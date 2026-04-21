@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitchen Furniture Design - Elevations</title>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f5f7fb;
+            color: #333;
+            margin: 0;
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #1a1a1a;
+            border-bottom: 2px solid #eaeaea;
+            padding-bottom: 10px;
+        }
+
+        p.subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            font-size: 18px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            color: #444;
+        }
+
+        .elevation-container {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            overflow-x: auto;
+            margin-bottom: 30px;
+        }
+
+        svg {
+            display: block;
+            margin: 0 auto;
+            background: white;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+        }
+
+        .label {
+            font-size: 11px;
+            fill: #555;
+            font-weight: 500;
+        }
+
+        .dim-line {
+            stroke: #a0a0a0;
+            stroke-width: 1;
+            stroke-dasharray: 3 3;
+        }
+
+        .dim-text {
+            font-size: 11px;
+            fill: #e67e22;
+            font-weight: 600;
+            text-anchor: middle;
+        }
+
+        .tick {
+            stroke: #a0a0a0;
+            stroke-width: 1;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eaeaea;
+            padding-bottom: 10px;
+        }
+
+        .tab-link {
+            background-color: #f5f7fb;
+            border: 1px solid #eee;
+            outline: none;
+            cursor: pointer;
+            padding: 10px 20px;
+            transition: 0.3s;
+            border-radius: 6px;
+            font-weight: 500;
+            color: #666;
+        }
+
+        .tab-link:hover {
+            background-color: #eaeaea;
+        }
+
+        .tab-link.active {
+            background-color: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+    <script>
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+            tablinks = document.getElementsByClassName("tab-link");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Kitchen Wall Elevations</h1>
+        <p class="subtitle">2D Furniture Design based on provided floor plan and visualization. Dimensions in mm.</p>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-link active" onclick="openTab(event, 'Design1')">Design 1</button>
+            <button class="tab-link" onclick="openTab(event, 'Design2')">Design 2</button>
+        </div>
+
+        <!-- Tab Content: Design 1 -->
+        <div id="Design1" class="tab-content active">
+            <h2>1. Back Wall Elevation (Width: 5420)</h2>
+            <div class="elevation-container">
+                <svg width="1360" height="800" viewBox="-60 -60 680 400">
+                    <defs>
+                        <pattern id="wood-tone" width="100" height="100" patternUnits="userSpaceOnUse">
+                            <rect width="100" height="100" fill="#a17a62" />
+                            <path d="M 0 10 Q 25 15 50 10 T 100 10" stroke="#7D5A47" stroke-width="0.8" fill="none"
+                                opacity="0.7" />
+                            <path d="M 0 30 Q 50 25 100 30" stroke="#5A3F30" stroke-width="0.5" fill="none"
+                                opacity="0.5" />
+                            <path d="M 0 50 Q 25 55 50 50 T 100 50" stroke="#7D5A47" stroke-width="0.8" fill="none"
+                                opacity="0.7" />
+                            <path d="M 0 70 Q 50 65 100 70" stroke="#5A3F30" stroke-width="0.5" fill="none"
+                                opacity="0.5" />
+                            <path d="M 0 90 Q 25 95 50 90 T 100 90" stroke="#7D5A47" stroke-width="0.8" fill="none"
+                                opacity="0.7" />
+                            <path d="M 0 20 Q 75 22 100 20" stroke="#3A281E" stroke-width="0.3" fill="none"
+                                opacity="0.3" />
+                            <path d="M 0 40 Q 25 38 50 40 T 100 40" stroke="#3A281E" stroke-width="0.3" fill="none"
+                                opacity="0.3" />
+                            <path d="M 0 60 Q 75 62 100 60" stroke="#3A281E" stroke-width="0.3" fill="none"
+                                opacity="0.3" />
+                            <path d="M 0 80 Q 25 78 50 80 T 100 80" stroke="#3A281E" stroke-width="0.3" fill="none"
+                                opacity="0.3" />
+                        </pattern>
+                        <linearGradient id="wall-color" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#FDFBF7" />
+                            <stop offset="100%" stop-color="#F5F0E8" />
+                        </linearGradient>
+                    </defs>
+                    <rect x="0" y="-20" width="542" height="280" fill="url(#wall-color)" stroke="#ddd" />
+                    <line x1="0" y1="260" x2="542" y2="260" stroke="#2c3e50" stroke-width="3" />
+                    <line x1="0" y1="-20" x2="542" y2="-20" stroke="#bdc3c7" stroke-width="1" />
+                    <rect x="0" y="-20" width="60" height="280" fill="url(#wood-tone)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <text x="30" y="120" class="label" text-anchor="middle" transform="rotate(-90 30 120)">TALL CABINETS
+                        SIDE</text>
+                    <rect x="60" y="-10" width="60" height="60" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1" />
+                    <rect x="60" y="245" width="482" height="15" fill="#4A3B32" opacity="0.8" />
+                    <rect x="60" y="209" width="482" height="3" fill="#D1D5DB" stroke="#9CA3AF" stroke-width="0.5" />
+                    <rect x="60" y="173" width="482" height="3" fill="#D1D5DB" stroke="#9CA3AF" stroke-width="0.5" />
+                    <rect x="60" y="176" width="482" height="33" fill="url(#wood-tone)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <rect x="60" y="212" width="482" height="33" fill="url(#wood-tone)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <line x1="120" y1="176" x2="120" y2="209" stroke="#8E6B47" stroke-width="0.5" />
+                    <line x1="180" y1="176" x2="180" y2="209" stroke="#8E6B47" stroke-width="0.5" />
+                    <line x1="240" y1="176" x2="240" y2="209" stroke="#8E6B47" stroke-width="0.5" />
+                    <line x1="300" y1="176" x2="300" y2="209" stroke="#8E6B47" stroke-width="0.5" />
+                    <line x1="360" y1="176" x2="360" y2="209" stroke="#8E6B47" stroke-width="0.5" />
+                    <line x1="420" y1="176" x2="420" y2="209" stroke="#8E6B47" stroke-width="0.5" />
+                    <line x1="480" y1="176" x2="480" y2="209" stroke="#8E6B47" stroke-width="0.5" />
+                    <line x1="120" y1="212" x2="120" y2="245" stroke="#8E6B47" stroke-width="0.5" />
+                    <line x1="180" y1="212" x2="180" y2="245" stroke="#8E6B47" stroke-width="0.5" />
+                    <line x1="240" y1="212" x2="240" y2="245" stroke="#8E6B47" stroke-width="0.5" />
+                    <line x1="300" y1="212" x2="300" y2="245" stroke="#8E6B47" stroke-width="0.5" />
+                    <line x1="360" y1="212" x2="360" y2="245" stroke="#8E6B47" stroke-width="0.5" />
+                    <line x1="420" y1="212" x2="420" y2="245" stroke="#8E6B47" stroke-width="0.5" />
+                    <line x1="480" y1="212" x2="480" y2="245" stroke="#8E6B47" stroke-width="0.5" />
+                    <rect x="60" y="170" width="482" height="3" fill="#E8DCC4" />
+                    <rect x="370" y="169" width="40" height="1" fill="#777" />
+                    <path d="M 390 169 Q 390 150 385 150" fill="none" stroke="#777" stroke-width="1.5" />
+                    <rect x="155" y="25" width="195" height="130" fill="#E0F2FE" stroke="#333" stroke-width="2" />
+                    <rect x="160" y="30" width="185" height="120" fill="none" stroke="#333" stroke-width="1" />
+                    <text x="252.5" y="90" class="label" text-anchor="middle">WINDOW</text>
+                    <rect x="362" y="-10" width="180" height="120" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1" />
+                    <line x1="362" y1="50" x2="542" y2="50" stroke="#D1D5DB" stroke-width="0.5" />
+                    <line x1="422" y1="-10" x2="422" y2="50" stroke="#D1D5DB" stroke-width="0.5" />
+                    <line x1="482" y1="-10" x2="482" y2="50" stroke="#D1D5DB" stroke-width="0.5" />
+                    <line x1="422" y1="50" x2="422" y2="110" stroke="#D1D5DB" stroke-width="0.5" />
+                    <line x1="482" y1="50" x2="482" y2="110" stroke="#D1D5DB" stroke-width="0.5" />
+                    <text x="452" y="35" class="label" text-anchor="middle" fill="#999">UPPER CABINETS</text>
+                    <line x1="60" y1="110" x2="120" y2="110" stroke="#333" stroke-width="3" />
+                    <text x="90" y="100" class="label" text-anchor="middle">SHELF</text>
+                    <line x1="0" y1="-30" x2="542" y2="-30" class="dim-line" />
+                    <text x="271" y="-35" class="dim-text">5420</text>
+                    <line x1="0" y1="-35" x2="0" y2="-25" class="tick" />
+                    <line x1="542" y1="-35" x2="542" y2="-25" class="tick" />
+                    <line x1="0" y1="290" x2="155" y2="290" class="dim-line" />
+                    <text x="77.5" y="305" class="dim-text">1550</text>
+                    <line x1="0" y1="285" x2="0" y2="295" class="tick" />
+                    <line x1="155" y1="285" x2="155" y2="295" class="tick" />
+                    <line x1="155" y1="290" x2="350" y2="290" class="dim-line" />
+                    <text x="252.5" y="305" class="dim-text">1950</text>
+                    <line x1="350" y1="285" x2="350" y2="295" class="tick" />
+                    <line x1="350" y1="290" x2="542" y2="290" class="dim-line" />
+                    <text x="446" y="305" class="dim-text">1920</text>
+                    <line x1="542" y1="285" x2="542" y2="295" class="tick" />
+                    <line x1="550" y1="260" x2="550" y2="245" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="560" y="255" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">150 cokół</text>
+                    <line x1="545" y1="260" x2="555" y2="260" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="545" y1="245" x2="555" y2="245" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="550" y1="245" x2="550" y2="209" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="560" y="227" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">360</text>
+                    <line x1="545" y1="209" x2="555" y2="209" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="550" y1="209" x2="550" y2="173" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="560" y="191" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">360</text>
+                    <line x1="545" y1="173" x2="555" y2="173" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="550" y1="173" x2="550" y2="170" stroke="#e67e22" stroke-width="0.8" />
+                    <text x="560" y="171.5" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">30 blat</text>
+                    <line x1="545" y1="170" x2="555" y2="170" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="550" y1="170" x2="550" y2="110" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="560" y="140" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">600</text>
+                    <line x1="545" y1="110" x2="555" y2="110" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="550" y1="110" x2="550" y2="50" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="560" y="80" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">600</text>
+                    <line x1="545" y1="50" x2="555" y2="50" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="550" y1="50" x2="550" y2="-10" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="560" y="20" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">600</text>
+                    <line x1="545" y1="-10" x2="555" y2="-10" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="-35" y1="260" x2="-35" y2="-20" class="dim-line" />
+                    <text x="-40" y="120" class="dim-text" transform="rotate(-90 -40 120)">2800</text>
+                    <line x1="-40" y1="260" x2="-30" y2="260" class="tick" />
+                    <line x1="-40" y1="-20" x2="-30" y2="-20" class="tick" />
+                </svg>
+            </div>
+
+            <h2>2. Left Wall Elevation (Width: 5400)</h2>
+            <div class="elevation-container">
+                <svg width="1360" height="720" viewBox="-40 -60 680 420">
+                    <rect x="0" y="-20" width="495" height="280" fill="url(#wall-color)" />
+                    <line x1="60" y1="-20" x2="495" y2="-20" stroke="#bdc3c7" stroke-width="1" />
+                    <rect x="0" y="53" width="60" height="3" fill="url(#wood-tone)" stroke="#8E6B47"
+                        stroke-width="0.5" />
+                    <rect x="0" y="173" width="60" height="3" fill="url(#wood-tone)" stroke="#8E6B47"
+                        stroke-width="0.5" />
+                    <rect x="0" y="218" width="60" height="3" fill="url(#wood-tone)" stroke="#8E6B47"
+                        stroke-width="0.5" />
+                    <rect x="60" y="-10" width="45" height="255" fill="#E0F2FE" stroke="#8E6B47" stroke-width="1"
+                        opacity="0.8" />
+                    <rect x="65" y="-5" width="35" height="240" fill="none" stroke="#38BDF8" stroke-width="1"
+                        opacity="0.5" />
+                    <line x1="70" y1="0" x2="90" y2="20" stroke="white" stroke-width="1" opacity="0.6" />
+                    <line x1="70" y1="15" x2="85" y2="30" stroke="white" stroke-width="1" opacity="0.6" />
+                    <rect x="105" y="-10" width="45" height="255" fill="#E0F2FE" stroke="#8E6B47" stroke-width="1"
+                        opacity="0.8" />
+                    <rect x="110" y="-5" width="35" height="240" fill="none" stroke="#38BDF8" stroke-width="1"
+                        opacity="0.5" />
+                    <line x1="115" y1="0" x2="135" y2="20" stroke="white" stroke-width="1" opacity="0.6" />
+                    <line x1="115" y1="15" x2="130" y2="30" stroke="white" stroke-width="1" opacity="0.6" />
+                    <rect x="195" y="-10" width="60" height="255" fill="url(#wood-tone)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <line x1="60" y1="-10" x2="60" y2="245" stroke="#8E6B47" stroke-width="0.5" />
+                    <line x1="105" y1="-10" x2="105" y2="245" stroke="#8E6B47" stroke-width="0.5" />
+                    <line x1="150" y1="-10" x2="150" y2="245" stroke="#8E6B47" stroke-width="0.5" />
+                    <rect x="150" y="173" width="45" height="72" fill="url(#wood-tone)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <rect x="152" y="180" width="1" height="20" fill="#4A3B32" />
+                    <rect x="150" y="50" width="45" height="123" fill="url(#wood-tone)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <rect x="152" y="146" width="1" height="20" fill="#4A3B32" />
+                    <rect x="150" y="-10" width="45" height="60" fill="url(#wood-tone)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <line x1="195" y1="-10" x2="195" y2="245" stroke="#8E6B47" stroke-width="0.5" />
+                    <rect x="255" y="-10" width="120" height="270" fill="url(#wood-tone)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <rect x="255" y="245" width="120" height="15" fill="url(#wall-color)" />
+                    <line x1="315" y1="-10" x2="315" y2="260" stroke="#8E6B47" stroke-width="0.5" />
+                    <line x1="375" y1="-10" x2="375" y2="260" stroke="#8E6B47" stroke-width="0.5" />
+                    <rect x="60" y="245" width="45" height="15" fill="#4A3B32" opacity="0.8" />
+                    <rect x="105" y="245" width="45" height="15" fill="#4A3B32" opacity="0.8" />
+                    <rect x="150" y="245" width="45" height="15" fill="#4A3B32" opacity="0.8" />
+                    <rect x="195" y="245" width="60" height="15" fill="#4A3B32" opacity="0.8" />
+                    <rect x="255" y="245" width="60" height="15" fill="#4A3B32" opacity="0.8" />
+                    <rect x="315" y="245" width="60" height="15" fill="#4A3B32" opacity="0.8" />
+                    <rect x="375" y="245" width="60" height="15" fill="#4A3B32" opacity="0.8" />
+                    <rect x="435" y="245" width="45" height="15" fill="#4A3B32" opacity="0.8" />
+                    <rect x="255" y="173" width="60" height="72" fill="url(#wood-tone)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <rect x="257" y="180" width="1" height="20" fill="#4A3B32" />
+                    <rect x="255" y="50" width="60" height="123" fill="url(#wood-tone)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <text x="285" y="115" class="label" text-anchor="middle" fill="#777" font-size="6">Fridge</text>
+                    <rect x="257" y="146" width="1" height="20" fill="#4A3B32" />
+                    <rect x="255" y="-10" width="60" height="60" fill="url(#wood-tone)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <rect x="315" y="173" width="60" height="72" fill="url(#wood-tone)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <rect x="317" y="180" width="1" height="20" fill="#4A3B32" />
+                    <rect x="315" y="50" width="60" height="123" fill="url(#wood-tone)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <rect x="317" y="146" width="1" height="20" fill="#4A3B32" />
+                    <rect x="315" y="-10" width="60" height="60" fill="url(#wood-tone)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <rect x="375" y="200" width="60" height="45" fill="url(#wood-tone)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <rect x="435" y="173" width="45" height="72" fill="url(#wood-tone)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <rect x="437" y="180" width="1" height="20" fill="#4A3B32" />
+                    <rect x="435" y="170" width="45" height="3" fill="#E8DCC4" stroke="#8E6B47" stroke-width="0.5" />
+                    <rect x="435" y="-10" width="60" height="120" fill="url(#wood-tone)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <rect x="435" y="110" width="105" height="60" fill="url(#wall-color)" stroke="#8E6B47"
+                        stroke-width="0.5" />
+                    <rect x="435" y="80" width="45" height="30" fill="#1A1A1A" stroke="#8E6B47" stroke-width="0.5" />
+                    <line x1="450" y1="80" x2="450" y2="110" stroke="#bdc3c7" stroke-width="0.5" />
+                    <line x1="465" y1="80" x2="465" y2="110" stroke="#bdc3c7" stroke-width="0.5" />
+                    <line x1="435" y1="95" x2="480" y2="95" stroke="#bdc3c7" stroke-width="0.5" />
+                    <line x1="435" y1="95" x2="450" y2="80" stroke="#bdc3c7" stroke-width="0.5" />
+                    <line x1="450" y1="95" x2="465" y2="80" stroke="#bdc3c7" stroke-width="0.5" />
+                    <line x1="465" y1="95" x2="480" y2="80" stroke="#bdc3c7" stroke-width="0.5" />
+                    <line x1="435" y1="110" x2="450" y2="95" stroke="#bdc3c7" stroke-width="0.5" />
+                    <line x1="450" y1="110" x2="465" y2="95" stroke="#bdc3c7" stroke-width="0.5" />
+                    <line x1="465" y1="110" x2="480" y2="95" stroke="#bdc3c7" stroke-width="0.5" />
+                    <rect x="495" y="-10" width="45" height="60" fill="none" stroke="#8E6B47" stroke-width="1" />
+                    <rect x="495" y="50" width="45" height="60" fill="none" stroke="#8E6B47" stroke-width="1" />
+                    <rect x="480" y="170" width="60" height="3" fill="#E8DCC4" stroke="#8E6B47" stroke-width="0.5" />
+                    <rect x="480" y="173" width="60" height="87" fill="url(#wall-color)" stroke="#8E6B47"
+                        stroke-width="0.5" />
+                    <line x1="0" y1="260" x2="540" y2="260" stroke="#2c3e50" stroke-width="3" />
+                    <rect x="375" y="140" width="60" height="60" fill="#1A1A1A" stroke="#333" />
+                    <rect x="380" y="145" width="50" height="40" fill="#333" />
+                    <text x="405" y="175" class="label" text-anchor="middle" fill="#777" font-size="6">Piekarnik</text>
+                    <rect x="375" y="95" width="60" height="45" fill="#1A1A1A" stroke="#333" />
+                    <rect x="380" y="100" width="50" height="25" fill="#333" />
+                    <text x="405" y="117" class="label" text-anchor="middle" fill="#777" font-size="6">Microfala</text>
+                    <rect x="375" y="50" width="60" height="45" fill="url(#wood-tone)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <rect x="375" y="-10" width="60" height="60" fill="url(#wood-tone)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <line x1="0" y1="290" x2="60" y2="290" stroke="#e67e22" stroke-width="0.8" stroke-dasharray="2 2" />
+                    <text x="30" y="300"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: middle; font-weight: 400;">600</text>
+                    <line x1="0" y1="285" x2="0" y2="295" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="60" y1="285" x2="60" y2="295" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="60" y1="290" x2="105" y2="290" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="82.5" y="300"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: middle; font-weight: 400;">450</text>
+                    <line x1="105" y1="285" x2="105" y2="295" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="105" y1="290" x2="150" y2="290" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="127.5" y="300"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: middle; font-weight: 400;">450</text>
+                    <line x1="150" y1="285" x2="150" y2="295" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="150" y1="290" x2="195" y2="290" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="172.5" y="300"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: middle; font-weight: 400;">450</text>
+                    <line x1="195" y1="285" x2="195" y2="295" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="195" y1="290" x2="255" y2="290" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="225" y="300"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: middle; font-weight: 400;">600</text>
+                    <line x1="255" y1="285" x2="255" y2="295" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="255" y1="290" x2="315" y2="290" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="285" y="300"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: middle; font-weight: 400;">600</text>
+                    <line x1="315" y1="285" x2="315" y2="295" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="315" y1="290" x2="375" y2="290" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="345" y="300"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: middle; font-weight: 400;">600</text>
+                    <line x1="375" y1="285" x2="375" y2="295" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="375" y1="290" x2="435" y2="290" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="405" y="300"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: middle; font-weight: 400;">600</text>
+                    <line x1="435" y1="285" x2="435" y2="295" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="435" y1="290" x2="480" y2="290" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="457.5" y="300"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: middle; font-weight: 400;">450</text>
+                    <line x1="480" y1="285" x2="480" y2="295" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="480" y1="290" x2="540" y2="290" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="510" y="300"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: middle; font-weight: 400;">600</text>
+                    <line x1="540" y1="285" x2="540" y2="295" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="0" y1="320" x2="540" y2="320" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="270" y="330"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: middle; font-weight: 400;">5400</text>
+                    <line x1="0" y1="315" x2="0" y2="325" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="540" y1="315" x2="540" y2="325" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="345" y1="350" x2="540" y2="350" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="442.5" y="360"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: middle; font-weight: 400;">1950</text>
+                    <line x1="345" y1="345" x2="345" y2="355" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="540" y1="345" x2="540" y2="355" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="225" y1="350" x2="345" y2="350" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="285" y="360"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: middle; font-weight: 400;">1200</text>
+                    <line x1="225" y1="345" x2="225" y2="355" stroke="#e67e22" stroke-width="0.8" />
+                    <!-- Top scale for upper cabinets -->
+                    <line x1="435" y1="-30" x2="495" y2="-30" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="465" y="-40"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: middle; font-weight: 400;">600</text>
+                    <line x1="435" y1="-35" x2="435" y2="-25" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="495" y1="-35" x2="495" y2="-25" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="495" y1="-30" x2="540" y2="-30" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="517.5" y="-40"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: middle; font-weight: 400;">450</text>
+                    <line x1="540" y1="-35" x2="540" y2="-25" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="-20" y1="260" x2="-20" y2="-20" class="dim-line" />
+                    <text x="-25" y="120" class="dim-text" transform="rotate(-90 -25 120)">2800</text>
+                    <line x1="-25" y1="260" x2="-15" y2="260" class="tick" />
+                    <line x1="-25" y1="-20" x2="-15" y2="-20" class="tick" />
+                    <line x1="560" y1="260" x2="560" y2="245" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="570" y="252.5" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">150</text>
+                    <line x1="555" y1="260" x2="565" y2="260" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="555" y1="245" x2="565" y2="245" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="560" y1="245" x2="560" y2="173" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="570" y="209" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">720</text>
+                    <line x1="555" y1="173" x2="565" y2="173" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="560" y1="173" x2="560" y2="170" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="570" y="171.5" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">30</text>
+                    <line x1="555" y1="170" x2="565" y2="170" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="560" y1="170" x2="560" y2="110" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="570" y="140" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">600</text>
+                    <line x1="555" y1="110" x2="565" y2="110" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="560" y1="110" x2="560" y2="50" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="570" y="80" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">600</text>
+                    <line x1="555" y1="50" x2="565" y2="50" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="560" y1="50" x2="560" y2="-10" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="570" y="20" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">600</text>
+                    <line x1="555" y1="-10" x2="565" y2="-10" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="560" y1="-10" x2="560" y2="-20" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="570" y="-15" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">100</text>
+                    <line x1="555" y1="-20" x2="565" y2="-20" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="610" y1="260" x2="610" y2="245" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="620" y="252.5" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">150</text>
+                    <line x1="605" y1="260" x2="615" y2="260" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="605" y1="245" x2="615" y2="245" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="610" y1="245" x2="610" y2="200" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="620" y="222.5" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">450</text>
+                    <line x1="605" y1="200" x2="615" y2="200" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="610" y1="200" x2="610" y2="140" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="620" y="170" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">600</text>
+                    <line x1="605" y1="140" x2="615" y2="140" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="610" y1="140" x2="610" y2="95" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="620" y="117.5" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">450</text>
+                    <line x1="605" y1="95" x2="615" y2="95" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="610" y1="95" x2="610" y2="50" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="620" y="72.5" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">450</text>
+                    <line x1="605" y1="50" x2="615" y2="50" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="610" y1="50" x2="610" y2="-10" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="620" y="20" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">600</text>
+                    <line x1="605" y1="-10" x2="615" y2="-10" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="610" y1="-10" x2="610" y2="-20" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="620" y="-15" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">100</text>
+                    <line x1="605" y1="-20" x2="615" y2="-20" stroke="#e67e22" stroke-width="0.8" />
+                </svg>
+            </div>
+        </div>
+
+        <!-- Tab Content: Design 2 -->
+        <div id="Design2" class="tab-content">
+            <h2>1. Back Wall Elevation (Width: 5420) [Copy]</h2>
+            <div class="elevation-container">
+                <svg width="1360" height="800" viewBox="-60 -60 680 400">
+                    <defs>
+                        <pattern id="wood-tone-2" width="100" height="100" patternUnits="userSpaceOnUse">
+                            <rect width="100" height="100" fill="#a17a62" />
+                            <path d="M 0 10 Q 25 15 50 10 T 100 10" stroke="#7D5A47" stroke-width="0.8" fill="none"
+                                opacity="0.7" />
+                            <path d="M 0 30 Q 50 25 100 30" stroke="#5A3F30" stroke-width="0.5" fill="none"
+                                opacity="0.5" />
+                            <path d="M 0 50 Q 25 55 50 50 T 100 50" stroke="#7D5A47" stroke-width="0.8" fill="none"
+                                opacity="0.7" />
+                            <path d="M 0 70 Q 50 65 100 70" stroke="#5A3F30" stroke-width="0.5" fill="none"
+                                opacity="0.5" />
+                            <path d="M 0 90 Q 25 95 50 90 T 100 90" stroke="#7D5A47" stroke-width="0.8" fill="none"
+                                opacity="0.7" />
+                            <path d="M 0 20 Q 75 22 100 20" stroke="#3A281E" stroke-width="0.3" fill="none"
+                                opacity="0.3" />
+                            <path d="M 0 40 Q 25 38 50 40 T 100 40" stroke="#3A281E" stroke-width="0.3" fill="none"
+                                opacity="0.3" />
+                            <path d="M 0 60 Q 75 62 100 60" stroke="#3A281E" stroke-width="0.3" fill="none"
+                                opacity="0.3" />
+                            <path d="M 0 80 Q 25 78 50 80 T 100 80" stroke="#3A281E" stroke-width="0.3" fill="none"
+                                opacity="0.3" />
+                        </pattern>
+                        <linearGradient id="wall-color-2" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#FDFBF7" />
+                            <stop offset="100%" stop-color="#F5F0E8" />
+                        </linearGradient>
+                    </defs>
+                    <rect x="0" y="-20" width="542" height="280" fill="url(#wall-color-2)" stroke="#ddd" />
+                    <line x1="0" y1="260" x2="542" y2="260" stroke="#2c3e50" stroke-width="3" />
+                    <line x1="0" y1="-20" x2="542" y2="-20" stroke="#bdc3c7" stroke-width="1" />
+                    <rect x="0" y="-20" width="60" height="280" fill="url(#wood-tone-2)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <text x="30" y="120" class="label" text-anchor="middle" transform="rotate(-90 30 120)">TALL CABINETS
+                        SIDE</text>
+                    <rect x="60" y="-10" width="60" height="60" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1" />
+                    <rect x="60" y="245" width="482" height="15" fill="#4A3B32" opacity="0.8" />
+                    <rect x="60" y="209" width="482" height="3" fill="#D1D5DB" stroke="#9CA3AF" stroke-width="0.5" />
+                    <rect x="60" y="173" width="482" height="3" fill="#D1D5DB" stroke="#9CA3AF" stroke-width="0.5" />
+                    <rect x="60" y="176" width="482" height="33" fill="url(#wood-tone-2)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <rect x="60" y="212" width="482" height="33" fill="url(#wood-tone-2)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <line x1="120" y1="176" x2="120" y2="209" stroke="#8E6B47" stroke-width="0.5" />
+                    <line x1="180" y1="176" x2="180" y2="209" stroke="#8E6B47" stroke-width="0.5" />
+                    <line x1="240" y1="176" x2="240" y2="209" stroke="#8E6B47" stroke-width="0.5" />
+                    <line x1="300" y1="176" x2="300" y2="209" stroke="#8E6B47" stroke-width="0.5" />
+                    <line x1="360" y1="176" x2="360" y2="209" stroke="#8E6B47" stroke-width="0.5" />
+                    <line x1="420" y1="176" x2="420" y2="209" stroke="#8E6B47" stroke-width="0.5" />
+                    <line x1="480" y1="176" x2="480" y2="209" stroke="#8E6B47" stroke-width="0.5" />
+                    <line x1="120" y1="212" x2="120" y2="245" stroke="#8E6B47" stroke-width="0.5" />
+                    <line x1="180" y1="212" x2="180" y2="245" stroke="#8E6B47" stroke-width="0.5" />
+                    <line x1="240" y1="212" x2="240" y2="245" stroke="#8E6B47" stroke-width="0.5" />
+                    <line x1="300" y1="212" x2="300" y2="245" stroke="#8E6B47" stroke-width="0.5" />
+                    <line x1="360" y1="212" x2="360" y2="245" stroke="#8E6B47" stroke-width="0.5" />
+                    <line x1="420" y1="212" x2="420" y2="245" stroke="#8E6B47" stroke-width="0.5" />
+                    <line x1="480" y1="212" x2="480" y2="245" stroke="#8E6B47" stroke-width="0.5" />
+                    <rect x="60" y="170" width="482" height="3" fill="#E8DCC4" />
+                    <rect x="370" y="169" width="40" height="1" fill="#777" />
+                    <path d="M 390 169 Q 390 150 385 150" fill="none" stroke="#777" stroke-width="1.5" />
+                    <rect x="155" y="25" width="195" height="130" fill="#E0F2FE" stroke="#333" stroke-width="2" />
+                    <rect x="160" y="30" width="185" height="120" fill="none" stroke="#333" stroke-width="1" />
+                    <text x="252.5" y="90" class="label" text-anchor="middle">WINDOW</text>
+                    <rect x="362" y="-10" width="180" height="120" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="1" />
+                    <line x1="362" y1="50" x2="542" y2="50" stroke="#D1D5DB" stroke-width="0.5" />
+                    <line x1="422" y1="-10" x2="422" y2="50" stroke="#D1D5DB" stroke-width="0.5" />
+                    <line x1="482" y1="-10" x2="482" y2="50" stroke="#D1D5DB" stroke-width="0.5" />
+                    <line x1="422" y1="50" x2="422" y2="110" stroke="#D1D5DB" stroke-width="0.5" />
+                    <line x1="482" y1="50" x2="482" y2="110" stroke="#D1D5DB" stroke-width="0.5" />
+                    <text x="452" y="35" class="label" text-anchor="middle" fill="#999">UPPER CABINETS</text>
+                    <line x1="60" y1="110" x2="120" y2="110" stroke="#333" stroke-width="3" />
+                    <text x="90" y="100" class="label" text-anchor="middle">SHELF</text>
+                    <line x1="0" y1="-30" x2="542" y2="-30" class="dim-line" />
+                    <text x="271" y="-35" class="dim-text">5420</text>
+                    <line x1="0" y1="-35" x2="0" y2="-25" class="tick" />
+                    <line x1="542" y1="-35" x2="542" y2="-25" class="tick" />
+                    <line x1="0" y1="290" x2="155" y2="290" class="dim-line" />
+                    <text x="77.5" y="305" class="dim-text">1550</text>
+                    <line x1="0" y1="285" x2="0" y2="295" class="tick" />
+                    <line x1="155" y1="285" x2="155" y2="295" class="tick" />
+                    <line x1="155" y1="290" x2="350" y2="290" class="dim-line" />
+                    <text x="252.5" y="305" class="dim-text">1950</text>
+                    <line x1="350" y1="285" x2="350" y2="295" class="tick" />
+                    <line x1="350" y1="290" x2="542" y2="290" class="dim-line" />
+                    <text x="446" y="305" class="dim-text">1920</text>
+                    <line x1="542" y1="285" x2="542" y2="295" class="tick" />
+                    <line x1="550" y1="260" x2="550" y2="245" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="560" y="255" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">150 cokół</text>
+                    <line x1="545" y1="260" x2="555" y2="260" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="545" y1="245" x2="555" y2="245" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="550" y1="245" x2="550" y2="209" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="560" y="227" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">360</text>
+                    <line x1="545" y1="209" x2="555" y2="209" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="550" y1="209" x2="550" y2="173" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="560" y="191" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">360</text>
+                    <line x1="545" y1="173" x2="555" y2="173" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="550" y1="173" x2="550" y2="170" stroke="#e67e22" stroke-width="0.8" />
+                    <text x="560" y="171.5" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">30 blat</text>
+                    <line x1="545" y1="170" x2="555" y2="170" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="550" y1="170" x2="550" y2="110" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="560" y="140" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">600</text>
+                    <line x1="545" y1="110" x2="555" y2="110" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="550" y1="110" x2="550" y2="50" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="560" y="80" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">600</text>
+                    <line x1="545" y1="50" x2="555" y2="50" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="550" y1="50" x2="550" y2="-10" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="560" y="20" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">600</text>
+                    <line x1="545" y1="-10" x2="555" y2="-10" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="-35" y1="260" x2="-35" y2="-20" class="dim-line" />
+                    <text x="-40" y="120" class="dim-text" transform="rotate(-90 -40 120)">2800</text>
+                    <line x1="-40" y1="260" x2="-30" y2="260" class="tick" />
+                    <line x1="-40" y1="-20" x2="-30" y2="-20" class="tick" />
+                </svg>
+            </div>
+
+            <h2>2. Left Wall Elevation (Width: 5400) [Copy]</h2>
+            <div class="elevation-container">
+                <svg width="1360" height="720" viewBox="-40 -60 680 420">
+                    <rect x="0" y="-20" width="540" height="280" fill="url(#wall-color-2)" />
+                    <line x1="60" y1="-20" x2="540" y2="-20" stroke="#bdc3c7" stroke-width="1" />
+                    <rect x="0" y="53" width="60" height="3" fill="url(#wood-tone-2)" stroke="#8E6B47"
+                        stroke-width="0.5" />
+                    <rect x="0" y="173" width="60" height="3" fill="url(#wood-tone-2)" stroke="#8E6B47"
+                        stroke-width="0.5" />
+                    <rect x="0" y="218" width="60" height="3" fill="url(#wood-tone-2)" stroke="#8E6B47"
+                        stroke-width="0.5" />
+                    <rect x="60" y="-10" width="45" height="255" fill="#E0F2FE" stroke="#8E6B47" stroke-width="1"
+                        opacity="0.8" />
+                    <rect x="65" y="-5" width="35" height="240" fill="none" stroke="#38BDF8" stroke-width="1"
+                        opacity="0.5" />
+                    <line x1="70" y1="0" x2="90" y2="20" stroke="white" stroke-width="1" opacity="0.6" />
+                    <line x1="70" y1="15" x2="85" y2="30" stroke="white" stroke-width="1" opacity="0.6" />
+                    <rect x="105" y="-10" width="45" height="255" fill="#E0F2FE" stroke="#8E6B47" stroke-width="1"
+                        opacity="0.8" />
+                    <rect x="110" y="-5" width="35" height="240" fill="none" stroke="#38BDF8" stroke-width="1"
+                        opacity="0.5" />
+                    <line x1="115" y1="0" x2="135" y2="20" stroke="white" stroke-width="1" opacity="0.6" />
+                    <line x1="115" y1="15" x2="130" y2="30" stroke="white" stroke-width="1" opacity="0.6" />
+                    <rect x="195" y="-10" width="60" height="255" fill="url(#wood-tone-2)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <line x1="60" y1="-10" x2="60" y2="245" stroke="#8E6B47" stroke-width="0.5" />
+                    <line x1="105" y1="-10" x2="105" y2="245" stroke="#8E6B47" stroke-width="0.5" />
+                    <line x1="150" y1="-10" x2="150" y2="245" stroke="#8E6B47" stroke-width="0.5" />
+                    <rect x="150" y="173" width="45" height="72" fill="url(#wood-tone-2)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <rect x="152" y="180" width="1" height="20" fill="#4A3B32" />
+                    <rect x="150" y="50" width="45" height="123" fill="url(#wood-tone-2)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <rect x="152" y="146" width="1" height="20" fill="#4A3B32" />
+                    <rect x="150" y="-10" width="45" height="60" fill="url(#wood-tone-2)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <line x1="195" y1="-10" x2="195" y2="245" stroke="#8E6B47" stroke-width="0.5" />
+                    <rect x="255" y="-10" width="165" height="270" fill="url(#wood-tone-2)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <rect x="255" y="245" width="165" height="15" fill="url(#wall-color-2)" />
+                    <line x1="315" y1="-10" x2="315" y2="260" stroke="#8E6B47" stroke-width="0.5" />
+                    <line x1="375" y1="-10" x2="375" y2="260" stroke="#8E6B47" stroke-width="0.5" />
+                    <rect x="60" y="245" width="45" height="15" fill="#4A3B32" opacity="0.8" />
+                    <rect x="105" y="245" width="45" height="15" fill="#4A3B32" opacity="0.8" />
+                    <rect x="150" y="245" width="45" height="15" fill="#4A3B32" opacity="0.8" />
+                    <rect x="195" y="245" width="60" height="15" fill="#4A3B32" opacity="0.8" />
+                    <rect x="255" y="245" width="60" height="15" fill="#4A3B32" opacity="0.8" />
+                    <rect x="315" y="245" width="60" height="15" fill="#4A3B32" opacity="0.8" />
+                    <rect x="375" y="245" width="60" height="15" fill="#4A3B32" opacity="0.8" />
+                    <rect x="435" y="245" width="45" height="15" fill="#4A3B32" opacity="0.8" />
+                    <rect x="255" y="173" width="60" height="72" fill="url(#wood-tone-2)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <rect x="257" y="180" width="1" height="20" fill="#4A3B32" />
+                    <rect x="255" y="50" width="60" height="123" fill="url(#wood-tone-2)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <text x="285" y="115" class="label" text-anchor="middle" fill="#777" font-size="6">Fridge</text>
+                    <rect x="257" y="146" width="1" height="20" fill="#4A3B32" />
+                    <rect x="255" y="-10" width="60" height="60" fill="url(#wood-tone-2)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <rect x="315" y="173" width="60" height="72" fill="url(#wood-tone-2)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <rect x="317" y="180" width="1" height="20" fill="#4A3B32" />
+                    <rect x="315" y="50" width="60" height="123" fill="url(#wood-tone-2)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <rect x="317" y="146" width="1" height="20" fill="#4A3B32" />
+                    <rect x="315" y="-10" width="60" height="60" fill="url(#wood-tone-2)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <rect x="375" y="200" width="60" height="45" fill="url(#wood-tone-2)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <rect x="435" y="173" width="45" height="72" fill="url(#wood-tone-2)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <rect x="437" y="180" width="1" height="20" fill="#4A3B32" />
+                    <rect x="435" y="170" width="45" height="3" fill="#E8DCC4" stroke="#8E6B47" stroke-width="0.5" />
+                    <rect x="435" y="-10" width="60" height="120" fill="url(#wood-tone-2)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <rect x="435" y="110" width="105" height="60" fill="url(#wall-color-2)" stroke="#8E6B47"
+                        stroke-width="0.5" />
+                    <rect x="435" y="80" width="45" height="30" fill="#1A1A1A" stroke="#8E6B47" stroke-width="0.5" />
+                    <line x1="450" y1="80" x2="450" y2="110" stroke="#bdc3c7" stroke-width="0.5" />
+                    <line x1="465" y1="80" x2="465" y2="110" stroke="#bdc3c7" stroke-width="0.5" />
+                    <line x1="435" y1="95" x2="480" y2="95" stroke="#bdc3c7" stroke-width="0.5" />
+                    <line x1="435" y1="95" x2="450" y2="80" stroke="#bdc3c7" stroke-width="0.5" />
+                    <line x1="450" y1="95" x2="465" y2="80" stroke="#bdc3c7" stroke-width="0.5" />
+                    <line x1="465" y1="95" x2="480" y2="80" stroke="#bdc3c7" stroke-width="0.5" />
+                    <line x1="435" y1="110" x2="450" y2="95" stroke="#bdc3c7" stroke-width="0.5" />
+                    <line x1="450" y1="110" x2="465" y2="95" stroke="#bdc3c7" stroke-width="0.5" />
+                    <line x1="465" y1="110" x2="480" y2="95" stroke="#bdc3c7" stroke-width="0.5" />
+                    <rect x="495" y="-10" width="45" height="60" fill="none" stroke="#8E6B47" stroke-width="1" />
+                    <rect x="495" y="50" width="45" height="60" fill="none" stroke="#8E6B47" stroke-width="1" />
+                    <rect x="480" y="170" width="60" height="3" fill="#E8DCC4" stroke="#8E6B47" stroke-width="0.5" />
+                    <rect x="480" y="173" width="60" height="87" fill="url(#wall-color-2)" stroke="#8E6B47"
+                        stroke-width="0.5" />
+                    <line x1="0" y1="260" x2="540" y2="260" stroke="#2c3e50" stroke-width="3" />
+                    <rect x="375" y="140" width="60" height="60" fill="#1A1A1A" stroke="#333" />
+                    <rect x="380" y="145" width="50" height="40" fill="#333" />
+                    <text x="405" y="175" class="label" text-anchor="middle" fill="#777" font-size="6">Piekarnik</text>
+                    <rect x="375" y="95" width="60" height="45" fill="#1A1A1A" stroke="#333" />
+                    <rect x="380" y="100" width="50" height="25" fill="#333" />
+                    <text x="405" y="117" class="label" text-anchor="middle" fill="#777" font-size="6">Microfala</text>
+                    <rect x="375" y="50" width="60" height="45" fill="url(#wood-tone-2)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <rect x="375" y="-10" width="60" height="60" fill="url(#wood-tone-2)" stroke="#8E6B47"
+                        stroke-width="1" />
+                    <line x1="0" y1="290" x2="60" y2="290" stroke="#e67e22" stroke-width="0.8" stroke-dasharray="2 2" />
+                    <text x="30" y="300"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: middle; font-weight: 400;">600</text>
+                    <line x1="0" y1="285" x2="0" y2="295" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="60" y1="285" x2="60" y2="295" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="60" y1="290" x2="105" y2="290" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="82.5" y="300"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: middle; font-weight: 400;">450</text>
+                    <line x1="105" y1="285" x2="105" y2="295" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="105" y1="290" x2="150" y2="290" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="127.5" y="300"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: middle; font-weight: 400;">450</text>
+                    <line x1="150" y1="285" x2="150" y2="295" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="150" y1="290" x2="195" y2="290" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="172.5" y="300"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: middle; font-weight: 400;">450</text>
+                    <line x1="195" y1="285" x2="195" y2="295" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="195" y1="290" x2="255" y2="290" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="225" y="300"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: middle; font-weight: 400;">600</text>
+                    <line x1="255" y1="285" x2="255" y2="295" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="255" y1="290" x2="315" y2="290" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="285" y="300"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: middle; font-weight: 400;">600</text>
+                    <line x1="315" y1="285" x2="315" y2="295" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="315" y1="290" x2="375" y2="290" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="345" y="300"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: middle; font-weight: 400;">600</text>
+                    <line x1="375" y1="285" x2="375" y2="295" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="375" y1="290" x2="435" y2="290" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="405" y="300"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: middle; font-weight: 400;">600</text>
+                    <line x1="435" y1="285" x2="435" y2="295" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="435" y1="290" x2="480" y2="290" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="457.5" y="300"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: middle; font-weight: 400;">450</text>
+                    <line x1="480" y1="285" x2="480" y2="295" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="480" y1="290" x2="540" y2="290" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="510" y="300"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: middle; font-weight: 400;">600</text>
+                    <line x1="540" y1="285" x2="540" y2="295" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="0" y1="320" x2="540" y2="320" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="270" y="330"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: middle; font-weight: 400;">5400</text>
+                    <line x1="0" y1="315" x2="0" y2="325" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="540" y1="315" x2="540" y2="325" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="345" y1="350" x2="540" y2="350" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="442.5" y="360"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: middle; font-weight: 400;">1950</text>
+                    <line x1="345" y1="345" x2="345" y2="355" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="540" y1="345" x2="540" y2="355" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="225" y1="350" x2="345" y2="350" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="285" y="360"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: middle; font-weight: 400;">1200</text>
+                    <line x1="225" y1="345" x2="225" y2="355" stroke="#e67e22" stroke-width="0.8" />
+                    <!-- Top scale for upper cabinets -->
+                    <line x1="435" y1="-30" x2="495" y2="-30" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="465" y="-40"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: middle; font-weight: 400;">600</text>
+                    <line x1="435" y1="-35" x2="435" y2="-25" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="495" y1="-35" x2="495" y2="-25" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="495" y1="-30" x2="540" y2="-30" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="517.5" y="-40"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: middle; font-weight: 400;">450</text>
+                    <line x1="540" y1="-35" x2="540" y2="-25" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="-20" y1="260" x2="-20" y2="-20" class="dim-line" />
+                    <text x="-25" y="120" class="dim-text" transform="rotate(-90 -25 120)">2800</text>
+                    <line x1="-25" y1="260" x2="-15" y2="260" class="tick" />
+                    <line x1="-25" y1="-20" x2="-15" y2="-20" class="tick" />
+                    <line x1="590" y1="260" x2="590" y2="245" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="600" y="252.5" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">150</text>
+                    <line x1="585" y1="260" x2="595" y2="260" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="585" y1="245" x2="595" y2="245" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="590" y1="245" x2="590" y2="173" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="600" y="209" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">720</text>
+                    <line x1="585" y1="173" x2="595" y2="173" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="590" y1="173" x2="590" y2="170" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="600" y="171.5" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">30</text>
+                    <line x1="585" y1="170" x2="595" y2="170" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="590" y1="170" x2="590" y2="110" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="600" y="140" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">600</text>
+                    <line x1="585" y1="110" x2="595" y2="110" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="590" y1="110" x2="590" y2="50" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="600" y="80" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">600</text>
+                    <line x1="585" y1="50" x2="595" y2="50" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="590" y1="50" x2="590" y2="-10" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="600" y="20" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">600</text>
+                    <line x1="585" y1="-10" x2="595" y2="-10" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="590" y1="-10" x2="590" y2="-20" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="600" y="-15" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">100</text>
+                    <line x1="585" y1="-20" x2="595" y2="-20" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="640" y1="260" x2="640" y2="245" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="650" y="252.5" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">150</text>
+                    <line x1="635" y1="260" x2="645" y2="260" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="635" y1="245" x2="645" y2="245" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="640" y1="245" x2="640" y2="200" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="650" y="222.5" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">450</text>
+                    <line x1="635" y1="200" x2="645" y2="200" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="640" y1="200" x2="640" y2="140" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="650" y="170" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">600</text>
+                    <line x1="635" y1="140" x2="645" y2="140" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="640" y1="140" x2="640" y2="95" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="650" y="117.5" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">450</text>
+                    <line x1="635" y1="95" x2="645" y2="95" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="640" y1="95" x2="640" y2="50" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="650" y="72.5" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">450</text>
+                    <line x1="635" y1="50" x2="645" y2="50" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="640" y1="50" x2="640" y2="-10" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="650" y="20" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">600</text>
+                    <line x1="635" y1="-10" x2="645" y2="-10" stroke="#e67e22" stroke-width="0.8" />
+                    <line x1="640" y1="-10" x2="640" y2="-20" stroke="#e67e22" stroke-width="0.8"
+                        stroke-dasharray="2 2" />
+                    <text x="650" y="-15" class="dim-text"
+                        style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">100</text>
+                    <line x1="635" y1="-20" x2="645" y2="-20" stroke="#e67e22" stroke-width="0.8" />
+                </svg>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
