@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laundry Furniture Design - Elevation</title>
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f5f7fb;
+            color: #333;
+            margin: 0;
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #1a1a1a;
+            border-bottom: 2px solid #eaeaea;
+            padding-bottom: 10px;
+        }
+
+        p.subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            font-size: 18px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            color: #444;
+        }
+
+        .elevation-container {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            overflow-x: auto;
+            margin-bottom: 30px;
+        }
+
+        svg {
+            display: block;
+            margin: 0 auto;
+            background: white;
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+        }
+
+        .label {
+            font-size: 11px;
+            fill: #555;
+            font-weight: 500;
+        }
+
+        .dim-line {
+            stroke: #e67e22;
+            stroke-width: 0.8;
+            stroke-dasharray: 2 2;
+        }
+
+        .dim-text {
+            font-size: 9px;
+            fill: #e67e22;
+            font-weight: 400;
+            text-anchor: middle;
+        }
+
+        .tick {
+            stroke: #e67e22;
+            stroke-width: 0.8;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Laundry Wall Elevation</h1>
+        <p class="subtitle">2D Furniture Design based on provided dimensions. Dimensions in mm.</p>
+
+        <h2>1. Laundry Elevation (Width: 3970, Height: 2800)</h2>
+        <div class="elevation-container">
+            <svg width="1100" height="600" viewBox="-60 -60 520 420">
+                <defs>
+                    <linearGradient id="wall-color" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stop-color="#FDFBF7" />
+                        <stop offset="100%" stop-color="#F5F0E8" />
+                    </linearGradient>
+                    <linearGradient id="cabinet-tone" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#EFEBE9" />
+                        <stop offset="100%" stop-color="#D7CCC8" />
+                    </linearGradient>
+                    <pattern id="wood-accent" width="100" height="100" patternUnits="userSpaceOnUse">
+                        <rect width="100" height="100" fill="#8D6E63" />
+                        <path d="M 0 10 L 100 10" stroke="#6D4C41" stroke-width="0.5" opacity="0.5" />
+                        <path d="M 0 30 L 100 30" stroke="#6D4C41" stroke-width="0.5" opacity="0.5" />
+                        <path d="M 0 50 L 100 50" stroke="#6D4C41" stroke-width="0.5" opacity="0.5" />
+                        <path d="M 0 70 L 100 70" stroke="#6D4C41" stroke-width="0.5" opacity="0.5" />
+                        <path d="M 0 90 L 100 90" stroke="#6D4C41" stroke-width="0.5" opacity="0.5" />
+                    </pattern>
+                </defs>
+                
+                <!-- Wall Background -->
+                <rect x="0" y="-20" width="397" height="280" fill="url(#wall-color)" stroke="#ddd" />
+                <line x1="0" y1="260" x2="397" y2="260" stroke="#2c3e50" stroke-width="3" />
+                <line x1="0" y1="-20" x2="397" y2="-20" stroke="#bdc3c7" stroke-width="1" />
+
+                <!-- Scale for top cabinets (y=-35) -->
+                <line x1="0" y1="-35" x2="112" y2="-35" stroke="#e67e22" stroke-width="0.8" stroke-dasharray="2 2" />
+                <text x="56" y="-25" class="dim-text">1120</text>
+                <line x1="0" y1="-40" x2="0" y2="-30" stroke="#e67e22" stroke-width="0.8" />
+                <line x1="112" y1="-40" x2="112" y2="-30" stroke="#e67e22" stroke-width="0.8" />
+
+                <line x1="112" y1="-35" x2="177" y2="-35" stroke="#e67e22" stroke-width="0.8" stroke-dasharray="2 2" />
+                <text x="144.5" y="-25" class="dim-text">650</text>
+                <line x1="177" y1="-40" x2="177" y2="-30" stroke="#e67e22" stroke-width="0.8" />
+
+                <line x1="177" y1="-35" x2="287" y2="-35" stroke="#e67e22" stroke-width="0.8" stroke-dasharray="2 2" />
+                <text x="232" y="-25" class="dim-text">1100</text>
+                <line x1="287" y1="-40" x2="287" y2="-30" stroke="#e67e22" stroke-width="0.8" />
+
+                <line x1="287" y1="-35" x2="397" y2="-35" stroke="#e67e22" stroke-width="0.8" stroke-dasharray="2 2" />
+                <text x="342" y="-25" class="dim-text">1100</text>
+                <line x1="397" y1="-40" x2="397" y2="-30" stroke="#e67e22" stroke-width="0.8" />
+                <!-- Cabinet Skeleton (Right side, 800x1600) -->
+                <rect x="317" y="100" width="80" height="160" fill="none" stroke="#8E6B47" stroke-width="1" />
+                <!-- Cabinet Skeleton (On top of first cabinet, 800x200) -->
+                <rect x="317" y="80" width="80" height="20" fill="none" stroke="#8E6B47" stroke-width="1" />
+                <!-- Cabinet Skeleton (Rightmost top, 1100x600) -->
+                <rect x="287" y="20" width="110" height="60" fill="none" stroke="#8E6B47" stroke-width="1" />
+                <!-- Horizontal Shelf in the middle -->
+                <line x1="287" y1="50" x2="397" y2="50" stroke="#8E6B47" stroke-width="0.5" />
+                <!-- Cabinet Skeleton (Middle top, 1100x600) -->
+                <rect x="177" y="20" width="110" height="60" fill="none" stroke="#8E6B47" stroke-width="1" />
+                <!-- Horizontal Shelf in the middle -->
+                <line x1="177" y1="50" x2="287" y2="50" stroke="#8E6B47" stroke-width="0.5" />
+                <!-- Cabinet Skeleton (Leftmost top, 650x600) -->
+                <rect x="112" y="20" width="65" height="60" fill="none" stroke="#8E6B47" stroke-width="1" />
+                <!-- Horizontal Shelf in the middle -->
+                <line x1="112" y1="50" x2="177" y2="50" stroke="#8E6B47" stroke-width="0.5" />
+                <!-- Vertical Splits (Right to Left: 400, 200, 200) -->
+                <line x1="357" y1="100" x2="357" y2="260" stroke="#8E6B47" stroke-width="0.5" />
+                <line x1="337" y1="100" x2="337" y2="260" stroke="#8E6B47" stroke-width="0.5" />
+                <!-- Cabinet Skeleton (Left of first one, 600x900) with Sink -->
+                <rect x="257" y="170" width="60" height="90" fill="none" stroke="#8E6B47" stroke-width="1" />
+                <!-- Vertical Line above left edge of sink cabinet (900mm) -->
+                <line x1="257" y1="170" x2="257" y2="80" stroke="#8E6B47" stroke-width="0.5" />
+                <path d="M 272 170 L 272 165 C 272 162 302 162 302 165 L 302 170 Z" fill="#B0BEC5" stroke="#78909C" stroke-width="1" />
+                <path d="M 287 162 L 287 152 C 287 148 282 148 282 150" fill="none" stroke="#78909C" stroke-width="2" />
+                <!-- Cabinet Skeleton (Left of second one, 800x900) -->
+                <rect x="177" y="170" width="80" height="90" fill="none" stroke="#8E6B47" stroke-width="1" />
+                <!-- Vertical Split (Center, 400+400) -->
+                <line x1="217" y1="170" x2="217" y2="260" stroke="#8E6B47" stroke-width="0.5" />
+                <!-- Closet Rod above 800mm cabinet -->
+                <line x1="177" y1="100" x2="257" y2="100" stroke="#7f8c8d" stroke-width="2" />
+                <!-- Cabinet Skeleton (Left of third one, 650x900) with Laundry Machine -->
+                <rect x="112" y="170" width="65" height="90" fill="none" stroke="#8E6B47" stroke-width="1" />
+                <circle cx="144.5" cy="215" r="20" fill="#ECEFF1" stroke="#CFD8DC" stroke-width="1" />
+                <circle cx="144.5" cy="215" r="15" fill="none" stroke="#B0BEC5" stroke-width="0.5" />
+                <text x="144.5" y="217" class="label" text-anchor="middle" fill="#78909C" font-size="6">Pralka</text>
+                <!-- Cabinet Skeleton (On top of laundry machine, 650x900) with Drying Machine -->
+                <rect x="112" y="80" width="65" height="90" fill="none" stroke="#8E6B47" stroke-width="1" />
+                <circle cx="144.5" cy="125" r="20" fill="#ECEFF1" stroke="#CFD8DC" stroke-width="1" />
+                <circle cx="144.5" cy="125" r="15" fill="none" stroke="#B0BEC5" stroke-width="0.5" />
+                <text x="144.5" y="127" class="label" text-anchor="middle" fill="#78909C" font-size="6">Suszarka</text>
+                <!-- Cabinet Skeleton (Left of laundry machine, 450x1800) -->
+                <!-- Cabinet Skeleton (Most left, 450x2400) with Plinth -->
+                <rect x="67" y="20" width="45" height="240" fill="none" stroke="#8E6B47" stroke-width="1" />
+                <!-- Plinth (150mm) -->
+                <line x1="67" y1="245" x2="112" y2="245" stroke="#8E6B47" stroke-width="0.5" />
+                <!-- Scale correspondign to laundry segments (Bottom scale) -->
+                <!-- y=290 -->
+                <line x1="0" y1="290" x2="67" y2="290" stroke="#e67e22" stroke-width="0.8" stroke-dasharray="2 2" />
+                <text x="33.5" y="300" class="dim-text">670</text>
+                <line x1="0" y1="285" x2="0" y2="295" stroke="#e67e22" stroke-width="0.8" />
+                <line x1="67" y1="285" x2="67" y2="295" stroke="#e67e22" stroke-width="0.8" />
+
+                <line x1="67" y1="290" x2="112" y2="290" stroke="#e67e22" stroke-width="0.8" stroke-dasharray="2 2" />
+                <text x="89.5" y="300" class="dim-text">450</text>
+                <line x1="112" y1="285" x2="112" y2="295" stroke="#e67e22" stroke-width="0.8" />
+
+                <line x1="112" y1="290" x2="177" y2="290" stroke="#e67e22" stroke-width="0.8" stroke-dasharray="2 2" />
+                <text x="144.5" y="300" class="dim-text">650</text>
+                <line x1="177" y1="285" x2="177" y2="295" stroke="#e67e22" stroke-width="0.8" />
+
+                <line x1="177" y1="290" x2="257" y2="290" stroke="#e67e22" stroke-width="0.8" stroke-dasharray="2 2" />
+                <text x="217" y="300" class="dim-text">800</text>
+                <line x1="257" y1="285" x2="257" y2="295" stroke="#e67e22" stroke-width="0.8" />
+
+                <line x1="257" y1="290" x2="317" y2="290" stroke="#e67e22" stroke-width="0.8" stroke-dasharray="2 2" />
+                <text x="287" y="300" class="dim-text">600</text>
+                <line x1="317" y1="285" x2="317" y2="295" stroke="#e67e22" stroke-width="0.8" />
+
+                <line x1="317" y1="290" x2="397" y2="290" stroke="#e67e22" stroke-width="0.8" stroke-dasharray="2 2" />
+                <text x="357" y="300" class="dim-text">800</text>
+                <line x1="397" y1="285" x2="397" y2="295" stroke="#e67e22" stroke-width="0.8" />
+
+                <!-- Total Width Scale (y=320) -->
+                <line x1="0" y1="320" x2="397" y2="320" stroke="#e67e22" stroke-width="0.8" stroke-dasharray="2 2" />
+                <text x="198.5" y="330" class="dim-text">3970</text>
+                <line x1="0" y1="315" x2="0" y2="325" stroke="#e67e22" stroke-width="0.8" />
+                <line x1="397" y1="315" x2="397" y2="325" stroke="#e67e22" stroke-width="0.8" />
+
+                <!-- Vertical Height Scale (Specific Heights, x=405) -->
+                <line x1="405" y1="20" x2="405" y2="260" stroke="#e67e22" stroke-width="0.8" stroke-dasharray="2 2" />
+                
+                <!-- Ticks -->
+                <line x1="400" y1="260" x2="410" y2="260" stroke="#e67e22" stroke-width="0.8" />
+                <line x1="400" y1="170" x2="410" y2="170" stroke="#e67e22" stroke-width="0.8" />
+                <line x1="400" y1="100" x2="410" y2="100" stroke="#e67e22" stroke-width="0.8" />
+                <line x1="400" y1="80" x2="410" y2="80" stroke="#e67e22" stroke-width="0.8" />
+                <line x1="400" y1="20" x2="410" y2="20" stroke="#e67e22" stroke-width="0.8" />
+                
+                <!-- Distance Labels -->
+                <text x="415" y="215" class="dim-text" transform="rotate(-90 415 215)">900</text>
+                <text x="415" y="135" class="dim-text" transform="rotate(-90 415 135)">700</text>
+                <text x="415" y="90" class="dim-text" transform="rotate(-90 415 90)">200</text>
+                <text x="415" y="50" class="dim-text" transform="rotate(-90 415 50)">600</text>
+
+                <!-- Side Scale for Height (Right side, x=430) -->
+                <line x1="430" y1="260" x2="430" y2="-20" stroke="#e67e22" stroke-width="0.8" stroke-dasharray="2 2" />
+                <text x="440" y="120" class="dim-text" transform="rotate(-90 440 120)">2800</text>
+                <line x1="425" y1="260" x2="435" y2="260" stroke="#e67e22" stroke-width="0.8" />
+                <line x1="425" y1="-20" x2="435" y2="-20" stroke="#e67e22" stroke-width="0.8" />
+            </svg>
+        </div>
+    </div>
+</body>
+
+</html>
