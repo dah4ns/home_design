@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Furniture Elevations Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0B0F19;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --card-hover-border: rgba(59, 130, 246, 0.4);
+            --text-primary: #F3F4F6;
+            --text-secondary: #9CA3AF;
+            --accent-kitchen: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            --accent-laundry: linear-gradient(135deg, #10b981, #047857);
+            --accent-glow-kitchen: rgba(59, 130, 246, 0.15);
+            --accent-glow-laundry: rgba(16, 185, 129, 0.15);
+        }
+
+        body {
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            box-sizing: border-box;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Subtle background glow spots */
+        body::before, body::after {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(150px);
+            z-index: -1;
+            opacity: 0.25;
+        }
+
+        body::before {
+            top: -10%;
+            left: -10%;
+            background: radial-gradient(circle, #3b82f6 0%, transparent 70%);
+        }
+
+        body::after {
+            bottom: -10%;
+            right: -10%;
+            background: radial-gradient(circle, #10b981 0%, transparent 70%);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: 42px;
+            font-weight: 700;
+            margin: 0 0 12px 0;
+            background: linear-gradient(135deg, #FFFFFF 30%, #9CA3AF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+        }
+
+        p.subtitle {
+            font-size: 16px;
+            color: var(--text-secondary);
+            max-width: 500px;
+            margin: 0 auto;
+            font-weight: 300;
+            line-height: 1.6;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            width: 100%;
+            max-width: 900px;
+            z-index: 1;
+        }
+
+        .room-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 30px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 320px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            text-decoration: none;
+            color: inherit;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .room-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            padding: 1px;
+            background: transparent;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+            transition: all 0.4s ease;
+        }
+
+        /* Dynamic card specific hover styles */
+        .room-card.kitchen-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(59, 130, 246, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 30px var(--accent-glow-kitchen);
+        }
+
+        .room-card.laundry-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(16, 185, 129, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 30px var(--accent-glow-laundry);
+        }
+
+        .room-icon {
+            width: 54px;
+            height: 54px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .room-card:hover .room-icon {
+            transform: scale(1.1);
+        }
+
+        .kitchen-card .room-icon svg {
+            stroke: #3b82f6;
+        }
+
+        .laundry-card .room-icon svg {
+            stroke: #10b981;
+        }
+
+        .room-info h2 {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+            color: #FFFFFF;
+        }
+
+        .room-info p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin: 0 0 30px 0;
+            line-height: 1.5;
+            font-weight: 300;
+        }
+
+        .explore-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            align-self: flex-start;
+        }
+
+        .kitchen-card .explore-btn {
+            background: var(--accent-kitchen);
+            color: #FFFFFF;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .laundry-card .explore-btn {
+            background: var(--accent-laundry);
+            color: #FFFFFF;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .room-card:hover .explore-btn {
+            transform: translateX(4px);
+        }
+
+        .explore-btn svg {
+            transition: transform 0.3s ease;
+        }
+
+        .room-card:hover .explore-btn svg {
+            transform: translateX(2px);
+        }
+
+        .footer {
+            margin-top: 80px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.3);
+            font-weight: 300;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>Furniture Elevations</h1>
+        <p class="subtitle">Browse detailed 2D architectural wall elevations, structural skeletons, and floor map layouts.</p>
+    </div>
+
+    <div class="dashboard-grid">
+        <!-- Kitchen Card -->
+        <a href="kitchen.html" class="room-card kitchen-card">
+            <div>
+                <div class="room-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                </div>
+                <div class="room-info">
+                    <h2>Kitchen Elevation</h2>
+                    <p>Back wall and left wall layouts with modular cabinets, appliance integration, structural skeletons, and customized plinth specifications.</p>
+                </div>
+            </div>
+            <div class="explore-btn">
+                <span>View Kitchen</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </div>
+        </a>
+
+        <!-- Laundry Card -->
+        <a href="laundry.html" class="room-card laundry-card">
+            <div>
+                <div class="room-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M8 12a4 4 0 1 0 8 0 4 4 0 1 0-8 0"></path>
+                        <line x1="12" y1="2" x2="12" y2="4"></line>
+                    </svg>
+                </div>
+                <div class="room-info">
+                    <h2>Laundry Elevation</h2>
+                    <p>Compact modular storage configurations, washing and drying unit columns, wardrobe towers, and exact dimension metrics.</p>
+                </div>
+            </div>
+            <div class="explore-btn">
+                <span>View Laundry</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </div>
+        </a>
+    </div>
+
+    <div class="footer">
+        &copy; 2026 Furniture Elevation Studio. Dimensions in mm (1:10 Scale).
+    </div>
+</body>
+
+</html>
