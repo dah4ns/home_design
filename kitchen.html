@@ -982,6 +982,19 @@
             <path d="M 135 170 L 135 150 C 135 140 125 140 125 145" fill="none" stroke="#777" stroke-width="3" />
             <line x1="115" y1="169" x2="155" y2="169" stroke="#777" stroke-width="1" />
 
+            <!-- Quadruple Electric Socket (Starts 80mm from left wall, 1040mm height) -->
+            <g class="socket">
+                <rect x="8" y="152" width="29.6" height="8" fill="#FFFFFF" stroke="#333333" stroke-width="0.5" />
+                <circle cx="12" cy="156" r="2.2" fill="#F3F4F6" stroke="#555555" stroke-width="0.5" />
+                <circle cx="12" cy="156" r="0.8" fill="#111111" />
+                <circle cx="19.2" cy="156" r="2.2" fill="#F3F4F6" stroke="#555555" stroke-width="0.5" />
+                <circle cx="19.2" cy="156" r="0.8" fill="#111111" />
+                <circle cx="26.4" cy="156" r="2.2" fill="#F3F4F6" stroke="#555555" stroke-width="0.5" />
+                <circle cx="26.4" cy="156" r="0.8" fill="#111111" />
+                <circle cx="33.6" cy="156" r="2.2" fill="#F3F4F6" stroke="#555555" stroke-width="0.5" />
+                <circle cx="33.6" cy="156" r="0.8" fill="#111111" />
+            </g>
+
             <!-- Double Electric Socket (Starts 1830mm from right, lower edge 100mm above countertop) -->
             <g class="socket">
                 <rect x="341.8" y="152" width="15.2" height="8" fill="#FFFFFF" stroke="#333333" stroke-width="0.5" />
@@ -1020,6 +1033,15 @@
                 <rect x="429.4" y="231" width="8" height="8" fill="#FFFFFF" stroke="#333333" stroke-width="0.5" />
                 <circle cx="433.4" cy="235" r="2.2" fill="#F3F4F6" stroke="#555555" stroke-width="0.5" />
                 <circle cx="433.4" cy="235" r="0.8" fill="#111111" />
+            </g>
+
+            <!-- Double Electric Socket Under Sink (Starts 30mm from right edge of sink cabinet, 450mm above floor, y=215) -->
+            <g class="socket">
+                <rect x="161.8" y="211" width="15.2" height="8" fill="#FFFFFF" stroke="#333333" stroke-width="0.5" />
+                <circle cx="165.8" cy="215" r="2.2" fill="#F3F4F6" stroke="#555555" stroke-width="0.5" />
+                <circle cx="165.8" cy="215" r="0.8" fill="#111111" />
+                <circle cx="173" cy="215" r="2.2" fill="#F3F4F6" stroke="#555555" stroke-width="0.5" />
+                <circle cx="173" cy="215" r="0.8" fill="#111111" />
             </g>
 
 
@@ -1115,6 +1137,18 @@
             <!-- Alignment Lines for single socket below Oven (Outlet center x=433.4, y=235) -->
             <line x1="433.4" y1="235" x2="433.4" y2="260" stroke="red" stroke-width="0.4" />
             <text x="430.4" y="247.5" class="dim-text" style="fill: red; font-size: 7px; text-anchor: middle; font-weight: 400;" transform="rotate(-90 430.4 247.5)">250</text>
+
+            <!-- Alignment Lines for left countertop socket (Outlet center x=12, y=156) -->
+            <line x1="0" y1="156" x2="12" y2="156" stroke="red" stroke-width="0.4" />
+            <line x1="12" y1="156" x2="12" y2="260" stroke="red" stroke-width="0.4" />
+            <text x="6" y="153" class="dim-text" style="fill: red; font-size: 7px; text-anchor: middle; font-weight: 400;">120</text>
+            <text x="9" y="208" class="dim-text" style="fill: red; font-size: 7px; text-anchor: middle; font-weight: 400;" transform="rotate(-90 9 208)">1040</text>
+
+            <!-- Alignment Lines for double socket under Sink (Outlet center x=165.8, y=215) -->
+            <line x1="0" y1="215" x2="165.8" y2="215" stroke="red" stroke-width="0.4" />
+            <line x1="165.8" y1="215" x2="165.8" y2="260" stroke="red" stroke-width="0.4" />
+            <text x="82.9" y="211" class="dim-text" style="fill: red; font-size: 7px; text-anchor: middle; font-weight: 400;">1658</text>
+            <text x="162.8" y="237.5" class="dim-text" style="fill: red; font-size: 7px; text-anchor: middle; font-weight: 400;" transform="rotate(-90 162.8 237.5)">450</text>
         </svg>
     </div>
 
