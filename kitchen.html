@@ -180,6 +180,7 @@
         <!-- Tabs -->
         <div class="tabs">
             <button class="tab-link active" onclick="openTab(event, 'Design1')">Design 1</button>
+            <button class="tab-link" onclick="openTab(event, 'Skeleton')">Skeleton</button>
             <button class="tab-link" onclick="openTab(event, 'Electricity')">Electricity</button>
             <button class="tab-link" onclick="openTab(event, 'FloorMap')">Floor Map</button>
         </div>
@@ -678,6 +679,262 @@
                 </svg>
             </div>
         </div>
+        </div>
+<!-- Tab Content: Skeleton -->
+<div id="Skeleton" class="tab-content">
+    <h2>1. Back Wall Elevation (Width: 5400) - Skeleton</h2>
+    <div class="elevation-container">
+        <svg width="1360" height="800" viewBox="-60 -80 680 420">
+            <defs>
+                <linearGradient id="wall-color-skel" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#FDFBF7" />
+                    <stop offset="100%" stop-color="#F5F0E8" />
+                </linearGradient>
+            </defs>
+            <rect x="0" y="-20" width="540" height="280" fill="#F5F0E8" stroke="#ddd" />
+            <!-- Cabinet backings for subtle distinction -->
+            <rect x="0" y="-10" width="31" height="120" fill="#FDFBF7" />
+            <rect x="60" y="173" width="300" height="72" fill="#FDFBF7" />
+            <rect x="360" y="-10" width="180" height="255" fill="#FDFBF7" />
+            <line x1="0" y1="260" x2="540" y2="260" stroke="#2c3e50" stroke-width="3" />
+            <line x1="0" y1="-20" x2="540" y2="-20" stroke="#bdc3c7" stroke-width="1" />
+            <!-- Skeleton for 310mm upper cabinet -->
+            <line x1="0" y1="-10" x2="31" y2="-10" stroke="#8E6B47" stroke-width="1" />
+            <line x1="0" y1="50" x2="31" y2="50" stroke="#8E6B47" stroke-width="1" />
+            <line x1="0" y1="110" x2="31" y2="110" stroke="#8E6B47" stroke-width="1" />
+            <line x1="0" y1="-10" x2="0" y2="110" stroke="#8E6B47" stroke-width="1" />
+            <line x1="31" y1="-10" x2="31" y2="110" stroke="#8E6B47" stroke-width="1" />
+            <!-- Base cabinets up to x=360 -->
+            <rect x="0" y="170" width="360" height="3" fill="#E8DCC4" />
+            <rect x="60" y="173" width="30" height="72" fill="none" stroke="#8E6B47" stroke-width="1" />
+            <rect x="90" y="173" width="90" height="72" fill="none" stroke="#8E6B47" stroke-width="1" />
+            <rect x="180" y="173" width="60" height="72" fill="none" stroke="#8E6B47" stroke-width="1" />
+            <rect x="240" y="173" width="60" height="72" fill="none" stroke="#8E6B47" stroke-width="1" />
+            <rect x="300" y="173" width="60" height="72" fill="none" stroke="#8E6B47" stroke-width="1" />
+            <line x1="60" y1="245" x2="540" y2="245" stroke="#8E6B47" stroke-width="1" />
+            <line x1="60" y1="245" x2="60" y2="260" stroke="#8E6B47" stroke-width="1" />
+            <line x1="540" y1="245" x2="540" y2="260" stroke="#8E6B47" stroke-width="1" />
+            <!-- Window -->
+            <rect x="145" y="25" width="195" height="130" fill="#E0F2FE" stroke="#333" stroke-width="2" />
+            <rect x="155" y="35" width="175" height="110" fill="none" stroke="#333" stroke-width="1" />
+            <!-- Vertical Split -->
+            <line x1="242.5" y1="35" x2="242.5" y2="145" stroke="#333" stroke-width="1.5" />
+            <!-- Handle -->
+            <rect x="240" y="85" width="5" height="10" fill="#555" stroke="#333" stroke-width="0.5" />
+            <line x1="240" y1="90" x2="230" y2="90" stroke="#555" stroke-width="2" />
+
+            <!-- Sink Tap (Moved to front) -->
+            <path d="M 135 170 L 135 150 C 135 140 125 140 125 145" fill="none" stroke="#777" stroke-width="3" />
+            <line x1="115" y1="169" x2="155" y2="169" stroke="#777" stroke-width="1" />
+
+            <!-- Segment 3 from right: Fridge (x=360-420) -->
+            <rect x="360" y="-10" width="60" height="255" fill="none" stroke="#8E6B47" stroke-width="1" />
+            <rect x="360" y="50" width="60" height="195" fill="none" stroke="#8E6B47" stroke-width="1" />
+
+            <!-- Segment 2 from right: Oven Tower (x=420-480) -->
+            <rect x="420" y="-10" width="60" height="255" fill="none" stroke="#8E6B47" stroke-width="1" />
+            <rect x="420" y="200" width="60" height="45" fill="none" stroke="#8E6B47" stroke-width="1" />
+            <rect x="420" y="140" width="60" height="60" fill="none" stroke="#8E6B47" stroke-width="1" />
+            <rect x="420" y="95" width="60" height="45" fill="none" stroke="#8E6B47" stroke-width="1" />
+            <rect x="420" y="50" width="60" height="45" fill="none" stroke="#8E6B47" stroke-width="1" />
+
+            <!-- Segment 1 from right: (x=480-540) -->
+            <rect x="480" y="-10" width="60" height="255" fill="none" stroke="#8E6B47" stroke-width="1" />
+            <rect x="480" y="50" width="60" height="195" fill="none" stroke="#8E6B47" stroke-width="1" />
+
+            <!-- Full width dimension -->
+            <line x1="0" y1="-55" x2="540" y2="-55" class="dim-line" />
+            <text x="270" y="-60" class="dim-text">5400</text>
+            <line x1="0" y1="-60" x2="0" y2="-50" class="tick" />
+            <line x1="540" y1="-60" x2="540" y2="-50" class="tick" />
+
+            <!-- New segments from left -->
+            <line x1="0" y1="-35" x2="31" y2="-35" class="dim-line" />
+            <text x="15.5" y="-40" class="dim-text">310</text>
+            <line x1="0" y1="-40" x2="0" y2="-30" class="tick" />
+            <line x1="31" y1="-40" x2="31" y2="-30" class="tick" />
+            <!-- Scale corresponding to cabinet widths -->
+            <line x1="0" y1="275" x2="60" y2="275" class="dim-line" />
+            <text x="30" y="285" class="dim-text">600</text>
+            <line x1="0" y1="270" x2="0" y2="280" class="tick" />
+
+            <line x1="60" y1="275" x2="90" y2="275" class="dim-line" />
+            <text x="75" y="285" class="dim-text">300</text>
+            <line x1="60" y1="270" x2="60" y2="280" class="tick" />
+
+            <line x1="90" y1="275" x2="180" y2="275" class="dim-line" />
+            <text x="135" y="285" class="dim-text">900</text>
+            <line x1="90" y1="270" x2="90" y2="280" class="tick" />
+
+            <line x1="180" y1="275" x2="240" y2="275" class="dim-line" />
+            <text x="210" y="285" class="dim-text">600</text>
+            <line x1="180" y1="270" x2="180" y2="280" class="tick" />
+
+            <line x1="240" y1="275" x2="300" y2="275" class="dim-line" />
+            <text x="270" y="285" class="dim-text">600</text>
+            <line x1="240" y1="270" x2="240" y2="280" class="tick" />
+
+            <line x1="300" y1="275" x2="360" y2="275" class="dim-line" />
+            <text x="330" y="285" class="dim-text">600</text>
+            <line x1="300" y1="270" x2="300" y2="280" class="tick" />
+
+            <line x1="360" y1="275" x2="420" y2="275" class="dim-line" />
+            <text x="390" y="285" class="dim-text">600</text>
+            <line x1="360" y1="270" x2="360" y2="280" class="tick" />
+
+            <line x1="420" y1="275" x2="480" y2="275" class="dim-line" />
+            <text x="450" y="285" class="dim-text">600</text>
+            <line x1="420" y1="270" x2="420" y2="280" class="tick" />
+
+            <line x1="480" y1="275" x2="540" y2="275" class="dim-line" />
+            <text x="510" y="285" class="dim-text">600</text>
+            <line x1="480" y1="270" x2="480" y2="280" class="tick" />
+            <line x1="540" y1="270" x2="540" y2="280" class="tick" />
+
+            <!-- Old bottom scale (moved down and corrected to x=540) -->
+            <line x1="0" y1="300" x2="145" y2="300" class="dim-line" />
+            <text x="72.5" y="310" class="dim-text">1450</text>
+            <line x1="0" y1="295" x2="0" y2="305" class="tick" />
+            <line x1="145" y1="295" x2="145" y2="305" class="tick" />
+            <line x1="145" y1="300" x2="340" y2="300" class="dim-line" />
+            <text x="242.5" y="310" class="dim-text">1950</text>
+            <line x1="340" y1="295" x2="340" y2="305" class="tick" />
+            <line x1="340" y1="300" x2="540" y2="300" class="dim-line" />
+            <text x="440" y="310" class="dim-text">2000</text>
+            <line x1="540" y1="295" x2="540" y2="305" class="tick" />
+            <line x1="550" y1="260" x2="550" y2="245" stroke="#e67e22" stroke-width="0.8" stroke-dasharray="2 2" />
+            <text x="560" y="255" class="dim-text"
+                style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">150 cokół</text>
+            <line x1="545" y1="260" x2="555" y2="260" stroke="#e67e22" stroke-width="0.8" />
+            <line x1="545" y1="245" x2="555" y2="245" stroke="#e67e22" stroke-width="0.8" />
+            <line x1="550" y1="245" x2="550" y2="209" stroke="#e67e22" stroke-width="0.8" stroke-dasharray="2 2" />
+            <text x="560" y="227" class="dim-text"
+                style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">360</text>
+            <line x1="545" y1="209" x2="555" y2="209" stroke="#e67e22" stroke-width="0.8" />
+            <line x1="550" y1="209" x2="550" y2="173" stroke="#e67e22" stroke-width="0.8" stroke-dasharray="2 2" />
+            <text x="560" y="191" class="dim-text"
+                style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">360</text>
+            <line x1="545" y1="173" x2="555" y2="173" stroke="#e67e22" stroke-width="0.8" />
+            <line x1="550" y1="173" x2="550" y2="170" stroke="#e67e22" stroke-width="0.8" />
+            <text x="560" y="171.5" class="dim-text"
+                style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">30 blat</text>
+            <line x1="545" y1="170" x2="555" y2="170" stroke="#e67e22" stroke-width="0.8" />
+            <line x1="550" y1="170" x2="550" y2="110" stroke="#e67e22" stroke-width="0.8" stroke-dasharray="2 2" />
+            <text x="560" y="140" class="dim-text"
+                style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">600</text>
+            <line x1="545" y1="110" x2="555" y2="110" stroke="#e67e22" stroke-width="0.8" />
+            <line x1="550" y1="110" x2="550" y2="50" stroke="#e67e22" stroke-width="0.8" stroke-dasharray="2 2" />
+            <text x="560" y="80" class="dim-text"
+                style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">600</text>
+            <line x1="545" y1="50" x2="555" y2="50" stroke="#e67e22" stroke-width="0.8" />
+            <line x1="550" y1="50" x2="550" y2="-10" stroke="#e67e22" stroke-width="0.8" stroke-dasharray="2 2" />
+            <line x1="545" y1="-10" x2="555" y2="-10" stroke="#e67e22" stroke-width="0.8" />
+            <line x1="550" y1="-10" x2="550" y2="-20" stroke="#e67e22" stroke-width="0.8" stroke-dasharray="2 2" />
+            <text x="560" y="-15" class="dim-text"
+                style="fill: #e67e22; font-size: 9px; text-anchor: start; font-weight: 400;">100</text>
+            <line x1="545" y1="-20" x2="555" y2="-20" stroke="#e67e22" stroke-width="0.8" />
+            <line x1="-35" y1="260" x2="-35" y2="-20" class="dim-line" />
+            <text x="-40" y="120" class="dim-text" transform="rotate(-90 -40 120)">2800</text>
+            <line x1="-40" y1="260" x2="-30" y2="260" class="tick" />
+            <line x1="-40" y1="-20" x2="-30" y2="-20" class="tick" />
+        </svg>
+    </div>
+
+    <h2>2. Left Wall Elevation (Width: 5400) - Skeleton</h2>
+    <div class="elevation-container">
+        <svg width="1360" height="720" viewBox="-40 -60 680 420">
+            <rect x="0" y="-20" width="540" height="280" fill="#F5F0E8" />
+            <!-- Cabinet backings for subtle distinction -->
+            <rect x="60" y="-10" width="135" height="255" fill="#FDFBF7" />
+            <rect x="240" y="-10" width="300" height="120" fill="#FDFBF7" />
+            <rect x="240" y="173" width="240" height="72" fill="#FDFBF7" />
+            <line x1="0" y1="-20" x2="540" y2="-20" stroke="#bdc3c7" stroke-width="1" />
+            <rect x="0" y="53" width="60" height="3" fill="none" stroke="#8E6B47" stroke-width="0.5" />
+            <rect x="0" y="173" width="60" height="3" fill="none" stroke="#8E6B47" stroke-width="0.5" />
+            <rect x="0" y="218" width="60" height="3" fill="none" stroke="#8E6B47" stroke-width="0.5" />
+            <rect x="60" y="-10" width="45" height="255" fill="none" stroke="#8E6B47" stroke-width="1" />
+            <rect x="105" y="-10" width="45" height="255" fill="none" stroke="#8E6B47" stroke-width="1" />
+
+            <line x1="60" y1="-10" x2="60" y2="245" stroke="#8E6B47" stroke-width="0.5" />
+            <line x1="105" y1="-10" x2="105" y2="245" stroke="#8E6B47" stroke-width="0.5" />
+            <line x1="150" y1="-10" x2="150" y2="245" stroke="#8E6B47" stroke-width="0.5" />
+            <rect x="150" y="173" width="45" height="72" fill="none" stroke="#8E6B47" stroke-width="1" />
+            <rect x="150" y="50" width="45" height="123" fill="none" stroke="#8E6B47" stroke-width="1" />
+            <rect x="150" y="-10" width="45" height="60" fill="none" stroke="#8E6B47" stroke-width="1" />
+
+            <!-- Segment 5 background -->
+            <rect x="195" y="-10" width="45" height="270" fill="#F5F0E8" />
+
+            <!-- Plinths (merged for uniformity) -->
+            <rect x="60" y="245" width="135" height="15" fill="none" stroke="#8E6B47" stroke-width="1" />
+            <rect x="240" y="245" width="240" height="15" fill="none" stroke="#8E6B47" stroke-width="1" />
+            <!-- Scale 5400 above drawing -->
+            <line x1="0" y1="-35" x2="540" y2="-35" stroke="#e67e22" stroke-width="0.8" stroke-dasharray="2 2" />
+            <text x="270" y="-45"
+                style="fill: #e67e22; font-size: 9px; text-anchor: middle; font-weight: 400;">5400</text>
+            <line x1="0" y1="-40" x2="0" y2="-30" stroke="#e67e22" stroke-width="0.8" />
+            <line x1="540" y1="-40" x2="540" y2="-30" stroke="#e67e22" stroke-width="0.8" />
+
+            <!-- Upper Cabinets -->
+            <rect x="240" y="-10" width="60" height="60" fill="none" stroke="#8E6B47" stroke-width="0.5" />
+            <rect x="240" y="50" width="60" height="60" fill="none" stroke="#8E6B47" stroke-width="0.5" />
+            <rect x="300" y="-10" width="60" height="60" fill="none" stroke="#8E6B47" stroke-width="0.5" />
+            <rect x="300" y="50" width="60" height="60" fill="none" stroke="#8E6B47" stroke-width="0.5" />
+            <rect x="360" y="-10" width="60" height="60" fill="none" stroke="#8E6B47" stroke-width="0.5" />
+            <rect x="360" y="50" width="60" height="60" fill="none" stroke="#8E6B47" stroke-width="0.5" />
+            <rect x="420" y="-10" width="60" height="60" fill="none" stroke="#8E6B47" stroke-width="0.5" />
+            <rect x="420" y="50" width="60" height="60" fill="none" stroke="#8E6B47" stroke-width="0.5" />
+            <rect x="480" y="-10" width="60" height="60" fill="none" stroke="#8E6B47" stroke-width="0.5" />
+            <rect x="480" y="50" width="60" height="60" fill="none" stroke="#8E6B47" stroke-width="0.5" />
+
+            <!-- Borders between upper cabinets -->
+            <!-- Vertical borders -->
+            <line x1="240" y1="-10" x2="240" y2="110" stroke="#8E6B47" stroke-width="1" />
+            <line x1="300" y1="-10" x2="300" y2="110" stroke="#8E6B47" stroke-width="1" />
+            <line x1="360" y1="-10" x2="360" y2="110" stroke="#8E6B47" stroke-width="1" />
+            <line x1="420" y1="-10" x2="420" y2="110" stroke="#8E6B47" stroke-width="1" />
+            <line x1="480" y1="-10" x2="480" y2="110" stroke="#8E6B47" stroke-width="1" />
+            <line x1="540" y1="-10" x2="540" y2="110" stroke="#8E6B47" stroke-width="1" />
+
+            <!-- Worktop -->
+            <rect x="240" y="170" width="240" height="3" fill="#E8DCC4" />
+
+            <!-- Cab 4 (x=240-300) -->
+            <rect x="240" y="173" width="60" height="72" fill="none" stroke="#8E6B47" stroke-width="1" />
+
+            <!-- Cab 3 (x=300-360) -->
+            <rect x="300" y="173" width="60" height="72" fill="none" stroke="#8E6B47" stroke-width="1" />
+
+            <!-- Cab 2 (x=360-420) -->
+            <rect x="360" y="173" width="60" height="72" fill="none" stroke="#8E6B47" stroke-width="1" />
+
+            <!-- Cab 1 (x=420-480) -->
+            <rect x="420" y="173" width="60" height="72" fill="none" stroke="#8E6B47" stroke-width="1" />
+
+            <!-- Borders between cabinets -->
+            <line x1="240" y1="173" x2="240" y2="245" stroke="#8E6B47" stroke-width="1" />
+            <line x1="300" y1="173" x2="300" y2="245" stroke="#8E6B47" stroke-width="1" />
+            <line x1="360" y1="173" x2="360" y2="245" stroke="#8E6B47" stroke-width="1" />
+            <line x1="420" y1="173" x2="420" y2="245" stroke="#8E6B47" stroke-width="1" />
+            <line x1="480" y1="173" x2="480" y2="245" stroke="#8E6B47" stroke-width="1" />
+
+            <!-- Background -->
+            <rect x="195" y="110" width="345" height="60" fill="#F5F0E8" />
+            <rect x="480" y="170" width="60" height="3" fill="#E8DCC4" />
+            <rect x="480" y="173" width="60" height="87" fill="#F5F0E8" stroke="#8E6B47"
+                stroke-width="0.5" />
+            <line x1="0" y1="260" x2="540" y2="260" stroke="#2c3e50" stroke-width="3" />
+
+            <!-- Horizontal and vertical borders -->
+            <line x1="240" y1="-10" x2="540" y2="-10" stroke="#8E6B47" stroke-width="1" />
+            <line x1="240" y1="50" x2="540" y2="50" stroke="#8E6B47" stroke-width="1" />
+            <line x1="240" y1="110" x2="540" y2="110" stroke="#8E6B47" stroke-width="1" />
+            <line x1="240" y1="173" x2="540" y2="173" stroke="#8E6B47" stroke-width="1" />
+            <line x1="195" y1="-10" x2="195" y2="245" stroke="#8E6B47" stroke-width="1" />
+        </svg>
+    </div>
+</div>
+
 <!-- Tab Content: Electricity -->
 <div id="Electricity" class="tab-content">
     <h2>1. Back Wall Elevation (Width: 5400) - Electricity</h2>
