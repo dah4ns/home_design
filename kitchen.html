@@ -179,14 +179,14 @@
 
         <!-- Tabs -->
         <div class="tabs">
-            <button class="tab-link active" onclick="openTab(event, 'Design1')">Design 1</button>
+            <button class="tab-link active" onclick="openTab(event, 'Furniture')">Furniture</button>
             <button class="tab-link" onclick="openTab(event, 'Skeleton')">Skeleton</button>
             <button class="tab-link" onclick="openTab(event, 'Electricity')">Electricity</button>
             <button class="tab-link" onclick="openTab(event, 'FloorMap')">Floor Map</button>
         </div>
 
-        <!-- Tab Content: Design 1 -->
-        <div id="Design1" class="tab-content active">
+        <!-- Tab Content: Furniture -->
+        <div id="Furniture" class="tab-content active">
             <h2>1. Back Wall Elevation (Width: 5400)</h2>
             <div class="elevation-container">
                 <svg width="1360" height="800" viewBox="-60 -80 680 420">
@@ -678,6 +678,26 @@
                     <line x1="605" y1="-20" x2="615" y2="-20" stroke="#e67e22" stroke-width="0.8" />
                 </svg>
             </div>
+
+            <h2>3. Kitchen Island - front (Width: 5400)</h2>
+            <div class="elevation-container">
+                <svg width="1360" height="800" viewBox="-60 -80 680 420">
+                    <line x1="0" y1="260" x2="540" y2="260" stroke="#2c3e50" stroke-width="3" />
+                    <line x1="0" y1="-20" x2="540" y2="-20" stroke="#bdc3c7" stroke-width="1" />
+
+                    <!-- Full width dimension -->
+                    <line x1="0" y1="-55" x2="540" y2="-55" class="dim-line" />
+                    <text x="270" y="-60" class="dim-text">5400</text>
+                    <line x1="0" y1="-60" x2="0" y2="-50" class="tick" />
+                    <line x1="540" y1="-60" x2="540" y2="-50" class="tick" />
+
+                    <!-- Vertical dimension -->
+                    <line x1="-35" y1="260" x2="-35" y2="-20" class="dim-line" />
+                    <text x="-40" y="120" class="dim-text" transform="rotate(-90 -40 120)">2800</text>
+                    <line x1="-40" y1="260" x2="-30" y2="260" class="tick" />
+                    <line x1="-40" y1="-20" x2="-30" y2="-20" class="tick" />
+                </svg>
+            </div>
         </div>
         </div>
 <!-- Tab Content: Skeleton -->
@@ -931,6 +951,26 @@
             <line x1="240" y1="110" x2="540" y2="110" stroke="#8E6B47" stroke-width="1" />
             <line x1="240" y1="173" x2="540" y2="173" stroke="#8E6B47" stroke-width="1" />
             <line x1="195" y1="-10" x2="195" y2="245" stroke="#8E6B47" stroke-width="1" />
+        </svg>
+    </div>
+
+    <h2>3. Kitchen Island - front (Width: 5400) - Skeleton</h2>
+    <div class="elevation-container">
+        <svg width="1360" height="800" viewBox="-60 -80 680 420">
+            <line x1="0" y1="260" x2="540" y2="260" stroke="#2c3e50" stroke-width="3" />
+            <line x1="0" y1="-20" x2="540" y2="-20" stroke="#bdc3c7" stroke-width="1" />
+
+            <!-- Full width dimension -->
+            <line x1="0" y1="-55" x2="540" y2="-55" class="dim-line" />
+            <text x="270" y="-60" class="dim-text">5400</text>
+            <line x1="0" y1="-60" x2="0" y2="-50" class="tick" />
+            <line x1="540" y1="-60" x2="540" y2="-50" class="tick" />
+
+            <!-- Vertical dimension -->
+            <line x1="-35" y1="260" x2="-35" y2="-20" class="dim-line" />
+            <text x="-40" y="120" class="dim-text" transform="rotate(-90 -40 120)">2800</text>
+            <line x1="-40" y1="260" x2="-30" y2="260" class="tick" />
+            <line x1="-40" y1="-20" x2="-30" y2="-20" class="tick" />
         </svg>
     </div>
 </div>
@@ -1246,6 +1286,38 @@
             <line x1="240" y1="173" x2="540" y2="173" stroke="#8E6B47" stroke-width="1" />
             <line x1="195" y1="-10" x2="195" y2="245" stroke="#8E6B47" stroke-width="1" />
 
+            <!-- Triple Electric Socket (Starts 151mm to the right from leftmost lower cabinet, 1040mm height) -->
+            <g class="socket">
+                <rect x="255.1" y="152" width="22.4" height="8" fill="#FFFFFF" stroke="#333333" stroke-width="0.5" />
+                <circle cx="259.1" cy="156" r="2.2" fill="#F3F4F6" stroke="#555555" stroke-width="0.5" />
+                <circle cx="259.1" cy="156" r="0.8" fill="#111111" />
+                <circle cx="266.3" cy="156" r="2.2" fill="#F3F4F6" stroke="#555555" stroke-width="0.5" />
+                <circle cx="266.3" cy="156" r="0.8" fill="#111111" />
+                <circle cx="273.5" cy="156" r="2.2" fill="#F3F4F6" stroke="#555555" stroke-width="0.5" />
+                <circle cx="273.5" cy="156" r="0.8" fill="#111111" />
+            </g>
+
+            <!-- Alignment Lines for left wall triple socket (Outlet center x=273.5, y=156, horizontal line y=136) -->
+            <line x1="273.5" y1="136" x2="540" y2="136" stroke="red" stroke-width="0.4" />
+            <line x1="273.5" y1="136" x2="273.5" y2="260" stroke="red" stroke-width="0.4" />
+            <text x="406.75" y="133" class="dim-text" style="fill: red; font-size: 7px; text-anchor: middle; font-weight: 400;">2665</text>
+            <text x="270.5" y="208" class="dim-text" style="fill: red; font-size: 7px; text-anchor: middle; font-weight: 400;" transform="rotate(-90 270.5 208)">1040</text>
+
+            <!-- Double Electric Socket (Starts 200mm from right wall, 1040mm height) -->
+            <g class="socket">
+                <rect x="504.8" y="152" width="15.2" height="8" fill="#FFFFFF" stroke="#333333" stroke-width="0.5" />
+                <circle cx="508.8" cy="156" r="2.2" fill="#F3F4F6" stroke="#555555" stroke-width="0.5" />
+                <circle cx="508.8" cy="156" r="0.8" fill="#111111" />
+                <circle cx="516" cy="156" r="2.2" fill="#F3F4F6" stroke="#555555" stroke-width="0.5" />
+                <circle cx="516" cy="156" r="0.8" fill="#111111" />
+            </g>
+
+            <!-- Alignment Lines for right double socket on left wall (Outlet center x=516, y=156) -->
+            <line x1="516" y1="156" x2="540" y2="156" stroke="red" stroke-width="0.4" />
+            <line x1="516" y1="156" x2="516" y2="260" stroke="red" stroke-width="0.4" />
+            <text x="528" y="153" class="dim-text" style="fill: red; font-size: 7px; text-anchor: middle; font-weight: 400;">240</text>
+            <text x="513" y="208" class="dim-text" style="fill: red; font-size: 7px; text-anchor: middle; font-weight: 400;" transform="rotate(-90 513 208)">1040</text>
+
             <line x1="0" y1="290" x2="60" y2="290" stroke="#e67e22" stroke-width="0.8" stroke-dasharray="2 2" />
             <text x="30" y="300"
                 style="fill: #e67e22; font-size: 9px; text-anchor: middle; font-weight: 400;">600</text>
@@ -1376,11 +1448,31 @@
             <line x1="605" y1="-20" x2="615" y2="-20" stroke="#e67e22" stroke-width="0.8" />
         </svg>
     </div>
+
+    <h2>3. Kitchen Island - front (Width: 5400) - Electricity</h2>
+    <div class="elevation-container">
+        <svg width="1360" height="800" viewBox="-60 -80 680 420">
+            <line x1="0" y1="260" x2="540" y2="260" stroke="#2c3e50" stroke-width="3" />
+            <line x1="0" y1="-20" x2="540" y2="-20" stroke="#bdc3c7" stroke-width="1" />
+
+            <!-- Full width dimension -->
+            <line x1="0" y1="-55" x2="540" y2="-55" class="dim-line" />
+            <text x="270" y="-60" class="dim-text">5400</text>
+            <line x1="0" y1="-60" x2="0" y2="-50" class="tick" />
+            <line x1="540" y1="-60" x2="540" y2="-50" class="tick" />
+
+            <!-- Vertical dimension -->
+            <line x1="-35" y1="260" x2="-35" y2="-20" class="dim-line" />
+            <text x="-40" y="120" class="dim-text" transform="rotate(-90 -40 120)">2800</text>
+            <line x1="-40" y1="260" x2="-30" y2="260" class="tick" />
+            <line x1="-40" y1="-20" x2="-30" y2="-20" class="tick" />
+        </svg>
+    </div>
 </div>
 
         <!-- Tab Content: Floor Map -->
         <div id="FloorMap" class="tab-content">
-            <h2>3. Floor Map (Bottom Cabinets)</h2>
+            <h2>4. Floor Map (Bottom Cabinets)</h2>
             <div class="elevation-container">
                 <svg width="800" height="800" viewBox="-80 -80 700 660">
                     <!-- Back Wall -->
