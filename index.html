@@ -18,8 +18,10 @@
             --text-secondary: #9CA3AF;
             --accent-kitchen: linear-gradient(135deg, #3b82f6, #1d4ed8);
             --accent-laundry: linear-gradient(135deg, #10b981, #047857);
+            --accent-electricity: linear-gradient(135deg, #ff3b30, #d70015);
             --accent-glow-kitchen: rgba(59, 130, 246, 0.15);
             --accent-glow-laundry: rgba(16, 185, 129, 0.15);
+            --accent-glow-electricity: rgba(255, 59, 48, 0.15);
         }
 
         body {
@@ -59,7 +61,7 @@
         body::after {
             bottom: -10%;
             right: -10%;
-            background: radial-gradient(circle, #10b981 0%, transparent 70%);
+            background: radial-gradient(circle, #ff3b30 0%, transparent 70%);
         }
 
         .header {
@@ -89,10 +91,10 @@
 
         .dashboard-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 30px;
             width: 100%;
-            max-width: 900px;
+            max-width: 1100px;
             z-index: 1;
         }
 
@@ -141,6 +143,12 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 30px var(--accent-glow-laundry);
         }
 
+        .room-card.electricity-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(255, 59, 48, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 30px var(--accent-glow-electricity);
+        }
+
         .room-icon {
             width: 54px;
             height: 54px;
@@ -164,6 +172,10 @@
 
         .laundry-card .room-icon svg {
             stroke: #10b981;
+        }
+
+        .electricity-card .room-icon svg {
+            stroke: #ff3b30;
         }
 
         .room-info h2 {
@@ -205,6 +217,12 @@
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
         }
 
+        .electricity-card .explore-btn {
+            background: var(--accent-electricity);
+            color: #FFFFFF;
+            box-shadow: 0 4px 12px rgba(255, 59, 48, 0.3);
+        }
+
         .room-card:hover .explore-btn {
             transform: translateX(4px);
         }
@@ -228,8 +246,8 @@
 
 <body>
     <div class="header">
-        <h1>Furniture Elevations</h1>
-        <p class="subtitle">Browse detailed 2D architectural wall elevations, structural skeletons, and floor map layouts.</p>
+        <h1>Furniture Elevations & Systems</h1>
+        <p class="subtitle">Browse detailed 2D architectural wall elevations, structural skeletons, floor maps, and electrical systems.</p>
     </div>
 
     <div class="dashboard-grid">
@@ -279,10 +297,32 @@
                 </svg>
             </div>
         </a>
+
+        <!-- Electricity Plan Card -->
+        <a href="electricity_0.html" class="room-card electricity-card">
+            <div>
+                <div class="room-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                    </svg>
+                </div>
+                <div class="room-info">
+                    <h2>Electricity Plan</h2>
+                    <p>Full home electrical plan layout detailing socket heights, splashproof points, multimedia TV systems, floor boxes, and main board placements.</p>
+                </div>
+            </div>
+            <div class="explore-btn">
+                <span>View Electricity</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </div>
+        </a>
     </div>
 
     <div class="footer">
-        &copy; 2026 Furniture Elevation Studio. Dimensions in mm (1:10 Scale).
+        &copy; 2026 Furniture Elevation Studio. Dimensions in mm.
     </div>
 </body>
 
