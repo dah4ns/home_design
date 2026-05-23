@@ -19,9 +19,11 @@
             --accent-kitchen: linear-gradient(135deg, #3b82f6, #1d4ed8);
             --accent-laundry: linear-gradient(135deg, #10b981, #047857);
             --accent-electricity: linear-gradient(135deg, #ff3b30, #d70015);
+            --accent-pantry: linear-gradient(135deg, #a855f7, #7e22ce);
             --accent-glow-kitchen: rgba(59, 130, 246, 0.15);
             --accent-glow-laundry: rgba(16, 185, 129, 0.15);
             --accent-glow-electricity: rgba(255, 59, 48, 0.15);
+            --accent-glow-pantry: rgba(168, 85, 247, 0.15);
         }
 
         body {
@@ -149,6 +151,12 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 30px var(--accent-glow-electricity);
         }
 
+        .room-card.pantry-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(168, 85, 247, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 30px var(--accent-glow-pantry);
+        }
+
         .room-icon {
             width: 54px;
             height: 54px;
@@ -176,6 +184,10 @@
 
         .electricity-card .room-icon svg {
             stroke: #ff3b30;
+        }
+
+        .pantry-card .room-icon svg {
+            stroke: #a855f7;
         }
 
         .room-info h2 {
@@ -221,6 +233,12 @@
             background: var(--accent-electricity);
             color: #FFFFFF;
             box-shadow: 0 4px 12px rgba(255, 59, 48, 0.3);
+        }
+
+        .pantry-card .explore-btn {
+            background: var(--accent-pantry);
+            color: #FFFFFF;
+            box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
         }
 
         .room-card:hover .explore-btn {
@@ -313,6 +331,31 @@
             </div>
             <div class="explore-btn">
                 <span>View Electricity</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </div>
+        </a>
+
+        <!-- Pantry Card -->
+        <a href="pantry.html" class="room-card pantry-card">
+            <div>
+                <div class="room-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="9"></rect>
+                        <rect x="14" y="3" width="7" height="5"></rect>
+                        <rect x="14" y="12" width="7" height="9"></rect>
+                        <rect x="3" y="16" width="7" height="5"></rect>
+                    </svg>
+                </div>
+                <div class="room-info">
+                    <h2>Pantry (Spiżarnia)</h2>
+                    <p>North wall and East wall elevations with cellar stairs descent outline, detailed height plans, structural skeletons, and floor mappings.</p>
+                </div>
+            </div>
+            <div class="explore-btn">
+                <span>View Pantry</span>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="5" y1="12" x2="19" y2="12"></line>
                     <polyline points="12 5 19 12 12 19"></polyline>
