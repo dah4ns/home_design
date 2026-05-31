@@ -228,6 +228,12 @@
                     <stop offset="0%" stop-color="#E5E7EB" />
                     <stop offset="100%" stop-color="#9CA3AF" />
                 </linearGradient>
+                <linearGradient id="fridge-metallic" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#E5E7EB" />
+                    <stop offset="30%" stop-color="#F3F4F6" />
+                    <stop offset="70%" stop-color="#D1D5DB" />
+                    <stop offset="100%" stop-color="#9CA3AF" />
+                </linearGradient>
             </defs>
         </svg>
 
@@ -235,15 +241,23 @@
         <div id="Furniture" class="tab-content active">
             <h2>1. North Wall Elevation (Width: 1875) - Furniture</h2>
             <div class="elevation-container">
-                <svg width="600" height="500" viewBox="-40 -50 260 370">
+                <svg width="600" height="500" viewBox="-55 -50 275 370">
                     <!-- Wall -->
                     <rect x="0" y="-20" width="187.5" height="280" fill="url(#wall-color)" stroke="#ddd" />
                     <line x1="0" y1="260" x2="187.5" y2="260" stroke="#2c3e50" stroke-width="3" />
                     <line x1="0" y1="-20" x2="187.5" y2="-20" stroke="#bdc3c7" stroke-width="1" />
 
-                    <!-- Placeholder/Furniture outline for empty state -->
-                    <rect x="0" y="-10" width="187.5" height="270" fill="none" stroke="#8E6B47" stroke-width="1" stroke-dasharray="4 4" opacity="0.4" />
-                    <text x="93.75" y="130" class="label" text-anchor="middle" fill="#aaa">North Wall (Empty State)</text>
+                    <!-- Freezer (Freestanding, 1900mm high, 600mm wide on the left, no split line) -->
+                    <rect x="0" y="70" width="60" height="190" fill="url(#fridge-metallic)" stroke="#4B5563" stroke-width="1" />
+                    <!-- Door single vertical handle -->
+                    <rect x="52" y="120" width="3" height="80" rx="1.5" fill="#374151" stroke="#111827" stroke-width="0.5" />
+                    <!-- Refrigerator Brand Badge / detail -->
+                    <rect x="25" y="82" width="10" height="2" fill="#374151" opacity="0.6" />
+                    <text x="30" y="160" class="label" text-anchor="middle" fill="#374151" font-size="8" font-weight="600">Zamrażarka</text>
+
+                    <!-- Remaining Empty Wall Space -->
+                    <rect x="60" y="-10" width="127.5" height="270" fill="none" stroke="#8E6B47" stroke-width="1" stroke-dasharray="4 4" opacity="0.3" />
+                    <text x="123.75" y="130" class="label" text-anchor="middle" fill="#bbb">Puste (Empty Space)</text>
 
                     <!-- Dimensions -->
                     <!-- Width 1875 -->
@@ -252,43 +266,51 @@
                     <line x1="0" y1="-40" x2="0" y2="-30" class="tick" />
                     <line x1="187.5" y1="-40" x2="187.5" y2="-30" class="tick" />
 
-                    <!-- Height 2800 -->
-                    <line x1="-20" y1="-20" x2="-20" y2="260" class="dim-line" />
-                    <text x="-25" y="120" class="dim-text" transform="rotate(-90 -25 120)">2800</text>
-                    <line x1="-25" y1="-20" x2="-15" y2="-20" class="tick" />
+                    <!-- Detailed horizontal scales at the bottom -->
+                    <line x1="0" y1="290" x2="60" y2="290" class="dim-line" />
+                    <text x="30" y="300" class="dim-text">600</text>
+                    <line x1="0" y1="285" x2="0" y2="295" class="tick" />
+                    <line x1="60" y1="285" x2="60" y2="295" class="tick" />
+
+                    <line x1="60" y1="290" x2="187.5" y2="290" class="dim-line" />
+                    <text x="123.75" y="300" class="dim-text">1275</text>
+                    <line x1="187.5" y1="285" x2="187.5" y2="295" class="tick" />
+
+                    <!-- Freezer Height scale on the left side -->
+                    <line x1="-20" y1="70" x2="-20" y2="260" class="dim-line" />
+                    <text x="-25" y="165" class="dim-text" transform="rotate(-90 -25 165)">1900</text>
+                    <line x1="-25" y1="70" x2="-15" y2="70" class="tick" />
                     <line x1="-25" y1="260" x2="-15" y2="260" class="tick" />
+
+                    <!-- Height 2800 (shifted further left) -->
+                    <line x1="-38" y1="-20" x2="-38" y2="260" class="dim-line" />
+                    <text x="-43" y="120" class="dim-text" transform="rotate(-90 -43 120)">2800</text>
+                    <line x1="-43" y1="-20" x2="-33" y2="-20" class="tick" />
+                    <line x1="-43" y1="260" x2="-33" y2="260" class="tick" />
                 </svg>
             </div>
 
             <h2>2. East Wall Elevation (Width: 2940) - Furniture</h2>
             <div class="elevation-container">
-                <svg width="800" height="520" viewBox="-40 -50 370 380">
+                <svg width="800" height="550" viewBox="-40 -50 370 410">
                     <!-- Wall -->
                     <rect x="0" y="-20" width="294" height="280" fill="url(#wall-color)" stroke="#ddd" />
                     <line x1="0" y1="260" x2="294" y2="260" stroke="#2c3e50" stroke-width="3" />
                     <line x1="0" y1="-20" x2="294" y2="-20" stroke="#bdc3c7" stroke-width="1" />
 
                     <!-- Stairs descent (wejście do piwnicy) on the right side (South corner) -->
-                    <!-- Width of stairs = 130 (1300mm) from x=164 to x=294 -->
+                    <!-- Width of stairs = 90 (900mm) from x=204 to x=294 -->
                     <!-- Cut-out below the floor level y=260 for descending steps -->
-                    <path d="M 164 260 L 164 310 L 294 310 L 294 260 Z" fill="url(#stairs-shading)" stroke="#333" stroke-width="1.5" />
+                    <path d="M 204 260 L 204 310 L 294 310 L 294 260 Z" fill="url(#stairs-shading)" stroke="#333" stroke-width="1.5" />
                     
-                    <!-- Stair steps -->
-                    <line x1="164" y1="260" x2="190" y2="270" stroke="#333" stroke-width="1" />
-                    <line x1="190" y1="270" x2="190" y2="310" stroke="#333" stroke-width="1" />
-                    <line x1="190" y1="270" x2="216" y2="280" stroke="#333" stroke-width="1" />
-                    <line x1="216" y1="280" x2="216" y2="310" stroke="#333" stroke-width="1" />
-                    <line x1="216" y1="280" x2="242" y2="290" stroke="#333" stroke-width="1" />
-                    <line x1="242" y1="290" x2="242" y2="310" stroke="#333" stroke-width="1" />
-                    <line x1="242" y1="290" x2="268" y2="300" stroke="#333" stroke-width="1" />
-                    <line x1="268" y1="300" x2="268" y2="310" stroke="#333" stroke-width="1" />
-                    <line x1="268" y1="300" x2="294" y2="310" stroke="#333" stroke-width="1" />
+                    <!-- Solid Stair steps -->
+                    <path d="M 204 260 L 222 260 L 222 270 L 240 270 L 240 280 L 258 280 L 258 290 L 276 290 L 276 300 L 294 300 L 294 310 L 204 310 Z" fill="#4b5563" stroke="#1f2937" stroke-width="1" />
 
-                    <text x="229" y="303" class="label" text-anchor="middle" font-size="7" fill="#555" style="font-weight:bold;">Schody w dół (Cellar Stairs)</text>
+                    <text x="249" y="298" class="label" text-anchor="middle" font-size="7" fill="#ffffff" style="font-weight:bold; letter-spacing: 0.5px;">Schody w dół</text>
 
                     <!-- Placeholder outline for empty state -->
-                    <rect x="0" y="-10" width="164" height="270" fill="none" stroke="#8E6B47" stroke-width="1" stroke-dasharray="4 4" opacity="0.4" />
-                    <text x="82" y="130" class="label" text-anchor="middle" fill="#aaa">East Wall (Empty State)</text>
+                    <rect x="0" y="-10" width="204" height="270" fill="none" stroke="#8E6B47" stroke-width="1" stroke-dasharray="4 4" opacity="0.4" />
+                    <text x="102" y="130" class="label" text-anchor="middle" fill="#aaa">East Wall (Empty State)</text>
 
                     <!-- Dimensions -->
                     <!-- Width 2940 -->
@@ -297,10 +319,14 @@
                     <line x1="0" y1="-40" x2="0" y2="-30" class="tick" />
                     <line x1="294" y1="-40" x2="294" y2="-30" class="tick" />
 
-                    <!-- Stairs width 1300 on the bottom -->
-                    <line x1="164" y1="325" x2="294" y2="325" class="dim-line" />
-                    <text x="229" y="335" class="dim-text">1300</text>
-                    <line x1="164" y1="320" x2="164" y2="330" class="tick" />
+                    <!-- Split wall dimensions on the bottom -->
+                    <line x1="0" y1="325" x2="204" y2="325" class="dim-line" />
+                    <text x="102" y="335" class="dim-text">2040</text>
+                    <line x1="0" y1="320" x2="0" y2="330" class="tick" />
+                    <line x1="204" y1="320" x2="204" y2="330" class="tick" />
+
+                    <line x1="204" y1="325" x2="294" y2="325" class="dim-line" />
+                    <text x="249" y="335" class="dim-text">900</text>
                     <line x1="294" y1="320" x2="294" y2="330" class="tick" />
 
                     <!-- Height 2800 -->
@@ -316,40 +342,66 @@
         <div id="Skeleton" class="tab-content">
             <h2>1. North Wall Elevation (Width: 1875) - Skeleton</h2>
             <div class="elevation-container">
-                <svg width="600" height="500" viewBox="-40 -50 260 370">
+                <svg width="600" height="500" viewBox="-55 -50 275 370">
                     <!-- Wall -->
                     <rect x="0" y="-20" width="187.5" height="280" fill="#F5F0E8" stroke="#ddd" />
                     <line x1="0" y1="260" x2="187.5" y2="260" stroke="#2c3e50" stroke-width="3" />
                     <line x1="0" y1="-20" x2="187.5" y2="-20" stroke="#bdc3c7" stroke-width="1" />
 
-                    <text x="93.75" y="130" class="label" text-anchor="middle" fill="#aaa">North Wall Skeleton</text>
+                    <!-- Freezer (Freestanding, 1900mm high, 600mm wide on the left, shown finished/normal in skeleton view) -->
+                    <rect x="0" y="70" width="60" height="190" fill="url(#fridge-metallic)" stroke="#4B5563" stroke-width="1" />
+                    <!-- Door single vertical handle -->
+                    <rect x="52" y="120" width="3" height="80" rx="1.5" fill="#374151" stroke="#111827" stroke-width="0.5" />
+                    <!-- Refrigerator Brand Badge / detail -->
+                    <rect x="25" y="82" width="10" height="2" fill="#374151" opacity="0.6" />
+                    <text x="30" y="160" class="label" text-anchor="middle" fill="#374151" font-size="8" font-weight="600">Zamrażarka</text>
+
+                    <text x="123.75" y="130" class="label" text-anchor="middle" fill="#ccc">North Wall Skeleton</text>
 
                     <!-- Dimensions -->
+                    <!-- Width 1875 -->
                     <line x1="0" y1="-35" x2="187.5" y2="-35" class="dim-line" />
                     <text x="93.75" y="-40" class="dim-text">1875</text>
                     <line x1="0" y1="-40" x2="0" y2="-30" class="tick" />
                     <line x1="187.5" y1="-40" x2="187.5" y2="-30" class="tick" />
 
-                    <line x1="-20" y1="-20" x2="-20" y2="260" class="dim-line" />
-                    <text x="-25" y="120" class="dim-text" transform="rotate(-90 -25 120)">2800</text>
-                    <line x1="-25" y1="-20" x2="-15" y2="-20" class="tick" />
+                    <!-- Detailed horizontal scales at the bottom -->
+                    <line x1="0" y1="290" x2="60" y2="290" class="dim-line" />
+                    <text x="30" y="300" class="dim-text">600</text>
+                    <line x1="0" y1="285" x2="0" y2="295" class="tick" />
+                    <line x1="60" y1="285" x2="60" y2="295" class="tick" />
+
+                    <line x1="60" y1="290" x2="187.5" y2="290" class="dim-line" />
+                    <text x="123.75" y="300" class="dim-text">1275</text>
+                    <line x1="187.5" y1="285" x2="187.5" y2="295" class="tick" />
+
+                    <!-- Freezer Height scale on the left side -->
+                    <line x1="-20" y1="70" x2="-20" y2="260" class="dim-line" />
+                    <text x="-25" y="165" class="dim-text" transform="rotate(-90 -25 165)">1900</text>
+                    <line x1="-25" y1="70" x2="-15" y2="70" class="tick" />
                     <line x1="-25" y1="260" x2="-15" y2="260" class="tick" />
+
+                    <!-- Height 2800 (shifted further left) -->
+                    <line x1="-38" y1="-20" x2="-38" y2="260" class="dim-line" />
+                    <text x="-43" y="120" class="dim-text" transform="rotate(-90 -43 120)">2800</text>
+                    <line x1="-43" y1="-20" x2="-33" y2="-20" class="tick" />
+                    <line x1="-43" y1="260" x2="-33" y2="260" class="tick" />
                 </svg>
             </div>
 
             <h2>2. East Wall Elevation (Width: 2940) - Skeleton</h2>
             <div class="elevation-container">
-                <svg width="800" height="520" viewBox="-40 -50 370 380">
+                <svg width="800" height="550" viewBox="-40 -50 370 410">
                     <!-- Wall -->
                     <rect x="0" y="-20" width="294" height="280" fill="#F5F0E8" stroke="#ddd" />
                     <line x1="0" y1="260" x2="294" y2="260" stroke="#2c3e50" stroke-width="3" />
                     <line x1="0" y1="-20" x2="294" y2="-20" stroke="#bdc3c7" stroke-width="1" />
 
                     <!-- Stairs descent -->
-                    <path d="M 164 260 L 164 310 L 294 310 L 294 260 Z" fill="#E5E7EB" stroke="#333" stroke-width="1.5" />
-                    <line x1="164" y1="260" x2="294" y2="310" stroke="#333" stroke-width="1.5" stroke-dasharray="3 3" />
+                    <path d="M 204 260 L 204 310 L 294 310 L 294 260 Z" fill="#F3F4F6" stroke="#333" stroke-width="1.5" />
+                    <path d="M 204 260 L 222 260 L 222 270 L 240 270 L 240 280 L 258 280 L 258 290 L 276 290 L 276 300 L 294 300 L 294 310 L 204 310 Z" fill="#E5E7EB" stroke="#9CA3AF" stroke-width="1" stroke-dasharray="2 2" />
 
-                    <text x="82" y="130" class="label" text-anchor="middle" fill="#aaa">East Wall Skeleton</text>
+                    <text x="102" y="130" class="label" text-anchor="middle" fill="#aaa">East Wall Skeleton</text>
 
                     <!-- Dimensions -->
                     <line x1="0" y1="-35" x2="294" y2="-35" class="dim-line" />
@@ -357,9 +409,14 @@
                     <line x1="0" y1="-40" x2="0" y2="-30" class="tick" />
                     <line x1="294" y1="-40" x2="294" y2="-30" class="tick" />
 
-                    <line x1="164" y1="325" x2="294" y2="325" class="dim-line" />
-                    <text x="229" y="335" class="dim-text">1300</text>
-                    <line x1="164" y1="320" x2="164" y2="330" class="tick" />
+                    <!-- Split wall dimensions on the bottom -->
+                    <line x1="0" y1="325" x2="204" y2="325" class="dim-line" />
+                    <text x="102" y="335" class="dim-text">2040</text>
+                    <line x1="0" y1="320" x2="0" y2="330" class="tick" />
+                    <line x1="204" y1="320" x2="204" y2="330" class="tick" />
+
+                    <line x1="204" y1="325" x2="294" y2="325" class="dim-line" />
+                    <text x="249" y="335" class="dim-text">900</text>
                     <line x1="294" y1="320" x2="294" y2="330" class="tick" />
 
                     <line x1="-20" y1="-20" x2="-20" y2="260" class="dim-line" />
@@ -374,39 +431,87 @@
         <div id="Electricity" class="tab-content">
             <h2>1. North Wall Elevation (Width: 1875) - Electricity</h2>
             <div class="elevation-container">
-                <svg width="600" height="500" viewBox="-40 -50 260 370">
+                <svg width="600" height="500" viewBox="-55 -50 275 370">
                     <!-- Wall -->
                     <rect x="0" y="-20" width="187.5" height="280" fill="#F5F0E8" stroke="#ddd" />
                     <line x1="0" y1="260" x2="187.5" y2="260" stroke="#2c3e50" stroke-width="3" />
                     <line x1="0" y1="-20" x2="187.5" y2="-20" stroke="#bdc3c7" stroke-width="1" />
 
-                    <text x="93.75" y="130" class="label" text-anchor="middle" fill="#aaa">North Wall Electricity</text>
+                    <!-- Freezer outline in background (dashed, no split line) -->
+                    <rect x="0" y="70" width="60" height="190" fill="none" stroke="#4B5563" stroke-width="0.8" stroke-dasharray="3 3" opacity="0.4" />
+
+                    <!-- Fridge Socket (Dedicated, height 450mm) -->
+                    <g class="socket">
+                        <rect x="26" y="211" width="8" height="8" fill="#FFFFFF" stroke="#333333" stroke-width="0.5" />
+                        <circle cx="30.0" cy="215" r="2.2" fill="#F3F4F6" stroke="#555555" stroke-width="0.5" />
+                        <circle cx="30.0" cy="215" r="0.8" fill="#111111" />
+                    </g>
+
+                    <!-- General Double Socket (Height 1040mm, x=80) -->
+                    <g class="socket">
+                        <rect x="72.4" y="152" width="15.2" height="8" fill="#FFFFFF" stroke="#333333" stroke-width="0.5" />
+                        <circle cx="76.4" cy="156" r="2.2" fill="#F3F4F6" stroke="#555555" stroke-width="0.5" />
+                        <circle cx="76.4" cy="156" r="0.8" fill="#111111" />
+                        <circle cx="83.6" cy="156" r="2.2" fill="#F3F4F6" stroke="#555555" stroke-width="0.5" />
+                        <circle cx="83.6" cy="156" r="0.8" fill="#111111" />
+                    </g>
+
+                    <!-- Alignment Lines for Fridge Socket (Outlet center x=30.0, y=215) -->
+                    <line x1="0" y1="215" x2="30.0" y2="215" stroke="red" stroke-width="0.4" />
+                    <line x1="30.0" y1="215" x2="30.0" y2="260" stroke="red" stroke-width="0.4" />
+                    <text x="15" y="212" class="dim-text" style="fill: red; font-size: 7px; text-anchor: middle; font-weight: 400;">300</text>
+                    <text x="27" y="237.5" class="dim-text" style="fill: red; font-size: 7px; text-anchor: middle; font-weight: 400;" transform="rotate(-90 27 237.5)">450</text>
+
+                    <!-- Alignment Lines for General Socket (Outlet center x=80.0, y=156) -->
+                    <line x1="0" y1="156" x2="80.0" y2="156" stroke="red" stroke-width="0.4" />
+                    <line x1="80.0" y1="156" x2="80.0" y2="260" stroke="red" stroke-width="0.4" />
+                    <text x="40" y="153" class="dim-text" style="fill: red; font-size: 7px; text-anchor: middle; font-weight: 400;">800</text>
+                    <text x="77" y="208" class="dim-text" style="fill: red; font-size: 7px; text-anchor: middle; font-weight: 400;" transform="rotate(-90 77 208)">1040</text>
 
                     <!-- Dimensions -->
+                    <!-- Width 1875 -->
                     <line x1="0" y1="-35" x2="187.5" y2="-35" class="dim-line" />
                     <text x="93.75" y="-40" class="dim-text">1875</text>
                     <line x1="0" y1="-40" x2="0" y2="-30" class="tick" />
                     <line x1="187.5" y1="-40" x2="187.5" y2="-30" class="tick" />
 
-                    <line x1="-20" y1="-20" x2="-20" y2="260" class="dim-line" />
-                    <text x="-25" y="120" class="dim-text" transform="rotate(-90 -25 120)">2800</text>
-                    <line x1="-25" y1="-20" x2="-15" y2="-20" class="tick" />
+                    <!-- Detailed horizontal scales at the bottom -->
+                    <line x1="0" y1="290" x2="60" y2="290" class="dim-line" />
+                    <text x="30" y="300" class="dim-text">600</text>
+                    <line x1="0" y1="285" x2="0" y2="295" class="tick" />
+                    <line x1="60" y1="285" x2="60" y2="295" class="tick" />
+
+                    <line x1="60" y1="290" x2="187.5" y2="290" class="dim-line" />
+                    <text x="123.75" y="300" class="dim-text">1275</text>
+                    <line x1="187.5" y1="285" x2="187.5" y2="295" class="tick" />
+
+                    <!-- Freezer Height scale on the left side -->
+                    <line x1="-20" y1="70" x2="-20" y2="260" class="dim-line" />
+                    <text x="-25" y="165" class="dim-text" transform="rotate(-90 -25 165)">1900</text>
+                    <line x1="-25" y1="70" x2="-15" y2="70" class="tick" />
                     <line x1="-25" y1="260" x2="-15" y2="260" class="tick" />
+
+                    <!-- Height 2800 (shifted further left) -->
+                    <line x1="-38" y1="-20" x2="-38" y2="260" class="dim-line" />
+                    <text x="-43" y="120" class="dim-text" transform="rotate(-90 -43 120)">2800</text>
+                    <line x1="-43" y1="-20" x2="-33" y2="-20" class="tick" />
+                    <line x1="-43" y1="260" x2="-33" y2="260" class="tick" />
                 </svg>
             </div>
 
             <h2>2. East Wall Elevation (Width: 2940) - Electricity</h2>
             <div class="elevation-container">
-                <svg width="800" height="520" viewBox="-40 -50 370 380">
+                <svg width="800" height="550" viewBox="-40 -50 370 410">
                     <!-- Wall -->
                     <rect x="0" y="-20" width="294" height="280" fill="#F5F0E8" stroke="#ddd" />
                     <line x1="0" y1="260" x2="294" y2="260" stroke="#2c3e50" stroke-width="3" />
                     <line x1="0" y1="-20" x2="294" y2="-20" stroke="#bdc3c7" stroke-width="1" />
 
                     <!-- Stairs descent -->
-                    <path d="M 164 260 L 164 310 L 294 310 L 294 260 Z" fill="#E5E7EB" stroke="#333" stroke-width="1.5" />
+                    <path d="M 204 260 L 204 310 L 294 310 L 294 260 Z" fill="#F3F4F6" stroke="#333" stroke-width="1.5" />
+                    <path d="M 204 260 L 222 260 L 222 270 L 240 270 L 240 280 L 258 280 L 258 290 L 276 290 L 276 300 L 294 300 L 294 310 L 204 310 Z" fill="#D1D5DB" stroke="#9CA3AF" stroke-width="1" />
 
-                    <text x="82" y="130" class="label" text-anchor="middle" fill="#aaa">East Wall Electricity</text>
+                    <text x="102" y="130" class="label" text-anchor="middle" fill="#aaa">East Wall Electricity</text>
 
                     <!-- Dimensions -->
                     <line x1="0" y1="-35" x2="294" y2="-35" class="dim-line" />
@@ -414,9 +519,14 @@
                     <line x1="0" y1="-40" x2="0" y2="-30" class="tick" />
                     <line x1="294" y1="-40" x2="294" y2="-30" class="tick" />
 
-                    <line x1="164" y1="325" x2="294" y2="325" class="dim-line" />
-                    <text x="229" y="335" class="dim-text">1300</text>
-                    <line x1="164" y1="320" x2="164" y2="330" class="tick" />
+                    <!-- Split wall dimensions on the bottom -->
+                    <line x1="0" y1="325" x2="204" y2="325" class="dim-line" />
+                    <text x="102" y="335" class="dim-text">2040</text>
+                    <line x1="0" y1="320" x2="0" y2="330" class="tick" />
+                    <line x1="204" y1="320" x2="204" y2="330" class="tick" />
+
+                    <line x1="204" y1="325" x2="294" y2="325" class="dim-line" />
+                    <text x="249" y="335" class="dim-text">900</text>
                     <line x1="294" y1="320" x2="294" y2="330" class="tick" />
 
                     <line x1="-20" y1="-20" x2="-20" y2="260" class="dim-line" />
@@ -441,18 +551,25 @@
                     <!-- West Wall -->
                     <line x1="0" y1="0" x2="0" y2="294" stroke="#2c3e50" stroke-width="3" />
 
-                    <!-- Stairs descent region (South Wall side, 1300mm wide in Plan) -->
-                    <!-- The stairs opening spans width of room on south wall -->
-                    <rect x="0" y="164" width="187.5" height="130" fill="#F3F4F6" stroke="#666" stroke-width="1" />
-                    <!-- Stair step lines in plan: some vertical steps on the right, diagonal steps in corner, horizontal steps on the left -->
-                    <!-- Draw L-shaped descending stair treads -->
-                    <!-- Vertical steps on the right -->
-                    <line x1="147.5" y1="164" x2="147.5" y2="294" stroke="#666" stroke-width="0.8" />
-                    <line x1="107.5" y1="164" x2="107.5" y2="294" stroke="#666" stroke-width="0.8" />
-                    <!-- Diagonal cross for shaft/stairs descent direction -->
-                    <line x1="0" y1="164" x2="187.5" y2="294" stroke="#666" stroke-width="0.5" opacity="0.5" />
-                    <line x1="187.5" y1="164" x2="0" y2="294" stroke="#666" stroke-width="0.5" opacity="0.5" />
-                    <text x="93.75" y="235" class="label" text-anchor="middle" fill="#555" font-size="8" style="font-weight: bold;">wejście do piwnicy</text>
+                    <!-- Refrigerator (Freestanding, 600mm x 600mm on the left) -->
+                    <rect x="0" y="0" width="60" height="60" fill="url(#fridge-metallic)" stroke="#333" stroke-width="1" />
+                    <text x="30" y="33" class="label" text-anchor="middle" font-size="7" font-weight="600" fill="#374151">Zamrażarka</text>
+
+                    <!-- Stairs descent region (South Wall side, 900mm wide in Plan) -->
+                    <rect x="0" y="204" width="187.5" height="90" fill="#F3F4F6" stroke="#666" stroke-width="1" />
+                    <!-- Step lines -->
+                    <line x1="27" y1="204" x2="27" y2="294" stroke="#9CA3AF" stroke-width="0.8" />
+                    <line x1="54" y1="204" x2="54" y2="294" stroke="#9CA3AF" stroke-width="0.8" />
+                    <line x1="81" y1="204" x2="81" y2="294" stroke="#9CA3AF" stroke-width="0.8" />
+                    <line x1="108" y1="204" x2="108" y2="294" stroke="#9CA3AF" stroke-width="0.8" />
+                    <line x1="135" y1="204" x2="135" y2="294" stroke="#9CA3AF" stroke-width="0.8" />
+                    <line x1="162" y1="204" x2="162" y2="294" stroke="#9CA3AF" stroke-width="0.8" />
+                    
+                    <!-- Descent Arrow (Down) -->
+                    <circle cx="20" cy="249" r="2.5" fill="#4b5563" />
+                    <line x1="20" y1="249" x2="165" y2="249" stroke="#4b5563" stroke-width="1" stroke-dasharray="2 1" />
+                    <path d="M 160 245 L 166 249 L 160 253" fill="none" stroke="#4b5563" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+                    <text x="93.75" y="235" class="label" text-anchor="middle" fill="#4b5563" font-size="7" font-weight="600">dół (down)</text>
 
                     <!-- Door D1 on the West wall (starts 180mm from North Wall, width 900mm) -->
                     <!-- Door opening opening into the pantry -->
@@ -464,9 +581,14 @@
 
                     <!-- Dimensions Labels -->
                     <!-- North Wall Scale -->
-                    <line x1="0" y1="-15" x2="187.5" y2="-15" class="dim-line" />
-                    <text x="93.75" y="-22" class="dim-text">1875</text>
+                    <!-- Detailed North Wall scale tiers in Plan -->
+                    <line x1="0" y1="-15" x2="60" y2="-15" class="dim-line" />
+                    <text x="30" y="-22" class="dim-text">600</text>
                     <line x1="0" y1="-20" x2="0" y2="-10" class="tick" />
+                    <line x1="60" y1="-20" x2="60" y2="-10" class="tick" />
+
+                    <line x1="60" y1="-15" x2="187.5" y2="-15" class="dim-line" />
+                    <text x="123.75" y="-22" class="dim-text">1275</text>
                     <line x1="187.5" y1="-20" x2="187.5" y2="-10" class="tick" />
 
                     <!-- East Wall Scale -->
@@ -475,10 +597,14 @@
                     <line x1="197.5" y1="0" x2="207.5" y2="0" class="tick" />
                     <line x1="197.5" y1="294" x2="207.5" y2="294" class="tick" />
 
-                    <!-- Stairs scale -->
-                    <line x1="220" y1="164" x2="220" y2="294" class="dim-line" />
-                    <text x="232" y="229" class="dim-text" transform="rotate(90 232 229)">1300</text>
-                    <line x1="215" y1="164" x2="225" y2="164" class="tick" />
+                    <!-- Split East Wall Scale in Plan -->
+                    <line x1="220" y1="0" x2="220" y2="204" class="dim-line" />
+                    <text x="232" y="102" class="dim-text" transform="rotate(90 232 102)">2040</text>
+                    <line x1="215" y1="0" x2="225" y2="0" class="tick" />
+                    <line x1="215" y1="204" x2="225" y2="204" class="tick" />
+
+                    <line x1="220" y1="204" x2="220" y2="294" class="dim-line" />
+                    <text x="232" y="249" class="dim-text" transform="rotate(90 232 249)">900</text>
                     <line x1="215" y1="294" x2="225" y2="294" class="tick" />
 
                     <!-- Door scale (left wall) -->
