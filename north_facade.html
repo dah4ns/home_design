@@ -1,0 +1,1828 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>North Facade Elevation - Elewacja Północna</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --card-border: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --accent-amber: #d97706;
+            --accent-amber-light: #fef3c7;
+            --accent-blue: #2563eb;
+            --accent-slate: #334155;
+            --accent-dark: #0f172a;
+            --dim-color: #d97706;
+            --axis-color: #ef4444;
+            --level-color: #0284c7;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 30px 20px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1560px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 35px 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 25px rgba(15, 23, 42, 0.06);
+            border: 1px solid var(--card-border);
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 18px;
+            background-color: #f1f5f9;
+            color: #334155;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            border: 1px solid #e2e8f0;
+        }
+
+        .back-btn:hover {
+            background-color: #e2e8f0;
+            color: #0f172a;
+            transform: translateX(-2px);
+        }
+
+        .header-meta {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            font-family: 'JetBrains Mono', monospace;
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
+
+        .badge.accent {
+            background: var(--accent-amber-light);
+            color: #92400e;
+            border-color: #fde68a;
+        }
+
+        .header-title-area {
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0 0 8px 0;
+            color: #0f172a;
+            letter-spacing: -0.02em;
+        }
+
+        p.subtitle {
+            color: var(--text-secondary);
+            margin: 0;
+            font-size: 15px;
+            max-width: 900px;
+        }
+
+        /* Tabs styling */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 10px;
+            overflow-x: auto;
+        }
+
+        .tab-link {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            outline: none;
+            cursor: pointer;
+            padding: 10px 22px;
+            transition: all 0.25s ease;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            color: #64748b;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .tab-link:hover {
+            background-color: #f1f5f9;
+            color: #1e293b;
+        }
+
+        .tab-link.active {
+            background-color: #0f172a;
+            color: #ffffff;
+            border-color: #0f172a;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(4px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Controls bar */
+        .controls-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+            padding: 12px 20px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .layer-toggles {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .toggle-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            background: white;
+            border: 1px solid #cbd5e1;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #475569;
+            user-select: none;
+        }
+
+        .toggle-btn.active {
+            background: #0284c7;
+            color: white;
+            border-color: #0284c7;
+        }
+
+        .toggle-btn.active.amber {
+            background: #d97706;
+            border-color: #d97706;
+        }
+
+        .toggle-btn.active.red {
+            background: #ef4444;
+            border-color: #ef4444;
+        }
+
+        .elevation-wrapper {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            overflow-x: auto;
+            margin-bottom: 30px;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.02);
+            position: relative;
+        }
+
+        svg.elevation-svg {
+            display: block;
+            margin: 0 auto;
+            background: #fafbfc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* SVG Styles */
+        .dim-line {
+            stroke: var(--dim-color);
+            stroke-width: 1.2;
+            stroke-dasharray: 4 3;
+        }
+
+        .dim-solid {
+            stroke: var(--dim-color);
+            stroke-width: 1.2;
+        }
+
+        .dim-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            fill: var(--dim-color);
+            font-weight: 600;
+            text-anchor: middle;
+        }
+
+        .tick {
+            stroke: var(--dim-color);
+            stroke-width: 1.6;
+        }
+
+        .axis-line {
+            stroke: var(--axis-color);
+            stroke-width: 1.2;
+            stroke-dasharray: 8 4 2 4;
+            opacity: 0.85;
+        }
+
+        .axis-bubble {
+            fill: white;
+            stroke: var(--axis-color);
+            stroke-width: 1.5;
+        }
+
+        .axis-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            font-weight: 700;
+            fill: var(--axis-color);
+            text-anchor: middle;
+            dominant-baseline: central;
+        }
+
+        .level-marker {
+            stroke: var(--level-color);
+            stroke-width: 1.2;
+        }
+
+        .level-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            font-weight: 600;
+            fill: var(--level-color);
+        }
+
+        .level-label {
+            font-size: 11px;
+            fill: #64748b;
+            font-weight: 400;
+        }
+
+        /* Interactive SVG element hover */
+        .interactive-element {
+            cursor: pointer;
+            transition: filter 0.2s ease, opacity 0.2s ease;
+        }
+
+        .interactive-element:hover {
+            filter: drop-shadow(0 0 6px rgba(59, 130, 246, 0.7));
+            opacity: 0.92;
+        }
+
+        /* Hotspots & Photo Tab */
+        .photo-tab-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        .photo-viewer-card {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
+        }
+
+        .photo-wrapper {
+            position: relative;
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            line-height: 0;
+        }
+
+        .photo-wrapper img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 8px;
+        }
+
+        /* Hotspot markers on photo */
+        .hotspot {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(217, 119, 6, 0.9);
+            border: 2px solid #ffffff;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 0 4px rgba(217, 119, 6, 0.35);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 10;
+        }
+
+        .hotspot:hover {
+            transform: translate(-50%, -50%) scale(1.2);
+            background: #2563eb;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5), 0 0 0 6px rgba(37, 99, 235, 0.4);
+        }
+
+        .hotspot-tooltip {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background: rgba(15, 23, 42, 0.95);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.25s ease;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            line-height: 1.4;
+            text-align: left;
+            z-index: 20;
+        }
+
+        .hotspot:hover .hotspot-tooltip {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Detail Modal / Drawer */
+        .info-panel {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 20px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .info-card {
+            background: white;
+            padding: 18px 20px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        }
+
+        .info-card h4 {
+            margin: 0 0 10px 0;
+            font-size: 15px;
+            font-weight: 600;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-card p {
+            margin: 0;
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.5;
+        }
+
+        /* Schedule Table */
+        .table-responsive {
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+
+        table.schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            text-align: left;
+        }
+
+        table.schedule-table th {
+            background: #f1f5f9;
+            color: #334155;
+            font-weight: 600;
+            padding: 12px 14px;
+            border-bottom: 2px solid #cbd5e1;
+        }
+
+        table.schedule-table td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #1e293b;
+        }
+
+        table.schedule-table tr:hover td {
+            background-color: #f8fafc;
+        }
+
+        .badge-tag {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .badge-blue {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .badge-amber {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .badge-emerald {
+            background: #d1fae5;
+            color: #047857;
+        }
+
+        .badge-purple {
+            background: #f3e8ff;
+            color: #7e22ce;
+        }
+
+        /* Alignment / Projection Diagram */
+        .diagram-box {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 20px;
+        }
+
+        .key-takeaway-banner {
+            background: linear-gradient(135deg, #fef3c7 0%, #ffedd5 100%);
+            border: 1px solid #fde68a;
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+        }
+
+        .key-takeaway-banner svg {
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .key-takeaway-text h3 {
+            margin: 0 0 4px 0;
+            font-size: 15px;
+            font-weight: 600;
+            color: #92400e;
+        }
+
+        .key-takeaway-text p {
+            margin: 0;
+            font-size: 13px;
+            color: #78350f;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Top Navigation -->
+        <div class="top-nav">
+            <a href="index.html" class="back-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back to Dashboard
+            </a>
+
+            <div class="header-meta">
+                <span class="badge accent">Izabelin C, ul. Grzybowa</span>
+                <span class="badge">Drawing Ref: A.02 & A.03</span>
+                <span class="badge">Width: 21,000 mm</span>
+                <span class="badge">Height: +6.88 m</span>
+            </div>
+        </div>
+
+        <!-- Header Title Area -->
+        <div class="header-title-area">
+            <h1>North Facade Elevation (Elewacja Północna)</h1>
+            <p class="subtitle">
+                Exterior architectural elevation of the north facade facing top in the official floor plans.
+                Interactive 2D architectural CAD model, dimension chains from drawings A.02 & A.03 (MAG Architekci), and 3D photographic rendering inspection.
+            </p>
+        </div>
+
+        <!-- Notice Banner explaining orientation -->
+        <div class="key-takeaway-banner">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="10" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            <div class="key-takeaway-text">
+                <h3>Architectural Orientation & Viewing Angle</h3>
+                <p>
+                    In the architectural floor plans, <strong>North is facing UP (top of page)</strong>. When standing in the northern garden looking South towards the house:
+                    the <strong>East side (Axis 6: Gabinet & Upper Terrace)</strong> is on your <strong>LEFT</strong>, and the <strong>West side (Axis 1: Protruding Garage volume & Corner Window)</strong> is on your <strong>RIGHT</strong>.
+                    This perfectly matches the 3D rendering perspective.
+                </p>
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="tabs">
+            <button class="tab-link active" onclick="openTab(event, 'TabElevation')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                    <line x1="3" y1="9" x2="21" y2="9"></line>
+                    <line x1="9" y1="21" x2="9" y2="9"></line>
+                </svg>
+                2D Architectural CAD Elevation
+            </button>
+            <button class="tab-link" onclick="openTab(event, 'TabPhoto')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+                3D Photo Rendering & Hotspots
+            </button>
+            <button class="tab-link" onclick="openTab(event, 'TabFloorPlan')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                </svg>
+                Floor Plan Alignment & Projections
+            </button>
+            <button class="tab-link" onclick="openTab(event, 'TabSchedule')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="8" y1="6" x2="21" y2="6"></line>
+                    <line x1="8" y1="12" x2="21" y2="12"></line>
+                    <line x1="8" y1="18" x2="21" y2="18"></line>
+                    <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                    <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                    <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                </svg>
+                Window & Opening Schedule
+            </button>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 1: 2D ARCHITECTURAL CAD ELEVATION -->
+        <!-- ========================================== -->
+        <div id="TabElevation" class="tab-content active">
+            <!-- Controls Bar -->
+            <div class="controls-bar">
+                <div class="layer-toggles">
+                    <span style="font-size: 13px; font-weight: 600; color: #334155;">Display Layers:</span>
+                    <button id="toggleDims" class="toggle-btn active amber" onclick="toggleLayer('layer-dims', this)">
+                        <span>📏</span> Dimensions (Wymiary)
+                    </button>
+                    <button id="toggleLevels" class="toggle-btn active" onclick="toggleLayer('layer-levels', this)">
+                        <span>📐</span> Elevation Levels (Rzędne)
+                    </button>
+                    <button id="toggleMaterials" class="toggle-btn active" onclick="toggleLayer('layer-textures', this)">
+                        <span>🎨</span> Realistic Materials
+                    </button>
+                    <button id="toggleShadows" class="toggle-btn active" onclick="toggleLayer('layer-shadows', this)">
+                        <span>⛅</span> 3D Depth Shadows
+                    </button>
+                </div>
+                <div style="font-size: 12px; color: #64748b; font-family: 'JetBrains Mono', monospace;">
+                    Scale: 1:100 | Units: mm / cm
+                </div>
+            </div>
+
+            <!-- SVG Container -->
+            <div class="elevation-wrapper">
+                                                <svg class="elevation-svg" width="100%" height="770" viewBox="-360 -1020 2680 1340" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <!-- Dark Graphite Clinker Brick Pattern -->
+                        <pattern id="brick-pattern" width="25" height="12" patternUnits="userSpaceOnUse">
+                            <rect width="25" height="12" fill="#383d47" />
+                            <line x1="0" y1="6" x2="25" y2="6" stroke="#252830" stroke-width="0.8" />
+                            <line x1="0" y1="12" x2="25" y2="12" stroke="#252830" stroke-width="0.8" />
+                            <line x1="12.5" y1="0" x2="12.5" y2="6" stroke="#252830" stroke-width="0.8" />
+                            <line x1="0" y1="6" x2="0" y2="12" stroke="#252830" stroke-width="0.8" />
+                            <line x1="25" y1="6" x2="25" y2="12" stroke="#252830" stroke-width="0.8" />
+                            <rect x="2" y="2" width="8" height="2" fill="#434955" opacity="0.35" />
+                            <rect x="14" y="8" width="8" height="2" fill="#2d313a" opacity="0.4" />
+                        </pattern>
+
+                        <!-- Vertical Natural Timber Slat Cladding Pattern -->
+                        <pattern id="wood-slats-pattern" width="8" height="40" patternUnits="userSpaceOnUse">
+                            <rect width="8" height="40" fill="#cbb497" />
+                            <rect x="0" y="0" width="6.5" height="40" fill="#d8c5ab" />
+                            <line x1="6.5" y1="0" x2="6.5" y2="40" stroke="#8a7356" stroke-width="0.7" />
+                            <line x1="7.5" y1="0" x2="7.5" y2="40" stroke="#5d4c38" stroke-width="0.8" />
+                            <line x1="2" y1="0" x2="2" y2="40" stroke="#eedec9" stroke-width="0.5" opacity="0.4" />
+                        </pattern>
+
+                        <!-- Metal Fascia / Attica Gradient (Black/Anthracite RAL 7016 / 9005) -->
+                        <linearGradient id="fascia-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#222731" />
+                            <stop offset="50%" stop-color="#181b22" />
+                            <stop offset="100%" stop-color="#0d0f14" />
+                        </linearGradient>
+
+                        <!-- Glass Glazing Gradient (Reflective Tinted Glass) -->
+                        <linearGradient id="glass-glare" x1="20%" y1="0%" x2="80%" y2="100%">
+                            <stop offset="0%" stop-color="#7dd3fc" stop-opacity="0.35" />
+                            <stop offset="35%" stop-color="#0284c7" stop-opacity="0.25" />
+                            <stop offset="70%" stop-color="#1e293b" stop-opacity="0.4" />
+                            <stop offset="100%" stop-color="#0f172a" stop-opacity="0.6" />
+                        </linearGradient>
+
+                        <!-- Interior Room Shading Gradient for Corner Window -->
+                        <linearGradient id="corner-interior" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#f8fafc" stop-opacity="0.2" />
+                            <stop offset="60%" stop-color="#e2e8f0" stop-opacity="0.1" />
+                            <stop offset="100%" stop-color="#334155" stop-opacity="0.3" />
+                        </linearGradient>
+
+                        <!-- Soft Drop Shadow Filter -->
+                        <filter id="shadow" x="-5%" y="-5%" width="110%" height="120%">
+                            <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#000000" flood-opacity="0.4" />
+                        </filter>
+                    </defs>
+
+                    <!-- ==================================== -->
+                    <!-- ENVIRONMENT & BACKGROUND SILHOUETTE -->
+                    <!-- ==================================== -->
+                    <!-- Sky subtle background -->
+                    <rect x="-360" y="-1020" width="2680" height="1340" fill="#f8fafc" />
+
+                    <!-- Pine Trees Silhouette (Izabelin Forest) -->
+                    <g id="pine-trees" opacity="0.15" fill="#1e293b">
+                        <!-- Left trees -->
+                        <polygon points="-300,20 -280,-650 -260,20" />
+                        <polygon points="-240,20 -220,-720 -200,20" />
+                        <polygon points="-170,20 -150,-580 -130,20" />
+                        <polygon points="-100,20 -85,-640 -70,20" />
+                        <!-- Middle trees behind roof -->
+                        <polygon points="450,-680 465,-850 480,-680" />
+                        <polygon points="980,-680 995,-880 1010,-680" />
+                        <polygon points="1350,-680 1365,-840 1380,-680" />
+                        <!-- Right trees -->
+                        <polygon points="2140,20 2160,-680 2180,20" />
+                        <polygon points="2200,20 2215,-720 2230,20" />
+                        <polygon points="2260,20 2280,-760 2300,20" />
+                    </g>
+
+                    <!-- Ground / Terrain Line -->
+                    <g id="ground-plane">
+                        <!-- Dark earth / plinth base -->
+                        <rect x="-360" y="2" width="2680" height="38" fill="#cbd5e1" />
+                        <line x1="-360" y1="2" x2="2320" y2="2" stroke="#475569" stroke-width="2.5" />
+                        <!-- Concrete curb -->
+                        <rect x="-360" y="40" width="2680" height="30" fill="#e2e8f0" />
+                        <!-- Driveway / Base below ground -->
+                        <rect x="-360" y="70" width="2680" height="200" fill="#334155" opacity="0.85" />
+                        <line x1="-360" y1="70" x2="2320" y2="70" stroke="#475569" stroke-width="1.5" />
+                    </g>
+
+                    <!-- ==================================== -->
+                    <!-- GROUND FLOOR ELEVATION (PARTER) -->
+                    <!-- Wall height from -0.02m (Y=2) to +2.80m (Y=-280) -->
+                    <!-- ==================================== -->
+
+                    <!-- 1. Recessed Facade (X = 0 to 1201, Gabinet & Kitchen) -->
+                    <g id="ground-recessed-facade">
+                        <!-- Wall body in dark graphite clinker brick (X = 0 to 1201, Y = -280 to 2) -->
+                        <rect x="0" y="-280" width="1201" height="282" fill="url(#brick-pattern)" stroke="#1e222a" stroke-width="1.5" />
+
+                        <!-- Window O2 (Gabinet 0.15) -->
+                        <!-- Starts at (77 + 38) = 115cm = 1150mm from left edge: X = 115 to 235 -->
+                        <!-- Length = 1200mm (width 120 in SVG), Height = 1700mm, Starts at hp = 800mm (Y = -80 to -250) -->
+                        <g class="interactive-element" onclick="showElementDetails('O2')">
+                            <!-- Outer frame reveal -->
+                            <rect x="115" y="-250" width="120" height="170" fill="#1e293b" stroke="#0f172a" stroke-width="2" />
+                            <rect x="119" y="-246" width="112" height="162" fill="url(#glass-glare)" />
+                            <rect x="119" y="-246" width="112" height="162" fill="none" stroke="#0f172a" stroke-width="3" />
+                            <!-- Vertical mullion / sash division -->
+                            <line x1="175" y1="-246" x2="175" y2="-84" stroke="#0f172a" stroke-width="2.5" />
+                            <!-- Sheet metal sill (parapet) at hp = 800mm (Y = -80) -->
+                            <rect x="112" y="-80" width="126" height="5" fill="#0f172a" />
+                            <text x="175" y="-165" font-family="'JetBrains Mono', monospace" font-size="10" fill="#ffffff" font-weight="700" text-anchor="middle" filter="drop-shadow(0 1px 2px black)">O2 (120×170)</text>
+                            <text x="175" y="-150" font-family="'JetBrains Mono', monospace" font-size="8.5" fill="#93c5fd" font-weight="600" text-anchor="middle">hp=80</text>
+                        </g>
+
+                        <!-- Window O1 (Kitchen 0.13, 1950mm wide x 1400mm high, hp=1100mm) -->
+                        <!-- Located at X = 845 to 1040, Lintel at Y = -250 (+2.50m), Sill at Y = -110 (+1.10m) -->
+                        <!-- Distance from O2 (right edge X=235): 845 - 235 = 610 (6,100mm) -->
+                        <g class="interactive-element" onclick="showElementDetails('O1')">
+                            <!-- Outer reveal / sill -->
+                            <rect x="845" y="-250" width="195" height="140" fill="#1e293b" stroke="#0f172a" stroke-width="2" />
+                            <rect x="849" y="-246" width="187" height="132" fill="url(#glass-glare)" />
+                            <!-- Window frame & mullion (2-sash) -->
+                            <rect x="849" y="-246" width="187" height="132" fill="none" stroke="#0f172a" stroke-width="3" />
+                            <line x1="942.5" y1="-246" x2="942.5" y2="-114" stroke="#0f172a" stroke-width="2.5" />
+                            <!-- Metal sill (Parapet at hp = 1100mm) -->
+                            <rect x="840" y="-110" width="205" height="5" fill="#0f172a" />
+                            <text x="942.5" y="-185" font-family="'JetBrains Mono', monospace" font-size="11" fill="#ffffff" font-weight="700" text-anchor="middle" filter="drop-shadow(0 1px 2px black)">O1 (195×140)</text>
+                            <text x="942.5" y="-168" font-family="'JetBrains Mono', monospace" font-size="8.5" fill="#93c5fd" font-weight="600" text-anchor="middle">hp=110</text>
+                        </g>
+                    </g>
+
+                    <!-- 2. Projecting Garage / Magazyn Volume (X = 1201 to 2100) -->
+                    <!-- Sits 3,100mm in front of Recessed Wing; Solid brickwork, blind facade -->
+                    <g id="ground-garage-volume" class="interactive-element" onclick="showElementDetails('GARAGE')">
+                        <!-- Main Garage brick block (X = 1201 to 2100, Y = -280 to 2) -->
+                        <rect x="1201" y="-280" width="899" height="282" fill="url(#brick-pattern)" stroke="#1e222a" stroke-width="2" filter="url(#shadow)" />
+                        <!-- Vertical expansion joint at X = 1201 -->
+                        <line x1="1201" y1="-280" x2="1201" y2="2" stroke="#0f172a" stroke-width="2" />
+
+                        <!-- Garage label badge on elevation -->
+                        <rect x="1560" y="-160" width="180" height="32" rx="4" fill="#0f172a" opacity="0.75" />
+                        <text x="1650" y="-140" font-family="'Outfit', sans-serif" font-size="12" fill="#f8fafc" font-weight="600" text-anchor="middle">SOLID BRICK GARAGE (8.99 m)</text>
+                    </g>
+
+                    <!-- Depth Shadow cast by Projecting Garage Volume onto Recessed Wall -->
+                    <g id="layer-shadows">
+                        <polygon points="1201,-280 1201,2 1145,2 1145,-280" fill="#000000" opacity="0.28" />
+                    </g>
+
+                    <!-- ==================================== -->
+                    <!-- INTERMEDIATE CORNICE (GZYMS POŚREDNI) -->
+                    <!-- Level: +2.80m (Y=-280) to +3.43m (Y=-343) -->
+                    <!-- Height: 63 cm (630 mm) - Continuous horizontal band -->
+                    <!-- ==================================== -->
+                    <g id="intermediate-cornice" class="interactive-element" onclick="showElementDetails('CORNICE')">
+                        <!-- Underside shadow reveal strip at +2.80m -->
+                        <rect x="-10" y="-280" width="2120" height="6" fill="#090b0e" />
+
+                        <!-- Main Cornice Body (Y = -343 to -280, 630mm high) -->
+                        <polygon points="-10,-343 2110,-343 2110,-280 0,-280 -10,-295" fill="url(#fascia-gradient)" stroke="#0a0c10" stroke-width="1.5" filter="url(#shadow)" />
+
+                        <!-- Top drip cap line -->
+                        <line x1="-10" y1="-343" x2="2110" y2="-343" stroke="#475569" stroke-width="1.2" />
+                        <!-- Bottom edge line -->
+                        <line x1="0" y1="-280" x2="2110" y2="-280" stroke="#1e293b" stroke-width="1" />
+
+                        <!-- Architectural Panel Joint Reveals (Vertical cassette seams every ~90-100cm) -->
+                        <line x1="0" y1="-343" x2="0" y2="-280" stroke="#2d3748" stroke-width="1" />
+                        <line x1="90" y1="-343" x2="90" y2="-280" stroke="#2d3748" stroke-width="1" />
+                        <line x1="180" y1="-343" x2="180" y2="-280" stroke="#2d3748" stroke-width="1" />
+                        <line x1="270" y1="-343" x2="270" y2="-280" stroke="#2d3748" stroke-width="1" />
+                        <line x1="360" y1="-343" x2="360" y2="-280" stroke="#2d3748" stroke-width="1" />
+                        <line x1="450" y1="-343" x2="450" y2="-280" stroke="#2d3748" stroke-width="1" />
+                        <line x1="540" y1="-343" x2="540" y2="-280" stroke="#2d3748" stroke-width="1" />
+                        <line x1="640" y1="-343" x2="640" y2="-280" stroke="#2d3748" stroke-width="1.5" />
+                        <line x1="740" y1="-343" x2="740" y2="-280" stroke="#2d3748" stroke-width="1" />
+                        <line x1="830" y1="-343" x2="830" y2="-280" stroke="#2d3748" stroke-width="1" />
+                        <line x1="920" y1="-343" x2="920" y2="-280" stroke="#2d3748" stroke-width="1" />
+                        <line x1="1010" y1="-343" x2="1010" y2="-280" stroke="#2d3748" stroke-width="1" />
+                        <line x1="1100" y1="-343" x2="1100" y2="-280" stroke="#2d3748" stroke-width="1" />
+                        <line x1="1201" y1="-343" x2="1201" y2="-280" stroke="#0a0c10" stroke-width="2" />
+                        <line x1="1290" y1="-343" x2="1290" y2="-280" stroke="#2d3748" stroke-width="1" />
+                        <line x1="1380" y1="-343" x2="1380" y2="-280" stroke="#2d3748" stroke-width="1" />
+                        <line x1="1470" y1="-343" x2="1470" y2="-280" stroke="#2d3748" stroke-width="1" />
+                        <line x1="1560" y1="-343" x2="1560" y2="-280" stroke="#2d3748" stroke-width="1" />
+                        <line x1="1650" y1="-343" x2="1650" y2="-280" stroke="#2d3748" stroke-width="1" />
+                        <line x1="1740" y1="-343" x2="1740" y2="-280" stroke="#2d3748" stroke-width="1" />
+                        <line x1="1830" y1="-343" x2="1830" y2="-280" stroke="#2d3748" stroke-width="1" />
+                        <line x1="1920" y1="-343" x2="1920" y2="-280" stroke="#2d3748" stroke-width="1" />
+                        <line x1="2010" y1="-343" x2="2010" y2="-280" stroke="#2d3748" stroke-width="1" />
+
+                        <!-- Subtle depth shadow under intermediate cornice -->
+                        <rect x="0" y="-280" width="1201" height="16" fill="#000000" opacity="0.35" />
+                        <rect x="1201" y="-280" width="899" height="16" fill="#000000" opacity="0.28" />
+                    </g>
+
+
+                    <!-- ==================================== -->
+                    <!-- UPPER FLOOR ELEVATION (PIĘTRO) -->
+                    <!-- Wall height from +3.43m (Y=-343) to +6.13m (Y=-613) = 2.70 m -->
+                    <!-- ==================================== -->
+
+                    <!-- 1. Balcony Zone (Length exactly 6,400 mm: X = 0 to 640) -->
+                    <g id="upper-terrace" class="interactive-element" onclick="showElementDetails('TERRACE')">
+                        <!-- Recessed back timber wall behind balcony (Y = -613 to -343) -->
+                        <rect x="0" y="-613" width="640" height="270" fill="url(#wood-slats-pattern)" stroke="#8a7356" stroke-width="1" />
+                        <!-- Balcony depth shadow in recess -->
+                        <rect x="0" y="-613" width="640" height="270" fill="#000000" opacity="0.22" />
+
+                        <!-- Minimalist Balcony Railing (Spans exactly X = 0 to 640, height 950mm) -->
+                        <!-- Sits on top of intermediate cornice (+3.43m / Y=-343) -->
+                        <rect x="0" y="-438" width="640" height="95" fill="#7dd3fc" opacity="0.22" stroke="#38bdf8" stroke-width="0.8" />
+                        <!-- Black top handrail -->
+                        <rect x="-5" y="-442" width="648" height="6" fill="#0f172a" stroke="#1e222a" stroke-width="1" />
+                        <!-- Vertical steel stanchions -->
+                        <line x1="0" y1="-438" x2="0" y2="-343" stroke="#0f172a" stroke-width="3" />
+                        <line x1="160" y1="-438" x2="160" y2="-343" stroke="#0f172a" stroke-width="2" />
+                        <line x1="320" y1="-438" x2="320" y2="-343" stroke="#0f172a" stroke-width="2" />
+                        <line x1="480" y1="-438" x2="480" y2="-343" stroke="#0f172a" stroke-width="2" />
+                        <line x1="640" y1="-438" x2="640" y2="-343" stroke="#0f172a" stroke-width="3" />
+
+                        <text x="320" y="-380" font-family="'Outfit', sans-serif" font-size="12" fill="#0f172a" font-weight="700" text-anchor="middle" filter="drop-shadow(0 1px 1px white)">BALKON / TARAS (L = 6 400 mm, +3.31 m)</text>
+                    </g>
+
+                    <!-- 2. Window 14a (STARTS AFTER BALCONY at X = 640, NOT covered by balcony glass!) -->
+                    <!-- Width: 100 cm (1,000 mm), X = 640 to 740, Height: 2,700 mm (Y = -343 to -613) -->
+                    <g class="interactive-element" onclick="showElementDetails('O14a')">
+                        <rect x="640" y="-613" width="100" height="270" fill="#1e293b" stroke="#0f172a" stroke-width="2" />
+                        <rect x="644" y="-609" width="92" height="262" fill="url(#glass-glare)" />
+                        <rect x="644" y="-609" width="92" height="262" fill="none" stroke="#0f172a" stroke-width="2.5" />
+                        <line x1="732" y1="-480" x2="732" y2="-470" stroke="#94a3b8" stroke-width="2" />
+                        <text x="690" y="-475" font-family="'JetBrains Mono', monospace" font-size="10" fill="#ffffff" font-weight="700" text-anchor="middle" filter="drop-shadow(0 1px 2px black)">14a (100×270)</text>
+                    </g>
+
+                    <!-- 3. Upper Floor Main Body (X = 740 to 2100, Y = -613 to -343) -->
+                    <g id="upper-timber-facade">
+                        <!-- Timber wall body -->
+                        <rect x="740" y="-613" width="1360" height="270" fill="url(#wood-slats-pattern)" stroke="#8a7356" stroke-width="1.5" />
+
+                        <!-- Window O11_1 - Bathroom 1.03 (1000mm wide x 1950mm high, hp=850mm) -->
+                        <!-- Located at X = 925 to 1025, Y = -613 to -418 -->
+                        <g class="interactive-element" onclick="showElementDetails('O11_1')">
+                            <rect x="925" y="-613" width="100" height="195" fill="#1e293b" stroke="#0f172a" stroke-width="2" />
+                            <rect x="929" y="-609" width="92" height="187" fill="url(#glass-glare)" />
+                            <rect x="929" y="-609" width="92" height="187" fill="none" stroke="#0f172a" stroke-width="3" />
+                            <rect x="923" y="-418" width="104" height="4" fill="#0f172a" />
+                            <text x="975" y="-510" font-family="'JetBrains Mono', monospace" font-size="10" fill="#ffffff" font-weight="700" text-anchor="middle" filter="drop-shadow(0 1px 2px black)">O11</text>
+                        </g>
+
+                        <!-- Window O11_2 - Bathroom 1.02 (1000mm wide x 1950mm high, hp=850mm) -->
+                        <!-- Located at X = 1203 to 1303, Y = -613 to -418 -->
+                        <g class="interactive-element" onclick="showElementDetails('O11_2')">
+                            <rect x="1203" y="-613" width="100" height="195" fill="#1e293b" stroke="#0f172a" stroke-width="2" />
+                            <rect x="1207" y="-609" width="92" height="187" fill="url(#glass-glare)" />
+                            <rect x="1207" y="-609" width="92" height="187" fill="none" stroke="#0f172a" stroke-width="3" />
+                            <rect x="1201" y="-418" width="104" height="4" fill="#0f172a" />
+                            <text x="1253" y="-510" font-family="'JetBrains Mono', monospace" font-size="10" fill="#ffffff" font-weight="700" text-anchor="middle" filter="drop-shadow(0 1px 2px black)">O11</text>
+                        </g>
+
+                        <!-- Window O11_3 - Hall / Bedroom 1.01 (1000mm wide x 1950mm high, hp=850mm) -->
+                        <!-- Located at X = 1472 to 1572, Y = -613 to -418 -->
+                        <g class="interactive-element" onclick="showElementDetails('O11_3')">
+                            <rect x="1472" y="-613" width="100" height="195" fill="#1e293b" stroke="#0f172a" stroke-width="2" />
+                            <rect x="1476" y="-609" width="92" height="187" fill="url(#glass-glare)" />
+                            <rect x="1476" y="-609" width="92" height="187" fill="none" stroke="#0f172a" stroke-width="3" />
+                            <rect x="1470" y="-418" width="104" height="4" fill="#0f172a" />
+                            <text x="1522" y="-510" font-family="'JetBrains Mono', monospace" font-size="10" fill="#ffffff" font-weight="700" text-anchor="middle" filter="drop-shadow(0 1px 2px black)">O11</text>
+                        </g>
+
+                        <!-- Master Bedroom 1.01 Panoramic Corner Window O13a (2200mm wide x 1950mm high, hp=850mm) -->
+                        <!-- Located at X = 1880 to 2100, Y = -613 to -418 -->
+                        <g class="interactive-element" onclick="showElementDetails('O13')">
+                            <rect x="1880" y="-613" width="220" height="195" fill="#1e293b" stroke="#0f172a" stroke-width="2" />
+                            <rect x="1884" y="-609" width="216" height="187" fill="url(#corner-interior)" />
+                            <rect x="1940" y="-560" width="30" height="45" fill="#ffffff" stroke="#475569" stroke-width="1.5" opacity="0.6" />
+                            <rect x="1980" y="-520" width="40" height="30" fill="#64748b" opacity="0.4" />
+                            <rect x="1884" y="-609" width="216" height="187" fill="url(#glass-glare)" opacity="0.65" />
+                            <line x1="1884" y1="-609" x2="1884" y2="-422" stroke="#0f172a" stroke-width="4" />
+                            <line x1="1884" y1="-609" x2="2100" y2="-609" stroke="#0f172a" stroke-width="4" />
+                            <line x1="1884" y1="-422" x2="2100" y2="-422" stroke="#0f172a" stroke-width="4" />
+                            <line x1="2100" y1="-613" x2="2100" y2="-418" stroke="#38bdf8" stroke-width="2" />
+                            <rect x="1876" y="-418" width="224" height="4" fill="#0f172a" />
+                            <text x="1980" y="-510" font-family="'JetBrains Mono', monospace" font-size="11" fill="#ffffff" font-weight="700" text-anchor="middle" filter="drop-shadow(0 1px 2px black)">CORNER O13a (220×195)</text>
+                        </g>
+                    </g>
+
+                    <!-- ==================================== -->
+                    <!-- MAIN ROOF OVERHANG & ATTICA CORNICE -->
+                    <!-- Level: +6.13m (Y=-613) to +6.88m (Y=-688) = 75 cm high -->
+                    <!-- Chimney / shaft at +7.26m (Y=-726) -->
+                    <!-- ==================================== -->
+                    <g id="main-roof-structure" class="interactive-element" onclick="showElementDetails('ROOF')">
+                        <!-- Cantilevered Roof Slab (X = -30 to 2130, Y = -688 to -613, 750mm thick attica band) -->
+                        <polygon points="-30,-688 2130,-688 2130,-613 -20,-613 -30,-625" fill="url(#fascia-gradient)" stroke="#0a0c10" stroke-width="2" filter="url(#shadow)" />
+
+                        <!-- Fascia panel joint reveals matching intermediate cornice -->
+                        <line x1="0" y1="-688" x2="0" y2="-613" stroke="#2d3748" stroke-width="1" />
+                        <line x1="180" y1="-688" x2="180" y2="-613" stroke="#2d3748" stroke-width="1" />
+                        <line x1="360" y1="-688" x2="360" y2="-613" stroke="#2d3748" stroke-width="1" />
+                        <line x1="540" y1="-688" x2="540" y2="-613" stroke="#2d3748" stroke-width="1" />
+                        <line x1="720" y1="-688" x2="720" y2="-613" stroke="#2d3748" stroke-width="1" />
+                        <line x1="900" y1="-688" x2="900" y2="-613" stroke="#2d3748" stroke-width="1" />
+                        <line x1="1080" y1="-688" x2="1080" y2="-613" stroke="#2d3748" stroke-width="1" />
+                        <line x1="1260" y1="-688" x2="1260" y2="-613" stroke="#2d3748" stroke-width="1" />
+                        <line x1="1440" y1="-688" x2="1440" y2="-613" stroke="#2d3748" stroke-width="1" />
+                        <line x1="1620" y1="-688" x2="1620" y2="-613" stroke="#2d3748" stroke-width="1" />
+                        <line x1="1800" y1="-688" x2="1800" y2="-613" stroke="#2d3748" stroke-width="1" />
+                        <line x1="1980" y1="-688" x2="1980" y2="-613" stroke="#2d3748" stroke-width="1" />
+
+                        <!-- Continuous deep soffit shadow cast onto upper facade -->
+                        <rect x="-30" y="-613" width="2160" height="35" fill="#000000" opacity="0.45" />
+                        <!-- Recessed architectural LED light strip -->
+                        <line x1="-20" y1="-612" x2="2120" y2="-612" stroke="#fde047" stroke-width="1.5" opacity="0.6" />
+
+                        <!-- Roof Chimney / Ventilation shaft (at +7.26m) -->
+                        <rect x="1420" y="-726" width="90" height="38" fill="#334155" stroke="#0f172a" stroke-width="1.5" />
+                        <rect x="1415" y="-730" width="100" height="4" fill="#0f172a" />
+                    </g>
+
+
+                    <!-- ==================================== -->
+                    <!-- LAYER: DIMENSIONS (WYMIARY) -->
+                    <!-- ==================================== -->
+                    <g id="layer-dims">
+                        <!-- TIER 1 (TOP): TOTAL BUILDING WIDTH (21,000 mm) at Y = -840 -->
+                        <g transform="translate(0, -840)">
+                            <line x1="0" y1="0" x2="0" y2="152" stroke="#d97706" stroke-width="0.8" stroke-dasharray="3 3" opacity="0.6" />
+                            <line x1="2100" y1="0" x2="2100" y2="152" stroke="#d97706" stroke-width="0.8" stroke-dasharray="3 3" opacity="0.6" />
+                            <line x1="0" y1="0" x2="2100" y2="0" class="dim-solid" />
+                            <line x1="0" y1="-10" x2="0" y2="10" class="tick" />
+                            <line x1="2100" y1="-10" x2="2100" y2="10" class="tick" />
+                            <rect x="965" y="-14" width="170" height="22" fill="#ffffff" stroke="#fde68a" rx="4" />
+                            <text x="1050" y="2" class="dim-text" font-size="14" font-weight="700">21 000 mm (21.00 m)</text>
+                        </g>
+
+                        <!-- TIER 2: VOLUME BREAKDOWN (12,010 mm Recessed + 8,990 mm Garage) at Y = -770 -->
+                        <g transform="translate(0, -770)">
+                            <line x1="1201" y1="0" x2="1201" y2="82" stroke="#d97706" stroke-width="0.8" stroke-dasharray="3 3" opacity="0.6" />
+                            <line x1="0" y1="0" x2="1201" y2="0" class="dim-solid" />
+                            <line x1="0" y1="-8" x2="0" y2="8" class="tick" />
+                            <line x1="1201" y1="-8" x2="1201" y2="8" class="tick" />
+                            <rect x="490" y="-12" width="220" height="20" fill="#ffffff" rx="3" />
+                            <text x="600" y="2" class="dim-text">12 010 (Skrzydło mieszkalne)</text>
+
+                            <line x1="1201" y1="0" x2="2100" y2="0" class="dim-solid" />
+                            <line x1="2100" y1="-8" x2="2100" y2="8" class="tick" />
+                            <rect x="1540" y="-12" width="220" height="20" fill="#ffffff" rx="3" />
+                            <text x="1650" y="2" class="dim-text">8 990 (Skrzydło garażowe)</text>
+                        </g>
+
+                        <!-- TIER 3: UPPER FLOOR OPENINGS & PIERS at Y = -710 -->
+                        <!-- Balcony length is 6,400mm; Window 14a starts after balcony (6,400 to 7,400mm) -->
+                        <g transform="translate(0, -710)">
+                            <line x1="0" y1="0" x2="0" y2="22" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
+                            <line x1="640" y1="0" x2="640" y2="22" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
+                            <line x1="740" y1="0" x2="740" y2="22" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
+                            <line x1="925" y1="0" x2="925" y2="22" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
+                            <line x1="1025" y1="0" x2="1025" y2="22" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
+                            <line x1="1203" y1="0" x2="1203" y2="22" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
+                            <line x1="1303" y1="0" x2="1303" y2="22" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
+                            <line x1="1472" y1="0" x2="1472" y2="22" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
+                            <line x1="1572" y1="0" x2="1572" y2="22" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
+                            <line x1="1880" y1="0" x2="1880" y2="22" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
+                            <line x1="2100" y1="0" x2="2100" y2="22" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
+
+                            <line x1="0" y1="0" x2="2100" y2="0" class="dim-solid" />
+
+                            <!-- Balcony length 6 400 mm -->
+                            <line x1="0" y1="-7" x2="0" y2="7" class="tick" />
+                            <rect x="255" y="-12" width="130" height="18" fill="#ffffff" rx="2" stroke="#0284c7" stroke-width="0.8" />
+                            <text x="320" y="2" class="dim-text" font-weight="700" fill="#0369a1">6 400 (Długość balkonu)</text>
+
+                            <!-- Window 14a (starts after balcony: 640 to 740, width 1000mm) -->
+                            <line x1="640" y1="-7" x2="640" y2="7" class="tick" />
+                            <rect x="648" y="-12" width="84" height="18" fill="#ffffff" rx="2" stroke="#10b981" stroke-width="0.8" />
+                            <text x="690" y="2" class="dim-text" font-weight="700" fill="#047857">1 000 (14a)</text>
+
+                            <!-- Pier between 14a and O11_1 (740 to 925) -->
+                            <line x1="740" y1="-7" x2="740" y2="7" class="tick" />
+                            <rect x="812" y="-12" width="40" height="18" fill="#ffffff" rx="2" />
+                            <text x="832.5" y="2" class="dim-text">1 850</text>
+
+                            <!-- Window O11_1 (925 to 1025) -->
+                            <line x1="925" y1="-7" x2="925" y2="7" class="tick" />
+                            <rect x="955" y="-12" width="40" height="18" fill="#ffffff" rx="2" />
+                            <text x="975" y="2" class="dim-text">1 000</text>
+
+                            <!-- Pier between O11_1 and O11_2 (1025 to 1203) -->
+                            <line x1="1025" y1="-7" x2="1025" y2="7" class="tick" />
+                            <rect x="1094" y="-12" width="40" height="18" fill="#ffffff" rx="2" />
+                            <text x="1114" y="2" class="dim-text">1 780</text>
+
+                            <!-- Window O11_2 (1203 to 1303) -->
+                            <line x1="1203" y1="-7" x2="1203" y2="7" class="tick" />
+                            <rect x="1233" y="-12" width="40" height="18" fill="#ffffff" rx="2" />
+                            <text x="1253" y="2" class="dim-text">1 000</text>
+
+                            <!-- Pier between O11_2 and O11_3 (1303 to 1472) -->
+                            <line x1="1303" y1="-7" x2="1303" y2="7" class="tick" />
+                            <rect x="1367" y="-12" width="40" height="18" fill="#ffffff" rx="2" />
+                            <text x="1387" y="2" class="dim-text">1 690</text>
+
+                            <!-- Window O11_3 (1472 to 1572) -->
+                            <line x1="1472" y1="-7" x2="1472" y2="7" class="tick" />
+                            <rect x="1502" y="-12" width="40" height="18" fill="#ffffff" rx="2" />
+                            <text x="1522" y="2" class="dim-text">1 000</text>
+
+                            <!-- Pier between O11_3 and Corner Window (1572 to 1880) -->
+                            <line x1="1572" y1="-7" x2="1572" y2="7" class="tick" />
+                            <rect x="1706" y="-12" width="40" height="18" fill="#ffffff" rx="2" />
+                            <text x="1726" y="2" class="dim-text">3 080</text>
+
+                            <!-- Corner Window O13a (1880 to 2100) -->
+                            <line x1="1880" y1="-7" x2="1880" y2="7" class="tick" />
+                            <line x1="2100" y1="-7" x2="2100" y2="7" class="tick" />
+                            <rect x="1935" y="-12" width="110" height="18" fill="#ffffff" rx="2" />
+                            <text x="1990" y="2" class="dim-text">2 200 (Corner)</text>
+                        </g>
+
+                        <!-- TIER 4 (BOTTOM 1): GROUND FLOOR GENERAL OPENING CHAIN at Y = +115 -->
+                        <g transform="translate(0, 115)">
+                            <!-- Witness lines rising up to ground level (Y = 2) -->
+                            <line x1="0" y1="0" x2="0" y2="-113" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
+                            <line x1="115" y1="0" x2="115" y2="-113" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
+                            <line x1="235" y1="0" x2="235" y2="-113" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
+                            <line x1="845" y1="0" x2="845" y2="-113" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
+                            <line x1="1040" y1="0" x2="1040" y2="-113" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
+                            <line x1="1201" y1="0" x2="1201" y2="-113" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
+                            <line x1="2100" y1="0" x2="2100" y2="-113" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
+
+                            <!-- Main line across ground floor -->
+                            <line x1="0" y1="0" x2="2100" y2="0" class="dim-solid" />
+
+                            <!-- East pier to O2 (0 to 115) = 1150 mm -->
+                            <line x1="0" y1="-7" x2="0" y2="7" class="tick" />
+                            <rect x="35" y="-12" width="45" height="18" fill="#ffffff" rx="2" stroke="#f59e0b" stroke-width="0.8" />
+                            <text x="57.5" y="2" class="dim-text" font-weight="700" fill="#b45309">1 150</text>
+
+                            <!-- Window O2 (115 to 235) = 1200 mm -->
+                            <line x1="115" y1="-7" x2="115" y2="7" class="tick" />
+                            <rect x="137" y="-12" width="76" height="18" fill="#ffffff" rx="2" stroke="#f59e0b" stroke-width="0.8" />
+                            <text x="175" y="2" class="dim-text" font-weight="700" fill="#b45309">1 200 (O2)</text>
+
+                            <!-- Pier between O2 and Kitchen O1 (235 to 845) = 6100 mm -->
+                            <line x1="235" y1="-7" x2="235" y2="7" class="tick" />
+                            <rect x="515" y="-12" width="50" height="18" fill="#ffffff" rx="2" stroke="#f59e0b" stroke-width="0.8" />
+                            <text x="540" y="2" class="dim-text" font-weight="700" fill="#b45309">6 100</text>
+
+                            <!-- Kitchen Window O1 (845 to 1040) = 1950 mm -->
+                            <line x1="845" y1="-7" x2="845" y2="7" class="tick" />
+                            <rect x="904" y="-12" width="76" height="18" fill="#ffffff" rx="2" stroke="#f59e0b" stroke-width="0.8" />
+                            <text x="942.5" y="2" class="dim-text" font-weight="700" fill="#b45309">1 950 (O1)</text>
+
+                            <!-- Pier to Garage corner (1040 to 1201) = 1610 mm -->
+                            <line x1="1040" y1="-7" x2="1040" y2="7" class="tick" />
+                            <rect x="1098" y="-12" width="45" height="18" fill="#ffffff" rx="2" />
+                            <text x="1120.5" y="2" class="dim-text">1 610</text>
+
+                            <!-- Garage blind wall (1201 to 2100) = 8990 mm -->
+                            <line x1="1201" y1="-7" x2="1201" y2="7" class="tick" />
+                            <line x1="2100" y1="-7" x2="2100" y2="7" class="tick" />
+                            <rect x="1560" y="-12" width="180" height="18" fill="#ffffff" rx="2" />
+                            <text x="1650" y="2" class="dim-text">8 990 (Blind Clinker Facade)</text>
+                        </g>
+
+                        <!-- TIER 5 (BOTTOM 2, HIGHLIGHTED): DEDICATED DETAIL SCALE FOR WINDOW O2 at Y = +190 -->
+                        <!-- Highlighting: (77 + 38) = 1150mm from left edge, length 1200mm, height 1700mm, sill hp=800mm -->
+                        <g id="highlighted-o2-scale" transform="translate(0, 190)">
+                            <!-- Background highlight container -->
+                            <rect x="-20" y="-32" width="460" height="68" rx="8" fill="#fffbeb" stroke="#f59e0b" stroke-width="1.5" filter="drop-shadow(0 2px 4px rgba(245, 158, 11, 0.15))" />
+
+                            <!-- Header label for this special scale -->
+                            <text x="-8" y="-18" font-family="'Outfit', sans-serif" font-size="11" font-weight="700" fill="#92400e">★ DETAL OKNA O2: ODSTĘP OD KRAWĘDZI (77+38) I WYMIARY</text>
+
+                            <!-- Extension witness lines extending all the way up to ground plane -->
+                            <line x1="0" y1="0" x2="0" y2="-188" stroke="#d97706" stroke-width="1" stroke-dasharray="2 2" />
+                            <line x1="38" y1="0" x2="38" y2="-188" stroke="#d97706" stroke-width="0.8" stroke-dasharray="2 2" opacity="0.7" />
+                            <line x1="115" y1="0" x2="115" y2="-188" stroke="#d97706" stroke-width="1" stroke-dasharray="2 2" />
+                            <line x1="235" y1="0" x2="235" y2="-188" stroke="#d97706" stroke-width="1" stroke-dasharray="2 2" />
+
+                            <!-- Dimension line -->
+                            <line x1="0" y1="0" x2="235" y2="0" stroke="#b45309" stroke-width="1.8" />
+                            <line x1="0" y1="-8" x2="0" y2="8" stroke="#b45309" stroke-width="2" />
+                            <line x1="38" y1="-5" x2="38" y2="5" stroke="#b45309" stroke-width="1.2" />
+                            <line x1="115" y1="-8" x2="115" y2="8" stroke="#b45309" stroke-width="2" />
+                            <line x1="235" y1="-8" x2="235" y2="8" stroke="#b45309" stroke-width="2" />
+
+                            <!-- Sub-segment 1: 380 mm (Outer wall thickness) -->
+                            <text x="19" y="-6" font-family="'JetBrains Mono', monospace" font-size="9" font-weight="700" fill="#b45309" text-anchor="middle">38</text>
+
+                            <!-- Sub-segment 2: 770 mm (Wall reveal to window) -->
+                            <text x="76.5" y="-6" font-family="'JetBrains Mono', monospace" font-size="9" font-weight="700" fill="#b45309" text-anchor="middle">77</text>
+
+                            <!-- Combined bracket label: (77+38) = 1150 mm -->
+                            <rect x="8" y="8" width="100" height="18" rx="3" fill="#fef3c7" stroke="#d97706" stroke-width="0.8" />
+                            <text x="58" y="21" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="800" fill="#78350f" text-anchor="middle">(77+38) = 1 150</text>
+
+                            <!-- Window O2 width segment: 1 200 mm -->
+                            <rect x="130" y="-11" width="90" height="20" rx="3" fill="#1e293b" />
+                            <text x="175" y="3" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="800" fill="#38bdf8" text-anchor="middle">L = 1 200 mm</text>
+
+                            <!-- Window O2 height & sill callout badge -->
+                            <rect x="245" y="-18" width="185" height="42" rx="4" fill="#ffffff" stroke="#d97706" stroke-width="1" />
+                            <text x="255" y="-2" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700" fill="#0f172a">Wysokość: 1 700 mm</text>
+                            <text x="255" y="14" font-family="'JetBrains Mono', monospace" font-size="9.5" font-weight="700" fill="#b45309">Parapet hp = 800 mm</text>
+                        </g>
+                    </g>
+
+
+                    <!-- ==================================== -->
+                    <!-- LAYER: VERTICAL ELEVATION LEVELS -->
+                    <!-- ==================================== -->
+                    <g id="layer-levels">
+                        <!-- LEFT MARGIN LEVEL ANNOTATIONS -->
+                        <!-- +7.26m Chimney / Ventilation shaft -->
+                        <g transform="translate(-200, -726)">
+                            <line x1="0" y1="0" x2="160" y2="0" class="level-marker" stroke-dasharray="2 2" opacity="0.7" />
+                            <polygon points="0,0 14,-6 14,6" fill="var(--level-color)" />
+                            <text x="-12" y="4" class="level-text" text-anchor="end">+7.26</text>
+                            <text x="24" y="-4" class="level-label">Komin / Wywietrzak dachu</text>
+                        </g>
+
+                        <!-- +6.88m Roof Attica Cornice Top -->
+                        <g transform="translate(-200, -688)">
+                            <line x1="0" y1="0" x2="170" y2="0" class="level-marker" stroke-width="1.5" />
+                            <polygon points="0,0 20,-9 20,9" fill="var(--level-color)" />
+                            <text x="-12" y="4" class="level-text" text-anchor="end">+6.88</text>
+                            <text x="28" y="-4" class="level-label">Attyka dachu płaskiego (Gzyms)</text>
+                        </g>
+
+                        <!-- +6.13m Upper Window Head / Roof Cornice Soffit -->
+                        <g transform="translate(-200, -613)">
+                            <line x1="0" y1="0" x2="170" y2="0" class="level-marker" />
+                            <polygon points="0,0 16,-7 16,7" fill="var(--level-color)" />
+                            <text x="-12" y="4" class="level-text" text-anchor="end">+6.13</text>
+                            <text x="28" y="-4" class="level-label">Nadproże okien piętra / Spód gzymsu</text>
+                        </g>
+
+                        <!-- +4.18m Upper Window Sill hp=85cm -->
+                        <g transform="translate(-200, -418)">
+                            <line x1="0" y1="0" x2="170" y2="0" class="level-marker" />
+                            <polygon points="0,0 16,-7 16,7" fill="var(--level-color)" />
+                            <text x="-12" y="4" class="level-text" text-anchor="end">+4.18</text>
+                            <text x="28" y="-4" class="level-label">Parapet okien piętra (hp=85)</text>
+                        </g>
+
+                        <!-- +3.43m Top of Intermediate Cornice / Window 14a Sill -->
+                        <g transform="translate(-200, -343)">
+                            <line x1="0" y1="0" x2="190" y2="0" class="level-marker" stroke-width="1.5" stroke="#d97706" />
+                            <polygon points="0,0 18,-8 18,8" fill="#d97706" />
+                            <text x="-12" y="4" class="level-text" font-weight="700" fill="#d97706" text-anchor="end">+3.43</text>
+                            <text x="28" y="-4" class="level-label" font-weight="700" fill="#b45309">Gzyms pośredni (Góra / Próg 14a)</text>
+                        </g>
+
+                        <!-- +2.80m Bottom of Intermediate Cornice / Top of Brickwork -->
+                        <g transform="translate(-200, -280)">
+                            <line x1="0" y1="0" x2="190" y2="0" class="level-marker" stroke-width="1.5" stroke="#d97706" />
+                            <polygon points="0,0 18,-8 18,8" fill="#d97706" />
+                            <text x="-12" y="4" class="level-text" font-weight="700" fill="#d97706" text-anchor="end">+2.80</text>
+                            <text x="28" y="-4" class="level-label" font-weight="700" fill="#b45309">Gzyms pośredni (Spód / Wierzch muru)</text>
+                        </g>
+
+                        <!-- +2.50m Shared Ground Floor Lintel Level (O1 & O2) -->
+                        <g transform="translate(-200, -250)">
+                            <line x1="0" y1="0" x2="170" y2="0" class="level-marker" stroke="#f59e0b" stroke-width="1.2" />
+                            <polygon points="0,0 16,-7 16,7" fill="#f59e0b" />
+                            <text x="-12" y="4" class="level-text" font-weight="700" fill="#b45309" text-anchor="end">+2.50</text>
+                            <text x="28" y="-4" class="level-label" font-weight="700" fill="#92400e">Wspólne nadproże okien parteru O1 i O2 (+2.50 m)</text>
+                        </g>
+
+                        <!-- +1.10m Kitchen Window Sill hp=110cm (O1) -->
+                        <g transform="translate(-200, -110)">
+                            <line x1="0" y1="0" x2="170" y2="0" class="level-marker" stroke="#0284c7" stroke-width="1.2" />
+                            <polygon points="0,0 16,-7 16,7" fill="#0284c7" />
+                            <text x="-12" y="4" class="level-text" font-weight="700" fill="#0369a1" text-anchor="end">+1.10</text>
+                            <text x="28" y="-4" class="level-label" font-weight="700" fill="#0369a1">Parapet okna kuchni O1 (hp=110 cm)</text>
+                        </g>
+
+                        <!-- +0.80m Window O2 Sill (Parapet okna gabinetu O2, hp=800mm) -->
+                        <g transform="translate(-200, -80)">
+                            <line x1="0" y1="0" x2="170" y2="0" class="level-marker" stroke="#f59e0b" stroke-width="1.2" />
+                            <polygon points="0,0 16,-7 16,7" fill="#f59e0b" />
+                            <text x="-12" y="4" class="level-text" font-weight="700" fill="#b45309" text-anchor="end">+0.80</text>
+                            <text x="28" y="-4" class="level-label" font-weight="600" fill="#92400e">Parapet okna O2 (hp=800 mm)</text>
+                        </g>
+
+                        <!-- ±0.00m Ground Floor Level -->
+                        <g transform="translate(-200, 0)">
+                            <line x1="0" y1="0" x2="170" y2="0" class="level-marker" stroke-width="1.5" />
+                            <polygon points="0,0 20,-9 20,9" fill="var(--level-color)" />
+                            <text x="-12" y="4" class="level-text" text-anchor="end">±0.00</text>
+                            <text x="28" y="-4" class="level-label">Poziom parteru (54.12 m n.p.m.)</text>
+                        </g>
+
+                        <!-- -0.02m Ground Line / Plinth -->
+                        <g transform="translate(-200, 2)">
+                            <line x1="0" y1="0" x2="170" y2="0" class="level-marker" stroke-dasharray="2 2" opacity="0.7" />
+                            <text x="-12" y="16" class="level-text" text-anchor="end">-0.02</text>
+                            <text x="28" y="16" class="level-label">Teren zewnętrzny / Cokół</text>
+                        </g>
+
+                        <!-- RIGHT MARGIN LEVEL ANNOTATIONS -->
+                        <g transform="translate(2140, -688)">
+                            <line x1="0" y1="0" x2="100" y2="0" class="level-marker" stroke-width="1.2" />
+                            <polygon points="100,0 82,-7 82,7" fill="var(--level-color)" />
+                            <text x="112" y="4" class="level-text" text-anchor="start">+6.88</text>
+                        </g>
+                        <g transform="translate(2140, -613)">
+                            <line x1="0" y1="0" x2="100" y2="0" class="level-marker" />
+                            <polygon points="100,0 84,-6 84,6" fill="var(--level-color)" />
+                            <text x="112" y="4" class="level-text" text-anchor="start">+6.13</text>
+                        </g>
+                        <g transform="translate(2140, -343)">
+                            <line x1="0" y1="0" x2="100" y2="0" class="level-marker" stroke="#d97706" stroke-width="1.2" />
+                            <polygon points="100,0 84,-6 84,6" fill="#d97706" />
+                            <text x="112" y="4" class="level-text" font-weight="700" fill="#d97706" text-anchor="start">+3.43</text>
+                        </g>
+                        <g transform="translate(2140, -280)">
+                            <line x1="0" y1="0" x2="100" y2="0" class="level-marker" stroke="#d97706" stroke-width="1.2" />
+                            <polygon points="100,0 84,-6 84,6" fill="#d97706" />
+                            <text x="112" y="4" class="level-text" font-weight="700" fill="#d97706" text-anchor="start">+2.80</text>
+                        </g>
+                        <g transform="translate(2140, 2)">
+                            <line x1="0" y1="0" x2="100" y2="0" class="level-marker" stroke-dasharray="2 2" opacity="0.7" />
+                            <polygon points="100,0 84,-6 84,6" fill="var(--level-color)" />
+                            <text x="112" y="4" class="level-text" text-anchor="start">-0.02</text>
+                        </g>
+                    </g>
+                </svg>
+            </div>
+
+            <!-- Dynamic Detail Drawer / Info Card -->
+            <div id="element-detail-card" class="info-panel" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                    <div>
+                        <h3 id="detail-title" style="margin: 0 0 4px 0; font-size: 18px; color: #0f172a;">Element Details</h3>
+                        <p id="detail-subtitle" style="margin: 0; font-size: 13px; color: #64748b;">Technical & Architectural Specifications from Drawings</p>
+                    </div>
+                    <button onclick="document.getElementById('element-detail-card').style.display='none'" style="background: none; border: none; font-size: 20px; cursor: pointer; color: #94a3b8;">&times;</button>
+                </div>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h4>📏 Exact Dimensions</h4>
+                        <p id="detail-dims">-</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>📍 Plan Position & Room</h4>
+                        <p id="detail-room">-</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>🎨 Materials & Specifications</h4>
+                        <p id="detail-specs">-</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 2: 3D PHOTO RENDERING & HOTSPOTS -->
+        <!-- ========================================== -->
+        <div id="TabPhoto" class="tab-content">
+            <div class="photo-tab-container">
+                <div class="photo-viewer-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; color: white;">
+                        <div>
+                            <h3 style="margin: 0 0 4px 0; font-size: 16px; font-weight: 600;">3D Architectural Visualization (North Facade)</h3>
+                            <p style="margin: 0; font-size: 12px; color: #94a3b8;">Hover or click the numbered markers to inspect each architectural element measured in the PDF plans.</p>
+                        </div>
+                        <span class="badge" style="background: rgba(255,255,255,0.1); color: #e2e8f0; border: none;">Photo source: Project Render</span>
+                    </div>
+
+                    <div class="photo-wrapper">
+                        <img src="north_facade_render.png" alt="North Facade Architectural Rendering">
+
+                        <!-- Hotspot 1: Upper Terrace (Left) -->
+                        <div class="hotspot" style="top: 32%; left: 22%;" onclick="showElementDetails('TERRACE')">
+                            1
+                            <div class="hotspot-tooltip">
+                                <strong>1. Taras (Upper Terrace)</strong><br>
+                                Area: 17.3 m² | Level: +3.31 m<br>
+                                Balustrade: Glass & steel h=1000mm<br>
+                                Slender corner support column
+                            </div>
+                        </div>
+
+                        <!-- Hotspot 2: Bedroom 1.04 Window 14a on Balcony -->
+                        <div class="hotspot" style="top: 27%; left: 34%;" onclick="showElementDetails('O14a')">
+                            2
+                            <div class="hotspot-tooltip">
+                                <strong>2. Window 14a on Balcony (Sypialnia 1.04)</strong><br>
+                                Width: 1,000 mm (100 cm) | Height: 2,700 mm<br>
+                                hp = 0 mm (+3.43 m cornice level)<br>
+                                Full-height glass opening onto balcony
+                            </div>
+                        </div>
+
+                        <!-- Hotspot 3: Bathrooms 1.02 & 1.03 Windows (O11) -->
+                        <div class="hotspot" style="top: 27%; left: 52%;" onclick="showElementDetails('O11_1')">
+                            3
+                            <div class="hotspot-tooltip">
+                                <strong>3. Bathrooms 1.02 & 1.03 (O11)</strong><br>
+                                3× Vertical Windows: 1,000 × 1,950 mm<br>
+                                hp = 850 mm | Lintel: +6.13 m<br>
+                                Anthracite aluminum profiles
+                            </div>
+                        </div>
+
+                        <!-- Hotspot 4: Master Bedroom 1.01 Panoramic Corner Window (O13a/b) -->
+                        <div class="hotspot" style="top: 27%; left: 77%;" onclick="showElementDetails('O13')">
+                            4
+                            <div class="hotspot-tooltip">
+                                <strong>4. Master Bedroom 1.01 (Corner O13)</strong><br>
+                                North face: 2,200 × 1,950 mm (hp=850mm)<br>
+                                West face: 2,450 × 1,950 mm<br>
+                                Frameless glass-to-glass butt joint
+                            </div>
+                        </div>
+
+                        <!-- Hotspot 5: Ground Floor Gabinet Window O2 -->
+                        <div class="hotspot" style="top: 52%; left: 18%;" onclick="showElementDetails('O2')">
+                            5
+                            <div class="hotspot-tooltip">
+                                <strong>5. Gabinet 0.15 Window (O2)</strong><br>
+                                Width: 1,200 mm | Height: 1,700 mm (hp = 800 mm)<br>
+                                Starts at: (77+38) = 1,150 mm from left edge
+                            </div>
+                        </div>
+
+                        <!-- Hotspot 6: Ground Floor Kitchen Window O1 -->
+                        <div class="hotspot" style="top: 49%; left: 43.5%;" onclick="showElementDetails('O1')">
+                            6
+                            <div class="hotspot-tooltip">
+                                <strong>6. Kitchen 0.13 Window (O1)</strong><br>
+                                Width: 1,950 mm | Height: 1,400 mm (hp = 1,100 mm)<br>
+                                Distance from O2: 6,100 mm | Lintel: +2.50 m
+                            </div>
+                        </div>
+
+                        <!-- Hotspot 7: Protruding Solid Garage Volume & Intermediate Cornice -->
+                        <div class="hotspot" style="top: 50%; left: 69%;" onclick="showElementDetails('GARAGE')">
+                            7
+                            <div class="hotspot-tooltip">
+                                <strong>7. Garage & Storage Volume</strong><br>
+                                Width: 8,990 mm | Depth Protrusion: 3,100 mm<br>
+                                Clinker brick masonry up to +2.80 m<br>
+                                Windowless acoustic & privacy barrier
+                            </div>
+                        </div>
+
+                        <!-- Hotspot 8: Main Cantilevered Roof Fascia -->
+                        <div class="hotspot" style="top: 17%; left: 45%;" onclick="showElementDetails('ROOF')">
+                            8
+                            <div class="hotspot-tooltip">
+                                <strong>8. Cantilevered Roof Fascia Overhang</strong><br>
+                                Top level: +6.88 m | Fascia height: 750 mm<br>
+                                Deep architectural overhang providing<br>
+                                passive solar protection to upper rooms
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Material Palette Summary -->
+                <div class="info-panel" style="margin-top: 0;">
+                    <h3 style="margin: 0 0 14px 0; font-size: 16px; color: #0f172a;">Architectural Material Harmonization</h3>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <h4>🧱 Ground Floor Cladding</h4>
+                            <p><strong>Graphite / Charcoal Clinker Brick:</strong> Hand-formed or waterstruck long-format clinker in dark anthracite up to +2.80 m level. Anchors the ground floor solidly to the site.</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>🪵 Upper Floor Cladding</h4>
+                            <p><strong>Vertical Wood Slats:</strong> Natural thermo-larch / thermo-ash with subtle shadow gaps from +3.43 m to +6.13 m. Warms the upper volume and contrasts against the dark horizontal bands.</p>
+                        </div>
+                        <div class="info-card">
+                            <h4>⬛ Intermediate & Roof Cornices</h4>
+                            <p><strong>Sheet Metal Cassette Banding:</strong> RAL 7016 / 9005 black matte aluminum panels forming the bold 63 cm intermediate cornice (+2.80 m to +3.43 m) and the 75 cm upper cantilevered roof fascia (+6.13 m to +6.88 m).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 3: FLOOR PLAN ALIGNMENT & PROJECTIONS -->
+        <!-- ========================================== -->
+        <div id="TabFloorPlan" class="tab-content">
+            <div class="diagram-box">
+                <h3 style="margin: 0 0 8px 0; font-size: 18px; color: #0f172a;">Floor Plan to Elevation Direct Projection</h3>
+                <p style="margin: 0 0 20px 0; font-size: 14px; color: #64748b;">
+                    Diagram demonstrating how the North facade elements directly correspond to Drawing <strong>A.02 (Rzut Parteru)</strong> and Drawing <strong>A.03 (Rzut Piętra)</strong>.
+                </p>
+
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; overflow-x: auto;">
+                    <svg width="100%" height="400" viewBox="0 0 1100 380" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Compass Rose -->
+                        <g transform="translate(70, 60)">
+                            <circle cx="0" cy="0" r="28" fill="white" stroke="#cbd5e1" stroke-width="1.5" />
+                            <polygon points="0,-24 6,0 0,-4 -6,0" fill="#ef4444" />
+                            <polygon points="0,24 6,0 0,4 -6,0" fill="#94a3b8" />
+                            <text x="0" y="-30" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="700" fill="#ef4444" text-anchor="middle">N (Top)</text>
+                            <text x="36" y="4" font-family="'JetBrains Mono', monospace" font-size="10" fill="#64748b" text-anchor="start">E (Left on Facade)</text>
+                            <text x="-36" y="4" font-family="'JetBrains Mono', monospace" font-size="10" fill="#64748b" text-anchor="end">W (Right on Facade)</text>
+                        </g>
+
+                        <!-- Architectural Viewing Cone -->
+                        <g transform="translate(550, 40)">
+                            <circle cx="0" cy="0" r="8" fill="#0f172a" />
+                            <path d="M -10,0 L -250,90 L 250,90 Z" fill="#3b82f6" opacity="0.12" />
+                            <line x1="0" y1="0" x2="0" y2="90" stroke="#3b82f6" stroke-width="1.5" stroke-dasharray="4 4" />
+                            <text x="0" y="-12" font-family="'Outfit', sans-serif" font-size="12" font-weight="600" fill="#0f172a" text-anchor="middle">Observer Standing North Looking South</text>
+                        </g>
+
+                        <!-- GROUND FLOOR PLAN TOP OUTLINE -->
+                        <g transform="translate(150, 150)">
+                            <!-- Axis A: Garage forward volume -->
+                            <!-- Protruding North by 3,100mm -->
+                            <rect x="428" y="-45" width="428" height="90" fill="#383d47" stroke="#1e222a" stroke-width="2" />
+                            <text x="642" y="5" font-family="'Outfit', sans-serif" font-size="13" font-weight="600" fill="#ffffff" text-anchor="middle">GARAGE 0.01 & STORAGE 0.02 (Axis A)</text>
+                            <text x="642" y="24" font-family="'JetBrains Mono', monospace" font-size="11" fill="#cbd5e1" text-anchor="middle">Width: 8,990 mm | Depth Protrusion: +3,100 mm</text>
+
+                            <!-- Axis B: Recessed Facade (Kitchen & Gabinet) -->
+                            <rect x="0" y="0" width="428" height="90" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1.5" />
+                            <rect x="41" y="0" width="43" height="10" fill="#0284c7" />
+                            <text x="62.5" y="-8" font-family="'JetBrains Mono', monospace" font-size="10" fill="#0284c7" font-weight="600" text-anchor="middle">Window O2</text>
+                            <rect x="301" y="0" width="69" height="10" fill="#0284c7" />
+                            <text x="335.5" y="-8" font-family="'JetBrains Mono', monospace" font-size="10" fill="#0284c7" font-weight="600" text-anchor="middle">Window O1</text>
+                            <text x="214" y="45" font-family="'Outfit', sans-serif" font-size="13" font-weight="600" fill="#334155" text-anchor="middle">GABINET 0.15 | PANTRY 0.14 | KITCHEN 0.13 (Axis B)</text>
+                            <text x="214" y="65" font-family="'JetBrains Mono', monospace" font-size="11" fill="#64748b" text-anchor="middle">Width: 12,010 mm (Recessed 3.10 m back)</text>
+
+                            <!-- Setback dimension indicator -->
+                            <line x1="438" y1="-45" x2="438" y2="0" stroke="#d97706" stroke-width="1.5" />
+                            <line x1="430" y1="-45" x2="446" y2="-45" stroke="#d97706" stroke-width="1.5" />
+                            <line x1="430" y1="0" x2="446" y2="0" stroke="#d97706" stroke-width="1.5" />
+                            <text x="455" y="-20" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" fill="#d97706">3 100 mm offset</text>
+                        </g>
+
+                        <!-- UPPER FLOOR PLAN ALIGNMENT -->
+                        <g transform="translate(150, 270)">
+                            <!-- Upper floor: Terrace on Left (Axis 6 to 5) -->
+                            <rect x="0" y="0" width="270" height="70" fill="#7dd3fc" opacity="0.3" stroke="#0284c7" stroke-width="2" stroke-dasharray="4 4" />
+                            <text x="135" y="38" font-family="'Outfit', sans-serif" font-size="12" font-weight="600" fill="#0369a1" text-anchor="middle">TARAS (17.3 m², +3.31) over Gabinet</text>
+
+                            <!-- Upper floor: Rooms (Bedrooms & Bathrooms) -->
+                            <rect x="270" y="0" width="586" height="70" fill="#d8c5ab" stroke="#8a7356" stroke-width="2" />
+                            <text x="563" y="38" font-family="'Outfit', sans-serif" font-size="12" font-weight="600" fill="#451a03" text-anchor="middle">Bedrooms 1.04 & 1.01 | Bathrooms 1.02 & 1.03 (Timber Facade)</text>
+
+                            <!-- Corner window tag on West end -->
+                            <circle cx="856" cy="0" r="10" fill="#ef4444" />
+                            <text x="856" y="2" font-family="'JetBrains Mono', monospace" font-size="8" fill="white" font-weight="700" text-anchor="middle" dominant-baseline="central">O13</text>
+                        </g>
+                    </svg>
+                </div>
+
+                <div class="info-grid" style="margin-top: 20px;">
+                    <div class="info-card">
+                        <h4>📐 Ground Floor Logic (A.02)</h4>
+                        <p>
+                            The Garage and Storage block (Axis 1–3) pushes forward 310 cm towards Grzybowa street (Axis A).
+                            The living wing (Kitchen, Pantry, Gabinet, Axis 3–6) is set back to Axis B, creating a sheltered private front entry court.
+                        </p>
+                    </div>
+                    <div class="info-card">
+                        <h4>🏠 First Floor Logic (A.03)</h4>
+                        <p>
+                            The upper floor aligns its north wall along Axis B across the entire house width.
+                            Above the garage is an unheated green/gravel flat roof (+3.53 m), and above the gabinet is a cantilevered open terrace (+3.31 m).
+                        </p>
+                    </div>
+                    <div class="info-card">
+                        <h4>☀️ Architectural Cornices & Shading</h4>
+                        <p>
+                            The 750 mm deep black roof attica (+6.13 to +6.88 m) and the 630 mm intermediate cornice (+2.80 to +3.43 m) create bold horizontal architectural bands.
+                            Upper north glazing receives glare-free indirect light, shielded by the roof overhang.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 4: WINDOW & OPENING SCHEDULE -->
+        <!-- ========================================== -->
+        <div id="TabSchedule" class="tab-content">
+            <div class="diagram-box">
+                <h3 style="margin: 0 0 8px 0; font-size: 18px; color: #0f172a;">North Facade Openings Schedule (Zestawienie Stolarki)</h3>
+                <p style="margin: 0 0 20px 0; font-size: 14px; color: #64748b;">
+                    Complete list of all window and door openings located on the North facade extracted from drawings A.02 and A.03.
+                </p>
+
+                <div class="table-responsive">
+                    <table class="schedule-table">
+                        <thead>
+                            <tr>
+                                <th>Symbol</th>
+                                <th>Level / Room</th>
+                                <th>Width (mm)</th>
+                                <th>Height (mm)</th>
+                                <th>Sill Height (hp)</th>
+                                <th>Lintel Level</th>
+                                <th>Type & Function</th>
+                                <th>Glazing / Specs</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="badge-tag badge-blue">O1</span></td>
+                                <td>Ground Floor: <strong>0.13 Kuchnia</strong></td>
+                                <td><strong>1 950</strong></td>
+                                <td><strong>1 400</strong></td>
+                                <td>hp = 1 100 mm (+1.10 m)</td>
+                                <td>+2.50 m</td>
+                                <td>Ribbon kitchen window (offset 6 100 mm from O2)</td>
+                                <td>Triple glazed, warm spacer, Ug=0.5, anthracite frame, shares +2.50 m lintel line</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge-tag badge-blue">O2</span></td>
+                                <td>Ground Floor: <strong>0.15 Gabinet</strong></td>
+                                <td><strong>1 200</strong></td>
+                                <td><strong>1 700</strong></td>
+                                <td>hp = 800 mm (+0.80 m)</td>
+                                <td>+2.50 m</td>
+                                <td>Study window (starts 77+38=1150 mm from left edge)</td>
+                                <td>Tilt & turn, aluminum sill at hp=800mm, brick parapet below</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge-tag badge-amber">O11</span></td>
+                                <td>First Floor: <strong>1.03 Łazienka</strong></td>
+                                <td><strong>1 000</strong></td>
+                                <td><strong>1 950</strong></td>
+                                <td>hp = 850 mm</td>
+                                <td>+6.13 m</td>
+                                <td>Vertical slot window (tilt & turn)</td>
+                                <td>Acoustic & privacy laminated glass, concealed hinges</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge-tag badge-amber">O11</span></td>
+                                <td>First Floor: <strong>1.02 Łazienka</strong></td>
+                                <td><strong>1 000</strong></td>
+                                <td><strong>1 950</strong></td>
+                                <td>hp = 850 mm</td>
+                                <td>+6.13 m</td>
+                                <td>Vertical slot window (tilt & turn)</td>
+                                <td>Acoustic & privacy laminated glass, concealed hinges</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge-tag badge-amber">O11</span></td>
+                                <td>First Floor: <strong>1.07 Komunikacja / Sypialnia</strong></td>
+                                <td><strong>1 000</strong></td>
+                                <td><strong>1 950</strong></td>
+                                <td>hp = 850 mm</td>
+                                <td>+6.13 m</td>
+                                <td>Vertical slot window (fixed / tilt)</td>
+                                <td>Triple glazed, high solar factor g=50%</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge-tag badge-purple">O13a / b</span></td>
+                                <td>First Floor: <strong>1.01 Sypialnia Master</strong></td>
+                                <td><strong>2 200 + 2 450</strong></td>
+                                <td><strong>1 950</strong></td>
+                                <td>hp = 850 mm</td>
+                                <td>+6.13 m</td>
+                                <td>All-glass panoramic corner window</td>
+                                <td>Glass-to-glass structural silicone butt joint (szkło na styk)</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge-tag badge-emerald">14a</span></td>
+                                <td>First Floor: <strong>1.04 Sypialnia (poza balkonem)</strong></td>
+                                <td><strong>1 000</strong> (100 cm)</td>
+                                <td><strong>2 700</strong> (270 cm)</td>
+                                <td>hp = 0 mm (+3.43 m)</td>
+                                <td>+6.13 m</td>
+                                <td>Full-height window starting after 6,400 mm balcony</td>
+                                <td>Safety tempered & laminated glass (VSG/ESG), not covered by balcony glass</td>
+                            </tr>
+                            <tr>
+                                <td><span class="badge-tag badge-emerald">O14b</span></td>
+                                <td>First Floor: <strong>1.04 Sypialnia to Taras</strong></td>
+                                <td><strong>1 880</strong></td>
+                                <td><strong>2 700</strong></td>
+                                <td>hp = 0 mm</td>
+                                <td>+6.03 m</td>
+                                <td>Terrace sliding door (HST / slide)</td>
+                                <td>Zero-barrier flush floor transition to terrace (+3.31 m)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Room Schedule alongside North Facade -->
+                <h4 style="margin: 30px 0 12px 0; font-size: 16px; color: #0f172a;">Rooms Along the North Facade (Zestawienie Pomieszczeń)</h4>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h4>🏠 Ground Floor Rooms (Parter)</h4>
+                        <p>
+                            • <strong>0.01 Garaż:</strong> 42.63 m² (gres)<br>
+                            • <strong>0.02 Magazyn:</strong> 8.05 m² (gres)<br>
+                            • <strong>0.13 Kuchnia:</strong> 44.27 m² (gres, window O1)<br>
+                            • <strong>0.14 Spiżarnia:</strong> 3.49 m² (gres)<br>
+                            • <strong>0.15 Gabinet:</strong> 12.50 m² (parkiet, door O2)
+                        </p>
+                    </div>
+                    <div class="info-card">
+                        <h4>🛌 First Floor Rooms (Piętro)</h4>
+                        <p>
+                            • <strong>1.01 Sypialnia:</strong> 16.12 m² (corner window O13)<br>
+                            • <strong>1.02 Łazienka:</strong> 6.46 m² (window O11)<br>
+                            • <strong>1.03 Łazienka:</strong> 9.05 m² (window O11)<br>
+                            • <strong>1.04 Sypialnia:</strong> 15.87 m² (window O14a & door O14b)<br>
+                            • <strong>Taras:</strong> 17.30 m² (gres, level +3.31 m)
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive Script -->
+    <script>
+        function openTab(evt, tabName) {
+            const tabcontent = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+            const tablinks = document.getElementsByClassName("tab-link");
+            for (let i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+            document.getElementById(tabName).classList.add("active");
+            if (evt) {
+                evt.currentTarget.classList.add("active");
+            }
+        }
+
+        function toggleLayer(layerId, btn) {
+            const layer = document.getElementById(layerId);
+            if (!layer) return;
+            if (layer.style.display === "none") {
+                layer.style.display = "inline";
+                btn.classList.add("active");
+            } else {
+                layer.style.display = "none";
+                btn.classList.remove("active");
+            }
+        }
+
+        const elementData = {
+            'O1': {
+                title: 'Window O1 — Kitchen (Kuchnia 0.13)',
+                subtitle: 'Horizontal Ribbon Window over Countertop / Sink',
+                dims: 'Width: 1,950 mm | Height: 1,400 mm | Sill Height: hp = 1,100 mm (+1.10 m) | Top Lintel: +2.50 m | Distance from O2: 6,100 mm',
+                room: 'Ground Floor, Room 0.13 Kuchnia (Area: 44.27 m²). Positioned 6,100 mm east of Window O2. Perfectly shares the +2.50 m lintel line with O2.',
+                specs: 'Triple-pane insulated glass unit (Ug=0.5 W/m²K), matte anthracite aluminum frame (RAL 7016), exterior sheet metal sill at +1.10 m.'
+            },
+            'O2': {
+                title: 'Window O2 — Gabinet (0.15)',
+                subtitle: 'Study / Office North Window with (77+38) Offset',
+                dims: 'Width: 1,200 mm | Height: 1,700 mm | Starts at: hp = 800 mm (+0.80 m) | Lintel: +2.50 m | Offset: (77+38) = 1,150 mm from left edge',
+                room: 'Ground Floor, Room 0.15 Gabinet (Area: 12.50 m²). Starts at 38 cm (wall thickness) + 77 cm (wall reveal) = 115 cm from left building corner.',
+                specs: 'Double-glazed / triple-glazed insulated window unit, aluminum exterior sill at +0.80 m, brick masonry parapet (800 mm) below and brick masonry (300 mm) above.'
+            },
+            'O14a': {
+                title: 'Window 14a — Bedroom 1.04 (Starts After Balcony)',
+                subtitle: 'Full-Height Floor-to-Ceiling Architectural Glazing (Not Covered by Glass)',
+                dims: 'Width: 1,000 mm (100 cm) | Height: 2,700 mm (270 cm) | Sill: hp = 0 mm (+3.43 m) | Head: +6.13 m | Starts at: X = 6,400 mm',
+                room: 'First Floor, Room 1.04 Sypialnia (Area: 15.87 m²). Starts immediately after the 6,400 mm balcony and is completely uncovered by the balcony railing glass.',
+                specs: 'Floor-to-ceiling safety glazing (VSG/ESG), flush sill on top of intermediate cornice (+3.43 m), independent of balcony balustrade.'
+            },
+            'TERRACE': {
+                title: 'Upper Floor Balcony / Terrace (Taras 17.3 m²)',
+                subtitle: 'Length: 6,400 mm over Gabinet (Level +3.31 m)',
+                dims: 'Length: 6,400 mm | Depth: 3,120 mm | Finished Level: +3.31 m | Balustrade: 950 mm',
+                room: 'First Floor outdoor terrace over Gabinet. Balcony glass ends at 6,400 mm, followed immediately by Window 14a.',
+                specs: 'Gres porcelain tiles on pedestals, minimalist black posts with laminated safety glass balustrade ending cleanly at 6,400 mm.'
+            },
+            'CORNICE': {
+                title: 'Intermediate Cornice (Gzyms Pośredni)',
+                subtitle: 'Continuous Horizontal Facade Band between Ground and Upper Floor',
+                dims: 'Height: 630 mm (63 cm) | Levels: +2.80 m to +3.43 m | Width: 21,100 mm continuous',
+                room: 'Exterior facade band unifying the recessed living wing and protruding garage wing.',
+                specs: 'Architectural cassette metal panel cladding (Alucobond / dark anthracite) with vertical joints every ~90cm, drip edge at +3.43m, underside shadow reveal at +2.80m.'
+            },
+            'O11_1': {
+                title: 'Window O11 — Bathroom (Łazienka 1.03)',
+                subtitle: 'Vertical Architectural Window Slot',
+                dims: 'Width: 1,000 mm | Height: 1,950 mm | Sill Height: hp = 850 mm | Top Lintel: +6.13 m',
+                room: 'First Floor, Room 1.03 Łazienka (Area: 9.05 m²). Central upper floor bathroom.',
+                specs: 'Matte acoustic glazing for privacy, micro-ventilation fitting, concealed hardware.'
+            },
+            'O11_2': {
+                title: 'Window O11 — Bathroom (Łazienka 1.02)',
+                subtitle: 'Vertical Architectural Window Slot',
+                dims: 'Width: 1,000 mm | Height: 1,950 mm | Sill Height: hp = 850 mm | Top Lintel: +6.13 m',
+                room: 'First Floor, Room 1.02 Łazienka (Area: 6.46 m²). En-suite master bathroom.',
+                specs: 'Triple glazed, warm frame, tilt-and-turn function.'
+            },
+            'O11_3': {
+                title: 'Window O11 — Hall / Bedroom Corridor',
+                subtitle: 'Daylight Window Slot',
+                dims: 'Width: 1,000 mm | Height: 1,950 mm | Sill Height: hp = 850 mm | Top Lintel: +6.13 m',
+                room: 'First Floor, Room 1.07 Komunikacja / 1.01 Sypialnia.',
+                specs: 'High light transmission glazing (Lt=74%), concealed hinges.'
+            },
+            'O13': {
+                title: 'Window O13 — Master Bedroom Corner Glass (Sypialnia 1.01)',
+                subtitle: 'Frameless Glass-to-Glass Panoramic Corner Window (Butt-Glazed)',
+                dims: 'North Face (O13a): 2,200 × 1,950 mm | West Face (O13b): 2,450 × 1,950 mm | Sill: hp = 850 mm',
+                room: 'First Floor, Room 1.01 Sypialnia Master (Area: 16.12 m²). Corner of Axis 1 and Axis B.',
+                specs: 'Butt-glazed structural corner (szkło na styk ze spoiną silikonową odporną na UV), no corner post, providing uninterrupted forest panorama.'
+            },
+            'GARAGE': {
+                title: 'Ground Floor Garage Volume (Garaż 0.01 & Magazyn 0.02)',
+                subtitle: 'Protruding Clinker Brick Structure on Axis A',
+                dims: 'Width: 8,990 mm | Depth Protrusion: 3,100 mm forward of Axis B | Height: +3.53 m parapet',
+                room: 'Ground Floor, 0.01 Garaż (42.63 m²) + 0.02 Magazyn (8.05 m²).',
+                specs: 'Hand-formed graphite clinker brickwork, ventilated cavity wall with 18cm mineral wool insulation, unheated flat roof with 3% slope and hidden rainwater downpipes.'
+            },
+            'TERRACE': {
+                title: 'First Floor Terrace (Taras 17.3 m²)',
+                subtitle: 'Private Cantilevered Balcony over Gabinet',
+                dims: 'Width: 6,440 mm | Depth: 3,120 mm | Finished Level: +3.31 m | Balustrade Height: 1,000 mm',
+                room: 'First Floor, Accessible directly from Bedroom 1.04 via sliding door O14b (188×270cm).',
+                specs: 'Gres porcelain exterior tiles on adjustable pedestals, black powder-coated steel posts with tempered laminated safety glass balustrade, black circular support column.'
+            },
+            'ROOF': {
+                title: 'Cantilevered Roof Fascia & Attica Overhang',
+                subtitle: 'Modernist Horizontal Architectural Floating Roof Band',
+                dims: 'Total Width: 22,000 mm | Fascia Height: 650 mm | Top Level: +6.80 m',
+                room: 'Main building roof structure providing passive solar shading.',
+                specs: 'Anthracite aluminum composite fascia panels (Alucobond / Reynobond RAL 7016), soffit finished in dark composite panels with integrated recessed LED linear channel.'
+            }
+        };
+
+        function showElementDetails(key) {
+            const data = elementData[key];
+            if (!data) return;
+
+            document.getElementById('detail-title').textContent = data.title;
+            document.getElementById('detail-subtitle').textContent = data.subtitle;
+            document.getElementById('detail-dims').textContent = data.dims;
+            document.getElementById('detail-room').textContent = data.room;
+            document.getElementById('detail-specs').textContent = data.specs;
+
+            const card = document.getElementById('element-detail-card');
+            card.style.display = 'block';
+
+            // Scroll to detail card smoothly if in elevation tab
+            card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    </script>
+</body>
+
+</html>

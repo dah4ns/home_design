@@ -20,10 +20,12 @@
             --accent-laundry: linear-gradient(135deg, #10b981, #047857);
             --accent-electricity: linear-gradient(135deg, #ff3b30, #d70015);
             --accent-pantry: linear-gradient(135deg, #a855f7, #7e22ce);
+            --accent-facade: linear-gradient(135deg, #d97706, #b45309);
             --accent-glow-kitchen: rgba(59, 130, 246, 0.15);
             --accent-glow-laundry: rgba(16, 185, 129, 0.15);
             --accent-glow-electricity: rgba(255, 59, 48, 0.15);
             --accent-glow-pantry: rgba(168, 85, 247, 0.15);
+            --accent-glow-facade: rgba(217, 119, 6, 0.2);
         }
 
         body {
@@ -96,7 +98,7 @@
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 30px;
             width: 100%;
-            max-width: 1100px;
+            max-width: 1280px;
             z-index: 1;
         }
 
@@ -157,6 +159,12 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 30px var(--accent-glow-pantry);
         }
 
+        .room-card.facade-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(217, 119, 6, 0.4);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 30px var(--accent-glow-facade);
+        }
+
         .room-icon {
             width: 54px;
             height: 54px;
@@ -188,6 +196,10 @@
 
         .pantry-card .room-icon svg {
             stroke: #a855f7;
+        }
+
+        .facade-card .room-icon svg {
+            stroke: #d97706;
         }
 
         .room-info h2 {
@@ -239,6 +251,12 @@
             background: var(--accent-pantry);
             color: #FFFFFF;
             box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
+        }
+
+        .facade-card .explore-btn {
+            background: var(--accent-facade);
+            color: #FFFFFF;
+            box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
         }
 
         .room-card:hover .explore-btn {
@@ -356,6 +374,34 @@
             </div>
             <div class="explore-btn">
                 <span>View Pantry</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </div>
+        </a>
+
+        <!-- North Facade Card -->
+        <a href="north_facade.html" class="room-card facade-card">
+            <div>
+                <div class="room-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 21h18"></path>
+                        <path d="M5 21V7l7-4 7 4v14"></path>
+                        <line x1="9" y1="10" x2="9" y2="10.01"></line>
+                        <line x1="15" y1="10" x2="15" y2="10.01"></line>
+                        <line x1="9" y1="14" x2="9" y2="14.01"></line>
+                        <line x1="15" y1="14" x2="15" y2="14.01"></line>
+                        <line x1="9" y1="18" x2="15" y2="18"></line>
+                    </svg>
+                </div>
+                <div class="room-info">
+                    <h2>North Facade</h2>
+                    <p>Exterior architectural elevation of the north facade facing top in the floor plans, incorporating 3D photographic rendering, CAD dimensions, window schedules, and floor alignment.</p>
+                </div>
+            </div>
+            <div class="explore-btn">
+                <span>View North Facade</span>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="5" y1="12" x2="19" y2="12"></line>
                     <polyline points="12 5 19 12 12 19"></polyline>
