@@ -771,37 +771,11 @@
                         <!-- Wall body in dark graphite clinker brick (X = 0 to 1201, Y = -280 to 2) -->
                         <rect x="0" y="-280" width="1201" height="282" fill="url(#brick-pattern)" stroke="#1e222a" stroke-width="1.5" />
 
-                        <!-- Window O2 (Gabinet 0.15) -->
-                        <!-- Starts at (77 + 38) = 115cm = 1150mm from left edge: X = 115 to 235 -->
-                        <!-- Length = 1200mm (width 120 in SVG), Height = 1700mm, Starts at hp = 800mm (Y = -80 to -250) -->
-                        <g class="interactive-element" onclick="showElementDetails('O2')">
-                            <!-- Outer frame reveal -->
-                            <rect x="115" y="-250" width="120" height="170" fill="#1e293b" stroke="#0f172a" stroke-width="2" />
-                            <rect x="119" y="-246" width="112" height="162" fill="url(#glass-glare)" />
-                            <rect x="119" y="-246" width="112" height="162" fill="none" stroke="#0f172a" stroke-width="3" />
-                            <!-- Vertical mullion / sash division -->
-                            <line x1="175" y1="-246" x2="175" y2="-84" stroke="#0f172a" stroke-width="2.5" />
-                            <!-- Sheet metal sill (parapet) at hp = 800mm (Y = -80) -->
-                            <rect x="112" y="-80" width="126" height="5" fill="#0f172a" />
-                            <text x="175" y="-165" font-family="'JetBrains Mono', monospace" font-size="10" fill="#ffffff" font-weight="700" text-anchor="middle" filter="drop-shadow(0 1px 2px black)">O2 (120×170)</text>
-                            <text x="175" y="-150" font-family="'JetBrains Mono', monospace" font-size="8.5" fill="#93c5fd" font-weight="600" text-anchor="middle">hp=80</text>
-                        </g>
+                        <!-- Reusable Window Component: O2 (Gabinet) -->
+                        <g data-window-component="O2" data-view-id="north_facade" data-window-style="exterior" id="facade-window-O2"></g>
 
-                        <!-- Window O1 (Kitchen 0.13, 1950mm wide x 1400mm high, hp=1100mm) -->
-                        <!-- Located at X = 845 to 1040, Lintel at Y = -250 (+2.50m), Sill at Y = -110 (+1.10m) -->
-                        <!-- Distance from O2 (right edge X=235): 845 - 235 = 610 (6,100mm) -->
-                        <g class="interactive-element" onclick="showElementDetails('O1')">
-                            <!-- Outer reveal / sill -->
-                            <rect x="845" y="-250" width="195" height="140" fill="#1e293b" stroke="#0f172a" stroke-width="2" />
-                            <rect x="849" y="-246" width="187" height="132" fill="url(#glass-glare)" />
-                            <!-- Window frame & mullion (2-sash) -->
-                            <rect x="849" y="-246" width="187" height="132" fill="none" stroke="#0f172a" stroke-width="3" />
-                            <line x1="942.5" y1="-246" x2="942.5" y2="-114" stroke="#0f172a" stroke-width="2.5" />
-                            <!-- Metal sill (Parapet at hp = 1100mm) -->
-                            <rect x="840" y="-110" width="205" height="5" fill="#0f172a" />
-                            <text x="942.5" y="-185" font-family="'JetBrains Mono', monospace" font-size="11" fill="#ffffff" font-weight="700" text-anchor="middle" filter="drop-shadow(0 1px 2px black)">O1 (195×140)</text>
-                            <text x="942.5" y="-168" font-family="'JetBrains Mono', monospace" font-size="8.5" fill="#93c5fd" font-weight="600" text-anchor="middle">hp=110</text>
-                        </g>
+                        <!-- Reusable Window Component: O1 (Kitchen) -->
+                        <g data-window-component="O1" data-view-id="north_facade" data-window-style="exterior" id="facade-window-O1"></g>
                     </g>
 
                     <!-- 2. Projecting Garage / Magazyn Volume (X = 1201 to 2100) -->
@@ -1118,18 +1092,18 @@
 
                             <!-- Pier between O2 and Kitchen O1 (235 to 845) = 6100 mm -->
                             <line x1="235" y1="-7" x2="235" y2="7" class="tick" />
-                            <rect x="515" y="-12" width="50" height="18" fill="#ffffff" rx="2" stroke="#f59e0b" stroke-width="0.8" />
-                            <text x="540" y="2" class="dim-text" font-weight="700" fill="#b45309">6 100</text>
+                            <rect x="515" y="-12" width="50" height="18" fill="#ffffff" rx="2" stroke="#f59e0b" stroke-width="0.8" id="nf-dim-o2-o1-box" />
+                            <text x="540" y="2" class="dim-text" font-weight="700" fill="#b45309" id="nf-dim-o2-o1-text">6 100</text>
 
                             <!-- Kitchen Window O1 (845 to 1040) = 1950 mm -->
-                            <line x1="845" y1="-7" x2="845" y2="7" class="tick" />
-                            <rect x="904" y="-12" width="76" height="18" fill="#ffffff" rx="2" stroke="#f59e0b" stroke-width="0.8" />
-                            <text x="942.5" y="2" class="dim-text" font-weight="700" fill="#b45309">1 950 (O1)</text>
+                            <line x1="845" y1="-7" x2="845" y2="7" class="tick" id="nf-dim-o1-ltick" />
+                            <rect x="904" y="-12" width="76" height="18" fill="#ffffff" rx="2" stroke="#f59e0b" stroke-width="0.8" id="nf-dim-o1-box" />
+                            <text x="942.5" y="2" class="dim-text" font-weight="700" fill="#b45309" id="nf-dim-o1-text">1 950 (O1)</text>
 
                             <!-- Pier to Garage corner (1040 to 1201) = 1610 mm -->
-                            <line x1="1040" y1="-7" x2="1040" y2="7" class="tick" />
-                            <rect x="1098" y="-12" width="45" height="18" fill="#ffffff" rx="2" />
-                            <text x="1120.5" y="2" class="dim-text">1 610</text>
+                            <line x1="1040" y1="-7" x2="1040" y2="7" class="tick" id="nf-dim-o1-rtick" />
+                            <rect x="1098" y="-12" width="45" height="18" fill="#ffffff" rx="2" id="nf-dim-o1-garage-box" />
+                            <text x="1120.5" y="2" class="dim-text" id="nf-dim-o1-garage-text">1 610</text>
 
                             <!-- Garage blind wall (1201 to 2100) = 8990 mm -->
                             <line x1="1201" y1="-7" x2="1201" y2="7" class="tick" />
@@ -1822,6 +1796,89 @@
             // Scroll to detail card smoothly if in elevation tab
             card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
+    </script>
+    <!-- Building Architectural Data & Dynamic Window Components -->
+    <script src="data/windows.js"></script>
+    <script src="js/window-store.js"></script>
+    <script src="js/coordinate-service.js"></script>
+    <script src="js/window-component.js"></script>
+    <script src="js/window-editor-modal.js"></script>
+    <script>
+        function updateNorthFacadeO1Dimensions(win) {
+            if (!win) win = WindowStore.get('O1');
+            if (!win) return;
+            const coords = CoordinateService.transform(win, 'north_facade');
+            const x = coords.x;
+            const w = coords.width;
+            const o2 = WindowStore.get('O2');
+            const o2Coords = o2 ? CoordinateService.transform(o2, 'north_facade') : { x: 115, width: 120 };
+            const o2End = o2Coords.x + o2Coords.width;
+
+            // Pier O2 -> O1
+            const pierLength = Math.round((x - o2End) * 10);
+            const pierMid = (o2End + x) / 2;
+            const pierBox = document.getElementById('nf-dim-o2-o1-box');
+            const pierText = document.getElementById('nf-dim-o2-o1-text');
+            if (pierText) {
+                pierText.setAttribute('x', pierMid);
+                pierText.textContent = pierLength.toLocaleString();
+            }
+            if (pierBox) {
+                pierBox.setAttribute('x', pierMid - 25);
+            }
+
+            // Window O1
+            const lTick = document.getElementById('nf-dim-o1-ltick');
+            if (lTick) {
+                lTick.setAttribute('x1', x);
+                lTick.setAttribute('x2', x);
+            }
+            const rTick = document.getElementById('nf-dim-o1-rtick');
+            if (rTick) {
+                rTick.setAttribute('x1', x + w);
+                rTick.setAttribute('x2', x + w);
+            }
+            const o1Mid = x + w / 2;
+            const o1Box = document.getElementById('nf-dim-o1-box');
+            const o1Text = document.getElementById('nf-dim-o1-text');
+            if (o1Text) {
+                o1Text.setAttribute('x', o1Mid);
+                o1Text.textContent = `${win.width.toLocaleString()} (O1)`;
+            }
+            if (o1Box) {
+                o1Box.setAttribute('x', o1Mid - 38);
+            }
+
+            // Pier O1 -> Garage (garage starts at 1201)
+            const garageStart = 1201;
+            const garPierLen = Math.round((garageStart - (x + w)) * 10);
+            const garPierMid = (x + w + garageStart) / 2;
+            const garBox = document.getElementById('nf-dim-o1-garage-box');
+            const garText = document.getElementById('nf-dim-o1-garage-text');
+            if (garText) {
+                garText.setAttribute('x', garPierMid);
+                garText.textContent = garPierLen.toLocaleString();
+            }
+            if (garBox) {
+                garBox.setAttribute('x', garPierMid - 22);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', function() {
+            WindowComponent.autoMountAll();
+            updateNorthFacadeO1Dimensions();
+
+            // Hook live WindowStore updates into technical drawer elementData & dimensions
+            WindowStore.subscribe(function(id, win) {
+                if (id === 'O1' || id === '*') {
+                    updateNorthFacadeO1Dimensions(win);
+                }
+                if (!win) return;
+                if (elementData[id]) {
+                    elementData[id].dims = `Width: ${win.width.toLocaleString()} mm | Height: ${win.height.toLocaleString()} mm | Sill: hp = ${win.sill} mm | Offset X: ${win.x} mm`;
+                }
+            });
+        });
     </script>
 </body>
 

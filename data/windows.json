@@ -1,0 +1,210 @@
+{
+  "$schema": "./windows.schema.json",
+  "version": "1.1.0",
+  "description": "Canonical database of building views and window openings with multi-view spatial orientation",
+  "coordinateSystem": {
+    "origin": "Eastmost point of the building at the start of the North Facade (X = 0 mm)",
+    "horizontalAxis": "Positive X extends Westward across the North Facade (0 to 21,000 mm)",
+    "verticalAxis": "Positive Y extends upward from finished ground floor datum (+0.00 m = 0 mm)",
+    "units": "millimeters (mm)"
+  },
+  "views": {
+    "north_facade": {
+      "id": "north_facade",
+      "name": "North Facade Elevation",
+      "positionOnMap": 0,
+      "leftEdge": 0,
+      "floor": "all",
+      "direction": "west",
+      "length": 21000,
+      "scale": 0.1,
+      "wall": "north",
+      "side": "exterior",
+      "description": "Exterior architectural elevation looking South from the garden. Position 0 is the East corner; X grows in the West direction (left to right)."
+    },
+    "kitchen_north_wall": {
+      "id": "kitchen_north_wall",
+      "name": "Kitchen North Wall Elevation",
+      "positionOnMap": 12150,
+      "leftEdge": 12150,
+      "floor": "ground",
+      "direction": "east",
+      "length": 5400,
+      "scale": 0.1,
+      "wall": "north",
+      "side": "interior",
+      "description": "Interior kitchen back wall elevation looking North. Left edge is at map coordinate 12150; positions decrease in the East direction (left to right)."
+    }
+  },
+  "windows": {
+    "O1": {
+      "id": "O1",
+      "name": "O1",
+      "x": 8750,
+      "sill": 1100,
+      "width": 1950,
+      "height": 1400,
+      "room": "0.13 Kuchnia",
+      "floor": "ground",
+      "wall": "north",
+      "views": [
+        "north_facade",
+        "kitchen_north_wall"
+      ],
+      "sashes": 2,
+      "hasMullion": true,
+      "handlePosition": "center-left",
+      "description": "Ribbon kitchen window over countertop / sink",
+      "specs": {
+        "glazing": "Triple-pane insulated glass unit (Ug=0.5 W/m²K)",
+        "frame": "Matte anthracite aluminum profile (RAL 7016)",
+        "sillExterior": "Sheet metal sill with anti-drumming tape at +1.10 m",
+        "sillInterior": "Granite / composite countertop integrated sill at 1100 mm"
+      }
+    },
+    "O2": {
+      "id": "O2",
+      "name": "O2",
+      "x": 1150,
+      "sill": 800,
+      "width": 1200,
+      "height": 1700,
+      "room": "0.15 Gabinet",
+      "floor": "ground",
+      "wall": "north",
+      "views": [
+        "north_facade"
+      ],
+      "sashes": 2,
+      "hasMullion": true,
+      "handlePosition": "center",
+      "description": "Study / office north window with (77+38) corner offset",
+      "specs": {
+        "glazing": "Triple-pane insulated glass unit",
+        "frame": "Matte anthracite aluminum profile (RAL 7016)",
+        "sillExterior": "Aluminum exterior sill at hp=800 mm",
+        "sillInterior": "Internal window board at 800 mm"
+      }
+    },
+    "14a": {
+      "id": "14a",
+      "name": "14a",
+      "x": 6400,
+      "sill": 3430,
+      "width": 1000,
+      "height": 2700,
+      "room": "1.04 Sypialnia",
+      "floor": "first",
+      "wall": "north",
+      "views": [
+        "north_facade"
+      ],
+      "sashes": 1,
+      "hasMullion": false,
+      "handlePosition": "left",
+      "description": "Full-height floor-to-ceiling architectural window starting immediately after 6,400mm balcony",
+      "specs": {
+        "glazing": "Safety tempered and laminated glass (VSG/ESG)",
+        "frame": "Concealed slimline aluminum frame",
+        "sillExterior": "Flush threshold on intermediate cornice (+3.43 m)",
+        "sillInterior": "Flush floor threshold"
+      }
+    },
+    "O11_1": {
+      "id": "O11_1",
+      "name": "O11",
+      "x": 9250,
+      "sill": 4180,
+      "width": 1000,
+      "height": 1950,
+      "room": "1.03 Łazienka",
+      "floor": "first",
+      "wall": "north",
+      "views": [
+        "north_facade"
+      ],
+      "sashes": 1,
+      "hasMullion": false,
+      "handlePosition": "right",
+      "description": "Vertical slot bathroom window",
+      "specs": {
+        "glazing": "Acoustic and privacy matte laminated glass",
+        "frame": "Anthracite aluminum tilt-and-turn profile",
+        "sillExterior": "Exterior sill at +4.18 m",
+        "sillInterior": "Tile-integrated sill at hp=850 mm"
+      }
+    },
+    "O11_2": {
+      "id": "O11_2",
+      "name": "O11",
+      "x": 12030,
+      "sill": 4180,
+      "width": 1000,
+      "height": 1950,
+      "room": "1.02 Łazienka",
+      "floor": "first",
+      "wall": "north",
+      "views": [
+        "north_facade"
+      ],
+      "sashes": 1,
+      "hasMullion": false,
+      "handlePosition": "right",
+      "description": "Vertical slot master bathroom window",
+      "specs": {
+        "glazing": "Acoustic and privacy matte laminated glass",
+        "frame": "Anthracite aluminum tilt-and-turn profile",
+        "sillExterior": "Exterior sill at +4.18 m",
+        "sillInterior": "Tile-integrated sill at hp=850 mm"
+      }
+    },
+    "O11_3": {
+      "id": "O11_3",
+      "name": "O11",
+      "x": 14720,
+      "sill": 4180,
+      "width": 1000,
+      "height": 1950,
+      "room": "1.07 Komunikacja",
+      "floor": "first",
+      "wall": "north",
+      "views": [
+        "north_facade"
+      ],
+      "sashes": 1,
+      "hasMullion": false,
+      "handlePosition": "right",
+      "description": "Vertical slot corridor daylight window",
+      "specs": {
+        "glazing": "High light transmission triple-glazed glass",
+        "frame": "Anthracite aluminum tilt-and-turn profile",
+        "sillExterior": "Exterior sill at +4.18 m",
+        "sillInterior": "Internal window board at hp=850 mm"
+      }
+    },
+    "O13a": {
+      "id": "O13a",
+      "name": "O13a",
+      "x": 18800,
+      "sill": 4180,
+      "width": 2200,
+      "height": 1950,
+      "room": "1.01 Sypialnia Master",
+      "floor": "first",
+      "wall": "north",
+      "views": [
+        "north_facade"
+      ],
+      "sashes": 1,
+      "hasMullion": false,
+      "handlePosition": "none",
+      "description": "Frameless panoramic corner window (North face)",
+      "specs": {
+        "glazing": "Structural silicone butt-glazed safety glass (szkło na styk)",
+        "frame": "Concealed head and sill perimeter framing",
+        "sillExterior": "Continuous corner sheet metal sill at +4.18 m",
+        "sillInterior": "Deep panoramic window bench"
+      }
+    }
+  }
+}
