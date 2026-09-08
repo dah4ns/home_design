@@ -31,7 +31,7 @@ All architectural elements and views are anchored to a universal building coordi
                             │
   WEST (Axis 1: Garage)     │     EAST (Axis 6: Gabinet)
   ◄─────────────────────────┼─────────────────────────►
-  X = 21,000 mm             │             X = 0 mm (Global Origin)
+  X = 20,590 mm             │             X = 0 mm (Global Origin)
                             │
                             ▼
                       [ SOUTH (Interior) ]
@@ -39,7 +39,7 @@ All architectural elements and views are anchored to a universal building coordi
 
 | Axis | Origin Datum | Positive Direction | Architectural Definition |
 | :--- | :--- | :--- | :--- |
-| **Global X** | Eastmost corner of the building ($X = 0\,\text{mm}$) | Westward ($0 \to 21\,000\,\text{mm}$) | Baseline along the North Facade from East to West. |
+| **Global X** | Eastmost corner of the building ($X = 0\,\text{mm}$) | Westward ($0 \to 20\,590\,\text{mm}$) | Baseline along the North Facade from East to West. |
 | **Global Y** | Finished Ground Floor ($+0.00\,\text{m} = 0\,\text{mm}$) | Upward | Elevation height above finished ground level. |
 | **Global Z** | Exterior North Facade plane ($Z = 0\,\text{mm}$) | Southward into the house | Wall thickness and room depth. |
 
@@ -66,7 +66,7 @@ Each view is stored as an entry in `data/windows.json` and `data/windows.js` und
       "leftEdge": 0,
       "floor": "all",
       "direction": "west",
-      "length": 21000,
+      "length": 20590,
       "scale": 0.1,
       "wall": "north",
       "side": "exterior"
@@ -101,12 +101,24 @@ Every window entity records the 6 core properties requested by the architectural
       "name": "O1",
       "x": 8750,
       "sill": 1100,
-      "width": 1950,
+      "width": 2500,
       "height": 1400,
       "room": "0.13 Kuchnia",
       "floor": "ground",
       "wall": "north",
       "views": ["north_facade", "kitchen_north_wall"]
+    },
+    "O2": {
+      "id": "O2",
+      "name": "O2",
+      "x": 1150,
+      "sill": 800,
+      "width": 1800,
+      "height": 1700,
+      "room": "0.15 Gabinet",
+      "floor": "ground",
+      "wall": "north",
+      "views": ["north_facade"]
     }
   }
 }
@@ -114,17 +126,41 @@ Every window entity records the 6 core properties requested by the architectural
 
 ### The 6 Core Properties:
 1. **`x`** *(number, mm)*: Horizontal coordinate of the opening's lower-left corner from the Eastmost origin ($X = 0$).  
-   *For O1*: **`8750`** mm.
+   *For O1*: **`8750`** mm; *For O2*: **`1150`** mm ($(77+38) = 1150$ mm from left corner).
 2. **`sill`** *(number, mm)*: Height of windowsill above finished floor level ($hp$).  
-   *For O1*: **`1100`** mm.
+   *For O1*: **`1100`** mm; *For O2*: **`800`** mm.
 3. **`width`** *(number, mm)*: Horizontal opening width.  
-   *For O1*: **`1950`** mm.
+   *For O1*: **`2500`** mm; *For O2*: **`1800`** mm (formerly 1200 mm).
 4. **`height`** *(number, mm)*: Vertical opening height.  
-   *For O1*: **`1400`** mm.
+   *For O1*: **`1400`** mm; *For O2*: **`1700`** mm.
 5. **`id`** *(string)*: Unique identifier.  
-   *For O1*: **`"O1"`**.
+   *For O1*: **`"O1"`**; *For O2*: **`"O2"`**.
 6. **`name`** *(string)*: Display name / architectural mark.  
-   *For O1*: **`"O1"`**.
+   *For O1*: **`"O1"`**; *For O2*: **`"O2"`**.
+
+### Ground Floor North Facade Elevation Chain Verification:
+$$\text{Corner to O2 } (1\,150\,\text{mm}) + \mathbf{O2 } (1\,800\,\text{mm}) + \text{Pier O2}\to\text{O1 } (5\,800\,\text{mm}) + \mathbf{O1 } (2\,500\,\text{mm}) + \text{Pier to Garage } (760\,\text{mm}) + \text{Garage } (\mathbf{8\,580\,\text{mm}}) = \mathbf{20\,590\,\text{mm}}$$
+
+### Upper Floor North Facade Elevation Chain Verification:
+Based on official architectural drawing *A.03 RZUT PIĘTRA*:
+$$\begin{aligned}
+&\text{Balcony } (6\,400\,\text{mm}) + \mathbf{14a } (\mathbf{1\,190\,\text{mm}}) + \text{Pier 1 } (\mathbf{1\,170\,\text{mm}}) + \mathbf{O11\_1 } (1\,000\,\text{mm}) \\
+&+ \text{Pier 2 } (\mathbf{1\,700\,\text{mm}}) + \mathbf{O11\_2 } (1\,000\,\text{mm}) + \text{Pier 3 } (\mathbf{1\,640\,\text{mm}}) + \mathbf{O11\_3 } (1\,000\,\text{mm}) \\
+&+ \text{Pier 4 } (\mathbf{3\,110\,\text{mm}}) + \mathbf{O13a } (\mathbf{2\,380\,\text{mm}}) = \mathbf{20\,590\,\text{mm}}
+\end{aligned}$$
+
+| Element | Start $X$ (mm) | End $X$ (mm) | Width (mm) | Description / Room |
+| :--- | :--- | :--- | :--- | :--- |
+| **Balcony** | 0 | 6 400 | 6 400 | Cantilevered terrace over Gabinet |
+| **Window 14a** | 6 400 | 7 590 | **1 190** | Bedroom 1.04 full-height glazing |
+| *Pier 1* | 7 590 | 8 760 | **1 170** | Wall pier between 14a and O11_1 |
+| **Window O11_1** | 8 760 | 9 760 | 1 000 | Bathroom 1.03 vertical slot window |
+| *Pier 2* | 9 760 | 11 460 | **1 700** | Wall pier between O11_1 and O11_2 |
+| **Window O11_2** | 11 460 | 12 460 | 1 000 | Bathroom 1.02 vertical slot window |
+| *Pier 3* | 12 460 | 14 100 | **1 640** | Wall pier between O11_2 and O11_3 |
+| **Window O11_3** | 14 100 | 15 100 | 1 000 | Hall / Bedroom corridor daylight window |
+| *Pier 4* | 15 100 | 18 210 | **3 110** | Wall pier between O11_3 and O13a |
+| **Window O13a** | 18 210 | 20 590 | **2 380** | Master Bedroom 1.01 corner window extending to exterior West corner |
 
 ---
 
@@ -180,7 +216,7 @@ graph TD
     
     Comp["WindowComponent (js/window-component.js)<br/>• Reusable SVG Renderer<br/>• Auto-mounts data-window-component<br/>• Auto-detects view orientation"]
     
-    Modal["WindowEditorModal (js/window-editor-modal.js)<br/>• Live Architecture Database Inspector<br/>• Views Tab (0, all, west, 21000 & 12150, ground, east, 5400)<br/>• ⚡ Direction-Aware Shift Tester (±100 mm)"]
+    Modal["WindowEditorModal (js/window-editor-modal.js)<br/>• Live Architecture Database Inspector<br/>• Views Tab (0, all, west, 20590 & 12150, ground, east, 5400)<br/>• ⚡ Direction-Aware Shift Tester (±100 mm)"]
     
     DB --> Store
     Store --> Coord

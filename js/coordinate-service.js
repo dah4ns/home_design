@@ -25,7 +25,7 @@
             leftEdge: 0,
             floor: 'all',
             direction: 'west',
-            length: 21000,
+            length: 20590,
             scale: 0.1,
             wall: 'north',
             side: 'exterior',
