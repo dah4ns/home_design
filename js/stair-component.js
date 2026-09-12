@@ -36,6 +36,7 @@
             step_height: 175,
             step_length: 260,
             plank_height: 40,
+            stair_slab: 193,
             x: 2549,
             global_x: 16361,
             total_risers: 19,
@@ -143,18 +144,42 @@
             const stepHSvg = s.step_height * scale;
             const stepLSvg = s.step_length * scale;
             const plankHSvg = (s.plank_height || 40) * scale;
-            const flightStartX = xSvg + widthSvg;
-            const flightStartY = floorSvgY - (s.turn_steps_count * stepHSvg);
-            const flightEndX = flightStartX + (s.straight_treads_count * stepLSvg);
-            const flightEndY = flightStartY - (s.straight_risers_count * stepHSvg);
+            const stairSlabSvg = ((typeof s.stair_slab !== 'undefined') ? s.stair_slab : 193) * scale;
+            // Architectural Rule for Stair Concrete Skeleton with Finished Wood Planks:
+            // 1. First step has concrete height: (step_height - plank_height)
+            //    so that in total the first step will have step_height together with the plank.
+            // 2. Last horizontal step (Step 18) is at:
+            //    top_floor_elevation - step_height - plank_height
+            //    so that with the plank, the rise from the last step to the top floor is exactly step_height.
+            const firstStepH = s.step_height - (s.plank_height || 40);
+            const firstStepHSvg = firstStepH * scale;
 
-            // Step lines / points for straight flight (5 to 19)
+            // Turn steps concrete tops (Steps 1 to 4)
+            const yStep1 = floorSvgY - firstStepHSvg;
+            const yStep2 = yStep1 - stepHSvg;
+            const yStep3 = yStep2 - stepHSvg;
+            const yStep4 = yStep3 - stepHSvg;
+
+            const flightStartX = xSvg + widthSvg;
+            const flightStartY = yStep4; // Flight starts at top of step 4
+
+            // Last horizontal step concrete top (Step 18)
+            const lastStepConcreteElevation = s.top_floor_elevation - s.step_height - (s.plank_height || 40);
+            const lastStepTopY = floorSvgY - (lastStepConcreteElevation * scale);
+
+            const flightEndX = flightStartX + (s.straight_treads_count * stepLSvg);
+            const topFloorSvgY = floorSvgY - (s.top_floor_elevation * scale);
+
+            // Intermediate risers across the 14 straight treads (Steps 5 to 18)
+            const straightRiserHSvg = (flightStartY - lastStepTopY) / s.straight_treads_count;
+
+            // Step lines / points for straight flight (5 to 18)
             const flightSteps = [];
             for (let i = 0; i < s.straight_treads_count; i++) {
                 const stepNum = s.turn_steps_count + 1 + i;
                 const riserX = flightStartX + (i * stepLSvg);
-                const bottomY = flightStartY - (i * stepHSvg);
-                const topY = bottomY - stepHSvg;
+                const bottomY = flightStartY - (i * straightRiserHSvg);
+                const topY = bottomY - straightRiserHSvg;
                 const nextX = riserX + stepLSvg;
 
                 flightSteps.push({
@@ -167,10 +192,10 @@
                 });
             }
 
-            // Step 19 (Final riser to landing)
-            const topRiserX = flightStartX + (s.straight_treads_count * stepLSvg);
-            const topRiserBottomY = flightStartY - (s.straight_treads_count * stepHSvg);
-            const topRiserTopY = flightStartY - (s.straight_risers_count * stepHSvg);
+            // Step 19 (Final riser to top landing)
+            const topRiserX = flightEndX;
+            const topRiserBottomY = lastStepTopY;
+            const topRiserTopY = topFloorSvgY;
 
             return {
                 scale,
@@ -180,10 +205,17 @@
                 stepHSvg,
                 stepLSvg,
                 plankHSvg,
+                stairSlabSvg,
+                firstStepHSvg,
+                yStep1,
+                yStep2,
+                yStep3,
+                yStep4,
                 flightStartX,
                 flightStartY,
                 flightEndX,
-                flightEndY,
+                flightEndY: topFloorSvgY,
+                lastStepTopY,
                 flightSteps,
                 topRiser: {
                     x: topRiserX,
@@ -195,6 +227,13 @@
                     y1: flightStartY,
                     x2: flightEndX,
                     y2: topRiserBottomY
+                },
+                slab: {
+                    thickness: stairSlabSvg,
+                    p1: { x: flightStartX, y: flightStartY },
+                    p2: { x: flightEndX, y: topRiserBottomY },
+                    p3: { x: flightEndX, y: topRiserBottomY + stairSlabSvg },
+                    p4: { x: flightStartX, y: flightStartY + stairSlabSvg }
                 }
             };
         },
@@ -216,6 +255,13 @@
             const lineWidth = stair.line_thickness || 1.0;
             const showPlanks = (typeof options.showPlanks !== 'undefined') ? options.showPlanks : Boolean(stair.show_planks);
 
+            // 0. Stair Slab (Structural slab under flight, parallel to soffit, vertical height = stair_slab)
+            const slabSvg = `
+                <!-- Stair Slab (Vertical height = ${stair.stair_slab || 193} mm, parallel to soffit) -->
+                <polygon points="${geom.slab.p1.x.toFixed(1)},${geom.slab.p1.y.toFixed(1)} ${geom.slab.p2.x.toFixed(1)},${geom.slab.p2.y.toFixed(1)} ${geom.slab.p3.x.toFixed(1)},${geom.slab.p3.y.toFixed(1)} ${geom.slab.p4.x.toFixed(1)},${geom.slab.p4.y.toFixed(1)}" 
+                         fill="#fdfbf7" stroke="${strokeColor}" stroke-width="${lineWidth}" />
+            `;
+
             // 1. Soffit line (Adjacent to all step corners: from (354.9, 570.0) to (718.9, 325.0))
             const soffitSvg = `
                 <!-- Stair Underside Soffit Line (Strictly adjacent to all step corners) -->
@@ -229,18 +275,18 @@
             const turnX2 = geom.flightStartX;
             const turnMidX = turnX1 + (geom.widthSvg / 2);
 
-            const yStep1 = geom.floorSvgY - (1 * geom.stepHSvg); // 622.5
-            const yStep2 = geom.floorSvgY - (2 * geom.stepHSvg); // 605.0
-            const yStep3 = geom.floorSvgY - (3 * geom.stepHSvg); // 587.5
-            const yStep4 = geom.floorSvgY - (4 * geom.stepHSvg); // 570.0
+            const yStep1 = geom.yStep1;
+            const yStep2 = geom.yStep2;
+            const yStep3 = geom.yStep3;
+            const yStep4 = geom.yStep4;
 
             let turnPlanksSvg = '';
             if (showPlanks) {
                 turnPlanksSvg = `
-                    <rect x="${(turnX1 - 1).toFixed(1)}" y="${(yStep1 - geom.plankHSvg / 2).toFixed(1)}" width="${(geom.widthSvg + 2).toFixed(1)}" height="${geom.plankHSvg.toFixed(1)}" rx="1" fill="url(#oak-wood-grad)" stroke="#7c4d1e" stroke-width="0.8" />
-                    <rect x="${(turnX1 - 1).toFixed(1)}" y="${(yStep2 - geom.plankHSvg / 2).toFixed(1)}" width="${(geom.widthSvg + 2).toFixed(1)}" height="${geom.plankHSvg.toFixed(1)}" rx="1" fill="url(#oak-wood-grad)" stroke="#7c4d1e" stroke-width="0.8" />
-                    <rect x="${(turnX1 - 1).toFixed(1)}" y="${(yStep3 - geom.plankHSvg / 2).toFixed(1)}" width="${((geom.widthSvg / 2) + 2).toFixed(1)}" height="${geom.plankHSvg.toFixed(1)}" rx="1" fill="url(#oak-wood-grad)" stroke="#7c4d1e" stroke-width="0.8" />
-                    <rect x="${(turnMidX - 1).toFixed(1)}" y="${(yStep4 - geom.plankHSvg / 2).toFixed(1)}" width="${((geom.widthSvg / 2) + 2).toFixed(1)}" height="${geom.plankHSvg.toFixed(1)}" rx="1" fill="url(#oak-wood-grad)" stroke="#7c4d1e" stroke-width="0.8" />
+                    <rect x="${(turnX1 - 1).toFixed(1)}" y="${(yStep1 - geom.plankHSvg).toFixed(1)}" width="${(geom.widthSvg + 2).toFixed(1)}" height="${geom.plankHSvg.toFixed(1)}" rx="1" fill="url(#oak-wood-grad)" stroke="#7c4d1e" stroke-width="0.8" />
+                    <rect x="${(turnX1 - 1).toFixed(1)}" y="${(yStep2 - geom.plankHSvg).toFixed(1)}" width="${(geom.widthSvg + 2).toFixed(1)}" height="${geom.plankHSvg.toFixed(1)}" rx="1" fill="url(#oak-wood-grad)" stroke="#7c4d1e" stroke-width="0.8" />
+                    <rect x="${(turnX1 - 1).toFixed(1)}" y="${(yStep3 - geom.plankHSvg).toFixed(1)}" width="${((geom.widthSvg / 2) + 2).toFixed(1)}" height="${geom.plankHSvg.toFixed(1)}" rx="1" fill="url(#oak-wood-grad)" stroke="#7c4d1e" stroke-width="0.8" />
+                    <rect x="${(turnMidX - 1).toFixed(1)}" y="${(yStep4 - geom.plankHSvg).toFixed(1)}" width="${((geom.widthSvg / 2) + 2).toFixed(1)}" height="${geom.plankHSvg.toFixed(1)}" rx="1" fill="url(#oak-wood-grad)" stroke="#7c4d1e" stroke-width="0.8" />
                 `;
             }
 
@@ -275,7 +321,7 @@
             geom.flightSteps.forEach(st => {
                 let plankSvg = '';
                 if (showPlanks) {
-                    plankSvg = `<rect x="${(st.riserX - 1.0).toFixed(1)}" y="${(st.treadY - geom.plankHSvg / 2).toFixed(1)}" width="${(geom.stepLSvg + 2.0).toFixed(1)}" height="${geom.plankHSvg.toFixed(1)}" rx="1" fill="url(#oak-wood-grad)" stroke="#7c4d1e" stroke-width="0.8" />`;
+                    plankSvg = `<rect x="${(st.riserX - 1.0).toFixed(1)}" y="${(st.treadY - geom.plankHSvg).toFixed(1)}" width="${(geom.stepLSvg + 2.0).toFixed(1)}" height="${geom.plankHSvg.toFixed(1)}" rx="1" fill="url(#oak-wood-grad)" stroke="#7c4d1e" stroke-width="0.8" />`;
                 }
                 flightStepsSvg += `
                     <!-- Step ${st.stepNumber}: Riser at X = ${st.riserX.toFixed(1)} (Y = ${st.bottomY.toFixed(1)} -> ${st.topY.toFixed(1)}), Tread X = ${st.riserX.toFixed(1)}..${st.treadEndX.toFixed(1)} -->
@@ -291,6 +337,7 @@
             `;
 
             return `
+                ${slabSvg}
                 ${soffitSvg}
                 ${turnSvg}
                 <!-- ==================== B. STAIRS 5 TO 19: STRAIGHT FLIGHT (MATCHING COLOR & ZERO GAP SKELETON) ==================== -->

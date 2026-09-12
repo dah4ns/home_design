@@ -30,6 +30,7 @@
                 "step_height": 175,
                 "step_length": 260,
                 "plank_height": 40,
+                "stair_slab": 193,
                 "x": 2549,
                 "global_x": 16361,
                 "total_risers": 19,

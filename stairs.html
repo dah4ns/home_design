@@ -400,8 +400,8 @@
                 Features solid natural oak treads, 4-step entry turn (1 straight + 3 winder steps) with subsequent
                 straight flight along the North Wall (19 risers × 17.5 × 28 cm to +3,33 m), exposed +2,96 m concrete
                 slab soffit above stairs (suspended ceiling removed for headroom), under-stair door D3 (80 × 205
-                cm leaf, 90 × 210 cm hole), left corridor doors under +2,80 m dropped ceiling, and live north-wall window
-                <strong>O11_3</strong>.
+                cm leaf, 90 × 210 cm hole), left corridor doors under +2,80 m dropped ceiling, upper floor landing (940 mm), and exposed
+                brick walls.
             </p>
         </div>
 
@@ -440,7 +440,7 @@
                     <circle cx="12" cy="12" r="10" />
                     <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
                 </svg>
-                North Wall Window (O11_3) & Spatial Alignment
+                Spatial Alignment & Wall Layout
             </button>
         </div>
 
@@ -455,8 +455,6 @@
                         Silhouettes (3)</button>
                     <button class="toggle-btn active" onclick="toggleLayer('layer-headroom', this)">↕️ Headroom
                         Clearance (226 / 209 cm)</button>
-                    <button class="toggle-btn active" onclick="toggleLayer('layer-window', this)">🪟 North Wall Window
-                        (O11_3)</button>
                     <button class="toggle-btn active" onclick="toggleLayer('layer-axes', this)">📐 Structural Grid
                         Axes</button>
                     <button class="toggle-btn active" onclick="toggleLayer('layer-plan-inset', this)">📐 Stair Turn Plan
@@ -623,11 +621,6 @@
                             stroke-dasharray="12 4 2 4" />
                     </g>
 
-                    <!-- ==================== 3. DYNAMIC NORTH WALL WINDOW (O11_3) ==================== -->
-                    <!-- Mounted via WindowComponent from data/windows.json (View: stairs_north_wall) -->
-                    <g id="layer-window">
-                        <g data-window-component="O11_3" data-view-id="stairs_north_wall"></g>
-                    </g>
 
                     <!-- Upper Floor Left Room Wall & Corridor Sequence:
                          1575 mm Background Wall + 180 mm Closer Wall + 900 mm Door Opening (Door 800×2050) + 730 mm Closer Wall + 80 mm Brick Wall
@@ -692,6 +685,46 @@
                             <rect x="326.5" y="60" width="32.0" height="15" rx="3" fill="#782d08" />
                             <text x="342.5" y="71" font-family="'JetBrains Mono', monospace" font-size="7.5"
                                 font-weight="700" fill="#fef3c7" text-anchor="middle">80 mm</text>
+                        </g>
+                    </g>
+
+                    <!-- ==================== 3B. UPPER FLOOR RIGHT SEQUENCE (940 mm Floor + 80 mm Brick Wall) ==================== -->
+                    <g opacity="0.95">
+                        <!-- 1. Upper Right Landing Wall (940 mm wide: X=718.9 to 812.9, Y=20 to 306) -->
+                        <g class="interactive-element" onclick="showElementDetails('upper_right_landing')">
+                            <!-- Background Wall with uniform warm corridor wall tone -->
+                            <rect x="718.9" y="20" width="94.0" height="286" fill="url(#warm-corridor-wall)" stroke="#bfa992"
+                                stroke-width="1" />
+                            <!-- Depth Callout Badge -->
+                            <rect x="735.9" y="32" width="60.0" height="18" rx="3" fill="#ffffff" fill-opacity="0.8" stroke="#c4b5a2"
+                                stroke-width="0.7" />
+                            <text x="765.9" y="44.5" font-family="'Outfit', sans-serif" font-size="7.5" font-weight="600" fill="#786754"
+                                text-anchor="middle">940 mm FLOOR</text>
+                        </g>
+                    
+                        <!-- 2. Upper Right 80 mm BRICK WALL (X=812.9 to 820.9, Y=20 to 344) -->
+                        <g class="interactive-element" onclick="showElementDetails('upper_right_brick_wall')">
+                            <!-- 80 mm Brick Wall Column to right of 940 mm upper floor -->
+                            <rect x="812.9" y="20" width="8.0" height="324" fill="url(#brick-wall-pattern)" stroke="#782d08"
+                                stroke-width="1.6" />
+                            <!-- Vertical Brick Boundary Highlights -->
+                            <line x1="812.9" y1="20" x2="812.9" y2="344" stroke="#5c2005" stroke-width="1.5" />
+                            <line x1="820.9" y1="20" x2="820.9" y2="344" stroke="#5c2005" stroke-width="1.5" />
+                            <!-- Top Wall Cap -->
+                            <rect x="812.4" y="18" width="9.0" height="3.5" fill="#e8dfd1" stroke="#782d08" stroke-width="0.8" />
+                            <!-- Label Badge for 80 mm Brick Wall -->
+                            <rect x="800.9" y="60" width="32.0" height="15" rx="3" fill="#782d08" />
+                            <text x="816.9" y="71" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="700"
+                                fill="#fef3c7" text-anchor="middle">80 mm</text>
+                        </g>
+                    
+                        <!-- 3. Upper Right Room Wall beyond 80 mm Brick Wall (X=820.9 to 900.0, Y=20 to 306) -->
+                        <g class="interactive-element" onclick="showElementDetails('upper_right_room')">
+                            <rect x="820.9" y="20" width="79.1" height="286" fill="url(#warm-corridor-wall)" stroke="#bfa992"
+                                stroke-width="1" />
+                            <!-- Room Label -->
+                            <text x="860.0" y="44.5" font-family="'Outfit', sans-serif" font-size="7.5" font-weight="600" fill="#786754"
+                                text-anchor="middle">1.01 SYPIALNIA</text>
                         </g>
                     </g>
 
@@ -809,13 +842,13 @@
                                                                                      continues for exactly 280 mm of wall to the right of D3 (X = 662.3 to 690.3),
                                                                                      where the wall terminates on the ground floor (+0,00).
                                                                                      From X = 690.3 to X = 718.9, the space under the stairs is open to the background North Wall. -->
-                    <polygon points="354.9,640 354.9,570.0 690.3,344.25 690.3,640" fill="url(#under-stair-wall)" stroke="#bfa992"
+                    <polygon points="354.9,640 354.9,574.0 690.3,347.8 690.3,640" fill="url(#under-stair-wall)" stroke="#bfa992"
                         stroke-width="1.2" />
                     
-                    <!-- Vertical Termination Edge of Ground Floor Wall at X = 690.3 (Y = 344.25 down to 640.0) -->
-                    <line x1="690.3" y1="344.25" x2="690.3" y2="640" stroke="#786754" stroke-width="2.2" />
+                    <!-- Vertical Termination Edge of Ground Floor Wall at X = 690.3 (Y = 347.8 down to 640.0) -->
+                    <line x1="690.3" y1="347.8" x2="690.3" y2="640" stroke="#786754" stroke-width="2.2" />
                     <!-- Subtle corner reveal shadow on wall edge -->
-                    <rect x="688.3" y="344.25" width="2" height="295.75" fill="#000000" opacity="0.08" />
+                    <rect x="688.3" y="347.8" width="2" height="292.2" fill="#000000" opacity="0.08" />
                     
                     <!-- Wall Pier Label: 280 mm of wall next to D3 -->
                     <g transform="translate(676.3, 510)">
@@ -867,75 +900,79 @@
                               * Balustrade at h = 90 cm (balustrada h=90)
                         -->
 
+                        <!-- Stair Slab: Vertical height = 193 mm (parallel to soffit line) -->
+                        <polygon points="354.9,574.0 718.9,328.5 718.9,347.8 354.9,593.3" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
+
                         <!-- Stair Underside Soffit Line (Strictly adjacent to all step corners) -->
-                        <line x1="354.9" y1="570.0" x2="718.9" y2="325.0" stroke="#4a3f35" stroke-width="1.0" />
+                        <line x1="354.9" y1="574.0" x2="718.9" y2="328.5" stroke="#4a3f35" stroke-width="1.0" />
 
                         <!-- ==================== A. THE 4 FIRST STAIRS: 1 STRAIGHT + 3 WINDER (STAIRS 1 TO 4) ==================== -->
                         <!-- Fits entirely within the 1000 mm width (X = 254.9 to 354.9 mm); Step 4 only on right part (X = 304.9 to 354.9 mm) -->
+                        <!-- Concrete Step 1: 135 mm (175 - 40 mm plank); Top with plank = 175 mm -->
                         <g onclick="showElementDetails('stair_turn')">
-                            <!-- Lower 3-Step Base Enclosure Block (1000 mm wide: X = 254.9 to 354.9, Y = 587.5 to 640.0) -->
-                            <rect x="254.9" y="587.5" width="100.0" height="52.5" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
+                            <!-- Lower 3-Step Base Enclosure Block (1000 mm wide: X = 254.9 to 354.9, Y = 591.5 to 640.0) -->
+                            <rect x="254.9" y="591.5" width="100.0" height="48.5" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
 
-                            <!-- STAIR 1 (STRAIGHT): Front Approach Riser Line (+0,00 to +0,175 m: Y = 640.0 -> 622.5) -->
-                            <line x1="254.9" y1="622.5" x2="354.9" y2="622.5" stroke="#4a3f35" stroke-width="1.0" />
+                            <!-- STAIR 1 (STRAIGHT): Front Approach Riser Line (+0,00 to +0,135 m: Y = 640.0 -> 626.5) -->
+                            <line x1="254.9" y1="626.5" x2="354.9" y2="626.5" stroke="#4a3f35" stroke-width="1.0" />
 
-                            <!-- STAIR 2 (WINDER): Clean Front Face Line (+0,175 to +0,350 m: Y = 622.5 -> 605.0) -->
-                            <line x1="254.9" y1="605.0" x2="354.9" y2="605.0" stroke="#4a3f35" stroke-width="1.0" />
+                            <!-- STAIR 2 (WINDER): Clean Front Face Line (+0,135 to +0,310 m: Y = 626.5 -> 609.0) -->
+                            <line x1="254.9" y1="609.0" x2="354.9" y2="609.0" stroke="#4a3f35" stroke-width="1.0" />
 
-                            <!-- STAIR 3 (WINDER TOP SURFACE ON LEFT): (+0,350 to +0,525 m: Y = 587.5, X = 254.9 to 304.9) -->
-                            <line x1="254.9" y1="587.5" x2="304.9" y2="587.5" stroke="#4a3f35" stroke-width="1.0" />
+                            <!-- STAIR 3 (WINDER TOP SURFACE ON LEFT): (+0,310 to +0,485 m: Y = 591.5, X = 254.9 to 304.9) -->
+                            <line x1="254.9" y1="591.5" x2="304.9" y2="591.5" stroke="#4a3f35" stroke-width="1.0" />
 
-                            <!-- STAIR 4 (RIGHT PART ONLY AS ANNOTATED): Vertical Riser at X = 304.9 (Y = 587.5 -> 570.0) & Tread (X = 304.9 to 354.9) -->
-                            <rect x="304.9" y="570.0" width="50.0" height="17.5" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
-                            <line x1="304.9" y1="587.5" x2="304.9" y2="570.0" stroke="#4a3f35" stroke-width="1.0" />
-                            <line x1="304.9" y1="570.0" x2="354.9" y2="570.0" stroke="#4a3f35" stroke-width="1.0" />
+                            <!-- STAIR 4 (RIGHT PART ONLY AS ANNOTATED): Vertical Riser at X = 304.9 (Y = 591.5 -> 574.0) & Tread (X = 304.9 to 354.9) -->
+                            <rect x="304.9" y="574.0" width="50.0" height="17.5" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
+                            <line x1="304.9" y1="591.5" x2="304.9" y2="574.0" stroke="#4a3f35" stroke-width="1.0" />
+                            <line x1="304.9" y1="574.0" x2="354.9" y2="574.0" stroke="#4a3f35" stroke-width="1.0" />
                         </g>
 
                         <!-- ==================== B. STAIRS 5 TO 19: STRAIGHT FLIGHT (MATCHING COLOR & ZERO GAP SKELETON) ==================== -->
-                        <!-- Step 5: Riser at X = 354.9 (Y = 570.0 -> 552.5), Tread X = 354.9..380.9 -->
-                        <polygon points="354.9,570.0 354.9,552.5 380.9,552.5" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
+                        <!-- Step 5: Riser at X = 354.9 (Y = 574.0 -> 556.5), Tread X = 354.9..380.9 -->
+                        <polygon points="354.9,574.0 354.9,556.5 380.9,556.5" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
 
-                        <!-- Step 6: Riser at X = 380.9 (Y = 552.5 -> 535.0), Tread X = 380.9..406.9 -->
-                        <polygon points="380.9,552.5 380.9,535.0 406.9,535.0" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
+                        <!-- Step 6: Riser at X = 380.9 (Y = 556.5 -> 538.9), Tread X = 380.9..406.9 -->
+                        <polygon points="380.9,556.5 380.9,538.9 406.9,538.9" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
 
-                        <!-- Step 7: Riser at X = 406.9 (Y = 535.0 -> 517.5), Tread X = 406.9..432.9 -->
-                        <polygon points="406.9,535.0 406.9,517.5 432.9,517.5" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
+                        <!-- Step 7: Riser at X = 406.9 (Y = 538.9 -> 521.4), Tread X = 406.9..432.9 -->
+                        <polygon points="406.9,538.9 406.9,521.4 432.9,521.4" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
 
-                        <!-- Step 8: Riser at X = 432.9 (Y = 517.5 -> 500.0), Tread X = 432.9..458.9 -->
-                        <polygon points="432.9,517.5 432.9,500.0 458.9,500.0" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
+                        <!-- Step 8: Riser at X = 432.9 (Y = 521.4 -> 503.9), Tread X = 432.9..458.9 -->
+                        <polygon points="432.9,521.4 432.9,503.9 458.9,503.9" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
 
-                        <!-- Step 9: Riser at X = 458.9 (Y = 500.0 -> 482.5), Tread X = 458.9..484.9 -->
-                        <polygon points="458.9,500.0 458.9,482.5 484.9,482.5" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
+                        <!-- Step 9: Riser at X = 458.9 (Y = 503.9 -> 486.3), Tread X = 458.9..484.9 -->
+                        <polygon points="458.9,503.9 458.9,486.3 484.9,486.3" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
 
-                        <!-- Step 10: Riser at X = 484.9 (Y = 482.5 -> 465.0), Tread X = 484.9..510.9 -->
-                        <polygon points="484.9,482.5 484.9,465.0 510.9,465.0" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
+                        <!-- Step 10: Riser at X = 484.9 (Y = 486.3 -> 468.8), Tread X = 484.9..510.9 -->
+                        <polygon points="484.9,486.3 484.9,468.8 510.9,468.8" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
 
-                        <!-- Step 11: Riser at X = 510.9 (Y = 465.0 -> 447.5), Tread X = 510.9..536.9 -->
-                        <polygon points="510.9,465.0 510.9,447.5 536.9,447.5" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
+                        <!-- Step 11: Riser at X = 510.9 (Y = 468.8 -> 451.3), Tread X = 510.9..536.9 -->
+                        <polygon points="510.9,468.8 510.9,451.3 536.9,451.3" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
 
-                        <!-- Step 12: Riser at X = 536.9 (Y = 447.5 -> 430.0), Tread X = 536.9..562.9 -->
-                        <polygon points="536.9,447.5 536.9,430.0 562.9,430.0" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
+                        <!-- Step 12: Riser at X = 536.9 (Y = 451.3 -> 433.7), Tread X = 536.9..562.9 -->
+                        <polygon points="536.9,451.3 536.9,433.7 562.9,433.7" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
 
-                        <!-- Step 13: Riser at X = 562.9 (Y = 430.0 -> 412.5), Tread X = 562.9..588.9 -->
-                        <polygon points="562.9,430.0 562.9,412.5 588.9,412.5" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
+                        <!-- Step 13: Riser at X = 562.9 (Y = 433.7 -> 416.2), Tread X = 562.9..588.9 -->
+                        <polygon points="562.9,433.7 562.9,416.2 588.9,416.2" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
 
-                        <!-- Step 14: Riser at X = 588.9 (Y = 412.5 -> 395.0), Tread X = 588.9..614.9 -->
-                        <polygon points="588.9,412.5 588.9,395.0 614.9,395.0" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
+                        <!-- Step 14: Riser at X = 588.9 (Y = 416.2 -> 398.6), Tread X = 588.9..614.9 -->
+                        <polygon points="588.9,416.2 588.9,398.6 614.9,398.6" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
 
-                        <!-- Step 15: Riser at X = 614.9 (Y = 395.0 -> 377.5), Tread X = 614.9..640.9 -->
-                        <polygon points="614.9,395.0 614.9,377.5 640.9,377.5" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
+                        <!-- Step 15: Riser at X = 614.9 (Y = 398.6 -> 381.1), Tread X = 614.9..640.9 -->
+                        <polygon points="614.9,398.6 614.9,381.1 640.9,381.1" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
 
-                        <!-- Step 16: Riser at X = 640.9 (Y = 377.5 -> 360.0), Tread X = 640.9..666.9 -->
-                        <polygon points="640.9,377.5 640.9,360.0 666.9,360.0" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
+                        <!-- Step 16: Riser at X = 640.9 (Y = 381.1 -> 363.6), Tread X = 640.9..666.9 -->
+                        <polygon points="640.9,381.1 640.9,363.6 666.9,363.6" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
 
-                        <!-- Step 17: Riser at X = 666.9 (Y = 360.0 -> 342.5), Tread X = 666.9..692.9 -->
-                        <polygon points="666.9,360.0 666.9,342.5 692.9,342.5" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
+                        <!-- Step 17: Riser at X = 666.9 (Y = 363.6 -> 346.0), Tread X = 666.9..692.9 -->
+                        <polygon points="666.9,363.6 666.9,346.0 692.9,346.0" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
 
-                        <!-- Step 18: Riser at X = 692.9 (Y = 342.5 -> 325.0), Tread X = 692.9..718.9 -->
-                        <polygon points="692.9,342.5 692.9,325.0 718.9,325.0" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
+                        <!-- Step 18 (Last Horizontal Step at 3330 - 17.5 - 40 mm = 3115 mm): Riser at X = 692.9 (Y = 346.0 -> 328.5), Tread X = 692.9..718.9 -->
+                        <polygon points="692.9,346.0 692.9,328.5 718.9,328.5" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
 
-                        <!-- Step 19 (Top Landing Riser to +3,325 m): Riser at X = 718.9 (Y = 325.0 -> 307.5) -->
-                        <line x1="718.9" y1="325.0" x2="718.9" y2="307.5" stroke="#4a3f35" stroke-width="1.0" />
+                        <!-- Step 19 (Top Landing Riser to +3,33 m / 3330 mm): Riser at X = 718.9 (Y = 328.5 -> 307.0) -->
+                        <line x1="718.9" y1="328.5" x2="718.9" y2="307.0" stroke="#4a3f35" stroke-width="1.0" />
                     </g>
 
                     <!-- ==================== 8. THREE WARM HUMAN SILHOUETTES (AS IN SCREEN) ==================== -->
@@ -1045,6 +1082,35 @@
                             <text x="173.25" y="-19" font-family="'JetBrains Mono', monospace" font-size="10.5"
                                 font-weight="700" fill="#9a3412" text-anchor="middle">∑ 3,465 mm (Upper Wall &amp; Door
                                 Sequence)</text>
+                        </g>
+
+                        <!-- UPPER LEVEL RIGHT HORIZONTAL CAD DIMENSIONS (940 mm Floor + 80 mm Brick Wall: X = 718.9 to 820.9) -->
+                        <g transform="translate(0, -12)">
+                            <!-- Continuous Dimension Baseline at Y = -12 for right sequence (X = 718.9 to 820.9) -->
+                            <line x1="718.9" y1="0" x2="820.9" y2="0" stroke="#c2410c" stroke-width="1.2" />
+                        
+                            <!-- Tick 6: End of Stairs / Upper Floor Start (X = 718.9) -->
+                            <line x1="718.9" y1="-10" x2="718.9" y2="32" stroke="#c2410c" stroke-width="0.8" stroke-dasharray="2 2" />
+                            <line x1="715.9" y1="3" x2="721.9" y2="-3" stroke="#c2410c" stroke-width="1.5" />
+                        
+                            <!-- Tick 7: Floor End / Brick Wall Start (X = 812.9, Floor = 940 mm) -->
+                            <line x1="812.9" y1="-10" x2="812.9" y2="32" stroke="#c2410c" stroke-width="0.8" stroke-dasharray="2 2" />
+                            <line x1="809.9" y1="3" x2="815.9" y2="-3" stroke="#c2410c" stroke-width="1.5" />
+                            <text x="765.9" y="-5" font-family="'JetBrains Mono', monospace" font-size="11.5" font-weight="700" fill="#9a3412"
+                                text-anchor="middle">940</text>
+                        
+                            <!-- Tick 8: Brick Wall End (X = 820.9, Brick Wall = 80 mm) -->
+                            <line x1="820.9" y1="-10" x2="820.9" y2="32" stroke="#c2410c" stroke-width="0.8" stroke-dasharray="2 2" />
+                            <line x1="817.9" y1="3" x2="823.9" y2="-3" stroke="#c2410c" stroke-width="1.5" />
+                            <text x="816.9" y="-5" font-family="'JetBrains Mono', monospace" font-size="8.5" font-weight="700" fill="#782d08"
+                                text-anchor="middle">80</text>
+                        
+                            <!-- Overall Dimension for Upper Landing (X = 718.9 to 820.9 = 1,020 mm) -->
+                            <line x1="718.9" y1="-15" x2="820.9" y2="-15" stroke="#9a3412" stroke-width="1" />
+                            <line x1="718.9" y1="-20" x2="718.9" y2="-10" stroke="#9a3412" stroke-width="1.2" />
+                            <line x1="820.9" y1="-20" x2="820.9" y2="-10" stroke="#9a3412" stroke-width="1.2" />
+                            <text x="769.9" y="-19" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700" fill="#9a3412"
+                                text-anchor="middle">∑ 1,020 mm (Floor + Wall)</text>
                         </g>
 
                         <!-- UPPER DOOR HEIGHT DIMENSION: 2100 mm (Hole) / 2050 mm (Door Leaf) -->
@@ -1275,53 +1341,6 @@
                                 text-anchor="middle">2100</text>
                         </g>
 
-                        <!-- CENTER VERTICAL DIMENSION CHAIN: 33 + 296 + 37 = 333 cm -->
-                        <g transform="translate(465, 0)">
-                            <!-- Vertical Spine -->
-                            <line x1="0" y1="295" x2="0" y2="680" stroke="#c2410c" stroke-width="1.1" />
-                            <!-- Tick at +3,33 (Y=307) -->
-                            <line x1="-6" y1="307" x2="6" y2="307" stroke="#c2410c" stroke-width="1.3" />
-                            <line x1="-3" y1="310" x2="3" y2="304" stroke="#c2410c" stroke-width="1.3" />
-                            <!-- Tick at +2,96 (Y=344) -->
-                            <line x1="-6" y1="344" x2="6" y2="344" stroke="#c2410c" stroke-width="1.3" />
-                            <line x1="-3" y1="347" x2="3" y2="341" stroke="#c2410c" stroke-width="1.3" />
-                            <!-- Tick at +0,00 (Y=640) -->
-                            <line x1="-6" y1="640" x2="6" y2="640" stroke="#c2410c" stroke-width="1.3" />
-                            <line x1="-3" y1="643" x2="3" y2="637" stroke="#c2410c" stroke-width="1.3" />
-                            <!-- Tick at -0,33 (Y=673) -->
-                            <line x1="-6" y1="673" x2="6" y2="673" stroke="#c2410c" stroke-width="1.3" />
-                            <line x1="-3" y1="676" x2="3" y2="670" stroke="#c2410c" stroke-width="1.3" />
-
-                            <!-- Labels: 37, 296, 33 -->
-                            <text x="-8" y="330" font-family="'JetBrains Mono', monospace" font-size="13.5"
-                                font-weight="700" fill="#9a3412" text-anchor="end">37</text>
-                            <text x="-8" y="492" font-family="'JetBrains Mono', monospace" font-size="14"
-                                font-weight="700" fill="#9a3412" transform="rotate(-90 -8 492)"
-                                text-anchor="middle">296</text>
-                            <text x="-8" y="661" font-family="'JetBrains Mono', monospace" font-size="13.5"
-                                font-weight="700" fill="#9a3412" text-anchor="end">33</text>
-                        </g>
-
-                        <!-- UNDER-STAIR DOOR D3 & WALL LOCAL DIMENSIONS (900 mm Door Hole + 280 mm Wall) -->
-                        <!-- Door D3 Hole Width: 900 mm (X = 572.3 to 662.3 at Y = 416) -->
-                        <line x1="572.3" y1="416" x2="662.3" y2="416" stroke="#c2410c" stroke-width="1.2"
-                            marker-start="url(#dim-tick)" marker-end="url(#dim-tick)" />
-                        <line x1="572.3" y1="400" x2="572.3" y2="425" stroke="#c2410c" stroke-width="0.8" stroke-dasharray="2 2" />
-                        <line x1="662.3" y1="400" x2="662.3" y2="425" stroke="#c2410c" stroke-width="0.8" stroke-dasharray="2 2" />
-                        <rect x="602.3" y="406" width="30" height="20" rx="4" fill="#ffffff" stroke="#c2410c"
-                            stroke-width="1.2" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.08))" />
-                        <text x="617.3" y="420" font-family="'JetBrains Mono', monospace" font-size="11.5"
-                            font-weight="700" fill="#9a3412" text-anchor="middle">900</text>
-
-                        <!-- Wall next to D3 Width: 280 mm (X = 662.3 to 690.3 at Y = 416) -->
-                        <line x1="662.3" y1="416" x2="690.3" y2="416" stroke="#c2410c" stroke-width="1.2" marker-start="url(#dim-tick)"
-                            marker-end="url(#dim-tick)" />
-                        <line x1="690.3" y1="344.25" x2="690.3" y2="425" stroke="#c2410c" stroke-width="0.8" stroke-dasharray="2 2" />
-                        <rect x="665.3" y="406" width="22" height="20" rx="4" fill="#ffffff" stroke="#c2410c" stroke-width="1.2"
-                            filter="drop-shadow(0 1px 2px rgba(0,0,0,0.08))" />
-                        <text x="676.3" y="420" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700" fill="#9a3412"
-                            text-anchor="middle">280</text>
-                        
                         <!-- Door D3 Hole Height: 2100 mm (from floor Y = 640 to top of opening Y = 430 at X = 558 to left of D3) -->
                         <g transform="translate(558, 0)">
                             <line x1="0" y1="430" x2="0" y2="640" stroke="#c2410c" stroke-width="1.1" />
@@ -1335,8 +1354,8 @@
                                 text-anchor="middle">2100</text>
                         </g>
 
-                        <!-- RIGHT VERTICAL DIMENSION STACK: 17 + 20 + 15.5 + 280 cm -->
-                        <g transform="translate(825, 0)">
+                        <!-- RIGHT VERTICAL DIMENSION STACK: 17 + 20 + 15.5 + 280 cm (Positioned at X=860 beyond 80 mm brick wall) -->
+                        <g transform="translate(860, 0)">
                             <line x1="0" y1="295" x2="0" y2="648" stroke="#c2410c" stroke-width="1.1" />
                             <!-- Tick at +3,33 (Y=307) -->
                             <line x1="-6" y1="307" x2="6" y2="307" stroke="#c2410c" stroke-width="1.3" />
@@ -1389,6 +1408,10 @@
                         <div class="spec-item"><div class="spec-label">step_height</div><div class="spec-value">175 mm (17.5 cm riser)</div></div>
                         <div class="spec-item"><div class="spec-label">step_length</div><div class="spec-value">260 mm (26.0 cm tread run, steps 5–19)</div></div>
                         <div class="spec-item"><div class="spec-label">plank_height</div><div class="spec-value">40 mm (40 mm oak tread plank)</div></div>
+                        <div class="spec-item">
+                            <div class="spec-label">stair_slab</div>
+                            <div class="spec-value">193 mm (vertical height of slab under stairs)</div>
+                        </div>
                         <div class="spec-item"><div class="spec-label">x (start position)</div><div class="spec-value">X = 2,549 mm (post-brick)</div></div>
                         <div class="spec-item"><div class="spec-label">turn_steps_count</div><div class="spec-value">4 steps (1 Straight + 3 Zabieg)</div></div>
                         <div class="spec-item"><div class="spec-label">straight_risers_count</div><div class="spec-value">15 risers (Steps 5 to 19)</div></div>
@@ -1553,13 +1576,6 @@
                             <td>-0,33 to +0,00 m</td>
                             <td>Foundation slab + damp-proof membrane + EPS thermal insulation + screed</td>
                         </tr>
-                        <tr>
-                            <td><strong>O11_3</strong></td>
-                            <td>North Wall Daylight Window</td>
-                            <td><strong>100 × 195 cm</strong> (1000 × 1950 mm)</td>
-                            <td>Sill at +4,18 m (hp=85 cm)</td>
-                            <td>Triple-glazed warm bronze/anthracite frame on North Wall behind stairs</td>
-                        </tr>
                         <tr style="background-color: #fef8ee;">
                             <td colspan="5"
                                 style="font-weight: 700; color: #9a3412; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; padding-top: 14px;">
@@ -1599,11 +1615,32 @@
                         </tr>
                         <tr>
                             <td><strong>U-BW-01</strong></td>
-                            <td>Upper Exposed Brick Wall (Cegła)</td>
+                            <td>Upper Left Exposed Brick Wall (Cegła)</td>
                             <td><strong>80 mm</strong> wide × 2870 mm tall</td>
                             <td>+3,33 m to Upper Ceiling</td>
                             <td>Exposed clay brick wall replacing vertical wall above stairs (X = 3,385 to 3,465 mm)
                             </td>
+                        </tr>
+                        <tr>
+                            <td><strong>U-FL-02</strong></td>
+                            <td>Upper Right Landing Floor</td>
+                            <td><strong>940 mm</strong> wide</td>
+                            <td>+3,33 m Finished Floor</td>
+                            <td>Upper floor landing extending 940 mm to the right of top stair landing (X = 7,189 to 8,129 mm)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>U-BW-02</strong></td>
+                            <td>Upper Right Exposed Brick Wall (Cegła)</td>
+                            <td><strong>80 mm</strong> wide × 3240 mm tall</td>
+                            <td>+3,33 m to Upper Ceiling</td>
+                            <td>Exposed clay brick wall terminating landing (X = 8,129 to 8,209 mm)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>U-RM-01</strong></td>
+                            <td>Upper Right Adjacent Bedroom Wall</td>
+                            <td><strong>791 mm</strong> visible span</td>
+                            <td>+3,33 m to Upper Ceiling</td>
+                            <td>Corridor / Bedroom 1.01 wall beyond 80 mm brick wall (X = 8,209 to 9,000 mm)</td>
                         </tr>
                     </tbody>
                 </table>
@@ -1638,19 +1675,14 @@
                         +2,80 m) is removed directly above the stairs (X = 2,549 to 3,465 mm), exposing the structural
                         concrete slab soffit at +2,96 m for 226 cm vertical clearance and 209 cm diagonal clearance.
                     </li>
-                    <li><strong>Window O11_3 (1.07 Komunikacja):</strong> Located at Global <code>X = 14,100 mm</code>,
-                        width <code>1,000 mm</code>, sill <code>4,180 mm</code> (+4,18 m = 85 cm above the +3,33 m first
-                        floor). With left edge <code>18,910 mm</code>, its local coordinate is
-                        <code>18910 - (14100 + 1000) = 3,810 mm</code> (SVG X = 381.0), positioning it right above the
-                        ascending stairs!
+                    <li><strong>Window O11 Note:</strong> Window O11 is located on the North Facade exterior wall behind this corridor wall
+                        (separated by an intervening wall not visible in this interior section view), and is therefore not rendered on this
+                        interior corridor elevation.</li>
+                    <li><strong>Upper Right Floor &amp; Brick Wall:</strong> To the right of the stair landing at <code>X = 7,189 mm</code>,
+                        the upper finished floor extends for exactly <code>940 mm</code> (to <code>X = 8,129 mm</code>), terminating at an
+                        <code>80 mm</code> exposed clay brick wall (to <code>X = 8,209 mm</code>) preceding Room 1.01 Sypialnia.
                     </li>
                 </ul>
-                <div style="margin-top: 16px;">
-                    <button class="toggle-btn active terracotta"
-                        onclick="WindowEditorModal && WindowEditorModal.open('O11_3')">
-                        🪟 Open Live Window Database Inspector (Shift O11_3)
-                    </button>
-                </div>
             </div>
         </div>
     </div>
@@ -1665,6 +1697,11 @@
     <script src="js/window-editor-modal.js"></script>
 
     <script>
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        window.scrollTo(0, 0);
+
         // Element inspector details dictionary
         const ELEMENT_SPECS = {
             'staircase': {
@@ -1677,6 +1714,7 @@
                     { label: 'step_height', value: '175 mm (17.5 cm riser)' },
                     { label: 'step_length', value: '260 mm (26.0 cm tread, steps 5–19)' },
                     { label: 'plank_height', value: '40 mm (finish oak tread plank)' },
+                    { label: 'stair_slab', value: '193 mm (vertical height of slab under stairs)' },
                     { label: 'x (start position)', value: 'X = 2,549 mm (Post-Brick datum)' },
                     { label: 'global_x', value: 'X = 16,361 mm on North Facade map' },
                     { label: 'total_risers', value: '19 risers (4 turn + 15 straight flight)' },
@@ -1811,6 +1849,35 @@
                     { label: 'Ground Floor Wall End', value: 'X = 6,903 mm (wall terminates here)' },
                     { label: 'Open Clearance under Stairs', value: 'X = 6,903 to 7,189 mm (286 mm span)' }
                 ]
+            },
+            'upper_right_landing': {
+                title: 'Selected Element: Upper Right Landing Floor (940 mm)',
+                desc: 'Upper floor landing section extending 940 mm to the right of the stair arrival point (X = 7,189 to 8,129 mm) at finished floor datum +3,33 m.',
+                specs: [
+                    { label: 'Floor Span', value: '940 mm (94.0 cm)' },
+                    { label: 'Coordinate Range', value: 'X = 7,189 to 8,129 mm' },
+                    { label: 'Finished Datum Level', value: '+3,33 m First Floor' },
+                    { label: 'Terminates At', value: '80 mm Brick Wall (X = 8,129 mm)' }
+                ]
+            },
+            'upper_right_brick_wall': {
+                title: 'Selected Element: Upper Right 80 mm Brick Wall (Ścianka z cegły 80 mm)',
+                desc: '80 mm solid exposed clay brick wall to the right of the 940 mm upper floor span (X = 8,129 to 8,209 mm), extending from +3,33 m floor up to ceiling.',
+                specs: [
+                    { label: 'Wall Thickness', value: '80 mm (8.0 cm)' },
+                    { label: 'Coordinate Range', value: 'X = 8,129 to 8,209 mm' },
+                    { label: 'Material', value: 'Solid Exposed Clay Brick (Cegła)' },
+                    { label: 'Elevation Range', value: '+3,33 m to Upper Ceiling' }
+                ]
+            },
+            'upper_right_room': {
+                title: 'Selected Element: Upper Floor Room 1.01 Sypialnia',
+                desc: 'Bedroom area situated to the right of the 80 mm brick wall (X = 8,209 to 9,000 mm).',
+                specs: [
+                    { label: 'Room Designation', value: '1.01 Sypialnia' },
+                    { label: 'Coordinate Range', value: 'X = 8,209 to 9,000 mm' },
+                    { label: 'Elevation Level', value: '+3,33 m First Floor' }
+                ]
             }
         };
 
@@ -1827,6 +1894,9 @@
                         <div class="spec-item"><div class="spec-label">step_height</div><div class="spec-value">${stair.step_height} mm (17.5 cm riser)</div></div>
                         <div class="spec-item"><div class="spec-label">step_length</div><div class="spec-value">${stair.step_length} mm (26.0 cm tread run, stairs 5–19)</div></div>
                         <div class="spec-item"><div class="spec-label">plank_height</div><div class="spec-value">${stair.plank_height} mm (40 mm oak tread plank)</div></div>
+                        <div class="spec-item"><div class="spec-label">first_step_concrete</div><div class="spec-value">${stair.step_height - stair.plank_height} mm (step_height - plank_height)</div></div>
+                        <div class="spec-item"><div class="spec-label">last_horizontal_step</div><div class="spec-value">${(stair.top_floor_elevation || 3330) - stair.step_height - stair.plank_height} mm (${stair.top_floor_elevation || 3330} - 175 - 40)</div></div>
+                        <div class="spec-item"><div class="spec-label">stair_slab</div><div class="spec-value">${stair.stair_slab || 193} mm (vertical height of slab under stairs)</div></div>
                         <div class="spec-item"><div class="spec-label">x (start position)</div><div class="spec-value">X = ${stair.x} mm (2,549 mm post-brick)</div></div>
                         <div class="spec-item"><div class="spec-label">global_x</div><div class="spec-value">X = ${stair.global_x} mm on North Facade map</div></div>
                         <div class="spec-item"><div class="spec-label">turn_steps_count</div><div class="spec-value">${stair.turn_steps_count} steps (1 Straight + 3 Zabieg)</div></div>
