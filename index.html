@@ -21,11 +21,13 @@
             --accent-electricity: linear-gradient(135deg, #ff3b30, #d70015);
             --accent-pantry: linear-gradient(135deg, #a855f7, #7e22ce);
             --accent-facade: linear-gradient(135deg, #d97706, #b45309);
+            --accent-stairs: linear-gradient(135deg, #ea580c, #c2410c);
             --accent-glow-kitchen: rgba(59, 130, 246, 0.15);
             --accent-glow-laundry: rgba(16, 185, 129, 0.15);
             --accent-glow-electricity: rgba(255, 59, 48, 0.15);
             --accent-glow-pantry: rgba(168, 85, 247, 0.15);
             --accent-glow-facade: rgba(217, 119, 6, 0.2);
+            --accent-glow-stairs: rgba(234, 88, 12, 0.2);
         }
 
         body {
@@ -165,6 +167,12 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 30px var(--accent-glow-facade);
         }
 
+        .room-card.stairs-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(234, 88, 12, 0.4);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 30px var(--accent-glow-stairs);
+        }
+
         .room-icon {
             width: 54px;
             height: 54px;
@@ -200,6 +208,10 @@
 
         .facade-card .room-icon svg {
             stroke: #d97706;
+        }
+
+        .stairs-card .room-icon svg {
+            stroke: #ea580c;
         }
 
         .room-info h2 {
@@ -257,6 +269,12 @@
             background: var(--accent-facade);
             color: #FFFFFF;
             box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
+        }
+
+        .stairs-card .explore-btn {
+            background: var(--accent-stairs);
+            color: #FFFFFF;
+            box-shadow: 0 4px 12px rgba(234, 88, 12, 0.3);
         }
 
         .room-card:hover .explore-btn {
@@ -402,6 +420,29 @@
             </div>
             <div class="explore-btn">
                 <span>View North Facade</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </div>
+        </a>
+
+        <!-- Stairs Card -->
+        <a href="stairs.html" class="room-card stairs-card">
+            <div>
+                <div class="room-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 5h-5v4h-5v4H7v4H2"></path>
+                        <line x1="2" y1="21" x2="22" y2="21"></line>
+                    </svg>
+                </div>
+                <div class="room-info">
+                    <h2>Stairs (Schody)</h2>
+                    <p>Warm interior architectural elevation of the north-wall staircase with oak steps, under-stair closet door, slab levels (+0.00 to +3.33), headroom metrics, and north window O11_3.</p>
+                </div>
+            </div>
+            <div class="explore-btn">
+                <span>View Stairs</span>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="5" y1="12" x2="19" y2="12"></line>
                     <polyline points="12 5 19 12 12 19"></polyline>

@@ -270,3 +270,36 @@ console.log(coords.localX_mm); // 1700 mm (or 1800 mm at default position)
 - [js/window-editor-modal.js](file:///Users/dhans/jetski_workshop/js/window-editor-modal.js): Live inspector modal with Views tab and real-time Shift Tester.
 - [kitchen.html](file:///Users/dhans/jetski_workshop/kitchen.html): Kitchen elevations with `data-view-id="kitchen_north_wall"` and responsive dimension chains.
 - [north_facade.html](file:///Users/dhans/jetski_workshop/north_facade.html): North facade elevation with dynamic O1/O2 component rendering and live dimension chains.
+
+---
+
+## 9. Architectural Cornice Overhang Specification
+
+The intermediate horizontal cornice (`#intermediate-cornice`, levels $+2.80\,\text{m}$ to $+3.43\,\text{m}$, height $630\,\text{mm}$) features a **$500\,\text{mm}$ cantilever overhang** at both ends:
+
+- **Wall Datum Preservation**: The building wall start remains strictly at **$X = 0\,\text{mm}$** (Point 0 global datum), and the west garage wall ends at **$X = 20,590\,\text{mm}$**. No scales, datum origins, window coordinates, or wall positions are shifted.
+- **East (Left) Cornice Overhang**: Extends $500\,\text{mm}$ past the wall boundary into negative coordinate space, from $X = -500\,\text{mm}$ ($x = -50.0$ in SVG) to $X = 0\,\text{mm}$.
+- **West (Right) Cornice Overhang**: Extends $500\,\text{mm}$ past the garage wall boundary, from $X = 20,590\,\text{mm}$ to $X = 21,090\,\text{mm}$ ($x = 2109.0$ in SVG).
+- **Total Cornice Length**: $500\,\text{mm} + 20,590\,\text{mm} + 500\,\text{mm} = \mathbf{21,590\,\text{mm}}$ ($2159\,\text{px}$ in 1:100 scale).
+- **Level Annotations**: Leader lines connect seamlessly to the cantilevered cornice edges at $x = -50$ (left) and $x = 2109$ (right) for levels $+3.43\,\text{m}$ and $+2.80\,\text{m}$.
+
+---
+
+## 10. Upper Floor Wooden Facade Returns & Corner Window O13a
+
+1. **West (Right) Side Return (Next to O13a)**:
+   - **Position**: Spans $220\,\text{mm}$ to the right of O13a, from $X = 20,590\,\text{mm}$ to $X = 20,810\,\text{mm}$ ($x = 2059 \to 2081$ in SVG).
+   - **Lower Section (Bottom $850\,\text{mm}$ / Sill Wall)**: Rendered in standard natural timber slat cladding (`#wood-slats-pattern`) from the intermediate cornice ($Y = -343$) to the window sill level ($Y = -418$).
+   - **Upper Section (Next to Window O13a)**: Rendered in darker wood matching the recessed balcony background (`#wood-slats-pattern` with $0.22$ black shadow overlay) from $Y = -418$ to $+6.13\,\text{m}$ ($Y = -613$) to simulate architectural recession into depth.
+   - **Main Building Boundary**: Does not alter ground floor walls or building dimension scales. Sits securely atop the $500\,\text{mm}$ intermediate cornice overhang ($x \le 2109$) and below the roof overhang ($x \le 2089$).
+
+2. **East (Left) Side Return (Next to Balcony)**:
+   - **Position**: Spans $220\,\text{mm}$ to the left of the balcony, from $X = -220\,\text{mm}$ to $X = 0\,\text{mm}$ ($x = -22 \to 0$ in SVG).
+   - **Appearance**: Full height from $+3.43\,\text{m}$ to $+6.13\,\text{m}$ in darker wood matching the recessed balcony background.
+   - **Main Building Boundary**: Preserves Point 0 datum; dimension scales and ground floor walls remain unchanged.
+
+3. **Window O13a Refinements**:
+   - **Label**: Updated strictly to `O13a (238×195)`.
+   - **Glazing**: Removed temporary interior furniture/cushion graphic rectangles, providing clean glass glazing with interior depth gradient and glare sheen.
+
+

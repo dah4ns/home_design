@@ -330,12 +330,15 @@
 
             const nfShift = CoordinateService.getShiftDirection('north_facade');
             const kwShift = CoordinateService.getShiftDirection('kitchen_north_wall');
+            const swShift = CoordinateService.getShiftDirection('stairs_north_wall');
             const nfCoords = CoordinateService.transform(win, 'north_facade');
             const kwCoords = CoordinateService.transform(win, 'kitchen_north_wall');
+            const swCoords = CoordinateService.transform(win, 'stairs_north_wall');
 
             fb.innerHTML = `
                 <div>• <strong>North Facade</strong> (dir: <em>${nfShift.direction}</em>): +ΔX shifts <strong style="color: #047857;">${nfShift.label}</strong> (Screen X = ${nfCoords.localX_mm} mm)</div>
                 <div>• <strong>Kitchen North Wall</strong> (dir: <em>${kwShift.direction}</em>): +ΔX shifts <strong style="color: #b45309;">${kwShift.label}</strong> (Screen X = ${kwCoords.localX_mm} mm)</div>
+                <div>• <strong>Stairs North Wall</strong> (dir: <em>${swShift.direction}</em>): +ΔX shifts <strong style="color: #c2410c;">${swShift.label}</strong> (Screen X = ${swCoords.localX_mm} mm)</div>
             `;
         },
 

@@ -800,21 +800,24 @@
                     <!-- INTERMEDIATE CORNICE (GZYMS POŚREDNI) -->
                     <!-- Level: +2.80m (Y=-280) to +3.43m (Y=-343) -->
                     <!-- Height: 63 cm (630 mm) - Continuous horizontal band -->
+                    <!-- Overhang: 500 mm on Left (X = -500 to 0) & 500 mm on Right (X = 20590 to 21090) -->
+                    <!-- Total Length: 21,590 mm (from X = -500 to X = 21,090) -->
                     <!-- ==================================== -->
                     <g id="intermediate-cornice" class="interactive-element" onclick="showElementDetails('CORNICE')">
                         <!-- Underside shadow reveal strip at +2.80m -->
-                        <rect x="-10" y="-280" width="2079" height="6" fill="#090b0e" />
+                        <rect x="-50" y="-280" width="2159" height="6" fill="#090b0e" />
 
-                        <!-- Main Cornice Body (Y = -343 to -280, 630mm high) -->
-                        <polygon points="-10,-343 2069,-343 2069,-280 0,-280 -10,-295" fill="url(#fascia-gradient)" stroke="#0a0c10" stroke-width="1.5" filter="url(#shadow)" />
+                        <!-- Main Cornice Body (Y = -343 to -280, 630mm high, 500mm cantilever overhangs on left and right) -->
+                        <polygon points="-50,-343 2109,-343 2109,-280 -50,-280" fill="url(#fascia-gradient)" stroke="#0a0c10" stroke-width="1.5" filter="url(#shadow)" />
 
                         <!-- Top drip cap line -->
-                        <line x1="-10" y1="-343" x2="2069" y2="-343" stroke="#475569" stroke-width="1.2" />
+                        <line x1="-50" y1="-343" x2="2109" y2="-343" stroke="#475569" stroke-width="1.2" />
                         <!-- Bottom edge line -->
-                        <line x1="0" y1="-280" x2="2069" y2="-280" stroke="#1e293b" stroke-width="1" />
+                        <line x1="-50" y1="-280" x2="2109" y2="-280" stroke="#1e293b" stroke-width="1" />
 
                         <!-- Architectural Panel Joint Reveals (Vertical cassette seams every ~90-100cm) -->
-                        <line x1="0" y1="-343" x2="0" y2="-280" stroke="#2d3748" stroke-width="1" />
+                        <!-- Seam at building left wall edge (X = 0) -->
+                        <line x1="0" y1="-343" x2="0" y2="-280" stroke="#2d3748" stroke-width="1.2" />
                         <line x1="90" y1="-343" x2="90" y2="-280" stroke="#2d3748" stroke-width="1" />
                         <line x1="180" y1="-343" x2="180" y2="-280" stroke="#2d3748" stroke-width="1" />
                         <line x1="270" y1="-343" x2="270" y2="-280" stroke="#2d3748" stroke-width="1" />
@@ -837,10 +840,15 @@
                         <line x1="1830" y1="-343" x2="1830" y2="-280" stroke="#2d3748" stroke-width="1" />
                         <line x1="1920" y1="-343" x2="1920" y2="-280" stroke="#2d3748" stroke-width="1" />
                         <line x1="2010" y1="-343" x2="2010" y2="-280" stroke="#2d3748" stroke-width="1" />
+                        <!-- Seam at building right wall edge (X = 2059) -->
+                        <line x1="2059" y1="-343" x2="2059" y2="-280" stroke="#2d3748" stroke-width="1.2" />
 
-                        <!-- Subtle depth shadow under intermediate cornice -->
+                        <!-- Subtle depth shadow under intermediate cornice along the walls -->
                         <rect x="0" y="-280" width="1201" height="16" fill="#000000" opacity="0.35" />
                         <rect x="1201" y="-280" width="858" height="16" fill="#000000" opacity="0.28" />
+                        <!-- Underside soffit shadow for the 500mm cantilever overhangs -->
+                        <rect x="-50" y="-280" width="50" height="8" fill="#000000" opacity="0.25" />
+                        <rect x="2059" y="-280" width="50" height="8" fill="#000000" opacity="0.25" />
                     </g>
 
 
@@ -848,6 +856,15 @@
                     <!-- UPPER FLOOR ELEVATION (PIĘTRO) -->
                     <!-- Wall height from +3.43m (Y=-343) to +6.13m (Y=-613) = 2.70 m -->
                     <!-- ==================================== -->
+
+                    <!-- 0. Left Side Wooden Facade Return (X = -22 to 0, 220 mm outside main building) -->
+                    <!-- Darker wood matching the background of the balcony -->
+                    <g id="upper-timber-left-return">
+                        <rect x="-22" y="-613" width="22" height="270" fill="url(#wood-slats-pattern)" stroke="#8a7356" stroke-width="0.8" />
+                        <rect x="-22" y="-613" width="22" height="270" fill="#000000" opacity="0.22" />
+                        <line x1="-22" y1="-613" x2="-22" y2="-343" stroke="#5d4c38" stroke-width="1.2" />
+                        <line x1="0" y1="-613" x2="0" y2="-343" stroke="#3d3225" stroke-width="1" />
+                    </g>
 
                     <!-- 1. Balcony Zone (Length exactly 6,400 mm: X = 0 to 640) -->
                     <g id="upper-terrace" class="interactive-element" onclick="showElementDetails('TERRACE')">
@@ -860,7 +877,7 @@
                         <!-- Sits on top of intermediate cornice (+3.43m / Y=-343) -->
                         <rect x="0" y="-438" width="640" height="95" fill="#7dd3fc" opacity="0.22" stroke="#38bdf8" stroke-width="0.8" />
                         <!-- Black top handrail -->
-                        <rect x="-5" y="-442" width="648" height="6" fill="#0f172a" stroke="#1e222a" stroke-width="1" />
+                        <rect x="0" y="-442" width="642" height="6" fill="#0f172a" stroke="#1e222a" stroke-width="1" />
                         <!-- Vertical steel stanchions -->
                         <line x1="0" y1="-438" x2="0" y2="-343" stroke="#0f172a" stroke-width="3" />
                         <line x1="160" y1="-438" x2="160" y2="-343" stroke="#0f172a" stroke-width="2" />
@@ -921,15 +938,31 @@
                         <g class="interactive-element" onclick="showElementDetails('O13')">
                             <rect x="1821" y="-613" width="238" height="195" fill="#1e293b" stroke="#0f172a" stroke-width="2" />
                             <rect x="1825" y="-609" width="234" height="187" fill="url(#corner-interior)" />
-                            <rect x="1889" y="-560" width="30" height="45" fill="#ffffff" stroke="#475569" stroke-width="1.5" opacity="0.6" />
-                            <rect x="1929" y="-520" width="40" height="30" fill="#64748b" opacity="0.4" />
                             <rect x="1825" y="-609" width="234" height="187" fill="url(#glass-glare)" opacity="0.65" />
                             <line x1="1825" y1="-609" x2="1825" y2="-422" stroke="#0f172a" stroke-width="4" />
                             <line x1="1825" y1="-609" x2="2059" y2="-609" stroke="#0f172a" stroke-width="4" />
                             <line x1="1825" y1="-422" x2="2059" y2="-422" stroke="#0f172a" stroke-width="4" />
-                            <line x1="2059" y1="-613" x2="2059" y2="-418" stroke="#38bdf8" stroke-width="2" />
+                            <line x1="2059" y1="-613" x2="2059" y2="-418" stroke="#0f172a" stroke-width="2.5" />
                             <rect x="1817" y="-418" width="246" height="4" fill="#0f172a" />
-                            <text x="1940" y="-510" font-family="'JetBrains Mono', monospace" font-size="11" fill="#ffffff" font-weight="700" text-anchor="middle" filter="drop-shadow(0 1px 2px black)">CORNER O13a (238×195)</text>
+                            <text x="1940" y="-510" font-family="'JetBrains Mono', monospace" font-size="11" fill="#ffffff" font-weight="700" text-anchor="middle" filter="drop-shadow(0 1px 2px black)">O13a (238×195)</text>
+                        </g>
+
+                        <!-- Right Side Wooden Facade Return (X = 2059 to 2081, 220 mm outside main building) -->
+                        <!-- Bottom 850mm (Y = -418 to -343) has regular wood color; Upper part next to window (Y = -613 to -418) has darker wood like balcony background -->
+                        <g id="upper-timber-right-return">
+                            <!-- Bottom 850mm parapet wall (Y = -418 to -343, height 75px above cornice): Regular wood color -->
+                            <rect x="2059" y="-418" width="22" height="75" fill="url(#wood-slats-pattern)" stroke="#8a7356" stroke-width="0.8" />
+
+                            <!-- Upper part next to window O13a (Y = -613 to -418, height 195px): Darker wood (balcony background color) -->
+                            <rect x="2059" y="-613" width="22" height="195" fill="url(#wood-slats-pattern)" stroke="#8a7356" stroke-width="0.8" />
+                            <rect x="2059" y="-613" width="22" height="195" fill="#000000" opacity="0.22" />
+
+                            <!-- Horizontal dividing seam at window sill level (Y = -418) -->
+                            <line x1="2059" y1="-418" x2="2081" y2="-418" stroke="#5d4c38" stroke-width="1" />
+                            <!-- Outer right contour line -->
+                            <line x1="2081" y1="-613" x2="2081" y2="-343" stroke="#5d4c38" stroke-width="1.2" />
+                            <!-- Corner line at X = 2059 -->
+                            <line x1="2059" y1="-418" x2="2059" y2="-343" stroke="#2d3748" stroke-width="1" />
                         </g>
                     </g>
 
@@ -1187,7 +1220,7 @@
 
                         <!-- +4.18m Upper Window Sill hp=85cm -->
                         <g transform="translate(-200, -418)">
-                            <line x1="0" y1="0" x2="170" y2="0" class="level-marker" />
+                            <line x1="0" y1="0" x2="178" y2="0" class="level-marker" />
                             <polygon points="0,0 16,-7 16,7" fill="var(--level-color)" />
                             <text x="-12" y="4" class="level-text" text-anchor="end">+4.18</text>
                             <text x="28" y="-4" class="level-label">Parapet okien piętra (hp=85)</text>
@@ -1195,7 +1228,7 @@
 
                         <!-- +3.43m Top of Intermediate Cornice / Window 14a Sill -->
                         <g transform="translate(-200, -343)">
-                            <line x1="0" y1="0" x2="190" y2="0" class="level-marker" stroke-width="1.5" stroke="#d97706" />
+                            <line x1="0" y1="0" x2="150" y2="0" class="level-marker" stroke-width="1.5" stroke="#d97706" />
                             <polygon points="0,0 18,-8 18,8" fill="#d97706" />
                             <text x="-12" y="4" class="level-text" font-weight="700" fill="#d97706" text-anchor="end">+3.43</text>
                             <text x="28" y="-4" class="level-label" font-weight="700" fill="#b45309">Gzyms pośredni (Góra / Próg 14a)</text>
@@ -1203,7 +1236,7 @@
 
                         <!-- +2.80m Bottom of Intermediate Cornice / Top of Brickwork -->
                         <g transform="translate(-200, -280)">
-                            <line x1="0" y1="0" x2="190" y2="0" class="level-marker" stroke-width="1.5" stroke="#d97706" />
+                            <line x1="0" y1="0" x2="150" y2="0" class="level-marker" stroke-width="1.5" stroke="#d97706" />
                             <polygon points="0,0 18,-8 18,8" fill="#d97706" />
                             <text x="-12" y="4" class="level-text" font-weight="700" fill="#d97706" text-anchor="end">+2.80</text>
                             <text x="28" y="-4" class="level-label" font-weight="700" fill="#b45309">Gzyms pośredni (Spód / Wierzch muru)</text>
@@ -1249,30 +1282,30 @@
                         </g>
 
                         <!-- RIGHT MARGIN LEVEL ANNOTATIONS -->
-                        <g transform="translate(2100, -688)">
-                            <line x1="0" y1="0" x2="100" y2="0" class="level-marker" stroke-width="1.2" />
-                            <polygon points="100,0 82,-7 82,7" fill="var(--level-color)" />
-                            <text x="112" y="4" class="level-text" text-anchor="start">+6.88</text>
+                        <g transform="translate(2160, -688)">
+                            <line x1="-71" y1="0" x2="60" y2="0" class="level-marker" stroke-width="1.2" />
+                            <polygon points="60,0 44,-6 44,6" fill="var(--level-color)" />
+                            <text x="72" y="4" class="level-text" text-anchor="start">+6.88</text>
                         </g>
-                        <g transform="translate(2100, -613)">
-                            <line x1="0" y1="0" x2="100" y2="0" class="level-marker" />
-                            <polygon points="100,0 84,-6 84,6" fill="var(--level-color)" />
-                            <text x="112" y="4" class="level-text" text-anchor="start">+6.13</text>
+                        <g transform="translate(2160, -613)">
+                            <line x1="-71" y1="0" x2="60" y2="0" class="level-marker" />
+                            <polygon points="60,0 44,-6 44,6" fill="var(--level-color)" />
+                            <text x="72" y="4" class="level-text" text-anchor="start">+6.13</text>
                         </g>
-                        <g transform="translate(2100, -343)">
-                            <line x1="0" y1="0" x2="100" y2="0" class="level-marker" stroke="#d97706" stroke-width="1.2" />
-                            <polygon points="100,0 84,-6 84,6" fill="#d97706" />
-                            <text x="112" y="4" class="level-text" font-weight="700" fill="#d97706" text-anchor="start">+3.43</text>
+                        <g transform="translate(2160, -343)">
+                            <line x1="-51" y1="0" x2="60" y2="0" class="level-marker" stroke="#d97706" stroke-width="1.2" />
+                            <polygon points="60,0 44,-6 44,6" fill="#d97706" />
+                            <text x="72" y="4" class="level-text" font-weight="700" fill="#d97706" text-anchor="start">+3.43</text>
                         </g>
-                        <g transform="translate(2100, -280)">
-                            <line x1="0" y1="0" x2="100" y2="0" class="level-marker" stroke="#d97706" stroke-width="1.2" />
-                            <polygon points="100,0 84,-6 84,6" fill="#d97706" />
-                            <text x="112" y="4" class="level-text" font-weight="700" fill="#d97706" text-anchor="start">+2.80</text>
+                        <g transform="translate(2160, -280)">
+                            <line x1="-51" y1="0" x2="60" y2="0" class="level-marker" stroke="#d97706" stroke-width="1.2" />
+                            <polygon points="60,0 44,-6 44,6" fill="#d97706" />
+                            <text x="72" y="4" class="level-text" font-weight="700" fill="#d97706" text-anchor="start">+2.80</text>
                         </g>
-                        <g transform="translate(2100, 2)">
-                            <line x1="0" y1="0" x2="100" y2="0" class="level-marker" stroke-dasharray="2 2" opacity="0.7" />
-                            <polygon points="100,0 84,-6 84,6" fill="var(--level-color)" />
-                            <text x="112" y="4" class="level-text" text-anchor="start">-0.02</text>
+                        <g transform="translate(2160, 2)">
+                            <line x1="-101" y1="0" x2="60" y2="0" class="level-marker" stroke-dasharray="2 2" opacity="0.7" />
+                            <polygon points="60,0 44,-6 44,6" fill="var(--level-color)" />
+                            <text x="72" y="4" class="level-text" text-anchor="start">-0.02</text>
                         </g>
                     </g>
                 </svg>
@@ -1725,9 +1758,9 @@
             'CORNICE': {
                 title: 'Intermediate Cornice (Gzyms Pośredni)',
                 subtitle: 'Continuous Horizontal Facade Band between Ground and Upper Floor',
-                dims: 'Height: 630 mm (63 cm) | Levels: +2.80 m to +3.43 m | Width: 20,590 mm continuous',
+                dims: 'Height: 630 mm (63 cm) | Levels: +2.80 m to +3.43 m | Width: 21,590 mm (20,590 mm wall + 500 mm left overhang + 500 mm right overhang)',
                 room: 'Exterior facade band unifying the recessed living wing and protruding garage wing.',
-                specs: 'Architectural cassette metal panel cladding (Alucobond / dark anthracite) with vertical joints every ~90cm, drip edge at +3.43m, underside shadow reveal at +2.80m.'
+                specs: 'Architectural cassette metal panel cladding (Alucobond / dark anthracite) with vertical joints every ~90cm, drip edge at +3.43m, underside shadow reveal at +2.80m, extending 500 mm beyond building corner on East (left, X = -500 mm) and West (right, X = 21,090 mm).'
             },
             'O11_1': {
                 title: 'Window O11 — Bathroom (Łazienka 1.03)',

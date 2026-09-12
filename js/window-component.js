@@ -33,6 +33,8 @@
                 return this._renderExteriorNorthFacade(win, x, y, w, h);
             } else if (viewId === 'kitchen_back_wall' || viewId === 'kitchen_north_wall') {
                 return this._renderInteriorKitchen(win, x, y, w, h, styleType);
+            } else if (viewId === 'stairs_north_wall') {
+                return this._renderInteriorStairs(win, x, y, w, h);
             }
 
             return this._renderGeneric(win, x, y, w, h);
@@ -105,6 +107,42 @@
                     <!-- Technical ID Label -->
                     <text x="${x + 12}" y="${y + 22}" font-family="'JetBrains Mono', monospace" font-size="9" fill="#0284c7" font-weight="700">
                         ${win.name} (${win.width}×${win.height})
+                    </text>
+                </g>
+            `;
+        },
+
+        _renderInteriorStairs: function (win, x, y, w, h) {
+            const midX = x + w / 2;
+            const innerMargin = 7;
+            const innerX = x + innerMargin;
+            const innerY = y + innerMargin;
+            const innerW = w - (innerMargin * 2);
+            const innerH = h - (innerMargin * 2);
+
+            return `
+                <g class="interactive-element window-component stairs-window" data-window-id="${win.id}" onclick="showElementDetails && showElementDetails('${win.id}')" style="cursor: pointer;">
+                    <!-- Warm Interior Window Reveal Shadow -->
+                    <rect x="${x - 3}" y="${y - 3}" width="${w + 6}" height="${h + 6}" fill="#e6dcd1" rx="2" />
+                    <!-- Outer Window Frame (Warm Dark Bronze / Anthracite) -->
+                    <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#fffdf9" stroke="#3f362f" stroke-width="2.2" />
+                    <!-- Warm Daylight Glass Fill with Sun Glow -->
+                    <rect x="${innerX}" y="${innerY}" width="${innerW}" height="${innerH}" fill="url(#warm-daylight-glass)" stroke="#52463d" stroke-width="1.2" />
+                    <!-- Subtle Diagonal Glass Sheen -->
+                    <line x1="${innerX + 10}" y1="${innerY + innerH - 12}" x2="${innerX + innerW - 10}" y2="${innerY + 12}" stroke="#ffffff" stroke-width="2" opacity="0.6" />
+                    <line x1="${innerX + 25}" y1="${innerY + innerH - 12}" x2="${innerX + innerW - 10}" y2="${innerY + 27}" stroke="#ffffff" stroke-width="1" opacity="0.4" />
+                    <!-- Window Handle (Right Side) -->
+                    <rect x="${innerX + innerW - 4}" y="${y + h * 0.48}" width="3" height="11" fill="#b45309" rx="1" />
+                    <line x1="${innerX + innerW - 2.5}" y1="${y + h * 0.48 + 5.5}" x2="${innerX + innerW - 11}" y2="${y + h * 0.48 + 5.5}" stroke="#b45309" stroke-width="1.8" stroke-linecap="round" />
+                    <!-- Warm Oak Interior Sill Board (Parapet) -->
+                    <rect x="${x - 6}" y="${y + h}" width="${w + 12}" height="4.5" fill="#c88a4b" stroke="#8c5828" stroke-width="0.8" rx="1" />
+                    <!-- Technical Badge -->
+                    <rect x="${midX - 42}" y="${y + h / 2 - 15}" width="84" height="30" rx="4" fill="#3f362f" fill-opacity="0.82" />
+                    <text x="${midX}" y="${y + h / 2 - 2}" font-family="'JetBrains Mono', monospace" font-size="9" fill="#fef3c7" font-weight="700" text-anchor="middle">
+                        ${win.name} (${Math.round(win.width / 10)}×${Math.round(win.height / 10)})
+                    </text>
+                    <text x="${midX}" y="${y + h / 2 + 10}" font-family="'JetBrains Mono', monospace" font-size="8" fill="#fdba74" font-weight="500" text-anchor="middle">
+                        hp=${Math.round((win.sill - 3330) / 10)}cm (+4,18)
                     </text>
                 </g>
             `;

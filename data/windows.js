@@ -48,6 +48,20 @@
                 "wall": "north",
                 "side": "interior",
                 "description": "Interior kitchen back wall elevation looking North. Left edge is at map coordinate 12150; positions decrease in the East direction (left to right)."
+            },
+            "stairs_north_wall": {
+                "id": "stairs_north_wall",
+                "name": "Stairs North Wall Elevation",
+                "positionOnMap": 18910,
+                "leftEdge": 18910,
+                "floor": "all",
+                "direction": "east",
+                "length": 9000,
+                "scale": 0.1,
+                "wall": "north",
+                "side": "interior",
+                "floorY": 640,
+                "description": "Interior staircase cross-section looking North towards the North wall. Left edge is at map coordinate 18910; positions decrease Eastward (left to right)."
             }
         },
         "windows": {
@@ -171,7 +185,7 @@
                 "room": "1.07 Komunikacja",
                 "floor": "first",
                 "wall": "north",
-                "views": ["north_facade"],
+                "views": ["north_facade", "stairs_north_wall"],
                 "sashes": 1,
                 "hasMullion": false,
                 "handlePosition": "right",

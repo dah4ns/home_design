@@ -44,6 +44,19 @@
             side: 'interior',
             floorY: 260,
             countertopY: 170
+        },
+        'stairs_north_wall': {
+            id: 'stairs_north_wall',
+            name: 'Stairs North Wall Elevation',
+            positionOnMap: 18910,
+            leftEdge: 18910,
+            floor: 'all',
+            direction: 'east',
+            length: 9000,
+            scale: 0.1,
+            wall: 'north',
+            side: 'interior',
+            floorY: 640
         }
     };
 
@@ -58,7 +71,9 @@
             if (storeView) {
                 // Ensure defaults for rendering parameters
                 if (storeView.floorY === undefined) {
-                    storeView.floorY = (canonicalId === 'kitchen_north_wall') ? 260 : 0;
+                    if (canonicalId === 'kitchen_north_wall') storeView.floorY = 260;
+                    else if (canonicalId === 'stairs_north_wall') storeView.floorY = 640;
+                    else storeView.floorY = 0;
                 }
                 if (storeView.countertopY === undefined && canonicalId === 'kitchen_north_wall') {
                     storeView.countertopY = 170;
@@ -145,6 +160,10 @@
                 sillSvgY = floorY - (win.sill * scale);
                 y = sillSvgY - (win.height * scale);
                 distAboveCountertop = win.sill - 900;
+            } else if (canonicalId === 'stairs_north_wall') {
+                const floorY = view.floorY !== undefined ? view.floorY : 640;
+                sillSvgY = floorY - (win.sill * scale);
+                y = sillSvgY - (win.height * scale);
             } else {
                 // Exterior elevation (North Facade)
                 const floorY = view.floorY !== undefined ? view.floorY : 0;
