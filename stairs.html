@@ -240,6 +240,243 @@
             border-color: #ea580c;
         }
 
+        /* Mode Selector (Project vs Measured) */
+        .mode-selector-container {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #f4ede2;
+            padding: 4px 10px;
+            border-radius: 9px;
+            border: 1px solid #dfd3c3;
+        }
+
+        .mode-selector-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #5c4e42;
+            letter-spacing: -0.01em;
+        }
+
+        .mode-toggle-group {
+            display: inline-flex;
+            background: #e8ded0;
+            padding: 2px;
+            border-radius: 7px;
+            gap: 3px;
+        }
+
+        .mode-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 5px;
+            font-size: 11.5px;
+            font-weight: 700;
+            font-family: inherit;
+            border: none;
+            cursor: pointer;
+            background: transparent;
+            color: #6d5b4a;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .mode-btn:hover {
+            color: #3b2d1f;
+            background: rgba(255, 255, 255, 0.45);
+        }
+
+        .mode-btn.active {
+            background: #7c2d12;
+            color: #ffffff;
+            box-shadow: 0 1px 4px rgba(124, 45, 18, 0.28);
+        }
+
+        .mode-btn.active .mode-dot {
+            background: #4ade80;
+        }
+
+        .mode-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #a89885;
+            display: inline-block;
+            transition: background 0.2s ease;
+        }
+
+        /* Parametric Adjustment Sliders Panel */
+        .parametric-controls-panel {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: #fdfaf5;
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid #e2d7c7;
+            width: 100%;
+            margin-top: 10px;
+            flex-wrap: wrap;
+            box-shadow: 0 1px 3px rgba(41, 34, 28, 0.04);
+        }
+
+        .slider-control-card {
+            flex: 1 1 270px;
+            background: #ffffff;
+            border: 1px solid #e6dfd3;
+            border-radius: 8px;
+            padding: 10px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            box-shadow: 0 1px 2px rgba(41, 34, 28, 0.03);
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .slider-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #4a3f35;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .slider-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 6px;
+            background: #ffedd5;
+            color: #9a3412;
+            border: 1px solid #fed7aa;
+            white-space: nowrap;
+        }
+
+        .slider-input-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .slider-input-row input[type="range"] {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: #e6dfd3;
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+            accent-color: #c2410c;
+        }
+
+        .slider-input-row input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #c2410c;
+            border: 2px solid #ffffff;
+            box-shadow: 0 1px 4px rgba(194, 65, 12, 0.4);
+            cursor: pointer;
+            transition: transform 0.1s ease;
+        }
+
+        .slider-input-row input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+        }
+
+        .slider-range-hint {
+            font-size: 10.5px;
+            color: #8a7967;
+            white-space: nowrap;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .slider-status-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: #fbf5ec;
+            border: 1px solid #dfd3c3;
+            border-radius: 8px;
+            padding: 9px 14px;
+            flex-wrap: wrap;
+        }
+
+        .status-metric {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+
+        .status-label {
+            font-size: 9.5px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #786754;
+        }
+
+        .status-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #7c2d12;
+        }
+
+        .reset-sliders-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            background: #ffffff;
+            border: 1px solid #d6cbbd;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #5c4e42;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .reset-sliders-btn:hover {
+            background: #fee2e2;
+            border-color: #fca5a5;
+            color: #991b1b;
+        }
+
+        .btn-height {
+            padding: 3px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            border: none;
+            background: #ffffff;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-height:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        .btn-height.active {
+            background: #0284c7;
+            color: #ffffff;
+            font-weight: 700;
+        }
+
         .elevation-wrapper {
             background: #fffcf8;
             padding: 20px;
@@ -447,21 +684,107 @@
         <!-- TAB 1: MAIN WARM INTERIOR ELEVATION -->
         <div id="tab-elevation" class="tab-content active">
             <div class="controls-bar">
-                <div class="layer-toggles">
-                    <span style="font-size: 12px; font-weight: 600; color: #5c4e42; margin-right: 4px;">Layers:</span>
-                    <button class="toggle-btn active" onclick="toggleLayer('layer-dimensions', this)">📏 CAD Dimensions
-                        & Levels</button>
-                    <button class="toggle-btn active terracotta" onclick="toggleLayer('layer-people', this)">🚶 Human
-                        Silhouettes (3)</button>
-                    <button class="toggle-btn active" onclick="toggleLayer('layer-headroom', this)">↕️ Headroom
-                        Clearance (226 / 209 cm)</button>
-                    <button class="toggle-btn active" onclick="toggleLayer('layer-axes', this)">📐 Structural Grid
-                        Axes</button>
-                    <button class="toggle-btn active" onclick="toggleLayer('layer-plan-inset', this)">📐 Stair Turn Plan
-                        (Rzut Zabiegu)</button>
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 12px;">
+                    <div style="display: flex; gap: 14px; align-items: center; flex-wrap: wrap;">
+                        <!-- Ground Floor Dimensions Selector: Project vs Measured -->
+                        <div class="mode-selector-container">
+                            <span class="mode-selector-label">Ground Floor Measures:</span>
+                            <div class="mode-toggle-group">
+                                <button id="btn-mode-project" class="mode-btn active" onclick="setGroundFloorMode('project')" title="Display nominal CAD design dimensions from project drawings">
+                                    <span class="mode-dot"></span>📐 Project
+                                </button>
+                                <button id="btn-mode-measured" class="mode-btn" onclick="setGroundFloorMode('measured')" title="Display on-site as-built measured dimensions (pomiar z natury)">
+                                    <span class="mode-dot"></span>📏 Measured (Pomiar)
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="layer-toggles">
+                            <span style="font-size: 12px; font-weight: 600; color: #5c4e42; margin-right: 4px;">Layers:</span>
+                            <button class="toggle-btn active" onclick="toggleLayer('layer-dimensions', this)">📏 CAD Dimensions
+                                & Levels</button>
+                            <button class="toggle-btn active terracotta" onclick="toggleLayer('layer-people', this)">🚶 Human
+                                Silhouettes (3)</button>
+                            <button class="toggle-btn active" onclick="toggleLayer('layer-headroom', this)">↕️ Headroom
+                                Clearance (226 / 209 cm)</button>
+                            <button class="toggle-btn active" onclick="toggleLayer('layer-axes', this)">📐 Structural Grid
+                                Axes</button>
+                            <button class="toggle-btn active" onclick="toggleLayer('layer-plan-inset', this)">📐 Stair Turn Plan
+                                (Rzut Zabiegu)</button>
+                        </div>
+                    </div>
+                    <div style="font-size: 12.5px; color: #786759;">
+                        💡 <em>Click any architectural element on the drawing to inspect its specs below</em>
+                    </div>
                 </div>
-                <div style="font-size: 12.5px; color: #786759;">
-                    💡 <em>Click any architectural element on the drawing to inspect its specs below</em>
+
+                <!-- Parametric Interactive Adjustment Sliders -->
+                <div class="parametric-controls-panel">
+                    <div class="slider-control-card">
+                        <div class="slider-header">
+                            <span class="slider-title">📐 Extend 2nd Floor Length</span>
+                            <span class="slider-badge" id="badge-extend-2nd">+0 mm (Total: 940 mm)</span>
+                        </div>
+                        <div class="slider-input-row">
+                            <input type="range" id="slider-extend-2nd" min="0" max="300" step="10" value="0" oninput="onParametricSlidersChange()">
+                            <span class="slider-range-hint">0 – 300 mm (10 mm steps)</span>
+                        </div>
+                    </div>
+
+                    <div class="slider-control-card">
+                        <div class="slider-header">
+                            <span class="slider-title">🧱 Reposition Lower 80 mm Wall</span>
+                            <span class="slider-badge" id="badge-move-wall">Move Left: 0 mm (X = 2,549)</span>
+                        </div>
+                        <div class="slider-input-row">
+                            <input type="range" id="slider-move-wall" min="0" max="200" step="10" value="0" oninput="onParametricSlidersChange()">
+                            <span class="slider-range-hint">0 – 200 mm (10 mm steps)</span>
+                        </div>
+                    </div>
+
+                    <div class="slider-control-card" style="border-color: #bae6fd; background: #f8fafc;">
+                        <div class="slider-header">
+                            <span class="slider-title" style="color: #0369a1;">
+                                👤 Middle Person (Stairs 4–10)
+                            </span>
+                            <span class="slider-badge" id="badge-person-stair" style="background: #e0f2fe; color: #0369a1; border-color: #bae6fd;">Stair 5 (Default)</span>
+                        </div>
+                        <div class="slider-input-row">
+                            <input type="range" id="slider-person-stair" min="4" max="10" step="1" value="5" oninput="onPersonStairChange(this.value)" style="accent-color: #0284c7;">
+                            <span class="slider-range-hint" style="color: #0284c7;">Stair 4 – 10</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px; gap: 8px; flex-wrap: wrap;">
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <span style="font-size: 11px; font-weight: 600; color: #475569;">Height:</span>
+                                <div style="display: inline-flex; border: 1px solid #cbd5e1; border-radius: 6px; overflow: hidden; background: #fff;">
+                                    <button type="button" id="btn-person-h180" class="btn-height active" onclick="setPersonHeight(180)">180 cm</button>
+                                    <button type="button" id="btn-person-h190" class="btn-height" onclick="setPersonHeight(190)">190 cm</button>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 4px;">
+                                <span style="font-size: 11px; font-weight: 600; color: #0369a1;">Eyes to Ceiling:</span>
+                                <span id="badge-head-clearance" style="font-family: 'JetBrains Mono', monospace; font-size: 11.5px; font-weight: 700; color: #0284c7; background: #e0f2fe; padding: 2px 6px; border-radius: 4px; border: 1px solid #bae6fd;">45.5 cm</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="slider-status-card">
+                        <div class="status-metric">
+                            <span class="status-label">Stairs Straight Run:</span>
+                            <span class="status-val" id="metric-flight-run">3,640 mm</span>
+                        </div>
+                        <div class="status-metric">
+                            <span class="status-label">Step Length (14 Treads):</span>
+                            <span class="status-val" id="metric-step-length">260.0 mm</span>
+                        </div>
+                        <div class="status-metric">
+                            <span class="status-label">Eyes to Ceiling Corner:</span>
+                            <span class="status-val" id="metric-head-clearance" style="color: #0284c7;">45.5 cm (455 mm)</span>
+                        </div>
+                        <button class="reset-sliders-btn" onclick="resetParametricSliders()" title="Reset parametric sliders to original design defaults">
+                            ↺ Reset
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -586,6 +909,10 @@
                         <marker id="dim-tick-red" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
                             <line x1="0" y1="6" x2="6" y2="0" stroke="#dc2626" stroke-width="1.4" />
                         </marker>
+                        <!-- Blue Tick marker for Person Headroom Clearance Dimension -->
+                        <marker id="dim-tick-blue" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+                            <line x1="0" y1="6" x2="6" y2="0" stroke="#0284c7" stroke-width="1.4" />
+                        </marker>
                     </defs>
 
                     <!-- ==================== 1. INTERIOR NORTH WALL BACKGROUND ==================== -->
@@ -617,7 +944,7 @@
                         <line x1="656" y1="20" x2="656" y2="695" stroke="#c2410c" stroke-width="0.8"
                             stroke-dasharray="12 4 2 4" />
                         <!-- Vertical Axis D (End of Stairs on Vertical Line: X = 718.9 mm) -->
-                        <line x1="718.9" y1="20" x2="718.9" y2="760" stroke="#c2410c" stroke-width="0.9"
+                        <line id="axis-d-line" x1="718.9" y1="20" x2="718.9" y2="760" stroke="#c2410c" stroke-width="0.9"
                             stroke-dasharray="12 4 2 4" />
                     </g>
 
@@ -693,12 +1020,12 @@
                         <!-- 1. Upper Right Landing Wall (940 mm wide: X=718.9 to 812.9, Y=20 to 306) -->
                         <g class="interactive-element" onclick="showElementDetails('upper_right_landing')">
                             <!-- Background Wall with uniform warm corridor wall tone -->
-                            <rect x="718.9" y="20" width="94.0" height="286" fill="url(#warm-corridor-wall)" stroke="#bfa992"
+                            <rect id="upper-right-floor-bg" x="718.9" y="20" width="94.0" height="286" fill="url(#warm-corridor-wall)" stroke="#bfa992"
                                 stroke-width="1" />
                             <!-- Depth Callout Badge -->
-                            <rect x="735.9" y="32" width="60.0" height="18" rx="3" fill="#ffffff" fill-opacity="0.8" stroke="#c4b5a2"
+                            <rect id="upper-right-floor-badge-rect" x="735.9" y="32" width="60.0" height="18" rx="3" fill="#ffffff" fill-opacity="0.8" stroke="#c4b5a2"
                                 stroke-width="0.7" />
-                            <text x="765.9" y="44.5" font-family="'Outfit', sans-serif" font-size="7.5" font-weight="600" fill="#786754"
+                            <text id="upper-right-floor-badge-text" x="765.9" y="44.5" font-family="'Outfit', sans-serif" font-size="7.5" font-weight="600" fill="#786754"
                                 text-anchor="middle">940 mm FLOOR</text>
                         </g>
                     
@@ -731,65 +1058,65 @@
                     <!-- ==================== 4. LEFT SECTION: LOWER LEVEL CORRIDOR & DOORS (D1 & D2: DOOR 80×205, HOLE 90×210) ==================== -->
                     <g class="interactive-element" onclick="showElementDetails('corridor_doors')">
                         <!-- Left Corridor Wall Background: Continuous UNIFORM warm wall from X=0 to 246.9, Y=360 to 640 (No vertical lines above doors!) -->
-                        <rect x="0" y="360" width="246.9" height="280" fill="url(#warm-corridor-wall)" stroke="#bfa992"
+                        <rect id="corridor-wall-bg" x="0" y="360" width="246.9" height="280" fill="url(#warm-corridor-wall)" stroke="#bfa992"
                             stroke-width="1" />
 
                         <!-- Dropped Ceiling Cavity in Corridor (+2,80 to +2,96 = 16 cm) from X=0 to X=246.9 -->
                         <!-- NOTE: Suspended ceiling (15.5/16 cm cavity) is REMOVED above the stairs (X=254.9 to 346.5) for maximum clear headroom up to +2,96 m slab soffit! -->
-                        <rect x="0" y="344" width="246.9" height="16" fill="#e9decb" stroke="#8a7967"
+                        <rect id="corridor-ceil-cavity" x="0" y="344" width="246.9" height="16" fill="#e9decb" stroke="#8a7967"
                             stroke-width="1.2" />
                         <!-- Vertical Plaster Return/Bulkhead at Corridor Edge (X=246.9, Y=344 to 360) -->
-                        <line x1="246.9" y1="344" x2="246.9" y2="360" stroke="#8a7967" stroke-width="1.6" />
+                        <line id="corridor-bulkhead-line" x1="246.9" y1="344" x2="246.9" y2="360" stroke="#8a7967" stroke-width="1.6" />
                         <!-- Warm Recessed LED Strip Glow under +2,80 Corridor Ceiling -->
-                        <line x1="5" y1="361" x2="244" y2="361" stroke="#f59e0b" stroke-width="2.5" opacity="0.7" />
+                        <line id="corridor-led-strip" x1="5" y1="361" x2="244" y2="361" stroke="#f59e0b" stroke-width="2.5" opacity="0.7" />
 
                         <!-- Door 1 (D1: Hole in wall = 900×2100 mm, Door leaf = 800×2050 mm: X=15.0 to 105.0, Y=430 to 640) -->
-                        <!-- Door 1 Rough Opening Hole (900 mm wide × 2100 mm tall: X=15.0 to 105.0, Y=430 to 640) -->
-                        <rect x="15.0" y="430" width="90.0" height="210" fill="#fcf9f4" stroke="#8c5828"
+                        <!-- Door 1 Rough Opening Hole -->
+                        <rect id="d1-hole" x="15.0" y="430" width="90.0" height="210" fill="#fcf9f4" stroke="#8c5828"
                             stroke-width="1.6" />
                         <!-- Outer Frame Casing (50 mm wide all around) -->
-                        <rect x="15.0" y="430" width="90.0" height="210" fill="none" stroke="#7c4d1e"
+                        <rect id="d1-frame" x="15.0" y="430" width="90.0" height="210" fill="none" stroke="#7c4d1e"
                             stroke-width="1.8" />
-                        <!-- Door 1 Leaf itself (800 mm wide × 2050 mm tall: centered at X=20.0 to 100.0, Y=435 to 640) -->
-                        <rect x="20.0" y="435" width="80.0" height="205" fill="url(#oak-door-panel)" stroke="#7c4d1e"
+                        <!-- Door 1 Leaf itself (800 mm wide × 2050 mm tall) -->
+                        <rect id="d1-leaf" x="20.0" y="435" width="80.0" height="205" fill="url(#oak-door-panel)" stroke="#7c4d1e"
                             stroke-width="1.2" />
                         <!-- Door 1 Warm Brushed Brass Handle (at +1.05m = Y: 535) -->
-                        <rect x="91" y="535" width="7" height="3" rx="1" fill="#78350f" />
-                        <circle cx="93" cy="542" r="1.8" fill="#78350f" />
-                        <text x="60.0" y="510" font-family="'Outfit', sans-serif" font-size="8.5" fill="#5c3a1b"
+                        <rect id="d1-handle-bar" x="91" y="535" width="7" height="3" rx="1" fill="#78350f" />
+                        <circle id="d1-handle-dot" cx="93" cy="542" r="1.8" fill="#78350f" />
+                        <text id="d1-text-title" x="60.0" y="510" font-family="'Outfit', sans-serif" font-size="8.5" fill="#5c3a1b"
                             font-weight="700" text-anchor="middle">D1: 80×205 cm</text>
-                        <text x="60.0" y="522" font-family="'JetBrains Mono', monospace" font-size="7.5" fill="#8c5828"
+                        <text id="d1-text-hole" x="60.0" y="522" font-family="'JetBrains Mono', monospace" font-size="7.5" fill="#8c5828"
                             font-weight="600" text-anchor="middle">(Hole: 90×210)</text>
 
                         <!-- Door 2 (D2: Hole in wall = 900×2100 mm, Door leaf = 800×2050 mm: X=151.3 to 241.3, Y=430 to 640) -->
-                        <!-- Door 2 Rough Opening Hole (900 mm wide × 2100 mm tall: X=151.3 to 241.3, Y=430 to 640) -->
-                        <rect x="151.3" y="430" width="90.0" height="210" fill="#fcf9f4" stroke="#8c5828"
+                        <!-- Door 2 Rough Opening Hole -->
+                        <rect id="d2-hole" x="151.3" y="430" width="90.0" height="210" fill="#fcf9f4" stroke="#8c5828"
                             stroke-width="1.6" />
                         <!-- Outer Frame Casing (50 mm wide all around) -->
-                        <rect x="151.3" y="430" width="90.0" height="210" fill="none" stroke="#7c4d1e"
+                        <rect id="d2-frame" x="151.3" y="430" width="90.0" height="210" fill="none" stroke="#7c4d1e"
                             stroke-width="1.8" />
-                        <!-- Door 2 Leaf itself (800 mm wide × 2050 mm tall: centered at X=156.3 to 236.3, Y=435 to 640) -->
-                        <rect x="156.3" y="435" width="80.0" height="205" fill="url(#oak-door-panel)" stroke="#7c4d1e"
+                        <!-- Door 2 Leaf itself (800 mm wide × 2050 mm tall) -->
+                        <rect id="d2-leaf" x="156.3" y="435" width="80.0" height="205" fill="url(#oak-door-panel)" stroke="#7c4d1e"
                             stroke-width="1.2" />
                         <!-- Door 2 Warm Brushed Brass Handle (at +1.05m = Y: 535) -->
-                        <rect x="227.3" y="535" width="7" height="3" rx="1" fill="#78350f" />
-                        <circle cx="229.3" cy="542" r="1.8" fill="#78350f" />
-                        <text x="196.3" y="510" font-family="'Outfit', sans-serif" font-size="8.5" fill="#5c3a1b"
+                        <rect id="d2-handle-bar" x="227.3" y="535" width="7" height="3" rx="1" fill="#78350f" />
+                        <circle id="d2-handle-dot" cx="229.3" cy="542" r="1.8" fill="#78350f" />
+                        <text id="d2-text-title" x="196.3" y="510" font-family="'Outfit', sans-serif" font-size="8.5" fill="#5c3a1b"
                             font-weight="700" text-anchor="middle">D2: 80×205 cm</text>
-                        <text x="196.3" y="522" font-family="'JetBrains Mono', monospace" font-size="7.5" fill="#8c5828"
+                        <text id="d2-text-hole" x="196.3" y="522" font-family="'JetBrains Mono', monospace" font-size="7.5" fill="#8c5828"
                             font-weight="600" text-anchor="middle">(Hole: 90×210)</text>
                     </g>
 
                     <!-- 6. LOWER BRICK WALL (80 mm wide: X=246.9 to 254.9, Y=344 to 640) -->
                     <g class="interactive-element" onclick="showElementDetails('brick_wall')">
                         <!-- 80 mm Exposed Brick Wall Column -->
-                        <rect x="246.9" y="344" width="8.0" height="296" fill="url(#brick-wall-pattern)"
+                        <rect id="brick-wall-rect" x="246.9" y="344" width="8.0" height="296" fill="url(#brick-wall-pattern)"
                             stroke="#782d08" stroke-width="1.5" />
                         <!-- Subtle Brick Edge Highlights -->
-                        <line x1="246.9" y1="344" x2="246.9" y2="640" stroke="#5c2005" stroke-width="1.2" />
-                        <line x1="254.9" y1="344" x2="254.9" y2="640" stroke="#5c2005" stroke-width="1.5" />
+                        <line id="brick-wall-line1" x1="246.9" y1="344" x2="246.9" y2="640" stroke="#5c2005" stroke-width="1.2" />
+                        <line id="brick-wall-line2" x1="254.9" y1="344" x2="254.9" y2="640" stroke="#5c2005" stroke-width="1.5" />
                         <!-- Brick Wall Plaster Cap / Header -->
-                        <rect x="246.4" y="343" width="9.0" height="3" fill="#e8dfd1" stroke="#782d08"
+                        <rect id="brick-wall-cap" x="246.4" y="343" width="9.0" height="3" fill="#e8dfd1" stroke="#782d08"
                             stroke-width="0.6" />
                     </g>
 
@@ -809,15 +1136,15 @@
                     <!-- Right First-Floor Slab (+2,96 to +3,33, X=718.9 to 900) -->
                     <g class="interactive-element" onclick="showElementDetails('upper_slab')">
                         <!-- Structural Concrete Slab (+2,96 to +3,16, 20 cm) -->
-                        <rect x="718.9" y="324" width="181.1" height="20" fill="url(#concrete-hatch)" stroke="#4a3f35"
+                        <rect id="slab-right-rc" x="718.9" y="324" width="181.1" height="20" fill="url(#concrete-hatch)" stroke="#4a3f35"
                             stroke-width="1.8" />
                         <!-- Insulation + Screed (+3,16 to +3,33, 17 cm) -->
-                        <rect x="718.9" y="309" width="181.1" height="15" fill="url(#insulation-hatch)" stroke="#786759"
+                        <rect id="slab-right-insul" x="718.9" y="309" width="181.1" height="15" fill="url(#insulation-hatch)" stroke="#786759"
                             stroke-width="1.2" />
                         <!-- Warm Oak Finished Floor Surface at +3,33 -->
-                        <rect x="718.9" y="306" width="181.1" height="3.5" fill="#b37436" />
+                        <rect id="slab-right-finish" x="718.9" y="306" width="181.1" height="3.5" fill="#b37436" />
                         <!-- Suspended Ceiling / Plaster Soffit below Right Slab (15.5 cm down to +2,805) -->
-                        <rect x="718.9" y="344" width="181.1" height="15.5" fill="#ede3d3" stroke="#8a7967"
+                        <rect id="slab-right-ceil" x="718.9" y="344" width="181.1" height="15.5" fill="#ede3d3" stroke="#8a7967"
                             stroke-width="1.2" />
                     </g>
 
@@ -842,16 +1169,16 @@
                                                                                      continues for exactly 280 mm of wall to the right of D3 (X = 662.3 to 690.3),
                                                                                      where the wall terminates on the ground floor (+0,00).
                                                                                      From X = 690.3 to X = 718.9, the space under the stairs is open to the background North Wall. -->
-                    <polygon points="354.9,640 354.9,574.0 690.3,347.8 690.3,640" fill="url(#under-stair-wall)" stroke="#bfa992"
+                    <polygon id="under-stair-wall-poly" points="354.9,640 354.9,574.0 690.3,347.8 690.3,640" fill="url(#under-stair-wall)" stroke="#bfa992"
                         stroke-width="1.2" />
                     
                     <!-- Vertical Termination Edge of Ground Floor Wall at X = 690.3 (Y = 347.8 down to 640.0) -->
-                    <line x1="690.3" y1="347.8" x2="690.3" y2="640" stroke="#786754" stroke-width="2.2" />
+                    <line id="under-stair-wall-term-line" x1="690.3" y1="347.8" x2="690.3" y2="640" stroke="#786754" stroke-width="2.2" />
                     <!-- Subtle corner reveal shadow on wall edge -->
-                    <rect x="688.3" y="347.8" width="2" height="292.2" fill="#000000" opacity="0.08" />
+                    <rect id="under-stair-wall-shadow" x="688.3" y="347.8" width="2" height="292.2" fill="#000000" opacity="0.08" />
                     
                     <!-- Wall Pier Label: 280 mm of wall next to D3 -->
-                    <g transform="translate(676.3, 510)">
+                    <g id="under-stair-wall-pier-badge" transform="translate(676.3, 510)">
                         <rect x="-13" y="-12" width="26" height="23" rx="3.5" fill="#ffffff" fill-opacity="0.9" stroke="#786754"
                             stroke-width="0.8" />
                         <text x="0" y="0" font-family="'JetBrains Mono', monospace" font-size="8" font-weight="700" fill="#5c3a1b"
@@ -861,27 +1188,27 @@
                     </g>
                     
                     <!-- Open Under-Stairs Passage Label between X = 690.3 and X = 718.9 -->
-                    <text x="704.6" y="520" font-family="'Outfit', sans-serif" font-size="7.5" font-weight="600" fill="#8a7967"
+                    <text id="under-stair-open-label" x="704.6" y="520" font-family="'Outfit', sans-serif" font-size="7.5" font-weight="600" fill="#8a7967"
                         text-anchor="middle" transform="rotate(-90 704.6 520)" letter-spacing="0.08em">OPEN UNDER STAIRS</text>
 
                     <!-- Under-Stair Door D3 (Hole = 900 × 2100 mm, Distance from D2 Right Edge = 3310 mm: X = 572.3 to 662.3) -->
                     <g class="interactive-element" onclick="showElementDetails('door_d3')">
                         <!-- Rough Opening Hole in Wall (900 mm wide × 2100 mm tall: X = 572.3 to 662.3, Y = 430.0 to 640.0) -->
-                        <rect x="572.3" y="430.0" width="90.0" height="210.0" fill="#fcf9f4" stroke="#8c5828"
+                        <rect id="d3-hole" x="572.3" y="430.0" width="90.0" height="210.0" fill="#fcf9f4" stroke="#8c5828"
                             stroke-width="1.6" />
                         <!-- Outer Frame Casing (50 mm wide all around) -->
-                        <rect x="572.3" y="430.0" width="90.0" height="210.0" fill="none" stroke="#7c4d1e"
+                        <rect id="d3-frame" x="572.3" y="430.0" width="90.0" height="210.0" fill="none" stroke="#7c4d1e"
                             stroke-width="1.8" />
                         <!-- Door Leaf itself (800 mm wide × 2050 mm tall: centered at X = 577.3 to 657.3, Y = 435.0 to 640.0) -->
-                        <rect x="577.3" y="435.0" width="80.0" height="205.0" fill="url(#oak-door-panel)" stroke="#5c3a1b"
+                        <rect id="d3-leaf" x="577.3" y="435.0" width="80.0" height="205.0" fill="url(#oak-door-panel)" stroke="#5c3a1b"
                             stroke-width="1.5" />
                         <!-- Warm Brushed Bronze Handle (at +1.05 m = Y: 535) -->
-                        <rect x="585.3" y="535.0" width="7" height="3" rx="1" fill="#5c3a1b" />
-                        <circle cx="587.3" cy="542.0" r="1.8" fill="#5c3a1b" />
+                        <rect id="d3-handle-bar" x="585.3" y="535.0" width="7" height="3" rx="1" fill="#5c3a1b" />
+                        <circle id="d3-handle-dot" cx="587.3" cy="542.0" r="1.8" fill="#5c3a1b" />
                         <!-- Door Labels (Unified with D1 & D2: D3: 80×205 cm, (Hole: 90×210)) -->
-                        <text x="617.3" y="510.0" font-family="'Outfit', sans-serif" font-size="8.5" font-weight="700"
+                        <text id="d3-text-title" x="617.3" y="510.0" font-family="'Outfit', sans-serif" font-size="8.5" font-weight="700"
                             fill="#5c3a1b" text-anchor="middle">D3: 80×205 cm</text>
-                        <text x="617.3" y="522.0" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="600"
+                        <text id="d3-text-hole" x="617.3" y="522.0" font-family="'JetBrains Mono', monospace" font-size="7.5" font-weight="600"
                             fill="#8c5828" text-anchor="middle">(Hole: 90×210)</text>
                     </g>
 
@@ -978,21 +1305,23 @@
                     <!-- ==================== 8. THREE WARM HUMAN SILHOUETTES (AS IN SCREEN) ==================== -->
                     <g id="layer-people">
                         <!-- Person 1: Standing on Step 3 (Left Part of Block, feet on Step 3 at Y=587.5) -->
-                        <g transform="translate(268, 417.5)" opacity="0.82">
+                        <g id="person-1" transform="translate(268, 417.5)" opacity="0.82">
                             <path
                                 d="M 15 0 C 20 0, 23 5, 23 11 C 23 17, 20 21, 17 23 L 28 28 C 33 31, 35 38, 35 50 L 33 82 L 28 82 L 26 50 L 24 96 L 22 170 L 16 170 L 14 110 L 12 170 L 6 170 L 4 96 L 2 50 L 0 82 L -5 82 L -7 50 C -7 38, -5 31, 0 28 L 11 23 C 8 21, 5 17, 5 11 C 5 5, 8 0, 15 0 Z"
                                 fill="#fed7aa" fill-opacity="0.45" stroke="#c2410c" stroke-width="1.3" />
                         </g>
 
-                        <!-- Person 2: Ascending Step 5 (Middle-Left, feet on Step 5 at Y=552.5) -->
-                        <g transform="translate(364, 382.5)" opacity="0.82">
+                        <!-- Person 2: Middle Person (Stairs 4–10, default Stair 5, height 180 or 190 cm, bluish) -->
+                        <g id="person-2" transform="translate(353.08, 372.50) scale(1.0588)" opacity="0.88" style="cursor: pointer;" onclick="showElementDetails('person_middle')">
                             <path
                                 d="M 15 0 C 20 0, 23 5, 23 11 C 23 17, 20 21, 17 23 L 28 28 C 33 31, 35 38, 35 50 L 33 82 L 28 82 L 26 50 L 24 96 L 22 170 L 16 170 L 14 110 L 12 170 L 6 170 L 4 96 L 2 50 L 0 82 L -5 82 L -7 50 C -7 38, -5 31, 0 28 L 11 23 C 8 21, 5 17, 5 11 C 5 5, 8 0, 15 0 Z"
-                                fill="#fed7aa" fill-opacity="0.45" stroke="#c2410c" stroke-width="1.3" />
+                                fill="#38bdf8" fill-opacity="0.38" stroke="#0284c7" stroke-width="1.4" />
+                            <!-- Eye Marker Dot at Local (14, 11) -->
+                            <circle id="person-2-eye-dot" cx="14" cy="11" r="2.2" fill="#0284c7" stroke="#ffffff" stroke-width="0.8" />
                         </g>
 
                         <!-- Person 3: Ascending Upper Flight Step 13 (Right-Center) -->
-                        <g transform="translate(572, 227)" opacity="0.82">
+                        <g id="person-3" transform="translate(572, 227)" opacity="0.82">
                             <path
                                 d="M 15 0 C 20 0, 23 5, 23 11 C 23 17, 20 21, 17 23 L 28 28 C 33 31, 35 38, 35 50 L 33 82 L 28 82 L 26 50 L 24 96 L 22 170 L 16 170 L 14 110 L 12 170 L 6 170 L 4 96 L 2 50 L 0 82 L -5 82 L -7 50 C -7 38, -5 31, 0 28 L 11 23 C 8 21, 5 17, 5 11 C 5 5, 8 0, 15 0 Z"
                                 fill="#fed7aa" fill-opacity="0.45" stroke="#c2410c" stroke-width="1.3" />
@@ -1012,9 +1341,9 @@
                             text-anchor="middle">226</text>
 
                         <!-- Clearance Line 2: 209 cm (Sloped clearance from slab soffit corner [X=346.5, Y=344] to Step 5 nosing [X=354.9, Y=552.5]) -->
-                        <line x1="346.5" y1="344" x2="354.9" y2="552.5" stroke="#d97706" stroke-width="1.3"
+                        <line id="headroom-sloped-line" x1="346.5" y1="344" x2="354.9" y2="552.5" stroke="#d97706" stroke-width="1.3"
                             stroke-dasharray="4 2" marker-start="url(#dim-tick)" marker-end="url(#dim-tick)" />
-                        <text x="358" y="460" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="700"
+                        <text id="headroom-sloped-text" x="358" y="460" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="700"
                             fill="#b45309" transform="rotate(-88 358 460)" text-anchor="middle">209</text>
 
                         <!-- Headroom Callout Badge -->
@@ -1025,6 +1354,15 @@
                                 fill="#92400e" text-anchor="middle">Headroom Clearance</text>
                             <text x="54" y="20" font-family="'JetBrains Mono', monospace" font-size="7.5" fill="#b45309"
                                 text-anchor="middle">Min 209 cm (Req ≥ 205)</text>
+                        </g>
+
+                        <!-- Clearance Line 3: Middle Person Head (Eyes) to Ceiling Corner -->
+                        <g id="dim-person-headroom-group">
+                            <line id="dim-person-head-line" x1="346.5" y1="344.0" x2="367.9" y2="384.1" stroke="#0284c7" stroke-width="1.5"
+                                stroke-dasharray="3 2" marker-start="url(#dim-tick-blue)" marker-end="url(#dim-tick-blue)" />
+                            <text id="dim-person-head-text" x="364.3" y="360.3" font-family="'JetBrains Mono', monospace" font-size="11.5"
+                                font-weight="700" fill="#0284c7" stroke="#ffffff" stroke-width="3.5" stroke-linejoin="round"
+                                paint-order="stroke fill" text-anchor="middle">45.5 cm</text>
                         </g>
                     </g>
 
@@ -1087,16 +1425,16 @@
                         <!-- UPPER LEVEL RIGHT HORIZONTAL CAD DIMENSIONS (940 mm Floor + 80 mm Brick Wall: X = 718.9 to 820.9) -->
                         <g transform="translate(0, -12)">
                             <!-- Continuous Dimension Baseline at Y = -12 for right sequence (X = 718.9 to 820.9) -->
-                            <line x1="718.9" y1="0" x2="820.9" y2="0" stroke="#c2410c" stroke-width="1.2" />
+                            <line id="dim-upper-right-base" x1="718.9" y1="0" x2="820.9" y2="0" stroke="#c2410c" stroke-width="1.2" />
                         
                             <!-- Tick 6: End of Stairs / Upper Floor Start (X = 718.9) -->
-                            <line x1="718.9" y1="-10" x2="718.9" y2="32" stroke="#c2410c" stroke-width="0.8" stroke-dasharray="2 2" />
-                            <line x1="715.9" y1="3" x2="721.9" y2="-3" stroke="#c2410c" stroke-width="1.5" />
+                            <line id="dim-upper-right-tick6-lead" x1="718.9" y1="-10" x2="718.9" y2="32" stroke="#c2410c" stroke-width="0.8" stroke-dasharray="2 2" />
+                            <line id="dim-upper-right-tick6-slash" x1="715.9" y1="3" x2="721.9" y2="-3" stroke="#c2410c" stroke-width="1.5" />
                         
                             <!-- Tick 7: Floor End / Brick Wall Start (X = 812.9, Floor = 940 mm) -->
                             <line x1="812.9" y1="-10" x2="812.9" y2="32" stroke="#c2410c" stroke-width="0.8" stroke-dasharray="2 2" />
                             <line x1="809.9" y1="3" x2="815.9" y2="-3" stroke="#c2410c" stroke-width="1.5" />
-                            <text x="765.9" y="-5" font-family="'JetBrains Mono', monospace" font-size="11.5" font-weight="700" fill="#9a3412"
+                            <text id="dim-upper-right-val-floor" x="765.9" y="-5" font-family="'JetBrains Mono', monospace" font-size="11.5" font-weight="700" fill="#9a3412"
                                 text-anchor="middle">940</text>
                         
                             <!-- Tick 8: Brick Wall End (X = 820.9, Brick Wall = 80 mm) -->
@@ -1106,10 +1444,10 @@
                                 text-anchor="middle">80</text>
                         
                             <!-- Overall Dimension for Upper Landing (X = 718.9 to 820.9 = 1,020 mm) -->
-                            <line x1="718.9" y1="-15" x2="820.9" y2="-15" stroke="#9a3412" stroke-width="1" />
-                            <line x1="718.9" y1="-20" x2="718.9" y2="-10" stroke="#9a3412" stroke-width="1.2" />
+                            <line id="dim-upper-right-ov-line" x1="718.9" y1="-15" x2="820.9" y2="-15" stroke="#9a3412" stroke-width="1" />
+                            <line id="dim-upper-right-ov-lead1" x1="718.9" y1="-20" x2="718.9" y2="-10" stroke="#9a3412" stroke-width="1.2" />
                             <line x1="820.9" y1="-20" x2="820.9" y2="-10" stroke="#9a3412" stroke-width="1.2" />
-                            <text x="769.9" y="-19" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700" fill="#9a3412"
+                            <text id="dim-upper-right-ov-val" x="769.9" y="-19" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700" fill="#9a3412"
                                 text-anchor="middle">∑ 1,020 mm (Floor + Wall)</text>
                         </g>
 
@@ -1174,7 +1512,7 @@
                         <!-- LOWER LEVEL HORIZONTAL CAD DIMENSION CHAIN (150 | 900 | 463 | 900 | 56 | 80 | 1000 | 3640 mm) -->
                         <g transform="translate(0, 690)">
                             <!-- Continuous Dimension Baseline at Y=690 extending to End of Stairs X=718.9 -->
-                            <line x1="0" y1="0" x2="718.9" y2="0" stroke="#c2410c" stroke-width="1.2" />
+                            <line id="gf-dim-baseline" x1="0" y1="0" x2="718.9" y2="0" stroke="#c2410c" stroke-width="1.2" />
 
                             <!-- Ticks & Leader Lines -->
                             <!-- Tick 0: Wall Start (X=0) -->
@@ -1183,133 +1521,135 @@
                             <line x1="-3" y1="3" x2="3" y2="-3" stroke="#c2410c" stroke-width="1.5" />
 
                             <!-- Tick 1: Door 1 Start (X=15.0, Wall=150mm) -->
-                            <line x1="15.0" y1="-50" x2="15.0" y2="6" stroke="#c2410c" stroke-width="0.8"
+                            <line id="gf-dim-tick1-lead" x1="15.0" y1="-50" x2="15.0" y2="6" stroke="#c2410c" stroke-width="0.8"
                                 stroke-dasharray="2 2" />
-                            <line x1="12" y1="3" x2="18" y2="-3" stroke="#c2410c" stroke-width="1.5" />
-                            <text x="7.5" y="-6" font-family="'JetBrains Mono', monospace" font-size="9"
+                            <line id="gf-dim-tick1-slash" x1="12" y1="3" x2="18" y2="-3" stroke="#c2410c" stroke-width="1.5" />
+                            <text id="gf-dim-val-wall1" x="7.5" y="-6" font-family="'JetBrains Mono', monospace" font-size="9"
                                 font-weight="700" fill="#9a3412" text-anchor="middle">150</text>
 
                             <!-- Tick 2: Door 1 End / Pier Start (X=105.0, Door=900mm) -->
-                            <line x1="105.0" y1="-50" x2="105.0" y2="6" stroke="#c2410c" stroke-width="0.8"
+                            <line id="gf-dim-tick2-lead" x1="105.0" y1="-50" x2="105.0" y2="6" stroke="#c2410c" stroke-width="0.8"
                                 stroke-dasharray="2 2" />
-                            <line x1="102" y1="3" x2="108" y2="-3" stroke="#c2410c" stroke-width="1.5" />
-                            <text x="60.0" y="-6" font-family="'JetBrains Mono', monospace" font-size="12"
+                            <line id="gf-dim-tick2-slash" x1="102" y1="3" x2="108" y2="-3" stroke="#c2410c" stroke-width="1.5" />
+                            <text id="gf-dim-val-d1" x="60.0" y="-6" font-family="'JetBrains Mono', monospace" font-size="12"
                                 font-weight="700" fill="#9a3412" text-anchor="middle">900</text>
 
                             <!-- Tick 3: Pier End / Door 2 Start (X=151.3, Pier=463mm) -->
-                            <line x1="151.3" y1="-50" x2="151.3" y2="6" stroke="#c2410c" stroke-width="0.8"
+                            <line id="gf-dim-tick3-lead" x1="151.3" y1="-50" x2="151.3" y2="6" stroke="#c2410c" stroke-width="0.8"
                                 stroke-dasharray="2 2" />
-                            <line x1="148.3" y1="3" x2="154.3" y2="-3" stroke="#c2410c" stroke-width="1.5" />
-                            <text x="128.15" y="-6" font-family="'JetBrains Mono', monospace" font-size="11.5"
+                            <line id="gf-dim-tick3-slash" x1="148.3" y1="3" x2="154.3" y2="-3" stroke="#c2410c" stroke-width="1.5" />
+                            <text id="gf-dim-val-pier" x="128.15" y="-6" font-family="'JetBrains Mono', monospace" font-size="11.5"
                                 font-weight="700" fill="#9a3412" text-anchor="middle">463</text>
 
                             <!-- Tick 4: Door 2 End / Wall Strip Start (X=241.3, Door=900mm) -->
-                            <line x1="241.3" y1="-50" x2="241.3" y2="74" stroke="#dc2626" stroke-width="1.2"
+                            <line id="gf-dim-tick4-lead" x1="241.3" y1="-50" x2="241.3" y2="74" stroke="#dc2626" stroke-width="1.2"
                                 stroke-dasharray="3 2" />
-                            <line x1="238.3" y1="3" x2="244.3" y2="-3" stroke="#c2410c" stroke-width="1.5" />
-                            <text x="196.3" y="-6" font-family="'JetBrains Mono', monospace" font-size="12"
+                            <line id="gf-dim-tick4-slash" x1="238.3" y1="3" x2="244.3" y2="-3" stroke="#c2410c" stroke-width="1.5" />
+                            <text id="gf-dim-val-d2" x="196.3" y="-6" font-family="'JetBrains Mono', monospace" font-size="12"
                                 font-weight="700" fill="#9a3412" text-anchor="middle">900</text>
 
                             <!-- Tick 5: Wall Strip End / Brick Wall Start (X=246.9, Strip=56mm) -->
-                            <line x1="246.9" y1="-50" x2="246.9" y2="6" stroke="#c2410c" stroke-width="0.8"
+                            <line id="gf-dim-tick5-lead" x1="246.9" y1="-50" x2="246.9" y2="6" stroke="#c2410c" stroke-width="0.8"
                                 stroke-dasharray="2 2" />
-                            <line x1="243.9" y1="3" x2="249.9" y2="-3" stroke="#c2410c" stroke-width="1.5" />
+                            <line id="gf-dim-tick5-slash" x1="243.9" y1="3" x2="249.9" y2="-3" stroke="#c2410c" stroke-width="1.5" />
                             <!-- 56 label with small angled leader -->
-                            <text x="244.1" y="-17" font-family="'JetBrains Mono', monospace" font-size="8.5"
+                            <text id="gf-dim-val-strip" x="244.1" y="-17" font-family="'JetBrains Mono', monospace" font-size="8.5"
                                 font-weight="700" fill="#9a3412" text-anchor="middle">56</text>
 
                             <!-- Tick 6: Brick Wall End / Stairs Start (X=254.9, Brick=80mm) -->
-                            <line x1="254.9" y1="-50" x2="254.9" y2="6" stroke="#c2410c" stroke-width="1.2" />
-                            <line x1="251.9" y1="3" x2="257.9" y2="-3" stroke="#c2410c" stroke-width="1.8" />
+                            <line id="gf-dim-tick6-lead" x1="254.9" y1="-50" x2="254.9" y2="6" stroke="#c2410c" stroke-width="1.2" />
+                            <line id="gf-dim-tick6-slash" x1="251.9" y1="3" x2="257.9" y2="-3" stroke="#c2410c" stroke-width="1.8" />
                             <!-- 80 label -->
-                            <text x="250.9" y="-6" font-family="'JetBrains Mono', monospace" font-size="9"
+                            <text id="gf-dim-val-brick" x="250.9" y="-6" font-family="'JetBrains Mono', monospace" font-size="9"
                                 font-weight="700" fill="#782d08" text-anchor="middle">80</text>
 
                             <!-- Tick 7: Stairs Turn Block End / Step 5 Start (X=354.9, 4 Steps Turn Width = 1000mm) -->
-                            <line x1="354.9" y1="-50" x2="354.9" y2="26" stroke="#dc2626" stroke-width="1.2" stroke-dasharray="3 2" />
-                            <line x1="351.9" y1="3" x2="357.9" y2="-3" stroke="#c2410c" stroke-width="1.8" />
+                            <line id="gf-dim-tick7-lead" x1="354.9" y1="-50" x2="354.9" y2="26" stroke="#dc2626" stroke-width="1.2" stroke-dasharray="3 2" />
+                            <line id="gf-dim-tick7-slash" x1="351.9" y1="3" x2="357.9" y2="-3" stroke="#c2410c" stroke-width="1.8" />
                             <!-- 1000 label -->
-                            <text x="304.9" y="-6" font-family="'JetBrains Mono', monospace" font-size="12"
+                            <text id="gf-dim-val-turn" x="304.9" y="-6" font-family="'JetBrains Mono', monospace" font-size="12"
                                 font-weight="700" fill="#dc2626" text-anchor="middle">1000</text>
 
                             <!-- Tick 8: End of Stairs on Vertical Line (X=718.9, 3640 mm from End of 4-Step Turn) -->
-                            <line x1="718.9" y1="-50" x2="718.9" y2="26" stroke="#9a3412" stroke-width="1.2" stroke-dasharray="3 2" />
-                            <line x1="715.9" y1="3" x2="721.9" y2="-3" stroke="#c2410c" stroke-width="1.8" />
+                            <line id="gf-dim-tick8-lead" x1="718.9" y1="-50" x2="718.9" y2="26" stroke="#9a3412" stroke-width="1.2" stroke-dasharray="3 2" />
+                            <line id="gf-dim-tick8-slash" x1="715.9" y1="3" x2="721.9" y2="-3" stroke="#c2410c" stroke-width="1.8" />
                             <!-- 3640 label on baseline -->
-                            <text x="536.9" y="-6" font-family="'JetBrains Mono', monospace" font-size="12"
+                            <text id="gf-dim-val-flight" x="536.9" y="-6" font-family="'JetBrains Mono', monospace" font-size="12"
                                 font-weight="700" fill="#9a3412" text-anchor="middle">3640</text>
 
                             <!-- Secondary Overall Dimension Bracket 1 (X=0 to 254.9 = 2549 mm to Stairs Start) -->
-                            <line x1="0" y1="20" x2="254.9" y2="20" stroke="#9a3412" stroke-width="1" />
+                            <line id="gf-dim-ov1-line" x1="0" y1="20" x2="254.9" y2="20" stroke="#9a3412" stroke-width="1" />
                             <line x1="0" y1="14" x2="0" y2="26" stroke="#9a3412" stroke-width="1.2" />
-                            <line x1="254.9" y1="14" x2="254.9" y2="26" stroke="#9a3412" stroke-width="1.2" />
-                            <text x="127.45" y="29" font-family="'JetBrains Mono', monospace" font-size="10.5"
+                            <line id="gf-dim-ov1-lead2" x1="254.9" y1="14" x2="254.9" y2="26" stroke="#9a3412" stroke-width="1.2" />
+                            <text id="gf-dim-ov1-text" x="127.45" y="29" font-family="'JetBrains Mono', monospace" font-size="10.5"
                                 font-weight="700" fill="#9a3412" text-anchor="middle">∑ 2,549 mm (To Stairs Start)</text>
 
                             <!-- Secondary Bracket 2: 1000 mm 4-Step Turn Block (X=254.9 to 354.9) -->
-                            <line x1="254.9" y1="20" x2="354.9" y2="20" stroke="#dc2626" stroke-width="1.2" />
-                            <line x1="354.9" y1="14" x2="354.9" y2="26" stroke="#dc2626" stroke-width="1.2" />
-                            <text x="304.9" y="29" font-family="'JetBrains Mono', monospace" font-size="10"
+                            <line id="gf-dim-ov2-line" x1="254.9" y1="20" x2="354.9" y2="20" stroke="#dc2626" stroke-width="1.2" />
+                            <line id="gf-dim-ov2-lead1" x1="254.9" y1="14" x2="254.9" y2="26" stroke="#dc2626" stroke-width="1.2" />
+                            <line id="gf-dim-ov2-lead2" x1="354.9" y1="14" x2="354.9" y2="26" stroke="#dc2626" stroke-width="1.2" />
+                            <text id="gf-dim-ov2-text" x="304.9" y="29" font-family="'JetBrains Mono', monospace" font-size="10"
                                 font-weight="700" fill="#dc2626" text-anchor="middle">1,000 (4-Step Turn)</text>
 
                             <!-- Secondary Bracket 3: 3,640 mm Straight Stair Flight to End of Stairs on Vertical Line (X=354.9 to 718.9) -->
-                            <line x1="354.9" y1="20" x2="718.9" y2="20" stroke="#9a3412" stroke-width="1.5"
+                            <line id="gf-dim-ov3-line" x1="354.9" y1="20" x2="718.9" y2="20" stroke="#9a3412" stroke-width="1.5"
                                 marker-start="url(#dim-tick)" marker-end="url(#dim-tick)" />
-                            <line x1="718.9" y1="14" x2="718.9" y2="26" stroke="#9a3412" stroke-width="1.6" />
+                            <line id="gf-dim-ov3-lead2" x1="718.9" y1="14" x2="718.9" y2="26" stroke="#9a3412" stroke-width="1.6" />
                             <!-- High-contrast badge for 3,640 mm -->
-                            <rect x="446.9" y="9" width="180" height="22" rx="4" fill="#ffffff" stroke="#9a3412"
+                            <rect id="gf-dim-ov3-badge-rect" x="446.9" y="9" width="180" height="22" rx="4" fill="#ffffff" stroke="#9a3412"
                                 stroke-width="1.4" filter="drop-shadow(0 1px 3px rgba(0,0,0,0.1))" />
-                            <text x="536.9" y="24.5" font-family="'JetBrains Mono', monospace" font-size="11.5"
+                            <text id="gf-dim-ov3-badge-val" x="536.9" y="24.5" font-family="'JetBrains Mono', monospace" font-size="11.5"
                                 font-weight="800" fill="#9a3412" text-anchor="middle">3,640 mm</text>
-                            <text x="536.9" y="39" font-family="'Outfit', sans-serif" font-size="9"
+                            <text id="gf-dim-ov3-badge-sub" x="536.9" y="39" font-family="'Outfit', sans-serif" font-size="9"
                                 font-weight="700" fill="#78350f" text-anchor="middle">End of 4 Stairs → End of Stairs (on vertical line)</text>
 
                             <!-- Dedicated Highlighted Separate Row: 3,310 mm from D2 Right Edge (X=241.3) to Door D3 Hole (X=572.3) + 900 mm D3 Hole + 280 mm Wall -->
                             <g id="scale-highlight-row-d2-d3">
                                 <!-- Subtle container highlight band for this separate row -->
-                                <rect x="235" y="48" width="465" height="42" rx="6" fill="#fff7ed" stroke="#fdba74"
+                                <rect id="d2-d3-row-box" x="235" y="48" width="465" height="42" rx="6" fill="#fff7ed" stroke="#fdba74"
                                     stroke-width="1" stroke-dasharray="4 2" opacity="0.75" />
 
                                 <!-- Leader lines down from Door D3 edges & Wall End -->
-                                <line x1="572.3" y1="-50" x2="572.3" y2="74" stroke="#dc2626" stroke-width="1.2" stroke-dasharray="3 2" />
-                                <line x1="662.3" y1="-50" x2="662.3" y2="74" stroke="#c2410c" stroke-width="1.2" stroke-dasharray="3 2" />
-                                <line x1="690.3" y1="-50" x2="690.3" y2="74" stroke="#c2410c" stroke-width="1.2" stroke-dasharray="3 2" />
+                                <line id="d2-d3-lead-d3-start" x1="572.3" y1="-50" x2="572.3" y2="74" stroke="#dc2626" stroke-width="1.2" stroke-dasharray="3 2" />
+                                <line id="d2-d3-lead-d3-end" x1="662.3" y1="-50" x2="662.3" y2="74" stroke="#c2410c" stroke-width="1.2" stroke-dasharray="3 2" />
+                                <line id="d2-d3-lead-wall-end" x1="690.3" y1="-50" x2="690.3" y2="74" stroke="#c2410c" stroke-width="1.2" stroke-dasharray="3 2" />
 
                                 <!-- Dimension Segment 1: 3,310 mm (Door D2 Right Edge to Door D3) -->
-                                <line x1="241.3" y1="52" x2="241.3" y2="72" stroke="#dc2626" stroke-width="1.8" />
-                                <line x1="572.3" y1="52" x2="572.3" y2="72" stroke="#dc2626" stroke-width="1.8" />
-                                <line x1="241.3" y1="62" x2="572.3" y2="62" stroke="#dc2626" stroke-width="2"
+                                <line id="d2-d3-seg1-tick-start" x1="241.3" y1="52" x2="241.3" y2="72" stroke="#dc2626" stroke-width="1.8" />
+                                <line id="d2-d3-seg1-tick-end" x1="572.3" y1="52" x2="572.3" y2="72" stroke="#dc2626" stroke-width="1.8" />
+                                <line id="d2-d3-seg1-line" x1="241.3" y1="62" x2="572.3" y2="62" stroke="#dc2626" stroke-width="2"
                                     marker-start="url(#red-arrow-start)" marker-end="url(#red-arrow-end)" />
                                 <!-- Badge for 3,310 mm -->
-                                <rect x="331.8" y="50.5" width="150" height="23" rx="4.5" fill="#ffffff" stroke="#dc2626"
+                                <rect id="d2-d3-seg1-badge-rect" x="331.8" y="50.5" width="150" height="23" rx="4.5" fill="#ffffff" stroke="#dc2626"
                                     stroke-width="1.6" filter="drop-shadow(0 2px 4px rgba(220,38,38,0.22))" />
-                                <text x="406.8" y="66.5" font-family="'JetBrains Mono', monospace" font-size="12.5"
+                                <text id="d2-d3-seg1-badge-val" x="406.8" y="66.5" font-family="'JetBrains Mono', monospace" font-size="12.5"
                                     font-weight="800" fill="#dc2626" text-anchor="middle">3,310 mm</text>
-                                <text x="406.8" y="84" font-family="'Outfit', sans-serif" font-size="9"
+                                <text id="d2-d3-seg1-badge-lbl" x="406.8" y="84" font-family="'Outfit', sans-serif" font-size="9"
                                     font-weight="700" fill="#b91c1c" text-anchor="middle">★ Door D2 (Right Edge) → Door D3</text>
 
                                 <!-- Dimension Segment 2: Door D3 Hole (900 mm: X = 572.3 to 662.3) -->
-                                <line x1="662.3" y1="52" x2="662.3" y2="72" stroke="#c2410c" stroke-width="1.6" />
-                                <line x1="572.3" y1="62" x2="662.3" y2="62" stroke="#c2410c" stroke-width="1.5"
+                                <line id="d2-d3-seg2-tick-end" x1="662.3" y1="52" x2="662.3" y2="72" stroke="#c2410c" stroke-width="1.6" />
+                                <line id="d2-d3-seg2-line" x1="572.3" y1="62" x2="662.3" y2="62" stroke="#c2410c" stroke-width="1.5"
                                     marker-start="url(#dim-tick)" marker-end="url(#dim-tick)" />
                                 <!-- Badge for 900 mm D3 Hole -->
-                                <rect x="592.3" y="51" width="50" height="22" rx="4" fill="#ffffff" stroke="#c2410c"
+                                <rect id="d2-d3-seg2-badge-rect" x="592.3" y="51" width="50" height="22" rx="4" fill="#ffffff" stroke="#c2410c"
                                     stroke-width="1.3" filter="drop-shadow(0 1px 3px rgba(194,65,12,0.15))" />
-                                <text x="617.3" y="66" font-family="'JetBrains Mono', monospace" font-size="11.5"
+                                <text id="d2-d3-seg2-badge-val" x="617.3" y="66" font-family="'JetBrains Mono', monospace" font-size="11.5"
                                     font-weight="700" fill="#c2410c" text-anchor="middle">900</text>
-                                <text x="617.3" y="84" font-family="'Outfit', sans-serif" font-size="9"
+                                <text id="d2-d3-seg2-badge-lbl" x="617.3" y="84" font-family="'Outfit', sans-serif" font-size="9"
                                     font-weight="700" fill="#9a3412" text-anchor="middle">D3 Hole</text>
-<!-- Dimension Segment 3: Wall next to D3 (280 mm: X = 662.3 to 690.3) -->
-<line x1="690.3" y1="52" x2="690.3" y2="72" stroke="#c2410c" stroke-width="1.6" />
-<line x1="662.3" y1="62" x2="690.3" y2="62" stroke="#c2410c" stroke-width="1.5" marker-start="url(#dim-tick)"
-    marker-end="url(#dim-tick)" />
-<!-- Badge for 280 mm Wall -->
-<rect x="664.3" y="51" width="24" height="22" rx="4" fill="#ffffff" stroke="#c2410c" stroke-width="1.3"
-    filter="drop-shadow(0 1px 3px rgba(194,65,12,0.15))" />
-<text x="676.3" y="66" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700" fill="#c2410c"
-    text-anchor="middle">280</text>
-<text x="676.3" y="84" font-family="'Outfit', sans-serif" font-size="8.5" font-weight="700" fill="#9a3412"
-    text-anchor="middle">Wall End</text>
+
+                                <!-- Dimension Segment 3: Wall next to D3 (280 mm: X = 662.3 to 690.3) -->
+                                <line id="d2-d3-seg3-tick-end" x1="690.3" y1="52" x2="690.3" y2="72" stroke="#c2410c" stroke-width="1.6" />
+                                <line id="d2-d3-seg3-line" x1="662.3" y1="62" x2="690.3" y2="62" stroke="#c2410c" stroke-width="1.5" marker-start="url(#dim-tick)"
+                                    marker-end="url(#dim-tick)" />
+                                <!-- Badge for 280 mm Wall -->
+                                <rect id="d2-d3-seg3-badge-rect" x="664.3" y="51" width="24" height="22" rx="4" fill="#ffffff" stroke="#c2410c" stroke-width="1.3"
+                                    filter="drop-shadow(0 1px 3px rgba(194,65,12,0.15))" />
+                                <text id="d2-d3-seg3-badge-val" x="676.3" y="66" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700" fill="#c2410c"
+                                    text-anchor="middle">280</text>
+                                <text id="d2-d3-seg3-badge-lbl" x="676.3" y="84" font-family="'Outfit', sans-serif" font-size="8.5" font-weight="700" fill="#9a3412"
+                                    text-anchor="middle">Wall End</text>
                             </g>
                         </g>
 
@@ -1485,35 +1825,35 @@
                         <tr>
                             <td><strong>WL-01</strong></td>
                             <td>Wall Start Pier</td>
-                            <td><strong>150 mm</strong> wide × 2800 mm tall</td>
+                            <td id="sched-wl01-dim"><strong>150 mm</strong> wide × 2800 mm tall</td>
                             <td>+0,00 to +2,80 m</td>
                             <td>Plastered interior partition wall from view left edge (18,910 mm)</td>
                         </tr>
                         <tr>
                             <td><strong>DR-01</strong></td>
                             <td>First Door Opening (D1)</td>
-                            <td><strong>900 × 2100 mm</strong> (90 × 210 cm)</td>
+                            <td id="sched-dr01-dim"><strong>900 × 2100 mm</strong> (90 × 210 cm)</td>
                             <td>+0,00 to +2,10 m</td>
                             <td>Natural oak flush door leaf in casing with brushed brass handle</td>
                         </tr>
                         <tr>
                             <td><strong>WL-02</strong></td>
                             <td>Wall Pier Between Doors</td>
-                            <td><strong>463 mm</strong> wide × 2800 mm tall</td>
+                            <td id="sched-wl02-dim"><strong>463 mm</strong> wide × 2800 mm tall</td>
                             <td>+0,00 to +2,80 m</td>
                             <td>Plastered structural wall pier separating D1 and D2 openings</td>
                         </tr>
                         <tr>
                             <td><strong>DR-02</strong></td>
                             <td>Second Door Opening (D2)</td>
-                            <td><strong>900 × 2100 mm</strong> (90 × 210 cm)</td>
+                            <td id="sched-dr02-dim"><strong>900 × 2100 mm</strong> (90 × 210 cm)</td>
                             <td>+0,00 to +2,10 m</td>
                             <td>Natural oak flush door leaf in casing with brushed brass handle</td>
                         </tr>
                         <tr>
                             <td><strong>WL-03</strong></td>
                             <td>Wall Strip after D2</td>
-                            <td><strong>56 mm</strong> wide × 2800 mm tall</td>
+                            <td id="sched-wl03-dim"><strong>56 mm</strong> wide × 2800 mm tall</td>
                             <td>+0,00 to +2,80 m</td>
                             <td>Plastered interior wall strip preceding the brick wall</td>
                         </tr>
@@ -1549,18 +1889,18 @@
                         <tr>
                             <td><strong>DR-03 (D3)</strong></td>
                             <td>Under-Stair Door (D3)</td>
-                            <td><strong>900 × 2100 mm Hole</strong> (Door leaf: 800 × 2050 mm)</td>
+                            <td id="sched-dr03-dim"><strong>900 × 2100 mm Hole</strong> (Door leaf: 800 × 2050 mm)</td>
                             <td>+0,00 to +2,10 m</td>
-                            <td>Located at 3,310 mm distance from right edge of Door D2 (X = 5,723 to 6,623 mm); natural oak door leaf with brushed bronze hardware</td>
+                            <td id="sched-dr03-desc">Located at 3,310 mm distance from right edge of Door D2 (X = 5,723 to 6,623 mm); natural oak door leaf with brushed bronze hardware</td>
                         </tr>
                         <tr>
                             <td><strong>WL-04</strong></td>
                             <td>Ground Floor Wall Pier next to D3</td>
-                            <td><strong>280 mm</strong> wide (X = 6,623 to 6,903 mm)</td>
+                            <td id="sched-wl04-dim"><strong>280 mm</strong> wide (X = 6,623 to 6,903 mm)</td>
                             <td>+0,00 to +2,92 m (stair soffit)</td>
-                            <td>280 mm of wall next to Door D3 on the right; the wall terminates at X = 6,903 mm on the ground floor (+0,00),
+                            <td id="sched-wl04-desc">280 mm of wall next to Door D3 on the right; the wall terminates at X = 6,903 mm on the ground floor (+0,00),
                                 leaving the remainder of the under-stair flight (X = 6,903 to 7,189 mm) open below</td>
-                            </tr>
+                        </tr>
                             <tr>
                             <td><strong>SL-01</strong></td>
                             <td>First Floor Slab Assembly</td>
@@ -1661,7 +2001,7 @@
                 <ul style="font-size: 14px; color: #4a3f35; line-height: 1.8;">
                     <li><strong>View Left Edge:</strong> Positioned exactly at <code>X = 18,910 mm</code> in global
                         building coordinates.</li>
-                    <li><strong>Lower Level Sequence:</strong> 150 mm wall + 900 mm door D1 (leaf 800×2050, hole
+                    <li id="tab3-lower-seq"><strong>Lower Level Sequence (Project):</strong> 150 mm wall + 900 mm door D1 (leaf 800×2050, hole
                         900×2100) + 463 mm wall + 900 mm door D2 (leaf 800×2050, hole 900×2100) + 56 mm wall + 80 mm
                         brick wall = <code>2,549 mm</code> to the start of the stairs!</li>
                     <li><strong>Stair Turn &amp; Flight Along North Wall:</strong> Exactly 4 first stairs contribute to
@@ -1878,32 +2218,1017 @@
                     { label: 'Coordinate Range', value: 'X = 8,209 to 9,000 mm' },
                     { label: 'Elevation Level', value: '+3,33 m First Floor' }
                 ]
+            },
+            'person_middle': {
+                title: 'Selected Element: Middle Person (Ergonomics & Headroom Clearance)',
+                desc: 'Interactive human silhouette for analyzing spatial clearance between head/eyes and the ceiling corner (+2,96 m slab soffit datum). Movable across stairs 4 to 10 with adjustable height (180 cm / 190 cm).',
+                specs: [
+                    { label: 'Current Position', value: 'Stair 5 (Middle of Tread)' },
+                    { label: 'Person Height', value: '180 cm (Adjustable to 190 cm)' },
+                    { label: 'Eye Level', value: '~168.3 cm above step tread' },
+                    { label: 'Ceiling Corner Datum', value: 'X = 3,465 mm (+2.96 m Slab Soffit)' },
+                    { label: 'Distance to Ceiling Corner', value: '45.5 cm (455 mm)' }
+                ]
             }
         };
 
+        let currentGroundFloorMode = 'project';
+        window.currentInspectedElement = 'staircase';
+
+        const GROUND_FLOOR_SPECS = {
+            project: {
+                modeName: 'Project (Projekt)',
+                d1: {
+                    holeX: 15.0, holeW: 90.0,
+                    frameX: 15.0, frameW: 90.0,
+                    leafX: 20.0, leafW: 80.0,
+                    handleBarX: 91.0, handleDotCx: 93.0,
+                    textX: 60.0,
+                    holeLabel: '(Hole: 90×210)'
+                },
+                d2: {
+                    holeX: 151.3, holeW: 90.0,
+                    frameX: 151.3, frameW: 90.0,
+                    leafX: 156.3, leafW: 80.0,
+                    handleBarX: 227.3, handleDotCx: 229.3,
+                    textX: 196.3,
+                    holeLabel: '(Hole: 90×210)'
+                },
+                d3: {
+                    holeX: 572.3, holeW: 90.0,
+                    frameX: 572.3, frameW: 90.0,
+                    leafX: 577.3, leafW: 80.0,
+                    handleBarX: 585.3, handleDotCx: 587.3,
+                    textX: 617.3,
+                    holeLabel: '(Hole: 90×210)'
+                },
+                wallUnderStair: {
+                    points: "354.9,640 354.9,574.0 690.3,347.8 690.3,640",
+                    termX: 690.3, termY: 347.8,
+                    shadowX: 688.3, shadowY: 347.8, shadowH: 292.2,
+                    pierBadgeTranslate: "translate(676.3, 510)",
+                    openLabelX: 704.6
+                },
+                dimChain: {
+                    tick1X: 15.0, slash1Start: 12.0, slash1End: 18.0, textWall1X: 7.5, valWall1: "150",
+                    tick2X: 105.0, slash2Start: 102.0, slash2End: 108.0, textD1X: 60.0, valD1: "900",
+                    tick3X: 151.3, slash3Start: 148.3, slash3End: 154.3, textPierX: 128.15, valPier: "463",
+                    tick4X: 241.3, slash4Start: 238.3, slash4End: 244.3, textD2X: 196.3, valD2: "900",
+                    textStripX: 244.1, valStrip: "56"
+                },
+                d2d3Row: {
+                    d3StartLeadX: 572.3,
+                    d3EndLeadX: 662.3,
+                    wallEndLeadX: 690.3,
+                    seg1TickStartX: 241.3, seg1TickEndX: 572.3, seg1LineStartX: 241.3, seg1LineEndX: 572.3,
+                    seg1BadgeRectX: 331.8, seg1BadgeTextX: 406.8, seg1Val: "3,310 mm",
+                    seg2TickEndX: 662.3, seg2LineStartX: 572.3, seg2LineEndX: 662.3,
+                    seg2BadgeRectX: 592.3, seg2BadgeTextX: 617.3, seg2Val: "900",
+                    seg3TickEndX: 690.3, seg3LineStartX: 662.3, seg3LineEndX: 690.3,
+                    seg3BadgeRectX: 664.3, seg3BadgeTextX: 676.3, seg3Val: "280"
+                },
+                schedule: {
+                    wl01Dim: "<strong>150 mm</strong> wide × 2800 mm tall",
+                    dr01Dim: "<strong>900 × 2100 mm</strong> (90 × 210 cm)",
+                    wl02Dim: "<strong>463 mm</strong> wide × 2800 mm tall",
+                    dr02Dim: "<strong>900 × 2100 mm</strong> (90 × 210 cm)",
+                    wl03Dim: "<strong>56 mm</strong> wide × 2800 mm tall",
+                    dr03Dim: "<strong>900 × 2100 mm Hole</strong> (Door leaf: 800 × 2050 mm)",
+                    dr03Desc: "Located at 3,310 mm distance from right edge of Door D2 (X = 5,723 to 6,623 mm); natural oak door leaf with brushed bronze hardware",
+                    wl04Dim: "<strong>280 mm</strong> wide (X = 6,623 to 6,903 mm)",
+                    wl04Desc: "280 mm of wall next to Door D3 on the right; the wall terminates at X = 6,903 mm on the ground floor (+0,00), leaving the remainder of the under-stair flight (X = 6,903 to 7,189 mm) open below"
+                },
+                inspector: {
+                    corridor_doors: {
+                        title: 'Selected Element: Corridor Openings & Doors D1 & D2 [Project]',
+                        desc: 'Ground floor hallway sequence (Nominal CAD Project Dimensions): 150 mm wall start, 900×2100 mm Door 1, 463 mm wall pier, 900×2100 mm Door 2, and 56 mm wall strip, under the +2,80 m dropped ceiling.',
+                        specs: [
+                            { label: 'Dimension Mode', value: 'Project (Nominal)' },
+                            { label: 'Door Openings', value: '900 × 2100 mm each' },
+                            { label: 'Pier Between Doors', value: '463 mm Wall' },
+                            { label: 'Wall Start / End Strip', value: '150 mm / 56 mm' },
+                            { label: 'Total to Brick Wall', value: '2,469 mm' }
+                        ]
+                    },
+                    door_d3: {
+                        title: 'Selected Element: Door D3 & Ground Floor Wall [Project]',
+                        desc: 'Rough wall hole of 900 × 2100 mm fitted with an 800 × 2050 mm natural oak flush door leaf built into the wall beneath the staircase, positioned at 3,310 mm from the right edge of Door D2 (X = 5,723 to 6,623 mm). To the right of D3, 280 mm of wall extends to X = 6,903 mm, where the ground floor wall terminates.',
+                        specs: [
+                            { label: 'Dimension Mode', value: 'Project (Nominal)' },
+                            { label: 'Door Hole', value: '900 × 2100 mm (90 × 210 cm)' },
+                            { label: 'Door Leaf Size', value: '800 × 2050 mm (80 × 205 cm)' },
+                            { label: 'Distance from D2 Right Edge', value: '3,310 mm (331.0 cm)' },
+                            { label: 'Wall Next to D3 (Right)', value: '280 mm (X = 6,623 to 6,903 mm)' },
+                            { label: 'Ground Floor Wall End', value: 'X = 6,903 mm (wall terminates here)' },
+                            { label: 'Open Clearance under Stairs', value: 'X = 6,903 to 7,189 mm (286 mm span)' }
+                        ]
+                    }
+                }
+            },
+            measured: {
+                modeName: 'Measured (Pomiar z natury)',
+                d1: {
+                    holeX: 14.0, holeW: 92.0,
+                    frameX: 14.0, frameW: 92.0,
+                    leafX: 20.0, leafW: 80.0,
+                    handleBarX: 91.0, handleDotCx: 93.0,
+                    textX: 60.0,
+                    holeLabel: '(Hole: 92×210)'
+                },
+                d2: {
+                    holeX: 151.0, holeW: 91.5,
+                    frameX: 151.0, frameW: 91.5,
+                    leafX: 156.75, leafW: 80.0,
+                    handleBarX: 227.75, handleDotCx: 229.75,
+                    textX: 196.75,
+                    holeLabel: '(Hole: 91.5×210)'
+                },
+                d3: {
+                    holeX: 566.5, holeW: 95.0,
+                    frameX: 566.5, frameW: 95.0,
+                    leafX: 574.0, leafW: 80.0,
+                    handleBarX: 582.0, handleDotCx: 584.0,
+                    textX: 614.0,
+                    holeLabel: '(Hole: 95×210)'
+                },
+                wallUnderStair: {
+                    points: "354.9,640 354.9,574.0 689.5,348.3 689.5,640",
+                    termX: 689.5, termY: 348.3,
+                    shadowX: 687.5, shadowY: 348.3, shadowH: 291.7,
+                    pierBadgeTranslate: "translate(675.5, 510)",
+                    openLabelX: 704.2
+                },
+                dimChain: {
+                    tick1X: 14.0, slash1Start: 11.0, slash1End: 17.0, textWall1X: 7.0, valWall1: "140",
+                    tick2X: 106.0, slash2Start: 103.0, slash2End: 109.0, textD1X: 60.0, valD1: "920",
+                    tick3X: 151.0, slash3Start: 148.0, slash3End: 154.0, textPierX: 128.5, valPier: "450",
+                    tick4X: 242.5, slash4Start: 239.5, slash4End: 245.5, textD2X: 196.75, valD2: "915",
+                    textStripX: 244.7, valStrip: "44"
+                },
+                d2d3Row: {
+                    d3StartLeadX: 566.5,
+                    d3EndLeadX: 661.5,
+                    wallEndLeadX: 689.5,
+                    seg1TickStartX: 242.5, seg1TickEndX: 566.5, seg1LineStartX: 242.5, seg1LineEndX: 566.5,
+                    seg1BadgeRectX: 329.5, seg1BadgeTextX: 404.5, seg1Val: "3,240 mm",
+                    seg2TickEndX: 661.5, seg2LineStartX: 566.5, seg2LineEndX: 661.5,
+                    seg2BadgeRectX: 589.0, seg2BadgeTextX: 614.0, seg2Val: "950",
+                    seg3TickEndX: 689.5, seg3LineStartX: 661.5, seg3LineEndX: 689.5,
+                    seg3BadgeRectX: 663.5, seg3BadgeTextX: 675.5, seg3Val: "280"
+                },
+                schedule: {
+                    wl01Dim: "<strong>140 mm</strong> wide × 2800 mm tall (measured)",
+                    dr01Dim: "<strong>920 × 2100 mm</strong> (92 × 210 cm, measured)",
+                    wl02Dim: "<strong>450 mm</strong> wide × 2800 mm tall (measured)",
+                    dr02Dim: "<strong>915 × 2100 mm</strong> (91.5 × 210 cm, measured)",
+                    wl03Dim: "<strong>44 mm</strong> wide × 2800 mm tall (measured)",
+                    dr03Dim: "<strong>950 × 2100 mm Hole</strong> (Door leaf: 800 × 2050 mm, measured)",
+                    dr03Desc: "Located at 3,240 mm distance from right edge of Door D2 (X = 5,665 to 6,615 mm); natural oak door leaf with brushed bronze hardware (measured in-situ)",
+                    wl04Dim: "<strong>280 mm</strong> wide (X = 6,615 to 6,895 mm)",
+                    wl04Desc: "280 mm of wall next to Door D3 on the right; the wall terminates at X = 6,895 mm on the ground floor (+0,00), leaving 294 mm open clearance under stairs (X = 6,895 to 7,189 mm)"
+                },
+                inspector: {
+                    corridor_doors: {
+                        title: 'Selected Element: Corridor Openings & Doors D1 & D2 [Measured]',
+                        desc: 'Ground floor hallway sequence (as-built pomiar z natury): 140 mm wall start, 920×2100 mm Door 1 hole, 450 mm wall pier, 915×2100 mm Door 2 hole, and 44 mm wall strip before the 80 mm brick wall.',
+                        specs: [
+                            { label: 'Dimension Mode', value: 'Measured (Pomiar z natury)' },
+                            { label: 'Door 1 Hole', value: '920 × 2100 mm (vs 900 project)' },
+                            { label: 'Pier Between Doors', value: '450 mm Wall (vs 463 project)' },
+                            { label: 'Door 2 Hole', value: '915 × 2100 mm (vs 900 project)' },
+                            { label: 'Wall Start / End Strip', value: '140 mm / 44 mm' },
+                            { label: 'Total to Brick Wall', value: '2,469 mm (Maintains exact alignment)' }
+                        ]
+                    },
+                    door_d3: {
+                        title: 'Selected Element: Door D3 & Ground Floor Wall [Measured]',
+                        desc: 'As-built measured rough wall hole of 950 × 2100 mm fitted with an 800 × 2050 mm natural oak flush door leaf beneath staircase, positioned at 3,240 mm from right edge of Door D2 (X = 5,665 to 6,615 mm). To the right of D3, 280 mm of wall extends to X = 6,895 mm, where the ground floor wall terminates.',
+                        specs: [
+                            { label: 'Dimension Mode', value: 'Measured (Pomiar z natury)' },
+                            { label: 'Door Hole', value: '950 × 2100 mm (vs 900 project)' },
+                            { label: 'Door Leaf Size', value: '800 × 2050 mm' },
+                            { label: 'Distance from D2 Right Edge', value: '3,240 mm (vs 3310 project)' },
+                            { label: 'Wall Next to D3 (Right)', value: '280 mm (X = 6,615 to 6,895 mm)' },
+                            { label: 'Ground Floor Wall End', value: 'X = 6,895 mm (wall terminates here)' },
+                            { label: 'Open Clearance under Stairs', value: 'X = 6,895 to 7,189 mm (294 mm span)' }
+                        ]
+                    }
+                }
+            }
+        };
+
+        function setGroundFloorMode(mode) {
+            if (!GROUND_FLOOR_SPECS[mode]) return;
+            currentGroundFloorMode = mode;
+
+            // Update mode selector buttons
+            const btnProj = document.getElementById('btn-mode-project');
+            const btnMeas = document.getElementById('btn-mode-measured');
+            if (btnProj) btnProj.classList.toggle('active', mode === 'project');
+            if (btnMeas) btnMeas.classList.toggle('active', mode === 'measured');
+
+            const spec = GROUND_FLOOR_SPECS[mode];
+
+            // 1. Update Door D1
+            const d1Hole = document.getElementById('d1-hole');
+            if (d1Hole) {
+                d1Hole.setAttribute('x', spec.d1.holeX);
+                d1Hole.setAttribute('width', spec.d1.holeW);
+            }
+            const d1Frame = document.getElementById('d1-frame');
+            if (d1Frame) {
+                d1Frame.setAttribute('x', spec.d1.frameX);
+                d1Frame.setAttribute('width', spec.d1.frameW);
+            }
+            const d1Leaf = document.getElementById('d1-leaf');
+            if (d1Leaf) {
+                d1Leaf.setAttribute('x', spec.d1.leafX);
+                d1Leaf.setAttribute('width', spec.d1.leafW);
+            }
+            const d1HandleBar = document.getElementById('d1-handle-bar');
+            if (d1HandleBar) d1HandleBar.setAttribute('x', spec.d1.handleBarX);
+            const d1HandleDot = document.getElementById('d1-handle-dot');
+            if (d1HandleDot) d1HandleDot.setAttribute('cx', spec.d1.handleDotCx);
+            const d1TextTitle = document.getElementById('d1-text-title');
+            if (d1TextTitle) d1TextTitle.setAttribute('x', spec.d1.textX);
+            const d1TextHole = document.getElementById('d1-text-hole');
+            if (d1TextHole) {
+                d1TextHole.setAttribute('x', spec.d1.textX);
+                d1TextHole.textContent = spec.d1.holeLabel;
+            }
+
+            // 2. Update Door D2
+            const d2Hole = document.getElementById('d2-hole');
+            if (d2Hole) {
+                d2Hole.setAttribute('x', spec.d2.holeX);
+                d2Hole.setAttribute('width', spec.d2.holeW);
+            }
+            const d2Frame = document.getElementById('d2-frame');
+            if (d2Frame) {
+                d2Frame.setAttribute('x', spec.d2.frameX);
+                d2Frame.setAttribute('width', spec.d2.frameW);
+            }
+            const d2Leaf = document.getElementById('d2-leaf');
+            if (d2Leaf) {
+                d2Leaf.setAttribute('x', spec.d2.leafX);
+                d2Leaf.setAttribute('width', spec.d2.leafW);
+            }
+            const d2HandleBar = document.getElementById('d2-handle-bar');
+            if (d2HandleBar) d2HandleBar.setAttribute('x', spec.d2.handleBarX);
+            const d2HandleDot = document.getElementById('d2-handle-dot');
+            if (d2HandleDot) d2HandleDot.setAttribute('cx', spec.d2.handleDotCx);
+            const d2TextTitle = document.getElementById('d2-text-title');
+            if (d2TextTitle) d2TextTitle.setAttribute('x', spec.d2.textX);
+            const d2TextHole = document.getElementById('d2-text-hole');
+            if (d2TextHole) {
+                d2TextHole.setAttribute('x', spec.d2.textX);
+                d2TextHole.textContent = spec.d2.holeLabel;
+            }
+
+            // 3. Update Door D3
+            const d3Hole = document.getElementById('d3-hole');
+            if (d3Hole) {
+                d3Hole.setAttribute('x', spec.d3.holeX);
+                d3Hole.setAttribute('width', spec.d3.holeW);
+            }
+            const d3Frame = document.getElementById('d3-frame');
+            if (d3Frame) {
+                d3Frame.setAttribute('x', spec.d3.frameX);
+                d3Frame.setAttribute('width', spec.d3.frameW);
+            }
+            const d3Leaf = document.getElementById('d3-leaf');
+            if (d3Leaf) {
+                d3Leaf.setAttribute('x', spec.d3.leafX);
+                d3Leaf.setAttribute('width', spec.d3.leafW);
+            }
+            const d3HandleBar = document.getElementById('d3-handle-bar');
+            if (d3HandleBar) d3HandleBar.setAttribute('x', spec.d3.handleBarX);
+            const d3HandleDot = document.getElementById('d3-handle-dot');
+            if (d3HandleDot) d3HandleDot.setAttribute('cx', spec.d3.handleDotCx);
+            const d3TextTitle = document.getElementById('d3-text-title');
+            if (d3TextTitle) d3TextTitle.setAttribute('x', spec.d3.textX);
+            const d3TextHole = document.getElementById('d3-text-hole');
+            if (d3TextHole) {
+                d3TextHole.setAttribute('x', spec.d3.textX);
+                d3TextHole.textContent = spec.d3.holeLabel;
+            }
+
+            // 4. Update Under-Stair Wall
+            const wallPoly = document.getElementById('under-stair-wall-poly');
+            if (wallPoly) wallPoly.setAttribute('points', spec.wallUnderStair.points);
+
+            const wallTermLine = document.getElementById('under-stair-wall-term-line');
+            if (wallTermLine) {
+                wallTermLine.setAttribute('x1', spec.wallUnderStair.termX);
+                wallTermLine.setAttribute('y1', spec.wallUnderStair.termY);
+                wallTermLine.setAttribute('x2', spec.wallUnderStair.termX);
+            }
+
+            const wallShadow = document.getElementById('under-stair-wall-shadow');
+            if (wallShadow) {
+                wallShadow.setAttribute('x', spec.wallUnderStair.shadowX);
+                wallShadow.setAttribute('y', spec.wallUnderStair.shadowY);
+                wallShadow.setAttribute('height', spec.wallUnderStair.shadowH);
+            }
+
+            const wallPierBadge = document.getElementById('under-stair-wall-pier-badge');
+            if (wallPierBadge) wallPierBadge.setAttribute('transform', spec.wallUnderStair.pierBadgeTranslate);
+
+            const openLabel = document.getElementById('under-stair-open-label');
+            if (openLabel) {
+                openLabel.setAttribute('x', spec.wallUnderStair.openLabelX);
+                openLabel.setAttribute('transform', `rotate(-90 ${spec.wallUnderStair.openLabelX} 520)`);
+            }
+
+            // 5. Update Ground Floor Baseline Dimension Chain
+            const tick1Lead = document.getElementById('gf-dim-tick1-lead');
+            if (tick1Lead) {
+                tick1Lead.setAttribute('x1', spec.dimChain.tick1X);
+                tick1Lead.setAttribute('x2', spec.dimChain.tick1X);
+            }
+            const tick1Slash = document.getElementById('gf-dim-tick1-slash');
+            if (tick1Slash) {
+                tick1Slash.setAttribute('x1', spec.dimChain.slash1Start);
+                tick1Slash.setAttribute('x2', spec.dimChain.slash1End);
+            }
+            const valWall1 = document.getElementById('gf-dim-val-wall1');
+            if (valWall1) {
+                valWall1.setAttribute('x', spec.dimChain.textWall1X);
+                valWall1.textContent = spec.dimChain.valWall1;
+            }
+
+            const tick2Lead = document.getElementById('gf-dim-tick2-lead');
+            if (tick2Lead) {
+                tick2Lead.setAttribute('x1', spec.dimChain.tick2X);
+                tick2Lead.setAttribute('x2', spec.dimChain.tick2X);
+            }
+            const tick2Slash = document.getElementById('gf-dim-tick2-slash');
+            if (tick2Slash) {
+                tick2Slash.setAttribute('x1', spec.dimChain.slash2Start);
+                tick2Slash.setAttribute('x2', spec.dimChain.slash2End);
+            }
+            const valD1 = document.getElementById('gf-dim-val-d1');
+            if (valD1) {
+                valD1.setAttribute('x', spec.dimChain.textD1X);
+                valD1.textContent = spec.dimChain.valD1;
+            }
+
+            const tick3Lead = document.getElementById('gf-dim-tick3-lead');
+            if (tick3Lead) {
+                tick3Lead.setAttribute('x1', spec.dimChain.tick3X);
+                tick3Lead.setAttribute('x2', spec.dimChain.tick3X);
+            }
+            const tick3Slash = document.getElementById('gf-dim-tick3-slash');
+            if (tick3Slash) {
+                tick3Slash.setAttribute('x1', spec.dimChain.slash3Start);
+                tick3Slash.setAttribute('x2', spec.dimChain.slash3End);
+            }
+            const valPier = document.getElementById('gf-dim-val-pier');
+            if (valPier) {
+                valPier.setAttribute('x', spec.dimChain.textPierX);
+                valPier.textContent = spec.dimChain.valPier;
+            }
+
+            const tick4Lead = document.getElementById('gf-dim-tick4-lead');
+            if (tick4Lead) {
+                tick4Lead.setAttribute('x1', spec.dimChain.tick4X);
+                tick4Lead.setAttribute('x2', spec.dimChain.tick4X);
+            }
+            const tick4Slash = document.getElementById('gf-dim-tick4-slash');
+            if (tick4Slash) {
+                tick4Slash.setAttribute('x1', spec.dimChain.slash4Start);
+                tick4Slash.setAttribute('x2', spec.dimChain.slash4End);
+            }
+            const valD2 = document.getElementById('gf-dim-val-d2');
+            if (valD2) {
+                valD2.setAttribute('x', spec.dimChain.textD2X);
+                valD2.textContent = spec.dimChain.valD2;
+            }
+
+            const valStrip = document.getElementById('gf-dim-val-strip');
+            if (valStrip) {
+                valStrip.setAttribute('x', spec.dimChain.textStripX);
+                valStrip.textContent = spec.dimChain.valStrip;
+            }
+
+            // 6. Update Dedicated Row D2 -> D3
+            const leadD3Start = document.getElementById('d2-d3-lead-d3-start');
+            if (leadD3Start) {
+                leadD3Start.setAttribute('x1', spec.d2d3Row.d3StartLeadX);
+                leadD3Start.setAttribute('x2', spec.d2d3Row.d3StartLeadX);
+            }
+            const leadD3End = document.getElementById('d2-d3-lead-d3-end');
+            if (leadD3End) {
+                leadD3End.setAttribute('x1', spec.d2d3Row.d3EndLeadX);
+                leadD3End.setAttribute('x2', spec.d2d3Row.d3EndLeadX);
+            }
+            const leadWallEnd = document.getElementById('d2-d3-lead-wall-end');
+            if (leadWallEnd) {
+                leadWallEnd.setAttribute('x1', spec.d2d3Row.wallEndLeadX);
+                leadWallEnd.setAttribute('x2', spec.d2d3Row.wallEndLeadX);
+            }
+
+            // Segment 1 (D2 -> D3)
+            const seg1TickStart = document.getElementById('d2-d3-seg1-tick-start');
+            if (seg1TickStart) {
+                seg1TickStart.setAttribute('x1', spec.d2d3Row.seg1TickStartX);
+                seg1TickStart.setAttribute('x2', spec.d2d3Row.seg1TickStartX);
+            }
+            const seg1TickEnd = document.getElementById('d2-d3-seg1-tick-end');
+            if (seg1TickEnd) {
+                seg1TickEnd.setAttribute('x1', spec.d2d3Row.seg1TickEndX);
+                seg1TickEnd.setAttribute('x2', spec.d2d3Row.seg1TickEndX);
+            }
+            const seg1Line = document.getElementById('d2-d3-seg1-line');
+            if (seg1Line) {
+                seg1Line.setAttribute('x1', spec.d2d3Row.seg1LineStartX);
+                seg1Line.setAttribute('x2', spec.d2d3Row.seg1LineEndX);
+            }
+            const seg1BadgeRect = document.getElementById('d2-d3-seg1-badge-rect');
+            if (seg1BadgeRect) seg1BadgeRect.setAttribute('x', spec.d2d3Row.seg1BadgeRectX);
+            const seg1BadgeVal = document.getElementById('d2-d3-seg1-badge-val');
+            if (seg1BadgeVal) {
+                seg1BadgeVal.setAttribute('x', spec.d2d3Row.seg1BadgeTextX);
+                seg1BadgeVal.textContent = spec.d2d3Row.seg1Val;
+            }
+            const seg1BadgeLbl = document.getElementById('d2-d3-seg1-badge-lbl');
+            if (seg1BadgeLbl) seg1BadgeLbl.setAttribute('x', spec.d2d3Row.seg1BadgeTextX);
+
+            // Segment 2 (D3 Hole)
+            const seg2TickEnd = document.getElementById('d2-d3-seg2-tick-end');
+            if (seg2TickEnd) {
+                seg2TickEnd.setAttribute('x1', spec.d2d3Row.seg2TickEndX);
+                seg2TickEnd.setAttribute('x2', spec.d2d3Row.seg2TickEndX);
+            }
+            const seg2Line = document.getElementById('d2-d3-seg2-line');
+            if (seg2Line) {
+                seg2Line.setAttribute('x1', spec.d2d3Row.seg2LineStartX);
+                seg2Line.setAttribute('x2', spec.d2d3Row.seg2LineEndX);
+            }
+            const seg2BadgeRect = document.getElementById('d2-d3-seg2-badge-rect');
+            if (seg2BadgeRect) seg2BadgeRect.setAttribute('x', spec.d2d3Row.seg2BadgeRectX);
+            const seg2BadgeVal = document.getElementById('d2-d3-seg2-badge-val');
+            if (seg2BadgeVal) {
+                seg2BadgeVal.setAttribute('x', spec.d2d3Row.seg2BadgeTextX);
+                seg2BadgeVal.textContent = spec.d2d3Row.seg2Val;
+            }
+            const seg2BadgeLbl = document.getElementById('d2-d3-seg2-badge-lbl');
+            if (seg2BadgeLbl) seg2BadgeLbl.setAttribute('x', spec.d2d3Row.seg2BadgeTextX);
+
+            // Segment 3 (Wall next to D3)
+            const seg3TickEnd = document.getElementById('d2-d3-seg3-tick-end');
+            if (seg3TickEnd) {
+                seg3TickEnd.setAttribute('x1', spec.d2d3Row.seg3TickEndX);
+                seg3TickEnd.setAttribute('x2', spec.d2d3Row.seg3TickEndX);
+            }
+            const seg3Line = document.getElementById('d2-d3-seg3-line');
+            if (seg3Line) {
+                seg3Line.setAttribute('x1', spec.d2d3Row.seg3LineStartX);
+                seg3Line.setAttribute('x2', spec.d2d3Row.seg3LineEndX);
+            }
+            const seg3BadgeRect = document.getElementById('d2-d3-seg3-badge-rect');
+            if (seg3BadgeRect) seg3BadgeRect.setAttribute('x', spec.d2d3Row.seg3BadgeRectX);
+            const seg3BadgeVal = document.getElementById('d2-d3-seg3-badge-val');
+            if (seg3BadgeVal) {
+                seg3BadgeVal.setAttribute('x', spec.d2d3Row.seg3BadgeTextX);
+                seg3BadgeVal.textContent = spec.d2d3Row.seg3Val;
+            }
+            const seg3BadgeLbl = document.getElementById('d2-d3-seg3-badge-lbl');
+            if (seg3BadgeLbl) seg3BadgeLbl.setAttribute('x', spec.d2d3Row.seg3BadgeTextX);
+
+            // 7. Update Schedule Table (Tab 2)
+            const sWl01 = document.getElementById('sched-wl01-dim');
+            if (sWl01) sWl01.innerHTML = spec.schedule.wl01Dim;
+            const sDr01 = document.getElementById('sched-dr01-dim');
+            if (sDr01) sDr01.innerHTML = spec.schedule.dr01Dim;
+            const sWl02 = document.getElementById('sched-wl02-dim');
+            if (sWl02) sWl02.innerHTML = spec.schedule.wl02Dim;
+            const sDr02 = document.getElementById('sched-dr02-dim');
+            if (sDr02) sDr02.innerHTML = spec.schedule.dr02Dim;
+            const sWl03 = document.getElementById('sched-wl03-dim');
+            if (sWl03) sWl03.innerHTML = spec.schedule.wl03Dim;
+            const sDr03 = document.getElementById('sched-dr03-dim');
+            if (sDr03) sDr03.innerHTML = spec.schedule.dr03Dim;
+            const sDr03Desc = document.getElementById('sched-dr03-desc');
+            if (sDr03Desc) sDr03Desc.textContent = spec.schedule.dr03Desc;
+            const sWl04 = document.getElementById('sched-wl04-dim');
+            if (sWl04) sWl04.innerHTML = spec.schedule.wl04Dim;
+            const sWl04Desc = document.getElementById('sched-wl04-desc');
+            if (sWl04Desc) sWl04Desc.textContent = spec.schedule.wl04Desc;
+
+            // 8. Update Tab 3 Spatial Alignment Description
+            const tab3LowerSeq = document.getElementById('tab3-lower-seq');
+            if (tab3LowerSeq) {
+                if (mode === 'measured') {
+                    tab3LowerSeq.innerHTML = '<strong>Lower Level Sequence (Measured):</strong> 140 mm wall + 920 mm door D1 (hole 920×2100) + 450 mm wall + 915 mm door D2 (hole 915×2100) + 44 mm wall + 80 mm brick wall = <code>2,549 mm</code> to the start of the stairs! | Under stairs: 3,240 mm between D2 and D3 + 950 mm D3 hole + 280 mm wall end.';
+                } else {
+                    tab3LowerSeq.innerHTML = '<strong>Lower Level Sequence (Project):</strong> 150 mm wall + 900 mm door D1 (hole 900×2100) + 463 mm wall + 900 mm door D2 (hole 900×2100) + 56 mm wall + 80 mm brick wall = <code>2,549 mm</code> to the start of the stairs! | Under stairs: 3,310 mm between D2 and D3 + 900 mm D3 hole + 280 mm wall end.';
+                }
+            }
+
+            // 9. Update Inspector details cache
+            if (typeof ELEMENT_SPECS !== 'undefined') {
+                if (ELEMENT_SPECS['corridor_doors']) Object.assign(ELEMENT_SPECS['corridor_doors'], spec.inspector.corridor_doors);
+                if (ELEMENT_SPECS['door_d3']) Object.assign(ELEMENT_SPECS['door_d3'], spec.inspector.door_d3);
+                if (ELEMENT_SPECS['under_stair_door']) Object.assign(ELEMENT_SPECS['under_stair_door'], spec.inspector.door_d3);
+            }
+
+            // If inspector currently displays corridor_doors or door_d3, re-render inspector:
+            if (window.currentInspectedElement === 'corridor_doors' || window.currentInspectedElement === 'door_d3' || window.currentInspectedElement === 'under_stair_door') {
+                showElementDetails(window.currentInspectedElement);
+            }
+
+            // 10. Re-apply any parametric slider adjustments so neither setting overrides the other
+            if (typeof updateParametricStairAdjustments === 'function') {
+                updateParametricStairAdjustments();
+            }
+        }
+
+        // ==================== PARAMETRIC STAIR & SPATIAL ADJUSTMENT LOGIC ====================
+        let deltaExtend2nd = 0; // 0 to 300 mm (10 mm steps)
+        let deltaMoveWall = 0;   // 0 to 200 mm (10 mm steps)
+        let personStair = 5;     // 4 to 10 (default 5)
+        let personHeight = 180;  // 180 or 190 cm (default 180)
+
+        function onParametricSlidersChange() {
+            const sExtend = document.getElementById('slider-extend-2nd');
+            const sWall = document.getElementById('slider-move-wall');
+            if (sExtend) deltaExtend2nd = parseInt(sExtend.value, 10) || 0;
+            if (sWall) deltaMoveWall = parseInt(sWall.value, 10) || 0;
+
+            updateParametricStairAdjustments();
+        }
+
+        function onPersonStairChange(val) {
+            personStair = parseInt(val, 10) || 5;
+            const badge = document.getElementById('badge-person-stair');
+            if (badge) {
+                badge.textContent = `Stair ${personStair}${personStair === 5 ? ' (Default)' : ''}`;
+            }
+            updateParametricStairAdjustments();
+        }
+
+        function setPersonHeight(h) {
+            personHeight = parseInt(h, 10) || 180;
+            const btn180 = document.getElementById('btn-person-h180');
+            const btn190 = document.getElementById('btn-person-h190');
+            if (btn180 && btn190) {
+                if (personHeight === 190) {
+                    btn180.classList.remove('active');
+                    btn190.classList.add('active');
+                } else {
+                    btn190.classList.remove('active');
+                    btn180.classList.add('active');
+                }
+            }
+            updateParametricStairAdjustments();
+        }
+
+        function resetParametricSliders() {
+            deltaExtend2nd = 0;
+            deltaMoveWall = 0;
+            personStair = 5;
+            personHeight = 180;
+
+            const sExtend = document.getElementById('slider-extend-2nd');
+            const sWall = document.getElementById('slider-move-wall');
+            const sPerson = document.getElementById('slider-person-stair');
+            if (sExtend) sExtend.value = 0;
+            if (sWall) sWall.value = 0;
+            if (sPerson) sPerson.value = 5;
+
+            const btn180 = document.getElementById('btn-person-h180');
+            const btn190 = document.getElementById('btn-person-h190');
+            if (btn180) btn180.classList.add('active');
+            if (btn190) btn190.classList.remove('active');
+
+            const badgePerson = document.getElementById('badge-person-stair');
+            if (badgePerson) badgePerson.textContent = 'Stair 5 (Default)';
+
+            updateParametricStairAdjustments();
+        }
+
+        function updateParametricStairAdjustments() {
+            const dE = deltaExtend2nd * 0.1; // SVG units (1 unit = 10 mm)
+            const dW = deltaMoveWall * 0.1;
+
+            const stairX = 2549 - deltaMoveWall;
+            const stairEndX = 7189 - deltaExtend2nd;
+            const flightRunMm = stairEndX - stairX - 1000;
+            const stepLengthMm = Math.round((flightRunMm / 14) * 100) / 100;
+
+            const flightStartX = (254.9 - dW) + 100.0; // 354.9 - dW
+            const flightEndX = 718.9 - dE;
+            const stepLSvg = (flightEndX - flightStartX) / 14;
+
+            // 1. Update Badges & Metrics
+            const bExtend = document.getElementById('badge-extend-2nd');
+            if (bExtend) {
+                bExtend.textContent = `+${deltaExtend2nd} mm (Total: ${940 + deltaExtend2nd} mm)`;
+            }
+            const bWall = document.getElementById('badge-move-wall');
+            if (bWall) {
+                bWall.textContent = `Move Left: ${deltaMoveWall} mm (X = ${stairX.toLocaleString()})`;
+            }
+            const mRun = document.getElementById('metric-flight-run');
+            if (mRun) {
+                mRun.textContent = `${Math.round(flightRunMm).toLocaleString()} mm`;
+            }
+            const mStep = document.getElementById('metric-step-length');
+            if (mStep) {
+                mStep.textContent = `${stepLengthMm.toFixed(1)} mm`;
+            }
+
+            // 2. Redraw Staircase Component
+            if (typeof StairComponent !== 'undefined') {
+                StairComponent.update('main_staircase', {
+                    x: stairX,
+                    end_x: stairEndX,
+                    step_length: stepLengthMm
+                });
+            }
+
+            // 3. Update Upper Floor 2nd Landing & Upper Right Slab
+            const upperFloorBg = document.getElementById('upper-right-floor-bg');
+            if (upperFloorBg) {
+                upperFloorBg.setAttribute('x', (718.9 - dE).toFixed(1));
+                upperFloorBg.setAttribute('width', (94.0 + dE).toFixed(1));
+            }
+            const badgeMidX = (718.9 - dE + 812.9) / 2;
+            const upperFloorBadgeRect = document.getElementById('upper-right-floor-badge-rect');
+            if (upperFloorBadgeRect) {
+                upperFloorBadgeRect.setAttribute('x', (badgeMidX - 30).toFixed(1));
+            }
+            const upperFloorBadgeText = document.getElementById('upper-right-floor-badge-text');
+            if (upperFloorBadgeText) {
+                upperFloorBadgeText.setAttribute('x', badgeMidX.toFixed(1));
+                upperFloorBadgeText.textContent = `${Math.round(940 + deltaExtend2nd)} mm FLOOR`;
+            }
+
+            // Upper right slab layers (start at 718.9 - dE, end at 900.0)
+            const rightSlabW = (181.1 + dE).toFixed(1);
+            const rightSlabX = (718.9 - dE).toFixed(1);
+            ['slab-right-rc', 'slab-right-insul', 'slab-right-finish', 'slab-right-ceil'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.setAttribute('x', rightSlabX);
+                    el.setAttribute('width', rightSlabW);
+                }
+            });
+
+            // 4. Update Axis D line
+            const axisD = document.getElementById('axis-d-line');
+            if (axisD) {
+                axisD.setAttribute('x1', (718.9 - dE).toFixed(1));
+                axisD.setAttribute('x2', (718.9 - dE).toFixed(1));
+            }
+
+            // 5. Update Upper CAD Dimensions
+            const dimBase = document.getElementById('dim-upper-right-base');
+            if (dimBase) dimBase.setAttribute('x1', (718.9 - dE).toFixed(1));
+
+            const dimTick6Lead = document.getElementById('dim-upper-right-tick6-lead');
+            if (dimTick6Lead) {
+                dimTick6Lead.setAttribute('x1', (718.9 - dE).toFixed(1));
+                dimTick6Lead.setAttribute('x2', (718.9 - dE).toFixed(1));
+            }
+            const dimTick6Slash = document.getElementById('dim-upper-right-tick6-slash');
+            if (dimTick6Slash) {
+                dimTick6Slash.setAttribute('x1', (718.9 - dE - 3).toFixed(1));
+                dimTick6Slash.setAttribute('x2', (718.9 - dE + 3).toFixed(1));
+            }
+            const dimValFloor = document.getElementById('dim-upper-right-val-floor');
+            if (dimValFloor) {
+                dimValFloor.setAttribute('x', badgeMidX.toFixed(1));
+                dimValFloor.textContent = Math.round(940 + deltaExtend2nd);
+            }
+
+            const dimOvLine = document.getElementById('dim-upper-right-ov-line');
+            if (dimOvLine) dimOvLine.setAttribute('x1', (718.9 - dE).toFixed(1));
+
+            const dimOvLead1 = document.getElementById('dim-upper-right-ov-lead1');
+            if (dimOvLead1) {
+                dimOvLead1.setAttribute('x1', (718.9 - dE).toFixed(1));
+                dimOvLead1.setAttribute('x2', (718.9 - dE).toFixed(1));
+            }
+            const dimOvVal = document.getElementById('dim-upper-right-ov-val');
+            if (dimOvVal) {
+                const ovMidX = (718.9 - dE + 820.9) / 2;
+                dimOvVal.setAttribute('x', ovMidX.toFixed(1));
+                dimOvVal.textContent = `∑ ${Math.round(1020 + deltaExtend2nd)} mm (Floor + Wall)`;
+            }
+
+            // 6. Update Lower Corridor & Brick Wall
+            const corridorBg = document.getElementById('corridor-wall-bg');
+            if (corridorBg) corridorBg.setAttribute('width', (246.9 - dW).toFixed(1));
+
+            const corridorCavity = document.getElementById('corridor-ceil-cavity');
+            if (corridorCavity) corridorCavity.setAttribute('width', (246.9 - dW).toFixed(1));
+
+            const corridorBulkhead = document.getElementById('corridor-bulkhead-line');
+            if (corridorBulkhead) {
+                corridorBulkhead.setAttribute('x1', (246.9 - dW).toFixed(1));
+                corridorBulkhead.setAttribute('x2', (246.9 - dW).toFixed(1));
+            }
+            const corridorLed = document.getElementById('corridor-led-strip');
+            if (corridorLed) corridorLed.setAttribute('x2', (244.0 - dW).toFixed(1));
+
+            const brickWall = document.getElementById('brick-wall-rect');
+            if (brickWall) brickWall.setAttribute('x', (246.9 - dW).toFixed(1));
+
+            const brickLine1 = document.getElementById('brick-wall-line1');
+            if (brickLine1) {
+                brickLine1.setAttribute('x1', (246.9 - dW).toFixed(1));
+                brickLine1.setAttribute('x2', (246.9 - dW).toFixed(1));
+            }
+            const brickLine2 = document.getElementById('brick-wall-line2');
+            if (brickLine2) {
+                brickLine2.setAttribute('x1', (254.9 - dW).toFixed(1));
+                brickLine2.setAttribute('x2', (254.9 - dW).toFixed(1));
+            }
+            const brickCap = document.getElementById('brick-wall-cap');
+            if (brickCap) brickCap.setAttribute('x', (246.4 - dW).toFixed(1));
+
+            // 7. Update People Silhouettes Position (Stay on top of treads)
+            const person1 = document.getElementById('person-1');
+            if (person1) {
+                person1.setAttribute('transform', `translate(${(268.0 - dW).toFixed(1)}, 417.5)`);
+            }
+
+            // Person 2: Middle Person (Stairs 4 to 10, height 180 or 190 cm)
+            const s = personHeight / 170;
+            const p2Ytread = 640.0 - (personStair * 17.5);
+            let p2MidX;
+            if (personStair === 4) {
+                p2MidX = 329.9 - dW;
+            } else {
+                const stepIdx = personStair - 5;
+                p2MidX = flightStartX + ((stepIdx + 0.5) * stepLSvg);
+            }
+            const p2TransX = p2MidX - (14 * s);
+            const p2TransY = p2Ytread - personHeight;
+
+            const person2 = document.getElementById('person-2');
+            if (person2) {
+                person2.setAttribute('transform', `translate(${p2TransX.toFixed(2)}, ${p2TransY.toFixed(2)}) scale(${s.toFixed(4)})`);
+            }
+
+            const person3 = document.getElementById('person-3');
+            if (person3) {
+                const p3X = flightStartX + (8.35 * stepLSvg);
+                person3.setAttribute('transform', `translate(${p3X.toFixed(1)}, 227)`);
+            }
+
+            // 7b. Update Headroom Clearance from Person 2 Head (Eyes) to Ceiling Corner (346.5, 344)
+            const eyeX = p2MidX;
+            const eyeY = p2TransY + (11 * s);
+            const ceilX = 346.5;
+            const ceilY = 344.0;
+            const dx = eyeX - ceilX;
+            const dy = eyeY - ceilY;
+            const distCm = Math.sqrt(dx * dx + dy * dy);
+            const distMm = Math.round(distCm * 10);
+
+            const pHeadLine = document.getElementById('dim-person-head-line');
+            if (pHeadLine) {
+                pHeadLine.setAttribute('x1', ceilX.toFixed(1));
+                pHeadLine.setAttribute('y1', ceilY.toFixed(1));
+                pHeadLine.setAttribute('x2', eyeX.toFixed(1));
+                pHeadLine.setAttribute('y2', eyeY.toFixed(1));
+            }
+
+            const midLineX = (ceilX + eyeX) / 2;
+            const midLineY = (ceilY + eyeY) / 2;
+            let nx = -dy / (distCm || 1);
+            let ny = dx / (distCm || 1);
+            if (ny > 0) {
+                nx = -nx;
+                ny = -ny;
+            }
+            const textOffsetX = midLineX + (nx * 8);
+            const textOffsetY = midLineY + (ny * 8);
+
+            const pHeadText = document.getElementById('dim-person-head-text');
+            if (pHeadText) {
+                pHeadText.setAttribute('x', textOffsetX.toFixed(1));
+                pHeadText.setAttribute('y', textOffsetY.toFixed(1));
+                pHeadText.textContent = `${distCm.toFixed(1)} cm`;
+            }
+
+            const badgeClearance = document.getElementById('badge-head-clearance');
+            if (badgeClearance) {
+                badgeClearance.textContent = `${distCm.toFixed(1)} cm`;
+            }
+            const metricClearance = document.getElementById('metric-head-clearance');
+            if (metricClearance) {
+                metricClearance.textContent = `${distCm.toFixed(1)} cm (${distMm} mm)`;
+            }
+            const badgePerson = document.getElementById('badge-person-stair');
+            if (badgePerson) {
+                badgePerson.textContent = `Stair ${personStair}${personStair === 5 ? ' (Default)' : ''}`;
+            }
+
+            // Update ELEMENT_SPECS for inspector
+            if (typeof ELEMENT_SPECS !== 'undefined' && ELEMENT_SPECS['person_middle']) {
+                ELEMENT_SPECS['person_middle'].specs = [
+                    { label: 'Current Position', value: `Stair ${personStair} (Middle of Tread)` },
+                    { label: 'Person Height', value: `${personHeight} cm (${personHeight === 180 ? 'Default' : 'Tall'})` },
+                    { label: 'Step Tread Level', value: `+${((640 - p2Ytread) * 10).toFixed(0)} mm (${((640 - p2Ytread) / 100).toFixed(3)} m)` },
+                    { label: 'Eye Level Coordinates', value: `X = ${Math.round(eyeX * 10)} mm, Y = +${Math.round((640 - eyeY) * 10)} mm` },
+                    { label: 'Ceiling Corner Datum', value: 'X = 3,465 mm (+2.96 m Slab Soffit)' },
+                    { label: 'Distance to Ceiling Corner', value: `${distCm.toFixed(1)} cm (${distMm} mm)` }
+                ];
+                if (window.currentInspectedElement === 'person_middle') {
+                    showElementDetails('person_middle');
+                }
+            }
+
+            // 8. Update Headroom Clearance Line 2
+            const headroomLine = document.getElementById('headroom-sloped-line');
+            if (headroomLine) headroomLine.setAttribute('x2', flightStartX.toFixed(1));
+
+            const headroomText = document.getElementById('headroom-sloped-text');
+            if (headroomText) {
+                const textX = (flightStartX + 3.1).toFixed(1);
+                headroomText.setAttribute('x', textX);
+                headroomText.setAttribute('transform', `rotate(-88 ${textX} 460)`);
+            }
+
+            // 9. Update Lower Baseline Dimensions
+            const gfBase = document.getElementById('gf-dim-baseline');
+            if (gfBase) gfBase.setAttribute('x2', flightEndX.toFixed(1));
+
+            // Tick 5 (Wall Strip End / Brick Wall Start)
+            const tick5Lead = document.getElementById('gf-dim-tick5-lead');
+            if (tick5Lead) {
+                tick5Lead.setAttribute('x1', (246.9 - dW).toFixed(1));
+                tick5Lead.setAttribute('x2', (246.9 - dW).toFixed(1));
+            }
+            const tick5Slash = document.getElementById('gf-dim-tick5-slash');
+            if (tick5Slash) {
+                tick5Slash.setAttribute('x1', (246.9 - dW - 3).toFixed(1));
+                tick5Slash.setAttribute('x2', (246.9 - dW + 3).toFixed(1));
+            }
+            const valStrip = document.getElementById('gf-dim-val-strip');
+            if (valStrip) {
+                const d2RightX = (typeof currentGroundFloorMode !== 'undefined' && currentGroundFloorMode === 'measured') ? 242.5 : 241.3;
+                const stripMm = Math.max(0, Math.round(((246.9 - dW) - d2RightX) * 10));
+                valStrip.textContent = stripMm;
+                valStrip.setAttribute('x', (((246.9 - dW) + d2RightX) / 2).toFixed(1));
+            }
+
+            // Tick 6 (Brick Wall End / Stairs Start)
+            const tick6Lead = document.getElementById('gf-dim-tick6-lead');
+            if (tick6Lead) {
+                tick6Lead.setAttribute('x1', (254.9 - dW).toFixed(1));
+                tick6Lead.setAttribute('x2', (254.9 - dW).toFixed(1));
+            }
+            const tick6Slash = document.getElementById('gf-dim-tick6-slash');
+            if (tick6Slash) {
+                tick6Slash.setAttribute('x1', (254.9 - dW - 3).toFixed(1));
+                tick6Slash.setAttribute('x2', (254.9 - dW + 3).toFixed(1));
+            }
+            const valBrick = document.getElementById('gf-dim-val-brick');
+            if (valBrick) valBrick.setAttribute('x', (250.9 - dW).toFixed(1));
+
+            // Tick 7 (Turn Block End / Step 5 Start)
+            const tick7Lead = document.getElementById('gf-dim-tick7-lead');
+            if (tick7Lead) {
+                tick7Lead.setAttribute('x1', flightStartX.toFixed(1));
+                tick7Lead.setAttribute('x2', flightStartX.toFixed(1));
+            }
+            const tick7Slash = document.getElementById('gf-dim-tick7-slash');
+            if (tick7Slash) {
+                tick7Slash.setAttribute('x1', (flightStartX - 3).toFixed(1));
+                tick7Slash.setAttribute('x2', (flightStartX + 3).toFixed(1));
+            }
+            const valTurn = document.getElementById('gf-dim-val-turn');
+            if (valTurn) valTurn.setAttribute('x', (flightStartX - 50.0).toFixed(1));
+
+            // Tick 8 (End of Stairs on Vertical Line)
+            const tick8Lead = document.getElementById('gf-dim-tick8-lead');
+            if (tick8Lead) {
+                tick8Lead.setAttribute('x1', flightEndX.toFixed(1));
+                tick8Lead.setAttribute('x2', flightEndX.toFixed(1));
+            }
+            const tick8Slash = document.getElementById('gf-dim-tick8-slash');
+            if (tick8Slash) {
+                tick8Slash.setAttribute('x1', (flightEndX - 3).toFixed(1));
+                tick8Slash.setAttribute('x2', (flightEndX + 3).toFixed(1));
+            }
+            const valFlight = document.getElementById('gf-dim-val-flight');
+            if (valFlight) {
+                valFlight.setAttribute('x', ((flightStartX + flightEndX) / 2).toFixed(1));
+                valFlight.textContent = Math.round(flightRunMm);
+            }
+
+            // Secondary Bracket 1 (X=0 to Stairs Start)
+            const ov1Line = document.getElementById('gf-dim-ov1-line');
+            if (ov1Line) ov1Line.setAttribute('x2', (254.9 - dW).toFixed(1));
+            const ov1Lead2 = document.getElementById('gf-dim-ov1-lead2');
+            if (ov1Lead2) {
+                ov1Lead2.setAttribute('x1', (254.9 - dW).toFixed(1));
+                ov1Lead2.setAttribute('x2', (254.9 - dW).toFixed(1));
+            }
+            const ov1Text = document.getElementById('gf-dim-ov1-text');
+            if (ov1Text) {
+                ov1Text.setAttribute('x', ((254.9 - dW) / 2).toFixed(1));
+                ov1Text.textContent = `∑ ${Math.round(stairX).toLocaleString()} mm (To Stairs Start)`;
+            }
+
+            // Secondary Bracket 2 (1000 mm Turn Block)
+            const ov2Line = document.getElementById('gf-dim-ov2-line');
+            if (ov2Line) {
+                ov2Line.setAttribute('x1', (254.9 - dW).toFixed(1));
+                ov2Line.setAttribute('x2', flightStartX.toFixed(1));
+            }
+            const ov2Lead1 = document.getElementById('gf-dim-ov2-lead1');
+            if (ov2Lead1) {
+                ov2Lead1.setAttribute('x1', (254.9 - dW).toFixed(1));
+                ov2Lead1.setAttribute('x2', (254.9 - dW).toFixed(1));
+            }
+            const ov2Lead2 = document.getElementById('gf-dim-ov2-lead2');
+            if (ov2Lead2) {
+                ov2Lead2.setAttribute('x1', flightStartX.toFixed(1));
+                ov2Lead2.setAttribute('x2', flightStartX.toFixed(1));
+            }
+            const ov2Text = document.getElementById('gf-dim-ov2-text');
+            if (ov2Text) ov2Text.setAttribute('x', (flightStartX - 50.0).toFixed(1));
+
+            // Secondary Bracket 3 (Straight Stair Flight Run)
+            const ov3Line = document.getElementById('gf-dim-ov3-line');
+            if (ov3Line) {
+                ov3Line.setAttribute('x1', flightStartX.toFixed(1));
+                ov3Line.setAttribute('x2', flightEndX.toFixed(1));
+            }
+            const ov3Lead2 = document.getElementById('gf-dim-ov3-lead2');
+            if (ov3Lead2) {
+                ov3Lead2.setAttribute('x1', flightEndX.toFixed(1));
+                ov3Lead2.setAttribute('x2', flightEndX.toFixed(1));
+            }
+            const midFlight = (flightStartX + flightEndX) / 2;
+            const ov3BadgeRect = document.getElementById('gf-dim-ov3-badge-rect');
+            if (ov3BadgeRect) ov3BadgeRect.setAttribute('x', (midFlight - 90).toFixed(1));
+            const ov3BadgeVal = document.getElementById('gf-dim-ov3-badge-val');
+            if (ov3BadgeVal) {
+                ov3BadgeVal.setAttribute('x', midFlight.toFixed(1));
+                ov3BadgeVal.textContent = `${Math.round(flightRunMm).toLocaleString()} mm`;
+            }
+            const ov3BadgeSub = document.getElementById('gf-dim-ov3-badge-sub');
+            if (ov3BadgeSub) ov3BadgeSub.setAttribute('x', midFlight.toFixed(1));
+
+            // 10. Update Under-Stair Partition Wall
+            const isMeasured = (typeof currentGroundFloorMode !== 'undefined' && currentGroundFloorMode === 'measured');
+            const xTerm = isMeasured ? 689.5 : 690.3;
+            // Slope from (flightStartX, 574.0) to (flightEndX, 328.5)
+            const m = (328.5 - 574.0) / (flightEndX - flightStartX);
+            const yTerm = 574.0 + m * (xTerm - flightStartX);
+
+            const wallPoly = document.getElementById('under-stair-wall-poly');
+            if (wallPoly) {
+                wallPoly.setAttribute('points', `${flightStartX.toFixed(1)},640 ${flightStartX.toFixed(1)},574.0 ${xTerm.toFixed(1)},${yTerm.toFixed(1)} ${xTerm.toFixed(1)},640`);
+            }
+            const wallTermLine = document.getElementById('under-stair-wall-term-line');
+            if (wallTermLine) {
+                wallTermLine.setAttribute('y1', yTerm.toFixed(1));
+            }
+            const wallShadow = document.getElementById('under-stair-wall-shadow');
+            if (wallShadow) {
+                wallShadow.setAttribute('y', yTerm.toFixed(1));
+                wallShadow.setAttribute('height', (640 - yTerm).toFixed(1));
+            }
+
+            // 11. Re-render Inspector if inspecting staircase
+            if (window.currentInspectedElement === 'staircase') {
+                showElementDetails('staircase');
+            }
+        }
+
         function showElementDetails(elementKey) {
+            window.currentInspectedElement = elementKey;
             if (elementKey === 'staircase' && typeof StairComponent !== 'undefined') {
                 const stair = StairComponent.get('main_staircase');
                 if (stair) {
                     document.getElementById('inspector-title').textContent = `${stair.name} [Parametric Object]`;
                     document.getElementById('inspector-desc').textContent = `${stair.description} (Object ID: ${stair.id})`;
+                    const stepLenStr = typeof stair.step_length === 'number' ? stair.step_length.toFixed(1) : stair.step_length;
                     const specsContainer = document.getElementById('inspector-specs');
                     specsContainer.innerHTML = `
                         <div class="spec-item"><div class="spec-label">flooring_height</div><div class="spec-value">${stair.flooring_height} mm (+0,00 m datum)</div></div>
                         <div class="spec-item"><div class="spec-label">width</div><div class="spec-value">${stair.width} mm (100 cm)</div></div>
                         <div class="spec-item"><div class="spec-label">step_height</div><div class="spec-value">${stair.step_height} mm (17.5 cm riser)</div></div>
-                        <div class="spec-item"><div class="spec-label">step_length</div><div class="spec-value">${stair.step_length} mm (26.0 cm tread run, stairs 5–19)</div></div>
+                        <div class="spec-item"><div class="spec-label">step_length</div><div class="spec-value">${stepLenStr} mm (tread run, stairs 5–19)</div></div>
                         <div class="spec-item"><div class="spec-label">plank_height</div><div class="spec-value">${stair.plank_height} mm (40 mm oak tread plank)</div></div>
                         <div class="spec-item"><div class="spec-label">first_step_concrete</div><div class="spec-value">${stair.step_height - stair.plank_height} mm (step_height - plank_height)</div></div>
                         <div class="spec-item"><div class="spec-label">last_horizontal_step</div><div class="spec-value">${(stair.top_floor_elevation || 3330) - stair.step_height - stair.plank_height} mm (${stair.top_floor_elevation || 3330} - 175 - 40)</div></div>
                         <div class="spec-item"><div class="spec-label">stair_slab</div><div class="spec-value">${stair.stair_slab || 193} mm (vertical height of slab under stairs)</div></div>
-                        <div class="spec-item"><div class="spec-label">x (start position)</div><div class="spec-value">X = ${stair.x} mm (2,549 mm post-brick)</div></div>
+                        <div class="spec-item"><div class="spec-label">x (start position)</div><div class="spec-value">X = ${Math.round(stair.x)} mm (post-brick wall)</div></div>
                         <div class="spec-item"><div class="spec-label">global_x</div><div class="spec-value">X = ${stair.global_x} mm on North Facade map</div></div>
                         <div class="spec-item"><div class="spec-label">turn_steps_count</div><div class="spec-value">${stair.turn_steps_count} steps (1 Straight + 3 Zabieg)</div></div>
                         <div class="spec-item"><div class="spec-label">straight_risers_count</div><div class="spec-value">${stair.straight_risers_count} risers (Steps 5 to 19)</div></div>
                         <div class="spec-item"><div class="spec-label">straight_treads_count</div><div class="spec-value">${stair.straight_treads_count} treads (Steps 5 to 18)</div></div>
-                        <div class="spec-item"><div class="spec-label">straight_flight_run</div><div class="spec-value">${stair.straight_flight_run} mm (14 × 260 mm)</div></div>
-                        <div class="spec-item"><div class="spec-label">end_x (end position)</div><div class="spec-value">X = ${stair.end_x} mm (on vertical axis)</div></div>
+                        <div class="spec-item"><div class="spec-label">straight_flight_run</div><div class="spec-value">${Math.round(stair.straight_flight_run)} mm (14 × ${stepLenStr} mm)</div></div>
+                        <div class="spec-item"><div class="spec-label">end_x (end position)</div><div class="spec-value">X = ${Math.round(stair.end_x)} mm (on vertical axis)</div></div>
                         <div class="spec-item"><div class="spec-label">total_risers</div><div class="spec-value">${stair.total_risers} risers (3,325 mm total rise)</div></div>
                         <div class="spec-item"><div class="spec-label">balustrade_height</div><div class="spec-value">${stair.balustrade_height} mm (h=90 cm above pitch)</div></div>
                         <div style="grid-column: 1 / -1; margin-top: 10px; display: flex; gap: 8px;">
@@ -1976,6 +3301,12 @@
                     }
                 });
                 showElementDetails('staircase');
+            }
+            if (typeof setGroundFloorMode === 'function') {
+                setGroundFloorMode('project');
+            }
+            if (typeof updateParametricStairAdjustments === 'function') {
+                updateParametricStairAdjustments();
             }
         });
     </script>

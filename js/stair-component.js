@@ -82,6 +82,12 @@
             if (!_stairs[id]) {
                 _stairs[id] = { id: id };
             }
+            if (updates.step_length !== undefined && updates.end_x === undefined) {
+                delete _stairs[id]._use_end_x;
+            }
+            if (updates.end_x !== undefined) {
+                _stairs[id]._use_end_x = true;
+            }
             Object.assign(_stairs[id], updates);
             this.recalculate(id);
             this._notify(id, _stairs[id]);
@@ -121,8 +127,18 @@
             s.straight_risers_count = s.straight_risers_count || 15;
             s.straight_treads_count = s.straight_treads_count || (s.straight_risers_count - 1);
             s.total_risers = s.turn_steps_count + s.straight_risers_count;
-            s.straight_flight_run = s.straight_treads_count * s.step_length;
-            s.end_x = s.x + s.width + s.straight_flight_run;
+
+            if (s._use_end_x && typeof s.end_x !== 'undefined' && typeof s.x !== 'undefined') {
+                s.straight_flight_run = s.end_x - s.x - (s.width || 1000);
+                s.step_length = Math.round((s.straight_flight_run / s.straight_treads_count) * 100) / 100;
+            } else if (typeof s.step_length !== 'undefined') {
+                s.straight_flight_run = s.straight_treads_count * s.step_length;
+                s.end_x = s.x + (s.width || 1000) + s.straight_flight_run;
+            } else if (typeof s.end_x !== 'undefined') {
+                s.straight_flight_run = s.end_x - s.x - (s.width || 1000);
+                s.step_length = Math.round((s.straight_flight_run / s.straight_treads_count) * 100) / 100;
+            }
+
             s.total_rise = s.total_risers * s.step_height;
             s.top_floor_elevation = s.flooring_height + s.total_rise;
         },
