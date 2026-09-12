@@ -47,6 +47,7 @@
             straight_flight_run: 3640,
             elevation_gain: 2625,
             step5_to_d3_distance: 2174,
+            d3_left_x: 5723,
             end_x: 7189,
             total_rise: 3325,
             top_floor_elevation: 3330,
@@ -152,7 +153,7 @@
             s.total_rise = s.total_risers * s.step_height;
             s.top_floor_elevation = s.flooring_height + s.total_rise;
             s.elevation_gain = s.straight_risers_count * s.step_height; // Elevation gain after turn (15 risers * step_height)
-            s.step5_to_d3_distance = Math.round(5723 - (s.x + (s.width || 1000))); // Distance from Step 5 start to D3 left edge (5,723 mm nominal)
+            s.step5_to_d3_distance = Math.round((s.d3_left_x || 5723) - (s.x + (s.width || 1000))); // Distance from Step 5 start to D3 left edge
         },
 
         /**

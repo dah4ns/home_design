@@ -477,6 +477,29 @@
             font-weight: 700;
         }
 
+        .btn-d3-opt {
+            padding: 3px 8px;
+            font-size: 11px;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            border: none;
+            background: #ffffff;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-d3-opt:hover {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
+
+        .btn-d3-opt.active {
+            background: #c2410c;
+            color: #ffffff;
+            font-weight: 700;
+        }
+
         .elevation-wrapper {
             background: #fffcf8;
             padding: 20px;
@@ -705,8 +728,7 @@
                                 & Levels</button>
                             <button class="toggle-btn active terracotta" onclick="toggleLayer('layer-people', this)">🚶 Human
                                 Silhouettes (3)</button>
-                            <button class="toggle-btn active" onclick="toggleLayer('layer-headroom', this)">↕️ Headroom
-                                Clearance (226 / 209 cm)</button>
+                            <button class="toggle-btn" onclick="toggleLayer('layer-headroom', this)">↕️ Headroom Clearance</button>
                             <button class="toggle-btn active" onclick="toggleLayer('layer-axes', this)">📐 Structural Grid
                                 Axes</button>
                             <button class="toggle-btn active" onclick="toggleLayer('layer-plan-inset', this)">📐 Stair Turn Plan
@@ -720,6 +742,42 @@
 
                 <!-- Parametric Interactive Adjustment Sliders -->
                 <div class="parametric-controls-panel">
+                    <div class="slider-control-card">
+                        <div class="slider-header">
+                            <span class="slider-title">📏 Stair Width</span>
+                            <span class="slider-badge" id="badge-stair-width">100 cm (Default)</span>
+                        </div>
+                        <div class="slider-input-row">
+                            <input type="range" id="slider-stair-width" min="90" max="100" step="1" value="100" oninput="onStairWidthChange(this.value)">
+                            <span class="slider-range-hint">90 – 100 cm (1 cm steps)</span>
+                        </div>
+                    </div>
+
+                    <div class="slider-control-card" style="border-color: #fed7aa; background: #fffcf8;">
+                        <div class="slider-header">
+                            <span class="slider-title" style="color: #9a3412;">🚪 Door D3 Hole Size</span>
+                            <span class="slider-badge" id="badge-d3-size" style="background: #ffedd5; color: #9a3412; border-color: #fed7aa;">900 × 2100 mm</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 6px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-size: 11px; font-weight: 600; color: #78350f;">Width:</span>
+                                <div style="display: inline-flex; border: 1px solid #fed7aa; border-radius: 6px; overflow: hidden; background: #fff;">
+                                    <button type="button" id="btn-d3-w900" class="btn-d3-opt active" onclick="setD3Width(900)">900 mm</button>
+                                    <button type="button" id="btn-d3-w850" class="btn-d3-opt" onclick="setD3Width(850)">850 mm</button>
+                                    <button type="button" id="btn-d3-w800" class="btn-d3-opt" onclick="setD3Width(800)">800 mm</button>
+                                </div>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-size: 11px; font-weight: 600; color: #78350f;">Height:</span>
+                                <div style="display: inline-flex; border: 1px solid #fed7aa; border-radius: 6px; overflow: hidden; background: #fff;">
+                                    <button type="button" id="btn-d3-h210" class="btn-d3-opt active" onclick="setD3Height(210)">210 cm</button>
+                                    <button type="button" id="btn-d3-h205" class="btn-d3-opt" onclick="setD3Height(205)">205 cm</button>
+                                    <button type="button" id="btn-d3-h200" class="btn-d3-opt" onclick="setD3Height(200)">200 cm</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="slider-control-card">
                         <div class="slider-header">
                             <span class="slider-title">📐 Extend 2nd Floor Length</span>
@@ -1328,20 +1386,48 @@
                                 d="M 15 0 C 20 0, 23 5, 23 11 C 23 17, 20 21, 17 23 L 28 28 C 33 31, 35 38, 35 50 L 33 82 L 28 82 L 26 50 L 24 96 L 22 170 L 16 170 L 14 110 L 12 170 L 6 170 L 4 96 L 2 50 L 0 82 L -5 82 L -7 50 C -7 38, -5 31, 0 28 L 11 23 C 8 21, 5 17, 5 11 C 5 5, 8 0, 15 0 Z"
                                 fill="#fed7aa" fill-opacity="0.45" stroke="#c2410c" stroke-width="1.3" />
                         </g>
-                    </g>
 
-                    <!-- ==================== 9. HEADROOM CLEARANCE DIMENSIONS (226 & 209 CM) ==================== -->
-                    <g id="layer-headroom">
-                        <!-- Headroom Datum Corner Marker at Slab Soffit (X = 346.5, Y = 344) -->
-                        <circle cx="346.5" cy="344" r="3" fill="#b45309" stroke="#fff" stroke-width="1" />
-
-                        <!-- Clearance Line 3: Middle Person Head (Eyes) to Ceiling Corner -->
+                        <!-- Clearance Line: Middle Person Head (Eyes) to Ceiling Corner -->
                         <g id="dim-person-headroom-group">
                             <line id="dim-person-head-line" x1="346.5" y1="344.0" x2="367.9" y2="384.1" stroke="#0284c7" stroke-width="1.5"
                                 stroke-dasharray="3 2" marker-start="url(#dim-tick-blue)" marker-end="url(#dim-tick-blue)" />
                             <text id="dim-person-head-text" x="364.3" y="360.3" font-family="'JetBrains Mono', monospace" font-size="11.5"
                                 font-weight="700" fill="#0284c7" stroke="#ffffff" stroke-width="3.5" stroke-linejoin="round"
                                 paint-order="stroke fill" text-anchor="middle">45.5 cm</text>
+                        </g>
+                    </g>
+
+                    <!-- ==================== 9. HEADROOM CLEARANCE DIMENSIONS (STEPS 5, 6, 7 TO CEILING CORNER) ==================== -->
+                    <g id="layer-headroom" style="display: none;">
+                        <!-- Headroom Datum Corner Marker at Slab Soffit (X = 346.5, Y = 344) -->
+                        <circle cx="346.5" cy="344" r="3.5" fill="#b45309" stroke="#fff" stroke-width="1.2" />
+                        <text x="346.5" y="337" font-family="'Outfit', sans-serif" font-size="8.5" font-weight="700" fill="#92400e" text-anchor="middle">Ceiling Corner (+2,96 m)</text>
+
+                        <!-- Clearance Line Step 5: from ceiling corner to Step 5 nosing -->
+                        <g id="headroom-step5-group">
+                            <line id="headroom-step5-line" x1="346.5" y1="344.0" x2="354.9" y2="552.5" stroke="#d97706" stroke-width="1.4"
+                                stroke-dasharray="4 2" marker-start="url(#dim-tick)" marker-end="url(#dim-tick)" />
+                            <text id="headroom-step5-text" x="338.0" y="470.0" font-family="'JetBrains Mono', monospace" font-size="11"
+                                font-weight="700" fill="#b45309" stroke="#ffffff" stroke-width="3" stroke-linejoin="round"
+                                paint-order="stroke fill" text-anchor="middle">209 cm (Step 5)</text>
+                        </g>
+
+                        <!-- Clearance Line Step 6: from ceiling corner to Step 6 nosing -->
+                        <g id="headroom-step6-group">
+                            <line id="headroom-step6-line" x1="346.5" y1="344.0" x2="380.9" y2="535.0" stroke="#d97706" stroke-width="1.4"
+                                stroke-dasharray="4 2" marker-start="url(#dim-tick)" marker-end="url(#dim-tick)" />
+                            <text id="headroom-step6-text" x="368.0" y="440.0" font-family="'JetBrains Mono', monospace" font-size="11"
+                                font-weight="700" fill="#b45309" stroke="#ffffff" stroke-width="3" stroke-linejoin="round"
+                                paint-order="stroke fill" text-anchor="middle">194 cm (Step 6)</text>
+                        </g>
+
+                        <!-- Clearance Line Step 7: from ceiling corner to Step 7 nosing -->
+                        <g id="headroom-step7-group">
+                            <line id="headroom-step7-line" x1="346.5" y1="344.0" x2="406.9" y2="517.5" stroke="#d97706" stroke-width="1.4"
+                                stroke-dasharray="4 2" marker-start="url(#dim-tick)" marker-end="url(#dim-tick)" />
+                            <text id="headroom-step7-text" x="398.0" y="410.0" font-family="'JetBrains Mono', monospace" font-size="11"
+                                font-weight="700" fill="#b45309" stroke="#ffffff" stroke-width="3" stroke-linejoin="round"
+                                paint-order="stroke fill" text-anchor="middle">184 cm (Step 7)</text>
                         </g>
                     </g>
 
@@ -1660,15 +1746,15 @@
                         <!-- DEDICATED RED DIMENSION DIRECTLY UNDER 4-STEP TURN BLOCK (Matching User Annotation) -->
                         <g id="callout-stairs-turn-1000">
                             <!-- Leader lines extending down from edges of turn block -->
-                            <line x1="254.9" y1="640" x2="254.9" y2="658" stroke="#dc2626" stroke-width="1" stroke-dasharray="2 2" />
-                            <line x1="354.9" y1="640" x2="354.9" y2="658" stroke="#dc2626" stroke-width="1" stroke-dasharray="2 2" />
+                            <line id="callout-turn-lead1" x1="254.9" y1="640" x2="254.9" y2="658" stroke="#dc2626" stroke-width="1" stroke-dasharray="2 2" />
+                            <line id="callout-turn-lead2" x1="354.9" y1="640" x2="354.9" y2="658" stroke="#dc2626" stroke-width="1" stroke-dasharray="2 2" />
                             <!-- Red Dimension Line with Red Arrowheads -->
-                            <line x1="254.9" y1="654" x2="354.9" y2="654" stroke="#dc2626" stroke-width="1.8"
+                            <line id="callout-turn-line" x1="254.9" y1="654" x2="354.9" y2="654" stroke="#dc2626" stroke-width="1.8"
                                 marker-start="url(#red-arrow-start)" marker-end="url(#red-arrow-end)" />
                             <!-- White badge with red border and text for crisp CAD clarity -->
-                            <rect x="281.9" y="644.5" width="46" height="19" rx="4" fill="#ffffff" stroke="#dc2626"
+                            <rect id="callout-turn-badge-rect" x="281.9" y="644.5" width="46" height="19" rx="4" fill="#ffffff" stroke="#dc2626"
                                 stroke-width="1.3" filter="drop-shadow(0 1px 2px rgba(220,38,38,0.15))" />
-                            <text x="304.9" y="658" font-family="'JetBrains Mono', monospace" font-size="12"
+                            <text id="callout-turn-badge-val" x="304.9" y="658" font-family="'JetBrains Mono', monospace" font-size="12"
                                 font-weight="700" fill="#dc2626" text-anchor="middle">1000</text>
                         </g>
 
@@ -1687,14 +1773,14 @@
 
                         <!-- Door D3 Hole Height: 2100 mm (from floor Y = 640 to top of opening Y = 430, to the right of D3) -->
                         <g id="dim-d3-height" transform="translate(674.3, 0)">
-                            <line x1="0" y1="430" x2="0" y2="640" stroke="#c2410c" stroke-width="1.1" />
-                            <line x1="-4" y1="430" x2="4" y2="430" stroke="#c2410c" stroke-width="1.2" />
+                            <line id="dim-d3-height-line" x1="0" y1="430" x2="0" y2="640" stroke="#c2410c" stroke-width="1.1" />
+                            <line id="dim-d3-height-top-tick" x1="-4" y1="430" x2="4" y2="430" stroke="#c2410c" stroke-width="1.2" />
                             <line x1="-4" y1="640" x2="4" y2="640" stroke="#c2410c" stroke-width="1.2" />
-                            <line x1="-3" y1="433" x2="3" y2="427" stroke="#c2410c" stroke-width="1.4" />
+                            <line id="dim-d3-height-top-slash" x1="-3" y1="433" x2="3" y2="427" stroke="#c2410c" stroke-width="1.4" />
                             <line x1="-3" y1="643" x2="3" y2="637" stroke="#c2410c" stroke-width="1.4" />
                             <!-- Leader line from D3 opening top-right corner to height scale -->
                             <line id="dim-d3-height-lead" x1="-12" y1="430" x2="0" y2="430" stroke="#c2410c" stroke-width="0.8" stroke-dasharray="2 2" />
-                            <text x="8" y="535" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" fill="#9a3412"
+                            <text id="dim-d3-height-val" x="8" y="535" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" fill="#9a3412"
                                 transform="rotate(-90 8 535)" stroke="#ffffff" stroke-width="2.5" stroke-linejoin="round" paint-order="stroke fill"
                                 text-anchor="middle">2100</text>
                         </g>
@@ -2838,6 +2924,9 @@
         let deltaMoveWall = 0;   // 0 to 200 mm (10 mm steps)
         let personStair = 5;     // 4 to 10 (default 5)
         let personHeight = 180;  // 180 or 190 cm (default 180)
+        let currentStairWidth = 100; // 90 to 100 cm (slider, default 100)
+        let currentD3Width = 900;   // 900, 850, 800 mm (default 900)
+        let currentD3Height = 2100; // 2100, 2050, 2000 mm (default 2100)
 
         function onParametricSlidersChange() {
             const sExtend = document.getElementById('slider-extend-2nd');
@@ -2845,6 +2934,42 @@
             if (sExtend) deltaExtend2nd = parseInt(sExtend.value, 10) || 0;
             if (sWall) deltaMoveWall = parseInt(sWall.value, 10) || 0;
 
+            updateParametricStairAdjustments();
+        }
+
+        function onStairWidthChange(val) {
+            currentStairWidth = parseInt(val, 10) || 100;
+            const badge = document.getElementById('badge-stair-width');
+            if (badge) {
+                badge.textContent = `${currentStairWidth} cm${currentStairWidth === 100 ? ' (Default)' : ''}`;
+            }
+            updateParametricStairAdjustments();
+        }
+
+        function setD3Width(w) {
+            currentD3Width = parseInt(w, 10) || 900;
+            [900, 850, 800].forEach(opt => {
+                const btn = document.getElementById(`btn-d3-w${opt}`);
+                if (btn) btn.classList.toggle('active', opt === currentD3Width);
+            });
+            const badge = document.getElementById('badge-d3-size');
+            if (badge) {
+                badge.textContent = `${currentD3Width} × ${currentD3Height} mm`;
+            }
+            updateParametricStairAdjustments();
+        }
+
+        function setD3Height(hCm) {
+            const h = parseInt(hCm, 10) || 210;
+            currentD3Height = h * 10; // 2100, 2050, 2000 mm
+            [210, 205, 200].forEach(opt => {
+                const btn = document.getElementById(`btn-d3-h${opt}`);
+                if (btn) btn.classList.toggle('active', opt === h);
+            });
+            const badge = document.getElementById('badge-d3-size');
+            if (badge) {
+                badge.textContent = `${currentD3Width} × ${currentD3Height} mm`;
+            }
             updateParametricStairAdjustments();
         }
 
@@ -2878,13 +3003,18 @@
             deltaMoveWall = 0;
             personStair = 5;
             personHeight = 180;
+            currentStairWidth = 100;
+            currentD3Width = 900;
+            currentD3Height = 2100;
 
             const sExtend = document.getElementById('slider-extend-2nd');
             const sWall = document.getElementById('slider-move-wall');
             const sPerson = document.getElementById('slider-person-stair');
+            const sStairW = document.getElementById('slider-stair-width');
             if (sExtend) sExtend.value = 0;
             if (sWall) sWall.value = 0;
             if (sPerson) sPerson.value = 5;
+            if (sStairW) sStairW.value = 100;
 
             const btn180 = document.getElementById('btn-person-h180');
             const btn190 = document.getElementById('btn-person-h190');
@@ -2894,6 +3024,21 @@
             const badgePerson = document.getElementById('badge-person-stair');
             if (badgePerson) badgePerson.textContent = 'Stair 5 (Default)';
 
+            const badgeStairW = document.getElementById('badge-stair-width');
+            if (badgeStairW) badgeStairW.textContent = '100 cm (Default)';
+
+            const badgeD3 = document.getElementById('badge-d3-size');
+            if (badgeD3) badgeD3.textContent = '900 × 2100 mm';
+
+            [900, 850, 800].forEach(w => {
+                const b = document.getElementById(`btn-d3-w${w}`);
+                if (b) b.classList.toggle('active', w === 900);
+            });
+            [210, 205, 200].forEach(h => {
+                const b = document.getElementById(`btn-d3-h${h}`);
+                if (b) b.classList.toggle('active', h === 210);
+            });
+
             updateParametricStairAdjustments();
         }
 
@@ -2901,14 +3046,25 @@
             const dE = deltaExtend2nd * 0.1; // SVG units (1 unit = 10 mm)
             const dW = deltaMoveWall * 0.1;
 
+            const stairWidthMm = currentStairWidth * 10;
+            const stairWidthSvg = currentStairWidth * 1.0;
+
             const stairX = 2549 - deltaMoveWall;
             const stairEndX = 7189 - deltaExtend2nd;
-            const flightRunMm = stairEndX - stairX - 1000;
+            const flightRunMm = stairEndX - stairX - stairWidthMm;
             const stepLengthMm = Math.round((flightRunMm / 14) * 100) / 100;
 
-            const flightStartX = (254.9 - dW) + 100.0; // 354.9 - dW
+            const flightStartX = (254.9 - dW) + stairWidthSvg;
             const flightEndX = 718.9 - dE;
             const stepLSvg = (flightEndX - flightStartX) / 14;
+
+            const isMeasured = (typeof currentGroundFloorMode !== 'undefined' && currentGroundFloorMode === 'measured');
+            const d3RightX = isMeasured ? 661.5 : 662.3;
+            const d3RightMm = isMeasured ? 6615 : 6623;
+            const d3LeftX = d3RightX - (currentD3Width * 0.1);
+            const d3LeftMm = d3RightMm - currentD3Width;
+            const d3TopY = 640.0 - (currentD3Height * 0.1);
+            const d3HoleH = currentD3Height * 0.1;
 
             // 1. Update Badges & Metrics
             const bExtend = document.getElementById('badge-extend-2nd');
@@ -2918,6 +3074,14 @@
             const bWall = document.getElementById('badge-move-wall');
             if (bWall) {
                 bWall.textContent = `Move Left: ${deltaMoveWall} mm (X = ${stairX.toLocaleString()})`;
+            }
+            const bStairW = document.getElementById('badge-stair-width');
+            if (bStairW) {
+                bStairW.textContent = `${currentStairWidth} cm${currentStairWidth === 100 ? ' (Default)' : ''}`;
+            }
+            const bD3 = document.getElementById('badge-d3-size');
+            if (bD3) {
+                bD3.textContent = `${currentD3Width} × ${currentD3Height} mm`;
             }
             const mRun = document.getElementById('metric-flight-run');
             if (mRun) {
@@ -2937,7 +3101,9 @@
                 StairComponent.update('main_staircase', {
                     x: stairX,
                     end_x: stairEndX,
-                    step_length: stepLengthMm
+                    width: stairWidthMm,
+                    step_length: stepLengthMm,
+                    d3_left_x: d3LeftMm
                 });
             }
 
@@ -3187,7 +3353,10 @@
                 tick7Slash.setAttribute('x2', (flightStartX + 3).toFixed(1));
             }
             const valTurn = document.getElementById('gf-dim-val-turn');
-            if (valTurn) valTurn.setAttribute('x', (flightStartX - 50.0).toFixed(1));
+            if (valTurn) {
+                valTurn.setAttribute('x', (((254.9 - dW) + flightStartX) / 2).toFixed(1));
+                valTurn.textContent = Math.round(stairWidthMm);
+            }
 
             // Tick 8 (End of Stairs on Vertical Line)
             const tick8Lead = document.getElementById('gf-dim-tick8-lead');
@@ -3220,7 +3389,7 @@
                 ov1Text.textContent = `∑ ${Math.round(stairX).toLocaleString()} mm (To Stairs Start)`;
             }
 
-            // Secondary Bracket 2 (1000 mm Turn Block)
+            // Secondary Bracket 2 (Turn Block)
             const ov2Line = document.getElementById('gf-dim-ov2-line');
             if (ov2Line) {
                 ov2Line.setAttribute('x1', (254.9 - dW).toFixed(1));
@@ -3236,8 +3405,38 @@
                 ov2Lead2.setAttribute('x1', flightStartX.toFixed(1));
                 ov2Lead2.setAttribute('x2', flightStartX.toFixed(1));
             }
+            const calloutTurnMidX = ((254.9 - dW) + flightStartX) / 2;
             const ov2Text = document.getElementById('gf-dim-ov2-text');
-            if (ov2Text) ov2Text.setAttribute('x', (flightStartX - 50.0).toFixed(1));
+            if (ov2Text) {
+                ov2Text.setAttribute('x', calloutTurnMidX.toFixed(1));
+                ov2Text.textContent = `${Math.round(stairWidthMm)} (4-Step Turn)`;
+            }
+
+            // Callout directly under 4-step turn block
+            const calloutLead1 = document.getElementById('callout-turn-lead1');
+            if (calloutLead1) {
+                calloutLead1.setAttribute('x1', (254.9 - dW).toFixed(1));
+                calloutLead1.setAttribute('x2', (254.9 - dW).toFixed(1));
+            }
+            const calloutLead2 = document.getElementById('callout-turn-lead2');
+            if (calloutLead2) {
+                calloutLead2.setAttribute('x1', flightStartX.toFixed(1));
+                calloutLead2.setAttribute('x2', flightStartX.toFixed(1));
+            }
+            const calloutLine = document.getElementById('callout-turn-line');
+            if (calloutLine) {
+                calloutLine.setAttribute('x1', (254.9 - dW).toFixed(1));
+                calloutLine.setAttribute('x2', flightStartX.toFixed(1));
+            }
+            const calloutBadgeRect = document.getElementById('callout-turn-badge-rect');
+            if (calloutBadgeRect) {
+                calloutBadgeRect.setAttribute('x', (calloutTurnMidX - 23).toFixed(1));
+            }
+            const calloutBadgeVal = document.getElementById('callout-turn-badge-val');
+            if (calloutBadgeVal) {
+                calloutBadgeVal.setAttribute('x', calloutTurnMidX.toFixed(1));
+                calloutBadgeVal.textContent = Math.round(stairWidthMm);
+            }
 
             // Secondary Bracket 3 (Straight Stair Flight Run)
             const ov3Line = document.getElementById('gf-dim-ov3-line');
@@ -3261,14 +3460,144 @@
             const ov3BadgeSub = document.getElementById('gf-dim-ov3-badge-sub');
             if (ov3BadgeSub) ov3BadgeSub.setAttribute('x', midFlight.toFixed(1));
 
-            const isMeasured = (typeof currentGroundFloorMode !== 'undefined' && currentGroundFloorMode === 'measured');
+            // 9b. Update Door D3 Drawing & Measurements
+            const leafW = currentD3Width - 100;
+            const leafH = currentD3Height - 50;
+            const leafX = d3LeftX + 5.0;
+            const leafY = d3TopY + 5.0;
 
-            // 9b. Update Step 5 -> D3 Row
-            const step5StartMm = Math.round(stairX + 1000); // 3549 - deltaMoveWall
-            const currentD3StartMm = isMeasured ? 5665 : 5723;
-            const currentD3StartX = isMeasured ? 566.5 : 572.3;
-            const distStep5ToD3Mm = Math.round(currentD3StartMm - step5StartMm);
-            const s5d3MidX = (flightStartX + currentD3StartX) / 2;
+            const d3Hole = document.getElementById('d3-hole');
+            if (d3Hole) {
+                d3Hole.setAttribute('x', d3LeftX.toFixed(1));
+                d3Hole.setAttribute('y', d3TopY.toFixed(1));
+                d3Hole.setAttribute('width', (currentD3Width * 0.1).toFixed(1));
+                d3Hole.setAttribute('height', d3HoleH.toFixed(1));
+            }
+            const d3Frame = document.getElementById('d3-frame');
+            if (d3Frame) {
+                d3Frame.setAttribute('x', d3LeftX.toFixed(1));
+                d3Frame.setAttribute('y', d3TopY.toFixed(1));
+                d3Frame.setAttribute('width', (currentD3Width * 0.1).toFixed(1));
+                d3Frame.setAttribute('height', d3HoleH.toFixed(1));
+            }
+            const d3Leaf = document.getElementById('d3-leaf');
+            if (d3Leaf) {
+                d3Leaf.setAttribute('x', leafX.toFixed(1));
+                d3Leaf.setAttribute('y', leafY.toFixed(1));
+                d3Leaf.setAttribute('width', (leafW * 0.1).toFixed(1));
+                d3Leaf.setAttribute('height', (leafH * 0.1).toFixed(1));
+            }
+            const d3HandleBar = document.getElementById('d3-handle-bar');
+            if (d3HandleBar) {
+                d3HandleBar.setAttribute('x', (leafX + 8.0).toFixed(1));
+            }
+            const d3HandleDot = document.getElementById('d3-handle-dot');
+            if (d3HandleDot) {
+                d3HandleDot.setAttribute('cx', (leafX + 10.0).toFixed(1));
+            }
+            const d3TextTitle = document.getElementById('d3-text-title');
+            if (d3TextTitle) {
+                const midX = d3LeftX + (currentD3Width * 0.05);
+                d3TextTitle.setAttribute('x', midX.toFixed(1));
+                d3TextTitle.textContent = `D3: ${Math.round(leafW / 10)}×${Math.round(leafH / 10)} cm`;
+            }
+            const d3TextHole = document.getElementById('d3-text-hole');
+            if (d3TextHole) {
+                const midX = d3LeftX + (currentD3Width * 0.05);
+                d3TextHole.setAttribute('x', midX.toFixed(1));
+                d3TextHole.textContent = `(Hole: ${Math.round(currentD3Width / 10)}×${Math.round(currentD3Height / 10)})`;
+            }
+
+            // Door D3 Height dimension scale
+            const dimD3HGroup = document.getElementById('dim-d3-height');
+            if (dimD3HGroup) {
+                dimD3HGroup.setAttribute('transform', `translate(${(d3RightX + 12).toFixed(1)}, 0)`);
+            }
+            const dimD3HLine = document.getElementById('dim-d3-height-line');
+            if (dimD3HLine) {
+                dimD3HLine.setAttribute('y1', d3TopY.toFixed(1));
+                dimD3HLine.setAttribute('y2', '640');
+            }
+            const dimD3HTick = document.getElementById('dim-d3-height-top-tick');
+            if (dimD3HTick) {
+                dimD3HTick.setAttribute('y1', d3TopY.toFixed(1));
+                dimD3HTick.setAttribute('y2', d3TopY.toFixed(1));
+            }
+            const dimD3HSlash = document.getElementById('dim-d3-height-top-slash');
+            if (dimD3HSlash) {
+                dimD3HSlash.setAttribute('y1', (d3TopY + 3).toFixed(1));
+                dimD3HSlash.setAttribute('y2', (d3TopY - 3).toFixed(1));
+            }
+            const dimD3HLead = document.getElementById('dim-d3-height-lead');
+            if (dimD3HLead) {
+                dimD3HLead.setAttribute('y1', d3TopY.toFixed(1));
+                dimD3HLead.setAttribute('y2', d3TopY.toFixed(1));
+            }
+            const dimD3HVal = document.getElementById('dim-d3-height-val');
+            if (dimD3HVal) {
+                dimD3HVal.setAttribute('y', ((d3TopY + 640) / 2).toFixed(1));
+                dimD3HVal.textContent = currentD3Height;
+            }
+
+            // 9c. Update D2 -> D3 Scale Row
+            const d2RightX = isMeasured ? 242.5 : 241.3;
+            const d2RightMm = isMeasured ? 2425 : 2413;
+            const d2ToD3DistMm = Math.round(d3LeftMm - d2RightMm);
+            const seg1MidX = (d2RightX + d3LeftX) / 2;
+            const seg2MidX = (d3LeftX + d3RightX) / 2;
+
+            const d2d3LeadD3 = document.getElementById('d2-d3-lead-d3-start');
+            if (d2d3LeadD3) {
+                d2d3LeadD3.setAttribute('x1', d3LeftX.toFixed(1));
+                d2d3LeadD3.setAttribute('x2', d3LeftX.toFixed(1));
+            }
+            const d2d3Seg1TickEnd = document.getElementById('d2-d3-seg1-tick-end');
+            if (d2d3Seg1TickEnd) {
+                d2d3Seg1TickEnd.setAttribute('x1', d3LeftX.toFixed(1));
+                d2d3Seg1TickEnd.setAttribute('x2', d3LeftX.toFixed(1));
+            }
+            const d2d3Seg1Line = document.getElementById('d2-d3-seg1-line');
+            if (d2d3Seg1Line) {
+                d2d3Seg1Line.setAttribute('x1', d2RightX.toFixed(1));
+                d2d3Seg1Line.setAttribute('x2', d3LeftX.toFixed(1));
+            }
+            const d2d3Seg1BadgeRect = document.getElementById('d2-d3-seg1-badge-rect');
+            if (d2d3Seg1BadgeRect) {
+                d2d3Seg1BadgeRect.setAttribute('x', (seg1MidX - 45).toFixed(1));
+            }
+            const d2d3Seg1BadgeVal = document.getElementById('d2-d3-seg1-badge-val');
+            if (d2d3Seg1BadgeVal) {
+                d2d3Seg1BadgeVal.setAttribute('x', seg1MidX.toFixed(1));
+                d2d3Seg1BadgeVal.textContent = `${d2ToD3DistMm.toLocaleString()} mm`;
+            }
+            const d2d3Seg1BadgeLbl = document.getElementById('d2-d3-seg1-badge-lbl');
+            if (d2d3Seg1BadgeLbl) {
+                d2d3Seg1BadgeLbl.setAttribute('x', seg1MidX.toFixed(1));
+            }
+
+            const d2d3Seg2Line = document.getElementById('d2-d3-seg2-line');
+            if (d2d3Seg2Line) {
+                d2d3Seg2Line.setAttribute('x1', d3LeftX.toFixed(1));
+                d2d3Seg2Line.setAttribute('x2', d3RightX.toFixed(1));
+            }
+            const d2d3Seg2BadgeRect = document.getElementById('d2-d3-seg2-badge-rect');
+            if (d2d3Seg2BadgeRect) {
+                d2d3Seg2BadgeRect.setAttribute('x', (seg2MidX - 38).toFixed(1));
+            }
+            const d2d3Seg2BadgeVal = document.getElementById('d2-d3-seg2-badge-val');
+            if (d2d3Seg2BadgeVal) {
+                d2d3Seg2BadgeVal.setAttribute('x', seg2MidX.toFixed(1));
+                d2d3Seg2BadgeVal.textContent = `${currentD3Width} mm`;
+            }
+            const d2d3Seg2BadgeLbl = document.getElementById('d2-d3-seg2-badge-lbl');
+            if (d2d3Seg2BadgeLbl) {
+                d2d3Seg2BadgeLbl.setAttribute('x', seg2MidX.toFixed(1));
+            }
+
+            // 9d. Update Step 5 -> D3 Row
+            const step5StartMm = Math.round(stairX + stairWidthMm);
+            const distStep5ToD3Mm = Math.round(d3LeftMm - step5StartMm);
+            const s5d3MidX = (flightStartX + d3LeftX) / 2;
 
             const s5d3LeadStep5 = document.getElementById('step5-d3-lead-step5');
             if (s5d3LeadStep5) {
@@ -3277,8 +3606,8 @@
             }
             const s5d3LeadD3 = document.getElementById('step5-d3-lead-d3-start');
             if (s5d3LeadD3) {
-                s5d3LeadD3.setAttribute('x1', currentD3StartX.toFixed(1));
-                s5d3LeadD3.setAttribute('x2', currentD3StartX.toFixed(1));
+                s5d3LeadD3.setAttribute('x1', d3LeftX.toFixed(1));
+                s5d3LeadD3.setAttribute('x2', d3LeftX.toFixed(1));
             }
             const s5d3TickStart = document.getElementById('step5-d3-tick-start');
             if (s5d3TickStart) {
@@ -3287,18 +3616,18 @@
             }
             const s5d3TickEnd = document.getElementById('step5-d3-tick-end');
             if (s5d3TickEnd) {
-                s5d3TickEnd.setAttribute('x1', currentD3StartX.toFixed(1));
-                s5d3TickEnd.setAttribute('x2', currentD3StartX.toFixed(1));
+                s5d3TickEnd.setAttribute('x1', d3LeftX.toFixed(1));
+                s5d3TickEnd.setAttribute('x2', d3LeftX.toFixed(1));
             }
             const s5d3Line = document.getElementById('step5-d3-line');
             if (s5d3Line) {
                 s5d3Line.setAttribute('x1', flightStartX.toFixed(1));
-                s5d3Line.setAttribute('x2', currentD3StartX.toFixed(1));
+                s5d3Line.setAttribute('x2', d3LeftX.toFixed(1));
             }
             const s5d3Box = document.getElementById('step5-d3-row-box');
             if (s5d3Box) {
-                const boxX = Math.min(flightStartX, currentD3StartX) - 6;
-                const boxW = Math.abs(currentD3StartX - flightStartX) + 12;
+                const boxX = Math.min(flightStartX, d3LeftX) - 6;
+                const boxW = Math.abs(d3LeftX - flightStartX) + 12;
                 s5d3Box.setAttribute('x', boxX.toFixed(1));
                 s5d3Box.setAttribute('width', boxW.toFixed(1));
             }
@@ -3341,14 +3670,13 @@
             }
 
             // 11. Update Door D3 Left Edge Stair Slab Intersection
-            const xD3Left = isMeasured ? 566.5 : 572.3;
-            const ySoffit = 574.0 + m * (xD3Left - flightStartX);
+            const ySoffit = 574.0 + m * (d3LeftX - flightStartX);
             const ySlab = ySoffit + 19.3;
             const hSlabMm = Math.round((640.0 - ySlab) * 10);
 
             const dotSlab = document.getElementById('d3-intersect-dot-slab');
             if (dotSlab) {
-                dotSlab.setAttribute('cx', xD3Left.toFixed(1));
+                dotSlab.setAttribute('cx', d3LeftX.toFixed(1));
                 dotSlab.setAttribute('cy', ySlab.toFixed(1));
             }
             const metricD3Intersect = document.getElementById('metric-d3-intersect');
@@ -3356,16 +3684,83 @@
                 metricD3Intersect.textContent = `${hSlabMm.toLocaleString()} mm`;
             }
 
-            // Update D3 inspector specs dynamically
-            const encroachmentMm = 2100 - hSlabMm;
+            // 12. Update Headroom Clearance (3 lines to Step 5, 6, 7)
+            const cCornerX = 346.5;
+            const cCornerY = 344.0;
+
+            // Step 5 nosing
+            const s5X = flightStartX;
+            const s5Y = 552.5;
+            const d5x = s5X - cCornerX;
+            const d5y = s5Y - cCornerY;
+            const dist5 = Math.sqrt(d5x * d5x + d5y * d5y);
+
+            // Step 6 nosing
+            const s6X = flightStartX + stepLSvg;
+            const s6Y = 535.0;
+            const d6x = s6X - cCornerX;
+            const d6y = s6Y - cCornerY;
+            const dist6 = Math.sqrt(d6x * d6x + d6y * d6y);
+
+            // Step 7 nosing
+            const s7X = flightStartX + (2 * stepLSvg);
+            const s7Y = 517.5;
+            const d7x = s7X - cCornerX;
+            const d7y = s7Y - cCornerY;
+            const dist7 = Math.sqrt(d7x * d7x + d7y * d7y);
+
+            const l5 = document.getElementById('headroom-step5-line');
+            if (l5) {
+                l5.setAttribute('x1', cCornerX.toFixed(1));
+                l5.setAttribute('y1', cCornerY.toFixed(1));
+                l5.setAttribute('x2', s5X.toFixed(1));
+                l5.setAttribute('y2', s5Y.toFixed(1));
+            }
+            const t5 = document.getElementById('headroom-step5-text');
+            if (t5) {
+                t5.setAttribute('x', (s5X - 18).toFixed(1));
+                t5.setAttribute('y', '470');
+                t5.textContent = `${Math.round(dist5)} cm (Step 5)`;
+            }
+
+            const l6 = document.getElementById('headroom-step6-line');
+            if (l6) {
+                l6.setAttribute('x1', cCornerX.toFixed(1));
+                l6.setAttribute('y1', cCornerY.toFixed(1));
+                l6.setAttribute('x2', s6X.toFixed(1));
+                l6.setAttribute('y2', s6Y.toFixed(1));
+            }
+            const t6 = document.getElementById('headroom-step6-text');
+            if (t6) {
+                t6.setAttribute('x', ((cCornerX + s6X) / 2 + 10).toFixed(1));
+                t6.setAttribute('y', '440');
+                t6.textContent = `${Math.round(dist6)} cm (Step 6)`;
+            }
+
+            const l7 = document.getElementById('headroom-step7-line');
+            if (l7) {
+                l7.setAttribute('x1', cCornerX.toFixed(1));
+                l7.setAttribute('y1', cCornerY.toFixed(1));
+                l7.setAttribute('x2', s7X.toFixed(1));
+                l7.setAttribute('y2', s7Y.toFixed(1));
+            }
+            const t7 = document.getElementById('headroom-step7-text');
+            if (t7) {
+                t7.setAttribute('x', ((cCornerX + s7X) / 2 + 18).toFixed(1));
+                t7.setAttribute('y', '410');
+                t7.textContent = `${Math.round(dist7)} cm (Step 7)`;
+            }
+
+            // 13. Update D3 inspector specs dynamically
+            const encroachmentMm = currentD3Height - hSlabMm;
             const d3Specs = [
                 { label: 'Dimension Mode', value: isMeasured ? 'Measured (Pomiar z natury)' : 'Project (Nominal)' },
-                { label: 'Door Hole', value: isMeasured ? '950 × 2100 mm (vs 900 project)' : '900 × 2100 mm (90 × 210 cm)' },
-                { label: 'Door Leaf Size', value: '800 × 2050 mm (80 × 205 cm)' },
-                { label: 'Distance from D2 Right Edge', value: isMeasured ? '3,240 mm (vs 3310 project)' : '3,310 mm (331.0 cm)' },
-                { label: 'Step 5 → D3 Left Edge', value: `${distStep5ToD3Mm.toLocaleString()} mm (from Step 5 start X=${Math.round(stairX + 1000)} to D3 X=${isMeasured ? '5,665' : '5,723'} mm)` },
+                { label: 'Door Hole', value: `${currentD3Width} × ${currentD3Height} mm (${currentD3Width/10} × ${currentD3Height/10} cm)` },
+                { label: 'Door Leaf Size', value: `${leafW} × ${leafH} mm (${leafW/10} × ${leafH/10} cm)` },
+                { label: 'Distance from D2 Right Edge', value: `${d2ToD3DistMm.toLocaleString()} mm (${(d2ToD3DistMm/10).toFixed(1)} cm)` },
+                { label: 'Step 5 → D3 Left Edge', value: `${distStep5ToD3Mm.toLocaleString()} mm (from Step 5 start X=${Math.round(stairX + stairWidthMm)} to D3 X=${Math.round(d3LeftMm)} mm)` },
                 { label: 'D3 Left Edge ∩ Stair Slab', value: `${hSlabMm.toLocaleString()} mm (+${(hSlabMm / 1000).toFixed(3)} m, slab bottom)` },
-                { label: 'Slab Encroachment', value: encroachmentMm > 0 ? `${encroachmentMm} mm into 2100 mm opening top` : 'Clear of opening' },
+                { label: 'Slab Encroachment', value: encroachmentMm > 0 ? `${encroachmentMm} mm into ${currentD3Height} mm opening top` : 'Clear of opening' },
                 { label: 'Wall Next to D3 (Right)', value: isMeasured ? '280 mm (X = 6,615 to 6,895 mm)' : '280 mm (X = 6,623 to 6,903 mm)' },
                 { label: 'Ground Floor Wall End', value: isMeasured ? 'X = 6,895 mm (wall terminates here)' : 'X = 6,903 mm (wall terminates here)' },
                 { label: 'Open Clearance under Stairs', value: isMeasured ? `X = 6,895 to ${Math.round(stairEndX).toLocaleString()} mm` : `X = 6,903 to ${Math.round(stairEndX).toLocaleString()} mm` }
@@ -3378,7 +3773,7 @@
                 showElementDetails(window.currentInspectedElement);
             }
 
-            // 12. Re-render Inspector if inspecting staircase
+            // 14. Re-render Inspector if inspecting staircase
             if (window.currentInspectedElement === 'staircase') {
                 showElementDetails('staircase');
             }
@@ -3395,7 +3790,7 @@
                     const specsContainer = document.getElementById('inspector-specs');
                     specsContainer.innerHTML = `
                         <div class="spec-item"><div class="spec-label">flooring_height</div><div class="spec-value">${stair.flooring_height} mm (+0,00 m datum)</div></div>
-                        <div class="spec-item"><div class="spec-label">width</div><div class="spec-value">${stair.width} mm (100 cm)</div></div>
+                        <div class="spec-item"><div class="spec-label">width</div><div class="spec-value">${stair.width} mm (${stair.width / 10} cm)</div></div>
                         <div class="spec-item"><div class="spec-label">step_height</div><div class="spec-value">${stair.step_height} mm (17.5 cm riser)</div></div>
                         <div class="spec-item"><div class="spec-label">step_length</div><div class="spec-value">${stepLenStr} mm (tread run, stairs 5–19)</div></div>
                         <div class="spec-item"><div class="spec-label">plank_height</div><div class="spec-value">${stair.plank_height} mm (40 mm oak tread plank)</div></div>
@@ -3409,7 +3804,7 @@
                         <div class="spec-item"><div class="spec-label">straight_treads_count</div><div class="spec-value">${stair.straight_treads_count} treads (Steps 5 to 18)</div></div>
                         <div class="spec-item"><div class="spec-label">horizontal_gain <span title="Straight flight run along North Wall (related only to the part after the turn)" style="cursor:help; color:#9a3412;">ℹ️</span></div><div class="spec-value">${Math.round(stair.horizontal_gain || stair.straight_flight_run)} mm (14 × ${stepLenStr} mm) <span style="font-size:11px;color:#78350f;font-weight:normal;">[after turn only]</span></div></div>
                         <div class="spec-item"><div class="spec-label">elevation_gain <span title="Elevation gain of the straight flight after the turn to upper floor (15 risers × 175 mm, related only to the part after the turn)" style="cursor:help; color:#047857;">ℹ️</span></div><div class="spec-value">${stair.elevation_gain || (stair.straight_risers_count * stair.step_height)} mm (15 risers × ${stair.step_height} mm) <span style="font-size:11px;color:#047857;font-weight:normal;">[after turn only]</span></div></div>
-                        <div class="spec-item"><div class="spec-label">step5_to_d3_distance <span title="Distance along North Wall between Step 5 start (X=3,549 mm) and Door D3 left edge (X=5,723 mm nominal / 5,665 mm measured)" style="cursor:help; color:#dc2626;">ℹ️</span></div><div class="spec-value">${(typeof currentGroundFloorMode !== 'undefined' && currentGroundFloorMode === 'measured') ? '2,116' : '2,174'} mm <span style="font-size:11px;color:#dc2626;font-weight:normal;">[Step 5 → D3]</span></div></div>
+                        <div class="spec-item"><div class="spec-label">step5_to_d3_distance <span title="Distance along North Wall between Step 5 start and Door D3 left edge" style="cursor:help; color:#dc2626;">ℹ️</span></div><div class="spec-value">${Math.round(stair.step5_to_d3_distance || (5723 - (stair.x + (stair.width || 1000)))).toLocaleString()} mm <span style="font-size:11px;color:#dc2626;font-weight:normal;">[Step 5 → D3]</span></div></div>
                         <div class="spec-item"><div class="spec-label">end_x (end position)</div><div class="spec-value">X = ${Math.round(stair.end_x)} mm (on vertical axis)</div></div>
                         <div class="spec-item"><div class="spec-label">total_risers</div><div class="spec-value">${stair.total_risers} risers (3,325 mm total rise)</div></div>
                         <div class="spec-item"><div class="spec-label">balustrade_height</div><div class="spec-value">${stair.balustrade_height} mm (h=90 cm above pitch)</div></div>
