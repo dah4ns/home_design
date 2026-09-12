@@ -481,7 +481,7 @@
                     - First Floor Finished Level (+3,33 m, 333 cm): Y = 307
                     - Right Suspended Ceiling (280 cm clear height, 15.5 cm cavity): Y = 359.5
                 -->
-                <svg class="elevation-svg" viewBox="-55 -40 985 860" xmlns="http://www.w3.org/2000/svg">
+                <svg class="elevation-svg" viewBox="-55 -40 1050 860" xmlns="http://www.w3.org/2000/svg">
                     <defs>
                         <!-- Warm Interior Wall Plaster Gradient (North Wall Behind Stairs) -->
                         <linearGradient id="warm-north-wall" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -803,9 +803,33 @@
                             stroke-width="1.5" />
                     </g>
 
-                    <!-- ==================== 6. UNDER-STAIR SPACE & CLOSET DOOR (900 × 2100 mm) ==================== -->
-                    <!-- Under-stair wall plaster fill -->
-                    <polygon points="354.9,640 354.9,568 718.9,329 718.9,640" fill="url(#under-stair-wall)" />
+                    <!-- ==================== 6. UNDER-STAIR GROUND FLOOR WALL & DOOR D3 ==================== -->
+                    <!-- Ground Floor Under-Stair Partition Wall:
+                                                                                     Extends from end of 4-step turn (X = 354.9) past Door D3 (X = 572.3 to 662.3),
+                                                                                     continues for exactly 280 mm of wall to the right of D3 (X = 662.3 to 690.3),
+                                                                                     where the wall terminates on the ground floor (+0,00).
+                                                                                     From X = 690.3 to X = 718.9, the space under the stairs is open to the background North Wall. -->
+                    <polygon points="354.9,640 354.9,570.0 690.3,344.25 690.3,640" fill="url(#under-stair-wall)" stroke="#bfa992"
+                        stroke-width="1.2" />
+                    
+                    <!-- Vertical Termination Edge of Ground Floor Wall at X = 690.3 (Y = 344.25 down to 640.0) -->
+                    <line x1="690.3" y1="344.25" x2="690.3" y2="640" stroke="#786754" stroke-width="2.2" />
+                    <!-- Subtle corner reveal shadow on wall edge -->
+                    <rect x="688.3" y="344.25" width="2" height="295.75" fill="#000000" opacity="0.08" />
+                    
+                    <!-- Wall Pier Label: 280 mm of wall next to D3 -->
+                    <g transform="translate(676.3, 510)">
+                        <rect x="-13" y="-12" width="26" height="23" rx="3.5" fill="#ffffff" fill-opacity="0.9" stroke="#786754"
+                            stroke-width="0.8" />
+                        <text x="0" y="0" font-family="'JetBrains Mono', monospace" font-size="8" font-weight="700" fill="#5c3a1b"
+                            text-anchor="middle">280</text>
+                        <text x="0" y="9" font-family="'Outfit', sans-serif" font-size="6.5" font-weight="600" fill="#786754"
+                            text-anchor="middle">wall</text>
+                    </g>
+                    
+                    <!-- Open Under-Stairs Passage Label between X = 690.3 and X = 718.9 -->
+                    <text x="704.6" y="520" font-family="'Outfit', sans-serif" font-size="7.5" font-weight="600" fill="#8a7967"
+                        text-anchor="middle" transform="rotate(-90 704.6 520)" letter-spacing="0.08em">OPEN UNDER STAIRS</text>
 
                     <!-- Under-Stair Door D3 (Hole = 900 × 2100 mm, Distance from D2 Right Edge = 3310 mm: X = 572.3 to 662.3) -->
                     <g class="interactive-element" onclick="showElementDetails('door_d3')">
@@ -828,8 +852,8 @@
                             fill="#8c5828" text-anchor="middle">(Hole: 90×210)</text>
                     </g>
 
-                    <!-- ==================== 7. THE STAIRCASE: 4-STEP TURN (1 STRAIGHT + 3 ZABIEG) & STRAIGHT FLIGHT ALONG WALL ==================== -->
-                    <g class="interactive-element" onclick="showElementDetails('staircase')">
+                    <!-- ==================== 7. THE STAIRCASE OBJECT (PARAMETRIC SKELETON COMPONENT) ==================== -->
+                    <g class="interactive-element" id="layer-staircase" data-stair-component="main_staircase" onclick="showElementDetails('staircase')">
                         <!--
                             Staircase Geometry based on CAD Screen & User Specification:
                             - Total 19 risers × 17.5 cm = 332.5 cm total rise (+0,00 to +3,33 m)
@@ -843,268 +867,75 @@
                               * Balustrade at h = 90 cm (balustrada h=90)
                         -->
 
-                        <!-- Structural Concrete Carriage Soffit beneath Stairs -->
-                        <polygon points="354.9,570 718.9,307 718.9,329 354.9,568 354.9,640 254.9,640 254.9,587.5 304.9,587.5 304.9,570"
-                            fill="url(#concrete-hatch)" stroke="#4a3f35" stroke-width="1.8" />
-                        <!-- Warm Plaster Underside Soffit Line of Stairs -->
-                        <line x1="354.9" y1="568" x2="718.9" y2="329" stroke="#8a7967" stroke-width="2.5" />
+                        <!-- Stair Underside Soffit Line (Strictly adjacent to all step corners) -->
+                        <line x1="354.9" y1="570.0" x2="718.9" y2="325.0" stroke="#4a3f35" stroke-width="1.0" />
 
                         <!-- ==================== A. THE 4 FIRST STAIRS: 1 STRAIGHT + 3 WINDER (STAIRS 1 TO 4) ==================== -->
                         <!-- Fits entirely within the 1000 mm width (X = 254.9 to 354.9 mm); Step 4 only on right part (X = 304.9 to 354.9 mm) -->
                         <g onclick="showElementDetails('stair_turn')">
                             <!-- Lower 3-Step Base Enclosure Block (1000 mm wide: X = 254.9 to 354.9, Y = 587.5 to 640.0) -->
-                            <rect x="254.9" y="587.5" width="100.0" height="52.5" fill="#f5ede0" stroke="#4a3f35"
-                                stroke-width="1.8" />
+                            <rect x="254.9" y="587.5" width="100.0" height="52.5" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
 
-                            <!-- STAIR 1 (STRAIGHT): Front Approach Riser & Oak Tread (+0,00 to +0,175 m: Y = 640.0 -> 622.5) -->
-                            <line x1="254.9" y1="622.5" x2="354.9" y2="622.5" stroke="#4a3f35" stroke-width="1.8" />
-                            <rect x="253.9" y="621.0" width="102.0" height="3.5" fill="url(#oak-wood-grad)"
-                                stroke="#7c4d1e" stroke-width="0.8" />
+                            <!-- STAIR 1 (STRAIGHT): Front Approach Riser Line (+0,00 to +0,175 m: Y = 640.0 -> 622.5) -->
+                            <line x1="254.9" y1="622.5" x2="354.9" y2="622.5" stroke="#4a3f35" stroke-width="1.0" />
 
-                            <!-- STAIR 2 (WINDER): Clean Front Face & Oak Tread (+0,175 to +0,350 m: Y = 622.5 -> 605.0) -->
-                            <line x1="254.9" y1="605.0" x2="354.9" y2="605.0" stroke="#4a3f35" stroke-width="1.6" />
-                            <rect x="253.9" y="603.5" width="102.0" height="3.5" fill="url(#oak-wood-grad)"
-                                stroke="#7c4d1e" stroke-width="0.8" />
+                            <!-- STAIR 2 (WINDER): Clean Front Face Line (+0,175 to +0,350 m: Y = 622.5 -> 605.0) -->
+                            <line x1="254.9" y1="605.0" x2="354.9" y2="605.0" stroke="#4a3f35" stroke-width="1.0" />
 
                             <!-- STAIR 3 (WINDER TOP SURFACE ON LEFT): (+0,350 to +0,525 m: Y = 587.5, X = 254.9 to 304.9) -->
-                            <line x1="254.9" y1="587.5" x2="304.9" y2="587.5" stroke="#4a3f35" stroke-width="1.8" />
-                            <rect x="253.9" y="586.0" width="52.0" height="3.5" fill="url(#oak-wood-grad)"
-                                stroke="#7c4d1e" stroke-width="0.8" />
+                            <line x1="254.9" y1="587.5" x2="304.9" y2="587.5" stroke="#4a3f35" stroke-width="1.0" />
 
                             <!-- STAIR 4 (RIGHT PART ONLY AS ANNOTATED): Vertical Riser at X = 304.9 (Y = 587.5 -> 570.0) & Tread (X = 304.9 to 354.9) -->
-                            <rect x="304.9" y="570.0" width="50.0" height="17.5" fill="#f5ede0" stroke="#4a3f35"
-                                stroke-width="1.8" />
-                            <line x1="304.9" y1="587.5" x2="304.9" y2="570.0" stroke="#4a3f35" stroke-width="1.8" />
-                            <line x1="304.9" y1="570.0" x2="354.9" y2="570.0" stroke="#4a3f35" stroke-width="2.0" />
-                            <rect x="303.9" y="568.5" width="52.0" height="3.5" fill="url(#oak-wood-grad)"
-                                stroke="#7c4d1e" stroke-width="1.0" />
-
-                            <!-- Solid Oak Inner Newel Post anchoring Balustrade at X = 354.9 -->
-                            <rect x="352.4" y="478.0" width="5.0" height="94.0" fill="url(#oak-wood-grad)"
-                                stroke="#7c4d1e" stroke-width="1.2" rx="1" />
-                            <circle cx="354.9" cy="476.5" r="3.5" fill="#b45309" stroke="#7c4d1e" stroke-width="1.2" />
+                            <rect x="304.9" y="570.0" width="50.0" height="17.5" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
+                            <line x1="304.9" y1="587.5" x2="304.9" y2="570.0" stroke="#4a3f35" stroke-width="1.0" />
+                            <line x1="304.9" y1="570.0" x2="354.9" y2="570.0" stroke="#4a3f35" stroke-width="1.0" />
                         </g>
 
-                        <!-- ==================== B. STAIRS 5 TO 19: ALL GO ALONG THE NORTH WALL ==================== -->
-                        <!-- The 5th stair starts at 1000 mm right from the beginning of the stairs (X = 354.9) -->
-                        <!-- Total straight flight run along North Wall = 3,640 mm (X = 354.9 to 718.9 mm, 14 treads × 26.0 cm) -->
+                        <!-- ==================== B. STAIRS 5 TO 19: STRAIGHT FLIGHT (MATCHING COLOR & ZERO GAP SKELETON) ==================== -->
                         <!-- Step 5: Riser at X = 354.9 (Y = 570.0 -> 552.5), Tread X = 354.9..380.9 -->
-                        <path d="M 354.9 570.0 L 354.9 552.5 L 380.9 552.5" fill="#f5ede0" stroke="#4a3f35"
-                            stroke-width="1.8" />
-                        <rect x="353.9" y="551.0" width="28.0" height="3.5" rx="1" fill="url(#oak-wood-grad)"
-                            stroke="#7c4d1e" stroke-width="0.8" />
+                        <polygon points="354.9,570.0 354.9,552.5 380.9,552.5" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
 
                         <!-- Step 6: Riser at X = 380.9 (Y = 552.5 -> 535.0), Tread X = 380.9..406.9 -->
-                        <path d="M 380.9 552.5 L 380.9 535.0 L 406.9 535.0" fill="#f5ede0" stroke="#4a3f35"
-                            stroke-width="1.8" />
-                        <rect x="379.9" y="533.5" width="28.0" height="3.5" rx="1" fill="url(#oak-wood-grad)"
-                            stroke="#7c4d1e" stroke-width="0.8" />
+                        <polygon points="380.9,552.5 380.9,535.0 406.9,535.0" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
 
                         <!-- Step 7: Riser at X = 406.9 (Y = 535.0 -> 517.5), Tread X = 406.9..432.9 -->
-                        <path d="M 406.9 535.0 L 406.9 517.5 L 432.9 517.5" fill="#f5ede0" stroke="#4a3f35"
-                            stroke-width="1.8" />
-                        <rect x="405.9" y="516.0" width="28.0" height="3.5" rx="1" fill="url(#oak-wood-grad)"
-                            stroke="#7c4d1e" stroke-width="0.8" />
+                        <polygon points="406.9,535.0 406.9,517.5 432.9,517.5" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
 
                         <!-- Step 8: Riser at X = 432.9 (Y = 517.5 -> 500.0), Tread X = 432.9..458.9 -->
-                        <path d="M 432.9 517.5 L 432.9 500.0 L 458.9 500.0" fill="#f5ede0" stroke="#4a3f35"
-                            stroke-width="1.8" />
-                        <rect x="431.9" y="498.5" width="28.0" height="3.5" rx="1" fill="url(#oak-wood-grad)"
-                            stroke="#7c4d1e" stroke-width="0.8" />
+                        <polygon points="432.9,517.5 432.9,500.0 458.9,500.0" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
 
                         <!-- Step 9: Riser at X = 458.9 (Y = 500.0 -> 482.5), Tread X = 458.9..484.9 -->
-                        <path d="M 458.9 500.0 L 458.9 482.5 L 484.9 482.5" fill="#f5ede0" stroke="#4a3f35"
-                            stroke-width="1.8" />
-                        <rect x="457.9" y="481.0" width="28.0" height="3.5" rx="1" fill="url(#oak-wood-grad)"
-                            stroke="#7c4d1e" stroke-width="0.8" />
+                        <polygon points="458.9,500.0 458.9,482.5 484.9,482.5" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
 
                         <!-- Step 10: Riser at X = 484.9 (Y = 482.5 -> 465.0), Tread X = 484.9..510.9 -->
-                        <path d="M 484.9 482.5 L 484.9 465.0 L 510.9 465.0" fill="#f5ede0" stroke="#4a3f35"
-                            stroke-width="1.8" />
-                        <rect x="483.9" y="463.5" width="28.0" height="3.5" rx="1" fill="url(#oak-wood-grad)"
-                            stroke="#7c4d1e" stroke-width="0.8" />
+                        <polygon points="484.9,482.5 484.9,465.0 510.9,465.0" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
 
                         <!-- Step 11: Riser at X = 510.9 (Y = 465.0 -> 447.5), Tread X = 510.9..536.9 -->
-                        <path d="M 510.9 465.0 L 510.9 447.5 L 536.9 447.5" fill="#f5ede0" stroke="#4a3f35"
-                            stroke-width="1.8" />
-                        <rect x="509.9" y="446.0" width="28.0" height="3.5" rx="1" fill="url(#oak-wood-grad)"
-                            stroke="#7c4d1e" stroke-width="0.8" />
+                        <polygon points="510.9,465.0 510.9,447.5 536.9,447.5" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
 
                         <!-- Step 12: Riser at X = 536.9 (Y = 447.5 -> 430.0), Tread X = 536.9..562.9 -->
-                        <path d="M 536.9 447.5 L 536.9 430.0 L 562.9 430.0" fill="#f5ede0" stroke="#4a3f35"
-                            stroke-width="1.8" />
-                        <rect x="535.9" y="428.5" width="28.0" height="3.5" rx="1" fill="url(#oak-wood-grad)"
-                            stroke="#7c4d1e" stroke-width="0.8" />
+                        <polygon points="536.9,447.5 536.9,430.0 562.9,430.0" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
 
                         <!-- Step 13: Riser at X = 562.9 (Y = 430.0 -> 412.5), Tread X = 562.9..588.9 -->
-                        <path d="M 562.9 430.0 L 562.9 412.5 L 588.9 412.5" fill="#f5ede0" stroke="#4a3f35"
-                            stroke-width="1.8" />
-                        <rect x="561.9" y="411.0" width="28.0" height="3.5" rx="1" fill="url(#oak-wood-grad)"
-                            stroke="#7c4d1e" stroke-width="0.8" />
+                        <polygon points="562.9,430.0 562.9,412.5 588.9,412.5" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
 
                         <!-- Step 14: Riser at X = 588.9 (Y = 412.5 -> 395.0), Tread X = 588.9..614.9 -->
-                        <path d="M 588.9 412.5 L 588.9 395.0 L 614.9 395.0" fill="#f5ede0" stroke="#4a3f35"
-                            stroke-width="1.8" />
-                        <rect x="587.9" y="393.5" width="28.0" height="3.5" rx="1" fill="url(#oak-wood-grad)"
-                            stroke="#7c4d1e" stroke-width="0.8" />
+                        <polygon points="588.9,412.5 588.9,395.0 614.9,395.0" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
 
                         <!-- Step 15: Riser at X = 614.9 (Y = 395.0 -> 377.5), Tread X = 614.9..640.9 -->
-                        <path d="M 614.9 395.0 L 614.9 377.5 L 640.9 377.5" fill="#f5ede0" stroke="#4a3f35"
-                            stroke-width="1.8" />
-                        <rect x="613.9" y="376.0" width="28.0" height="3.5" rx="1" fill="url(#oak-wood-grad)"
-                            stroke="#7c4d1e" stroke-width="0.8" />
+                        <polygon points="614.9,395.0 614.9,377.5 640.9,377.5" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
 
                         <!-- Step 16: Riser at X = 640.9 (Y = 377.5 -> 360.0), Tread X = 640.9..666.9 -->
-                        <path d="M 640.9 377.5 L 640.9 360.0 L 666.9 360.0" fill="#f5ede0" stroke="#4a3f35"
-                            stroke-width="1.8" />
-                        <rect x="639.9" y="358.5" width="28.0" height="3.5" rx="1" fill="url(#oak-wood-grad)"
-                            stroke="#7c4d1e" stroke-width="0.8" />
+                        <polygon points="640.9,377.5 640.9,360.0 666.9,360.0" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
 
                         <!-- Step 17: Riser at X = 666.9 (Y = 360.0 -> 342.5), Tread X = 666.9..692.9 -->
-                        <path d="M 666.9 360.0 L 666.9 342.5 L 692.9 342.5" fill="#f5ede0" stroke="#4a3f35"
-                            stroke-width="1.8" />
-                        <rect x="665.9" y="341.0" width="28.0" height="3.5" rx="1" fill="url(#oak-wood-grad)"
-                            stroke="#7c4d1e" stroke-width="0.8" />
+                        <polygon points="666.9,360.0 666.9,342.5 692.9,342.5" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
 
                         <!-- Step 18: Riser at X = 692.9 (Y = 342.5 -> 325.0), Tread X = 692.9..718.9 -->
-                        <path d="M 692.9 342.5 L 692.9 325.0 L 718.9 325.0" fill="#f5ede0" stroke="#4a3f35"
-                            stroke-width="1.8" />
-                        <rect x="691.9" y="323.5" width="28.0" height="3.5" rx="1" fill="url(#oak-wood-grad)"
-                            stroke="#7c4d1e" stroke-width="0.8" />
+                        <polygon points="692.9,342.5 692.9,325.0 718.9,325.0" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
 
-                        <!-- Step 19 (Top Landing Riser to +3,33 m on vertical line): Riser at X = 718.9 (Y = 325.0 -> 307.0) -->
-                        <path d="M 718.9 325.0 L 718.9 307.0" fill="none" stroke="#4a3f35" stroke-width="1.8" />
-
-                        <!-- Balustrade & Handrail (balustrada h=90 cm above stair pitch) -->
-                        <line x1="354.9" y1="480" x2="718.9" y2="217" stroke="#b45309" stroke-width="3.2"
-                            stroke-linecap="round" />
-                        <line x1="354.9" y1="482" x2="718.9" y2="219" stroke="#fde68a" stroke-width="0.9"
-                            opacity="0.6" />
-                        <!-- Balusters spaced along flight -->
-                        <line x1="380.9" y1="535" x2="380.9" y2="461" stroke="#b45309" stroke-width="1.5" />
-                        <line x1="432.9" y1="500" x2="432.9" y2="423" stroke="#b45309" stroke-width="1.5" />
-                        <line x1="484.9" y1="465" x2="484.9" y2="386" stroke="#b45309" stroke-width="1.5" />
-                        <line x1="536.9" y1="430" x2="536.9" y2="348" stroke="#b45309" stroke-width="1.5" />
-                        <line x1="588.9" y1="395" x2="588.9" y2="311" stroke="#b45309" stroke-width="1.5" />
-                        <line x1="640.9" y1="360" x2="640.9" y2="273" stroke="#b45309" stroke-width="1.5" />
-                        <line x1="692.9" y1="325" x2="692.9" y2="236" stroke="#b45309" stroke-width="1.5" />
-                    </g>
-
-                    <!-- ==================== ARCHITECTURAL STAIR TURN PLAN INSET (RZUT SCHODÓW: 1 PROSTY + 3 ZABIEGOWE + PROSTE) ==================== -->
-                    <g id="layer-plan-inset" class="interactive-element" onclick="showElementDetails('stair_turn')">
-                        <!-- Inset Box Container with Drop Shadow -->
-                        <rect x="705" y="435" width="250" height="200" rx="6" fill="#fffefb" stroke="#b45309"
-                            stroke-width="1.6" filter="drop-shadow(0 4px 8px rgba(0,0,0,0.10))" />
-                        <!-- Header Banner -->
-                        <rect x="705" y="435" width="250" height="26" rx="6" fill="#fef3c7" stroke="#fcd34d"
-                            stroke-width="1" />
-                        <text x="830" y="452" font-family="'Outfit', sans-serif" font-size="10" font-weight="700"
-                            fill="#92400e" text-anchor="middle">📐 RZUT SCHODÓW (1 PROSTY + 3 ZABIEG)</text>
-
-                        <!-- North Wall at Top of Plan Inset (Hatched Exterior Wall) -->
-                        <rect x="718" y="468" width="224" height="12" fill="url(#concrete-hatch)" stroke="#4a3f35"
-                            stroke-width="1.2" />
-                        <text x="830" y="477" font-family="'Outfit', sans-serif" font-size="7.5" font-weight="700"
-                            fill="#5c3a1b" text-anchor="middle">ŚCIANA PÓŁNOCNA (NORTH WALL)</text>
-
-                        <!-- West Wall at Left of Plan Inset (80 mm Brick Wall) -->
-                        <rect x="718" y="480" width="8" height="142" fill="url(#brick-wall-pattern)" stroke="#782d08"
-                            stroke-width="1.2" />
-
-                        <!-- Lower Flight coming from South (Width = 100 cm: X = 726 to 774) -->
-                        <rect x="726" y="555" width="48" height="67" fill="#fdf8ee" stroke="#8c5828" stroke-width="1" />
-
-                        <!-- STAIR 1 (STRAIGHT): Horizontal line at bottom of flight -->
-                        <line x1="726" y1="588" x2="774" y2="588" stroke="#7c4d1e" stroke-width="1.8" />
-                        <text x="750" y="602" font-family="'JetBrains Mono', monospace" font-size="7.5"
-                            font-weight="700" fill="#92400e" text-anchor="middle">1 (prosty)</text>
-
-                        <!-- 90° Winder Turn Corner (100×100 cm: X = 726 to 774, Y = 480 to 528) -->
-                        <rect x="726" y="480" width="48" height="48" fill="#fef3c7" stroke="#b45309"
-                            stroke-width="1.4" />
-                        <!-- STAIRS 2, 3, 4: EXACTLY 3 RADIAL STEPS BUILDING THE TURN FROM INNER CORNER (774, 528) -->
-                        <!-- Stair 2: diagonal to West Wall -->
-                        <line x1="774" y1="528" x2="726" y2="540" stroke="#7c4d1e" stroke-width="1.6" />
-                        <text x="742" y="546" font-family="'JetBrains Mono', monospace" font-size="7" font-weight="700"
-                            fill="#b45309">2</text>
-                        <!-- Stair 3: diagonal into NW Corner -->
-                        <line x1="774" y1="528" x2="726" y2="480" stroke="#7c4d1e" stroke-width="1.8" />
-                        <text x="742" y="508" font-family="'JetBrains Mono', monospace" font-size="7" font-weight="700"
-                            fill="#b45309">3</text>
-                        <!-- Stair 4: diagonal to North Wall -->
-                        <line x1="774" y1="528" x2="756" y2="480" stroke="#7c4d1e" stroke-width="1.8" />
-                        <text x="760" y="494" font-family="'JetBrains Mono', monospace" font-size="7" font-weight="700"
-                            fill="#b45309">4</text>
-
-                        <!-- STAIRS 5+: ALL SUBSEQUENT STAIRS GO ALONG THE NORTH WALL (VERTICAL LINES PERPENDICULAR TO NORTH WALL) -->
-                        <rect x="774" y="480" width="161" height="48" fill="#fdfaf5" stroke="#7c4d1e"
-                            stroke-width="1.2" />
-
-                        <!-- Step 5 (Along Wall): Vertical line at X = 774 -->
-                        <line x1="774" y1="480" x2="774" y2="528" stroke="#7c4d1e" stroke-width="1.8" />
-                        <text x="772" y="495" font-family="'JetBrains Mono', monospace" font-size="7" font-weight="700"
-                            fill="#15803d" text-anchor="end">5</text>
-
-                        <!-- Diagonal Cut Line (Linia przekroju poziomego) -->
-                        <line x1="798" y1="480" x2="774" y2="528" stroke="#dc2626" stroke-width="1.5"
-                            stroke-dasharray="6 2" />
-
-                        <!-- Steps 6 to 19 along North Wall (Solid before cut line, Dashed after cut line) -->
-                        <line x1="790" y1="480" x2="790" y2="528" stroke="#7c4d1e" stroke-width="1.2" />
-                        <line x1="804" y1="480" x2="804" y2="528" stroke="#7c4d1e" stroke-width="1.2"
-                            stroke-dasharray="3 2" />
-                        <line x1="818" y1="480" x2="818" y2="528" stroke="#7c4d1e" stroke-width="1.2"
-                            stroke-dasharray="3 2" />
-                        <line x1="832" y1="480" x2="832" y2="528" stroke="#7c4d1e" stroke-width="1.2"
-                            stroke-dasharray="3 2" />
-                        <line x1="846" y1="480" x2="846" y2="528" stroke="#7c4d1e" stroke-width="1.2"
-                            stroke-dasharray="3 2" />
-                        <line x1="860" y1="480" x2="860" y2="528" stroke="#7c4d1e" stroke-width="1.2"
-                            stroke-dasharray="3 2" />
-                        <line x1="874" y1="480" x2="874" y2="528" stroke="#7c4d1e" stroke-width="1.2"
-                            stroke-dasharray="3 2" />
-                        <line x1="888" y1="480" x2="888" y2="528" stroke="#7c4d1e" stroke-width="1.2"
-                            stroke-dasharray="3 2" />
-                        <line x1="902" y1="480" x2="902" y2="528" stroke="#7c4d1e" stroke-width="1.2"
-                            stroke-dasharray="3 2" />
-                        <line x1="916" y1="480" x2="916" y2="528" stroke="#7c4d1e" stroke-width="1.2"
-                            stroke-dasharray="3 2" />
-                        <line x1="930" y1="480" x2="930" y2="528" stroke="#7c4d1e" stroke-width="1.2"
-                            stroke-dasharray="3 2" />
-
-                        <!-- Balustrade line along inner edge (balustrada h=90) -->
-                        <line x1="774" y1="528" x2="935" y2="528" stroke="#b45309" stroke-width="2" />
-                        <text x="855" y="538" font-family="'JetBrains Mono', monospace" font-size="7.5"
-                            font-weight="600" fill="#78350f" text-anchor="middle">balustrada h=90</text>
-
-                        <!-- Walking Line with Start Dot & Direction Arrow (Linia biegu) -->
-                        <circle cx="750" cy="612" r="2.5" fill="#dc2626" />
-                        <path d="M 750 612 L 750 528 Q 750 504 774 504 L 925 504" fill="none" stroke="#dc2626"
-                            stroke-width="1.4" stroke-dasharray="4 2" />
-                        <polygon points="925,501 932,504 925,507" fill="#dc2626" />
-
-                        <!-- Plan CAD Dimensions: 100 | 10 | 240 -->
-                        <!-- 100 Dimension (Lower Flight Width) -->
-                        <line x1="726" y1="628" x2="774" y2="628" stroke="#c2410c" stroke-width="1" />
-                        <line x1="726" y1="624" x2="726" y2="632" stroke="#c2410c" stroke-width="1" />
-                        <line x1="774" y1="624" x2="774" y2="632" stroke="#c2410c" stroke-width="1" />
-                        <text x="750" y="626" font-family="'JetBrains Mono', monospace" font-size="8" font-weight="700"
-                            fill="#9a3412" text-anchor="middle">100</text>
-
-                        <!-- 240 Dimension (Straight Run along Wall) -->
-                        <line x1="774" y1="463" x2="930" y2="463" stroke="#c2410c" stroke-width="1" />
-                        <line x1="774" y1="460" x2="774" y2="466" stroke="#c2410c" stroke-width="1" />
-                        <line x1="930" y1="460" x2="930" y2="466" stroke="#c2410c" stroke-width="1" />
-                        <text x="852" y="461" font-family="'JetBrains Mono', monospace" font-size="9" font-weight="700"
-                            fill="#9a3412" text-anchor="middle">240</text>
-
-                        <!-- Inset Legend / CAD Spec Label -->
-                        <rect x="782" y="546" width="158" height="20" rx="3" fill="#ffffff" fill-opacity="0.95"
-                            stroke="#e5e7eb" stroke-width="0.8" />
-                        <text x="861" y="555" font-family="'JetBrains Mono', monospace" font-size="8" font-weight="700"
-                            fill="#9a3412" text-anchor="middle">1. Prosty + 2–4. Zabieg + 5–19. Bieg</text>
-                        <text x="861" y="563.5" font-family="'Outfit', sans-serif" font-size="7" fill="#4b5563"
-                            text-anchor="middle">19 × 17,5 × 28 cm · balustrada h=90</text>
+                        <!-- Step 19 (Top Landing Riser to +3,325 m): Riser at X = 718.9 (Y = 325.0 -> 307.5) -->
+                        <line x1="718.9" y1="325.0" x2="718.9" y2="307.5" stroke="#4a3f35" stroke-width="1.0" />
                     </g>
 
                     <!-- ==================== 8. THREE WARM HUMAN SILHOUETTES (AS IN SCREEN) ==================== -->
@@ -1367,15 +1198,16 @@
                             <text x="536.9" y="39" font-family="'Outfit', sans-serif" font-size="9"
                                 font-weight="700" fill="#78350f" text-anchor="middle">End of 4 Stairs → End of Stairs (on vertical line)</text>
 
-                            <!-- Dedicated Highlighted Separate Row: 3,310 mm from D2 Right Edge (X=241.3) to Door D3 Hole (X=572.3) -->
+                            <!-- Dedicated Highlighted Separate Row: 3,310 mm from D2 Right Edge (X=241.3) to Door D3 Hole (X=572.3) + 900 mm D3 Hole + 280 mm Wall -->
                             <g id="scale-highlight-row-d2-d3">
                                 <!-- Subtle container highlight band for this separate row -->
-                                <rect x="235" y="48" width="435" height="42" rx="6" fill="#fff7ed" stroke="#fdba74"
+                                <rect x="235" y="48" width="465" height="42" rx="6" fill="#fff7ed" stroke="#fdba74"
                                     stroke-width="1" stroke-dasharray="4 2" opacity="0.75" />
 
-                                <!-- Leader lines down from Door D3 edges -->
+                                <!-- Leader lines down from Door D3 edges & Wall End -->
                                 <line x1="572.3" y1="-50" x2="572.3" y2="74" stroke="#dc2626" stroke-width="1.2" stroke-dasharray="3 2" />
                                 <line x1="662.3" y1="-50" x2="662.3" y2="74" stroke="#c2410c" stroke-width="1.2" stroke-dasharray="3 2" />
+                                <line x1="690.3" y1="-50" x2="690.3" y2="74" stroke="#c2410c" stroke-width="1.2" stroke-dasharray="3 2" />
 
                                 <!-- Dimension Segment 1: 3,310 mm (Door D2 Right Edge to Door D3) -->
                                 <line x1="241.3" y1="52" x2="241.3" y2="72" stroke="#dc2626" stroke-width="1.8" />
@@ -1401,6 +1233,17 @@
                                     font-weight="700" fill="#c2410c" text-anchor="middle">900</text>
                                 <text x="617.3" y="84" font-family="'Outfit', sans-serif" font-size="9"
                                     font-weight="700" fill="#9a3412" text-anchor="middle">D3 Hole</text>
+<!-- Dimension Segment 3: Wall next to D3 (280 mm: X = 662.3 to 690.3) -->
+<line x1="690.3" y1="52" x2="690.3" y2="72" stroke="#c2410c" stroke-width="1.6" />
+<line x1="662.3" y1="62" x2="690.3" y2="62" stroke="#c2410c" stroke-width="1.5" marker-start="url(#dim-tick)"
+    marker-end="url(#dim-tick)" />
+<!-- Badge for 280 mm Wall -->
+<rect x="664.3" y="51" width="24" height="22" rx="4" fill="#ffffff" stroke="#c2410c" stroke-width="1.3"
+    filter="drop-shadow(0 1px 3px rgba(194,65,12,0.15))" />
+<text x="676.3" y="66" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700" fill="#c2410c"
+    text-anchor="middle">280</text>
+<text x="676.3" y="84" font-family="'Outfit', sans-serif" font-size="8.5" font-weight="700" fill="#9a3412"
+    text-anchor="middle">Wall End</text>
                             </g>
                         </g>
 
@@ -1459,7 +1302,7 @@
                                 font-weight="700" fill="#9a3412" text-anchor="end">33</text>
                         </g>
 
-                        <!-- UNDER-STAIR DOOR D3 LOCAL DIMENSIONS (900 mm width × 2100 mm height) -->
+                        <!-- UNDER-STAIR DOOR D3 & WALL LOCAL DIMENSIONS (900 mm Door Hole + 280 mm Wall) -->
                         <!-- Door D3 Hole Width: 900 mm (X = 572.3 to 662.3 at Y = 416) -->
                         <line x1="572.3" y1="416" x2="662.3" y2="416" stroke="#c2410c" stroke-width="1.2"
                             marker-start="url(#dim-tick)" marker-end="url(#dim-tick)" />
@@ -1470,15 +1313,25 @@
                         <text x="617.3" y="420" font-family="'JetBrains Mono', monospace" font-size="11.5"
                             font-weight="700" fill="#9a3412" text-anchor="middle">900</text>
 
-                        <!-- Door D3 Hole Height: 2100 mm (from floor Y = 640 to top of opening Y = 430 at X = 672.3) -->
-                        <g transform="translate(672.3, 0)">
+                        <!-- Wall next to D3 Width: 280 mm (X = 662.3 to 690.3 at Y = 416) -->
+                        <line x1="662.3" y1="416" x2="690.3" y2="416" stroke="#c2410c" stroke-width="1.2" marker-start="url(#dim-tick)"
+                            marker-end="url(#dim-tick)" />
+                        <line x1="690.3" y1="344.25" x2="690.3" y2="425" stroke="#c2410c" stroke-width="0.8" stroke-dasharray="2 2" />
+                        <rect x="665.3" y="406" width="22" height="20" rx="4" fill="#ffffff" stroke="#c2410c" stroke-width="1.2"
+                            filter="drop-shadow(0 1px 2px rgba(0,0,0,0.08))" />
+                        <text x="676.3" y="420" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700" fill="#9a3412"
+                            text-anchor="middle">280</text>
+                        
+                        <!-- Door D3 Hole Height: 2100 mm (from floor Y = 640 to top of opening Y = 430 at X = 558 to left of D3) -->
+                        <g transform="translate(558, 0)">
                             <line x1="0" y1="430" x2="0" y2="640" stroke="#c2410c" stroke-width="1.1" />
                             <line x1="-5" y1="430" x2="5" y2="430" stroke="#c2410c" stroke-width="1.2" />
                             <line x1="-5" y1="640" x2="5" y2="640" stroke="#c2410c" stroke-width="1.2" />
                             <line x1="-3" y1="433" x2="3" y2="427" stroke="#c2410c" stroke-width="1.4" />
                             <line x1="-3" y1="643" x2="3" y2="637" stroke="#c2410c" stroke-width="1.4" />
-                            <text x="12" y="535" font-family="'JetBrains Mono', monospace" font-size="11"
-                                font-weight="700" fill="#9a3412" transform="rotate(-90 12 535)"
+                            <line x1="0" y1="430" x2="14.3" y2="430" stroke="#c2410c" stroke-width="0.8" stroke-dasharray="2 2" />
+                            <text x="-12" y="535" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" fill="#9a3412"
+                                transform="rotate(-90 -12 535)"
                                 text-anchor="middle">2100</text>
                         </g>
 
@@ -1525,31 +1378,33 @@
                             <line x1="12" y1="16" x2="12" y2="12" />
                             <line x1="12" y1="8" x2="12.01" y2="8" />
                         </svg>
-                        <span id="inspector-title">Selected Element: Main Oak Staircase (19 Risers: 1 Str + 3 Zabieg +
-                            15 Bieg)</span>
+                        <span id="inspector-title">Main Staircase (Schody) [Parametric Object]</span>
                     </h3>
                     <p id="inspector-desc" style="font-size: 14px; color: #63564b; margin: 0 0 14px 0;">
-                        Reinforced concrete monolithic stair flight clad in solid 40 mm warm natural oak treads with
-                        white/beige plastered risers. Features an entry turn where exactly 4 first stairs contribute
-                        (Stair 1 straight, Stairs 2–4 build 90° winder turn) and all subsequent stairs (Stairs 5–19)
-                        ascend straight along the North Wall.
+                        Parametric staircase structural object defined with core properties: flooring_height = 0 mm, width = 1000 mm, step_height = 175 mm, step_length = 260 mm (starting at step 5), plank_height = 40 mm, and x = 2549 mm. Features 19 total risers (4-step winder turn + 15-step straight flight along North Wall).
                     </p>
                     <div class="spec-list" id="inspector-specs">
-                        <div class="spec-item">
-                            <div class="spec-label">Total Rise (+0,00 → +3,33)</div>
-                            <div class="spec-value">332.5 cm (~333 cm)</div>
-                        </div>
-                        <div class="spec-item">
-                            <div class="spec-label">Risers × Height</div>
-                            <div class="spec-value">19 × 17.5 cm</div>
-                        </div>
-                        <div class="spec-item">
-                            <div class="spec-label">Tread Depth & Material</div>
-                            <div class="spec-value">28.0 cm Solid Oak (240 cm run)</div>
-                        </div>
-                        <div class="spec-item">
-                            <div class="spec-label">Turn Configuration</div>
-                            <div class="spec-value">1 Straight + 3 Winder Steps</div>
+                        <div class="spec-item"><div class="spec-label">flooring_height</div><div class="spec-value">0 mm (+0,00 m datum)</div></div>
+                        <div class="spec-item"><div class="spec-label">width</div><div class="spec-value">1000 mm (100 cm)</div></div>
+                        <div class="spec-item"><div class="spec-label">step_height</div><div class="spec-value">175 mm (17.5 cm riser)</div></div>
+                        <div class="spec-item"><div class="spec-label">step_length</div><div class="spec-value">260 mm (26.0 cm tread run, steps 5–19)</div></div>
+                        <div class="spec-item"><div class="spec-label">plank_height</div><div class="spec-value">40 mm (40 mm oak tread plank)</div></div>
+                        <div class="spec-item"><div class="spec-label">x (start position)</div><div class="spec-value">X = 2,549 mm (post-brick)</div></div>
+                        <div class="spec-item"><div class="spec-label">turn_steps_count</div><div class="spec-value">4 steps (1 Straight + 3 Zabieg)</div></div>
+                        <div class="spec-item"><div class="spec-label">straight_risers_count</div><div class="spec-value">15 risers (Steps 5 to 19)</div></div>
+                        <div class="spec-item"><div class="spec-label">straight_treads_count</div><div class="spec-value">14 treads (Steps 5 to 18)</div></div>
+                        <div class="spec-item"><div class="spec-label">straight_flight_run</div><div class="spec-value">3,640 mm (14 × 260 mm)</div></div>
+                        <div class="spec-item"><div class="spec-label">end_x (end position)</div><div class="spec-value">X = 7,189 mm (on vertical axis)</div></div>
+                        <div class="spec-item"><div class="spec-label">total_risers</div><div class="spec-value">19 risers (3,325 mm total rise)</div></div>
+                        <div class="spec-item"><div class="spec-label">balustrade_height</div><div class="spec-value">900 mm (h=90 cm above pitch)</div></div>
+                        <div class="spec-item"><div class="spec-label">Display Mode</div><div class="spec-value" style="color: #047857; font-weight: 700;">Structural Skeleton (Thin Lines)</div></div>
+                        <div style="grid-column: 1 / -1; margin-top: 10px; display: flex; gap: 8px;">
+                            <button class="toggle-btn active" style="flex: 1; justify-content: center; background: #ea580c; color: white;" onclick="toggleStairPlanks()">
+                                🪵 Preview with 40 mm Wood Planks
+                            </button>
+                            <button class="toggle-btn active" style="justify-content: center; background: #0f172a; color: white;" onclick="WindowEditorModal.open('staircase')">
+                                ⚙️ Edit Object
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -1649,16 +1504,16 @@
                         <tr>
                             <td><strong>ST-01</strong></td>
                             <td>Stair Entry Turn (Stairs 1–4: 1 Straight + 3 Zabieg)</td>
-                            <td><strong>100 cm (1000 mm)</strong> width · 4 risers × 17.5 cm (70 cm rise)</td>
+                            <td><strong>1000 mm width</strong> · 4 risers × 175 mm (700 mm rise)</td>
                             <td>+0,00 to +0,70 m</td>
-                            <td>Starts at X = 2,549 mm. Fits entirely inside 1,000 mm width (X = 2,549 to 3,549 mm). Stair 1 is straight approach; Stairs 2, 3, 4 build the 90° winder turn; Step 4 right side is fully aligned with the North Wall at X = 3,549 mm.</td>
+                            <td><strong>Object properties:</strong> <code>flooring_height: 0 mm</code>, <code>width: 1000 mm</code>, <code>step_height: 175 mm</code>, <code>plank_height: 40 mm</code>, <code>x: 2549 mm</code>. Starts at X = 2,549 mm (post-brick). Fits entirely within 1,000 mm width (X = 2,549 to 3,549 mm). Step 4 right side is fully aligned with North Wall at X = 3,549 mm.</td>
                         </tr>
                         <tr>
                             <td><strong>ST-02</strong></td>
                             <td>Main Stair Flight Along North Wall (Stairs 5–19)</td>
-                            <td><strong>3,640 mm run</strong> · 15 risers × 17.5 cm (262.5 cm rise) · 14 treads × 26.0 cm</td>
+                            <td><strong>3,640 mm run</strong> · 15 risers × 175 mm (2625 mm rise) · 14 treads × 260 mm</td>
                             <td>+0,70 to +3,33 m</td>
-                            <td>Runs 3,640 mm from end of 4-step turn (X = 3,549 mm) to end of stairs on vertical line (X = 7,189 mm). 15 risers ascend straight along the North Wall to +3,33 m floor slab with balustrada h=90 cm.</td>
+                            <td><strong>Object properties:</strong> <code>step_height: 175 mm</code>, <code>step_length: 260 mm</code> (stairs 5–19), <code>straight_flight_run: 3640 mm</code>, <code>end_x: 7189 mm</code>. 15 risers ascend straight along North Wall to +3,33 m finished floor slab with balustrada h=90 cm.</td>
                         </tr>
                         <tr>
                             <td><strong>CL-01</strong></td>
@@ -1676,6 +1531,14 @@
                             <td>Located at 3,310 mm distance from right edge of Door D2 (X = 5,723 to 6,623 mm); natural oak door leaf with brushed bronze hardware</td>
                         </tr>
                         <tr>
+                            <td><strong>WL-04</strong></td>
+                            <td>Ground Floor Wall Pier next to D3</td>
+                            <td><strong>280 mm</strong> wide (X = 6,623 to 6,903 mm)</td>
+                            <td>+0,00 to +2,92 m (stair soffit)</td>
+                            <td>280 mm of wall next to Door D3 on the right; the wall terminates at X = 6,903 mm on the ground floor (+0,00),
+                                leaving the remainder of the under-stair flight (X = 6,903 to 7,189 mm) open below</td>
+                            </tr>
+                            <tr>
                             <td><strong>SL-01</strong></td>
                             <td>First Floor Slab Assembly</td>
                             <td><strong>37 cm total</strong> (20 cm RC + 17 cm finish)</td>
@@ -1792,26 +1655,36 @@
         </div>
     </div>
 
-    <!-- Load Canonical Window Database & Multi-View Coordinate Services -->
+    <!-- Load Canonical Window & Stair Database & Multi-View Coordinate Services -->
     <script src="data/windows.js"></script>
+    <script src="data/stairs.js"></script>
     <script src="js/window-store.js"></script>
     <script src="js/coordinate-service.js"></script>
     <script src="js/window-component.js"></script>
+    <script src="js/stair-component.js"></script>
     <script src="js/window-editor-modal.js"></script>
 
     <script>
         // Element inspector details dictionary
         const ELEMENT_SPECS = {
             'staircase': {
-                title: 'Selected Element: Main Oak Staircase (19 Risers: 1 Str + 3 Zabieg + 15 Bieg)',
-                desc: 'Reinforced concrete monolithic stair flight clad in solid 40 mm warm natural oak treads with white/beige plastered risers. Features a 1,000 mm wide entry turn where exactly 4 first stairs contribute (Stair 1 is straight approach, Stairs 2–4 build 90° winder turn; Step 4 right side aligns with the North Wall at X = 3,549 mm). The subsequent straight flight runs for exactly 3,640 mm along the North Wall (X = 3,549 to 7,189 mm) to the end of stairs on the vertical line.',
+                title: 'Selected Element: Main Staircase Object (Schody Parametryczne)',
+                desc: 'Parametric staircase structural object defined with core properties: flooring_height = 0 mm, width = 1000 mm, step_height = 175 mm, step_length = 260 mm (starting at step 5), plank_height = 40 mm, and x = 2549 mm. Features 19 total risers (4-step winder turn + 15-step straight flight along North Wall).',
                 specs: [
-                    { label: 'Start Coordinate', value: 'X = 2,549 mm (Post-Brick)' },
-                    { label: 'Turn Block Width', value: '1,000 mm (X = 2,549 to 3,549 mm)' },
-                    { label: 'Straight Flight Run', value: '3,640 mm (X = 3,549 to 7,189 mm)' },
-                    { label: 'End of Stairs Coordinate', value: 'X = 7,189 mm (on vertical line)' },
-                    { label: 'Total Rise (+0,00 → +3,33)', value: '332.5 cm (~333 cm)' },
-                    { label: 'Risers × Height', value: '19 × 17.5 cm (15 risers in straight flight)' }
+                    { label: 'Object ID', value: 'main_staircase' },
+                    { label: 'flooring_height', value: '0 mm (+0,00 m datum)' },
+                    { label: 'width', value: '1,000 mm (100 cm)' },
+                    { label: 'step_height', value: '175 mm (17.5 cm riser)' },
+                    { label: 'step_length', value: '260 mm (26.0 cm tread, steps 5–19)' },
+                    { label: 'plank_height', value: '40 mm (finish oak tread plank)' },
+                    { label: 'x (start position)', value: 'X = 2,549 mm (Post-Brick datum)' },
+                    { label: 'global_x', value: 'X = 16,361 mm on North Facade map' },
+                    { label: 'total_risers', value: '19 risers (4 turn + 15 straight flight)' },
+                    { label: 'straight_flight_run', value: '3,640 mm (14 treads × 260 mm)' },
+                    { label: 'end_x (end position)', value: 'X = 7,189 mm (on vertical axis)' },
+                    { label: 'total_rise', value: '3,325 mm (~333 cm to +3,33 m slab)' },
+                    { label: 'balustrade_height', value: '900 mm (h=90 cm)' },
+                    { label: 'current_mode', value: 'Structural Skeleton (Planks: Off)' }
                 ]
             },
             'stair_turn': {
@@ -1916,30 +1789,66 @@
                 ]
             },
             'door_d3': {
-                title: 'Selected Element: Door D3 under Stairs (900 × 2100 mm Hole)',
-                desc: 'Rough wall hole of 900 × 2100 mm fitted with an 800 × 2050 mm natural oak flush door leaf built into the wall beneath the staircase, positioned at an exact distance of 3,310 mm from the right edge of Door D2 (X = 5,723 to 6,623 mm).',
+                title: 'Selected Element: Door D3 & Ground Floor Wall',
+                desc: 'Rough wall hole of 900 × 2100 mm fitted with an 800 × 2050 mm natural oak flush door leaf built into the wall beneath the staircase, positioned at 3,310 mm from the right edge of Door D2 (X = 5,723 to 6,623 mm). To the right of D3, 280 mm of wall extends to X = 6,903 mm, where the ground floor wall terminates.',
                 specs: [
                     { label: 'Door Hole', value: '900 × 2100 mm (90 × 210 cm)' },
                     { label: 'Door Leaf Size', value: '800 × 2050 mm (80 × 205 cm)' },
                     { label: 'Distance from D2 Right Edge', value: '3,310 mm (331.0 cm)' },
-                    { label: 'Coordinate Range', value: 'X = 5,723 to 6,623 mm' },
-                    { label: 'Elevation', value: '+0,00 m Finished Floor Datum' }
+                    { label: 'Wall Next to D3 (Right)', value: '280 mm (X = 6,623 to 6,903 mm)' },
+                    { label: 'Ground Floor Wall End', value: 'X = 6,903 mm (wall terminates here)' },
+                    { label: 'Open Clearance under Stairs', value: 'X = 6,903 to 7,189 mm (286 mm span)' }
                 ]
             },
             'under_stair_door': {
-                title: 'Selected Element: Door D3 under Stairs (900 × 2100 mm Hole)',
-                desc: 'Rough wall hole of 900 × 2100 mm fitted with an 800 × 2050 mm natural oak flush door leaf built into the wall beneath the staircase, positioned at an exact distance of 3,310 mm from the right edge of Door D2 (X = 5,723 to 6,623 mm).',
+                title: 'Selected Element: Door D3 & Ground Floor Wall',
+                desc: 'Rough wall hole of 900 × 2100 mm fitted with an 800 × 2050 mm natural oak flush door leaf built into the wall beneath the staircase, positioned at 3,310 mm from the right edge of Door D2 (X = 5,723 to 6,623 mm). To the right of D3, 280 mm of wall extends to X = 6,903 mm, where the ground floor wall terminates.',
                 specs: [
                     { label: 'Door Hole', value: '900 × 2100 mm (90 × 210 cm)' },
                     { label: 'Door Leaf Size', value: '800 × 2050 mm (80 × 205 cm)' },
                     { label: 'Distance from D2 Right Edge', value: '3,310 mm (331.0 cm)' },
-                    { label: 'Coordinate Range', value: 'X = 5,723 to 6,623 mm' },
-                    { label: 'Elevation', value: '+0,00 m Finished Floor Datum' }
+                    { label: 'Wall Next to D3 (Right)', value: '280 mm (X = 6,623 to 6,903 mm)' },
+                    { label: 'Ground Floor Wall End', value: 'X = 6,903 mm (wall terminates here)' },
+                    { label: 'Open Clearance under Stairs', value: 'X = 6,903 to 7,189 mm (286 mm span)' }
                 ]
             }
         };
 
         function showElementDetails(elementKey) {
+            if (elementKey === 'staircase' && typeof StairComponent !== 'undefined') {
+                const stair = StairComponent.get('main_staircase');
+                if (stair) {
+                    document.getElementById('inspector-title').textContent = `${stair.name} [Parametric Object]`;
+                    document.getElementById('inspector-desc').textContent = `${stair.description} (Object ID: ${stair.id})`;
+                    const specsContainer = document.getElementById('inspector-specs');
+                    specsContainer.innerHTML = `
+                        <div class="spec-item"><div class="spec-label">flooring_height</div><div class="spec-value">${stair.flooring_height} mm (+0,00 m datum)</div></div>
+                        <div class="spec-item"><div class="spec-label">width</div><div class="spec-value">${stair.width} mm (100 cm)</div></div>
+                        <div class="spec-item"><div class="spec-label">step_height</div><div class="spec-value">${stair.step_height} mm (17.5 cm riser)</div></div>
+                        <div class="spec-item"><div class="spec-label">step_length</div><div class="spec-value">${stair.step_length} mm (26.0 cm tread run, stairs 5–19)</div></div>
+                        <div class="spec-item"><div class="spec-label">plank_height</div><div class="spec-value">${stair.plank_height} mm (40 mm oak tread plank)</div></div>
+                        <div class="spec-item"><div class="spec-label">x (start position)</div><div class="spec-value">X = ${stair.x} mm (2,549 mm post-brick)</div></div>
+                        <div class="spec-item"><div class="spec-label">global_x</div><div class="spec-value">X = ${stair.global_x} mm on North Facade map</div></div>
+                        <div class="spec-item"><div class="spec-label">turn_steps_count</div><div class="spec-value">${stair.turn_steps_count} steps (1 Straight + 3 Zabieg)</div></div>
+                        <div class="spec-item"><div class="spec-label">straight_risers_count</div><div class="spec-value">${stair.straight_risers_count} risers (Steps 5 to 19)</div></div>
+                        <div class="spec-item"><div class="spec-label">straight_treads_count</div><div class="spec-value">${stair.straight_treads_count} treads (Steps 5 to 18)</div></div>
+                        <div class="spec-item"><div class="spec-label">straight_flight_run</div><div class="spec-value">${stair.straight_flight_run} mm (14 × 260 mm)</div></div>
+                        <div class="spec-item"><div class="spec-label">end_x (end position)</div><div class="spec-value">X = ${stair.end_x} mm (on vertical axis)</div></div>
+                        <div class="spec-item"><div class="spec-label">total_risers</div><div class="spec-value">${stair.total_risers} risers (3,325 mm total rise)</div></div>
+                        <div class="spec-item"><div class="spec-label">balustrade_height</div><div class="spec-value">${stair.balustrade_height} mm (h=90 cm above pitch)</div></div>
+                        <div style="grid-column: 1 / -1; margin-top: 10px; display: flex; gap: 8px;">
+                            <button class="toggle-btn active" style="flex: 1; justify-content: center; background: ${stair.show_planks ? '#7c2d12' : '#ea580c'}; color: white;" onclick="toggleStairPlanks()">
+                                🪵 ${stair.show_planks ? 'Switch to Pure Skeleton View' : 'Preview with 40 mm Wood Planks'}
+                            </button>
+                            <button class="toggle-btn active" style="justify-content: center; background: #0f172a; color: white;" onclick="WindowEditorModal.open('staircase')">
+                                ⚙️ Edit Object
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+            }
+
             const info = ELEMENT_SPECS[elementKey];
             if (!info) return;
             document.getElementById('inspector-title').textContent = info.title;
@@ -1956,6 +1865,15 @@
             if (elementKey === 'O11_3' && typeof WindowEditorModal !== 'undefined') {
                 WindowEditorModal.open('O11_3');
             }
+        }
+
+        function toggleStairPlanks() {
+            if (typeof StairComponent === 'undefined') return;
+            const stair = StairComponent.get('main_staircase');
+            if (!stair) return;
+            const newShow = !stair.show_planks;
+            StairComponent.update('main_staircase', { show_planks: newShow });
+            showElementDetails('staircase');
         }
 
         function toggleLayer(layerId, btn) {
@@ -1975,10 +1893,19 @@
             evt.currentTarget.classList.add('active');
         }
 
-        // Mount dynamic window components on page load
+        // Mount dynamic components on page load
         document.addEventListener('DOMContentLoaded', function () {
             if (typeof WindowComponent !== 'undefined') {
                 WindowComponent.autoMountAll();
+            }
+            if (typeof StairComponent !== 'undefined') {
+                StairComponent.autoMountAll();
+                StairComponent.subscribe(function (id) {
+                    if (id === 'main_staircase') {
+                        showElementDetails('staircase');
+                    }
+                });
+                showElementDetails('staircase');
             }
         });
     </script>

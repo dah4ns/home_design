@@ -219,6 +219,33 @@
                     "sillInterior": "Deep panoramic window bench"
                 }
             }
+        },
+        "stairs": {
+            "main_staircase": {
+                "id": "main_staircase",
+                "name": "Main Staircase (Schody)",
+                "room": "1.07 Komunikacja / Korytarz",
+                "viewId": "stairs_north_wall",
+                "flooring_height": 0,
+                "width": 1000,
+                "step_height": 175,
+                "step_length": 260,
+                "plank_height": 40,
+                "x": 2549,
+                "global_x": 16361,
+                "total_risers": 19,
+                "turn_steps_count": 4,
+                "straight_risers_count": 15,
+                "straight_treads_count": 14,
+                "straight_flight_run": 3640,
+                "end_x": 7189,
+                "total_rise": 3325,
+                "top_floor_elevation": 3330,
+                "balustrade_height": 900,
+                "show_planks": false,
+                "line_thickness": 1.0,
+                "description": "Two-flight interior staircase with 4-step winder entry turn (1 straight + 3 winder) in 1000×1000 mm corner, followed by a 3,640 mm straight flight of 14 treads (260 mm) × 15 risers (175 mm) along the North Wall to finished +3,33 m."
+            }
         }
     };
 }));

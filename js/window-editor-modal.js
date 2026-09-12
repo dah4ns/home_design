@@ -9,12 +9,13 @@
     if (typeof module === 'object' && typeof module.exports === 'object') {
         module.exports = factory(
             require('./window-store.js'),
-            require('./coordinate-service.js')
+            require('./coordinate-service.js'),
+            require('./stair-component.js')
         );
     } else {
-        root.WindowEditorModal = factory(root.WindowStore, root.CoordinateService);
+        root.WindowEditorModal = factory(root.WindowStore, root.CoordinateService, root.StairComponent);
     }
-}(typeof self !== 'undefined' ? self : this, function (WindowStore, CoordinateService) {
+}(typeof self !== 'undefined' ? self : this, function (WindowStore, CoordinateService, StairComponent) {
 
     const WindowEditorModal = {
         currentTab: 'windows', // 'windows' | 'views'
@@ -80,6 +81,9 @@
                             <button id="we-tab-btn-views" onclick="WindowEditorModal.switchTab('views')" style="
                                 background: transparent; border: 1px solid transparent; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 600; color: #64748b; cursor: pointer;
                             ">Architectural Views (2)</button>
+                            <button id="we-tab-btn-stairs" onclick="WindowEditorModal.switchTab('stairs')" style="
+                                background: transparent; border: 1px solid transparent; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 600; color: #64748b; cursor: pointer;
+                            ">Staircase Object (Schody)</button>
                         </div>
 
                         <!-- Body Container -->
@@ -166,6 +170,74 @@
                                 </div>
                             </div>
 
+                            <!-- ================= TAB 3: STAIRCASE (SCHODY) ================= -->
+                            <div id="we-panel-stairs" style="display: none;">
+                                <div style="margin-bottom: 14px; background: #fdfaf5; border: 1px solid #f6efe4; border-left: 4px solid #c2410c; padding: 12px 14px; border-radius: 8px;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <strong style="font-size: 13px; color: #431407;">Main Staircase (Schody) Object</strong>
+                                        <span style="background: #ffedd5; color: #c2410c; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px;">ROOM 1.07</span>
+                                    </div>
+                                    <p style="margin: 4px 0 0 0; font-size: 11.5px; color: #78350f;">
+                                        Parametric staircase geometry with 4-step entry turn (1 straight + 3 winder) and straight flight along the North Wall.
+                                    </p>
+                                </div>
+
+                                <!-- Stair Properties Form -->
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                                    <div>
+                                        <label style="display: block; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 3px;">1) flooring_height (mm)</label>
+                                        <input id="we-stair-flooring" type="number" step="5" oninput="WindowEditorModal.applyStairLiveChange()" style="width: 100%; box-sizing: border-box; padding: 7px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: monospace; font-size: 13px; font-weight: 700; color: #0284c7;" />
+                                        <span style="font-size: 10px; color: #94a3b8;">Floor elevation datum = 0 mm</span>
+                                    </div>
+
+                                    <div>
+                                        <label style="display: block; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 3px;">2) width (mm)</label>
+                                        <input id="we-stair-width" type="number" step="10" oninput="WindowEditorModal.applyStairLiveChange()" style="width: 100%; box-sizing: border-box; padding: 7px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: monospace; font-size: 13px; font-weight: 700; color: #0284c7;" />
+                                        <span style="font-size: 10px; color: #94a3b8;">Width of stairs (1000 mm)</span>
+                                    </div>
+
+                                    <div>
+                                        <label style="display: block; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 3px;">3) step_height (mm)</label>
+                                        <input id="we-stair-step-h" type="number" step="1" oninput="WindowEditorModal.applyStairLiveChange()" style="width: 100%; box-sizing: border-box; padding: 7px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: monospace; font-size: 13px; font-weight: 700; color: #16a34a;" />
+                                        <span style="font-size: 10px; color: #94a3b8;">Riser height (175 mm)</span>
+                                    </div>
+
+                                    <div>
+                                        <label style="display: block; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 3px;">4) step_length (mm)</label>
+                                        <input id="we-stair-step-l" type="number" step="1" oninput="WindowEditorModal.applyStairLiveChange()" style="width: 100%; box-sizing: border-box; padding: 7px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: monospace; font-size: 13px; font-weight: 700; color: #16a34a;" />
+                                        <span style="font-size: 10px; color: #94a3b8;">Run of flight stairs 5–19 (260 mm)</span>
+                                    </div>
+
+                                    <div>
+                                        <label style="display: block; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 3px;">5) plank_height (mm)</label>
+                                        <input id="we-stair-plank-h" type="number" step="1" oninput="WindowEditorModal.applyStairLiveChange()" style="width: 100%; box-sizing: border-box; padding: 7px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: monospace; font-size: 13px; font-weight: 700; color: #b45309;" />
+                                        <span style="font-size: 10px; color: #94a3b8;">Wood tread plank thickness (40 mm)</span>
+                                    </div>
+
+                                    <div>
+                                        <label style="display: block; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 3px;">6) x (position from datum mm)</label>
+                                        <input id="we-stair-x" type="number" step="10" oninput="WindowEditorModal.applyStairLiveChange()" style="width: 100%; box-sizing: border-box; padding: 7px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: monospace; font-size: 13px; font-weight: 700; color: #b45309;" />
+                                        <span style="font-size: 10px; color: #94a3b8;">Stair start after 80 mm brick wall (2549 mm)</span>
+                                    </div>
+                                </div>
+
+                                <!-- Mode Toggle Button -->
+                                <div style="margin-top: 14px;">
+                                    <button id="we-stair-toggle-planks-btn" onclick="WindowEditorModal.toggleStairPlanks()" style="
+                                        width: 100%; background: #ea580c; color: white; border: none; border-radius: 6px; padding: 9px 14px; font-size: 12.5px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+                                    ">
+                                        🪵 Preview with 40 mm Wood Planks
+                                    </button>
+                                </div>
+
+                                <!-- Calculated Geometry Summary -->
+                                <div style="margin-top: 14px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px;">
+                                    <div style="font-size: 11.5px; font-weight: 700; color: #334155; text-transform: uppercase; margin-bottom: 8px;">Derived Calculations (Auto-Computed)</div>
+                                    <div id="we-stair-calcs" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; font-size: 11.5px;">
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Live Feedback Notification -->
                             <div id="we-live-badge" style="margin-top: 14px; padding: 8px 12px; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 6px; font-size: 11.5px; color: #065f46; display: flex; align-items: center; gap: 6px;">
                                 <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #10b981;"></span>
@@ -203,28 +275,136 @@
             this.currentTab = tab;
             const pWindows = document.getElementById('we-panel-windows');
             const pViews = document.getElementById('we-panel-views');
+            const pStairs = document.getElementById('we-panel-stairs');
             const bWindows = document.getElementById('we-tab-btn-windows');
             const bViews = document.getElementById('we-tab-btn-views');
+            const bStairs = document.getElementById('we-tab-btn-stairs');
+
+            [pWindows, pViews, pStairs].forEach(p => { if (p) p.style.display = 'none'; });
+            [bWindows, bViews, bStairs].forEach(b => {
+                if (b) {
+                    b.style.background = 'transparent';
+                    b.style.color = '#64748b';
+                    b.style.borderColor = 'transparent';
+                }
+            });
 
             if (tab === 'windows') {
-                pWindows.style.display = 'block';
-                pViews.style.display = 'none';
-                bWindows.style.background = '#ffffff';
-                bWindows.style.color = '#0f172a';
-                bWindows.style.borderColor = '#cbd5e1';
-                bViews.style.background = 'transparent';
-                bViews.style.color = '#64748b';
-                bViews.style.borderColor = 'transparent';
-            } else {
-                pWindows.style.display = 'none';
-                pViews.style.display = 'block';
-                bViews.style.background = '#ffffff';
-                bViews.style.color = '#0f172a';
-                bViews.style.borderColor = '#cbd5e1';
-                bWindows.style.background = 'transparent';
-                bWindows.style.color = '#64748b';
-                bWindows.style.borderColor = 'transparent';
+                if (pWindows) pWindows.style.display = 'block';
+                if (bWindows) {
+                    bWindows.style.background = '#ffffff';
+                    bWindows.style.color = '#0f172a';
+                    bWindows.style.borderColor = '#cbd5e1';
+                }
+            } else if (tab === 'views') {
+                if (pViews) pViews.style.display = 'block';
+                if (bViews) {
+                    bViews.style.background = '#ffffff';
+                    bViews.style.color = '#0f172a';
+                    bViews.style.borderColor = '#cbd5e1';
+                }
                 this._renderViewsList();
+            } else if (tab === 'stairs') {
+                if (pStairs) pStairs.style.display = 'block';
+                if (bStairs) {
+                    bStairs.style.background = '#ffffff';
+                    bStairs.style.color = '#0f172a';
+                    bStairs.style.borderColor = '#cbd5e1';
+                }
+                this.loadStaircase();
+            }
+        },
+
+        _getStairComponent: function () {
+            if (typeof StairComponent !== 'undefined' && StairComponent) return StairComponent;
+            if (typeof window !== 'undefined' && window.StairComponent) return window.StairComponent;
+            return null;
+        },
+
+        loadStaircase: function () {
+            const sc = this._getStairComponent();
+            if (!sc) return;
+            const s = sc.get('main_staircase');
+            if (!s) return;
+
+            const elFloor = document.getElementById('we-stair-flooring');
+            const elWidth = document.getElementById('we-stair-width');
+            const elStepH = document.getElementById('we-stair-step-h');
+            const elStepL = document.getElementById('we-stair-step-l');
+            const elPlankH = document.getElementById('we-stair-plank-h');
+            const elX = document.getElementById('we-stair-x');
+            const btnPlanks = document.getElementById('we-stair-toggle-planks-btn');
+
+            if (elFloor) elFloor.value = s.flooring_height;
+            if (elWidth) elWidth.value = s.width;
+            if (elStepH) elStepH.value = s.step_height;
+            if (elStepL) elStepL.value = s.step_length;
+            if (elPlankH) elPlankH.value = s.plank_height;
+            if (elX) elX.value = s.x;
+
+            if (btnPlanks) {
+                btnPlanks.innerHTML = s.show_planks ? '🪵 Switch to Pure Skeleton View' : '🪵 Preview with 40 mm Wood Planks';
+                btnPlanks.style.background = s.show_planks ? '#7c2d12' : '#ea580c';
+            }
+
+            this._updateStairCalcs(s);
+        },
+
+        _updateStairCalcs: function (s) {
+            const calcs = document.getElementById('we-stair-calcs');
+            if (!calcs) return;
+            const blondel = (2 * s.step_height) + s.step_length;
+            calcs.innerHTML = `
+                <div style="background: white; padding: 6px 8px; border-radius: 4px; border: 1px solid #e2e8f0;">
+                    <span style="color: #64748b; font-size: 10px; text-transform: uppercase; display: block;">Total Rise</span>
+                    <strong style="color: #0f172a;">${s.total_rise} mm</strong> (${s.total_risers} risers)
+                </div>
+                <div style="background: white; padding: 6px 8px; border-radius: 4px; border: 1px solid #e2e8f0;">
+                    <span style="color: #64748b; font-size: 10px; text-transform: uppercase; display: block;">Flight Run</span>
+                    <strong style="color: #0f172a;">${s.straight_flight_run} mm</strong> (${s.straight_treads_count} treads)
+                </div>
+                <div style="background: white; padding: 6px 8px; border-radius: 4px; border: 1px solid #e2e8f0;">
+                    <span style="color: #64748b; font-size: 10px; text-transform: uppercase; display: block;">End X</span>
+                    <strong style="color: #0f172a;">X = ${s.end_x} mm</strong>
+                </div>
+                <div style="background: white; padding: 6px 8px; border-radius: 4px; border: 1px solid #e2e8f0;">
+                    <span style="color: #64748b; font-size: 10px; text-transform: uppercase; display: block;">Top Floor Elevation</span>
+                    <strong style="color: #0f172a;">+${(s.top_floor_elevation / 1000).toFixed(2).replace('.', ',')} m</strong>
+                </div>
+                <div style="background: white; padding: 6px 8px; border-radius: 4px; border: 1px solid #e2e8f0; grid-column: span 2;">
+                    <span style="color: #64748b; font-size: 10px; text-transform: uppercase; display: block;">Blondel Rule: 2h + s = 600–650 mm</span>
+                    <strong style="color: ${blondel >= 600 && blondel <= 650 ? '#059669' : '#d97706'};">2×${s.step_height} + ${s.step_length} = ${blondel} mm ${blondel >= 600 && blondel <= 650 ? '✓ (Optimal)' : ''}</strong>
+                </div>
+            `;
+        },
+
+        applyStairLiveChange: function () {
+            const sc = this._getStairComponent();
+            if (!sc) return;
+
+            const updates = {
+                flooring_height: Number(document.getElementById('we-stair-flooring').value) || 0,
+                width: Number(document.getElementById('we-stair-width').value) || 1000,
+                step_height: Number(document.getElementById('we-stair-step-h').value) || 175,
+                step_length: Number(document.getElementById('we-stair-step-l').value) || 260,
+                plank_height: Number(document.getElementById('we-stair-plank-h').value) || 40,
+                x: Number(document.getElementById('we-stair-x').value) || 2549
+            };
+
+            const updated = sc.update('main_staircase', updates);
+            this._updateStairCalcs(updated);
+        },
+
+        toggleStairPlanks: function () {
+            const sc = this._getStairComponent();
+            if (!sc) return;
+            const s = sc.get('main_staircase');
+            if (!s) return;
+            const updated = sc.update('main_staircase', { show_planks: !s.show_planks });
+            const btn = document.getElementById('we-stair-toggle-planks-btn');
+            if (btn) {
+                btn.innerHTML = updated.show_planks ? '🪵 Switch to Pure Skeleton View' : '🪵 Preview with 40 mm Wood Planks';
+                btn.style.background = updated.show_planks ? '#7c2d12' : '#ea580c';
             }
         },
 
@@ -290,12 +470,17 @@
             container.innerHTML = html;
         },
 
-        open: function (targetWindowId) {
+        open: function (targetTabOrWindowId) {
             this.init();
             const container = document.getElementById('window-editor-modal-container');
             if (container) {
                 container.style.display = 'flex';
-                this._populateSelect(targetWindowId || 'O1');
+                if (targetTabOrWindowId === 'stairs' || targetTabOrWindowId === 'staircase') {
+                    this.switchTab('stairs');
+                } else {
+                    this.switchTab('windows');
+                    this._populateSelect(targetTabOrWindowId || 'O1');
+                }
             }
         },
 
