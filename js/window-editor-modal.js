@@ -368,8 +368,16 @@
                     <strong style="color: #0f172a;">${s.total_rise} mm</strong> (${s.total_risers} risers)
                 </div>
                 <div style="background: white; padding: 6px 8px; border-radius: 4px; border: 1px solid #e2e8f0;">
-                    <span style="color: #64748b; font-size: 10px; text-transform: uppercase; display: block;">Flight Run</span>
-                    <strong style="color: #0f172a;">${s.straight_flight_run} mm</strong> (${s.straight_treads_count} treads)
+                    <span style="color: #64748b; font-size: 10px; text-transform: uppercase; display: block;" title="Related only to the part after the turn">Horizontal Gain (after turn)</span>
+                    <strong style="color: #0f172a;">${s.horizontal_gain || s.straight_flight_run} mm</strong> (${s.straight_treads_count} treads)
+                </div>
+                <div style="background: white; padding: 6px 8px; border-radius: 4px; border: 1px solid #e2e8f0;">
+                    <span style="color: #64748b; font-size: 10px; text-transform: uppercase; display: block;" title="Related only to the part after the turn">Elevation Gain (after turn)</span>
+                    <strong style="color: #047857;">${s.elevation_gain || (s.straight_risers_count * s.step_height)} mm</strong> (${s.straight_risers_count} risers)
+                </div>
+                <div style="background: white; padding: 6px 8px; border-radius: 4px; border: 1px solid #e2e8f0;">
+                    <span style="color: #64748b; font-size: 10px; text-transform: uppercase; display: block;" title="Distance along North Wall from Step 5 to D3 left edge">Step 5 → D3 Left Edge</span>
+                    <strong style="color: #dc2626;">${s.step5_to_d3_distance || Math.round(5723 - (s.x + (s.width || 1000)))} mm</strong>
                 </div>
                 <div style="background: white; padding: 6px 8px; border-radius: 4px; border: 1px solid #e2e8f0;">
                     <span style="color: #64748b; font-size: 10px; text-transform: uppercase; display: block;">Stair Slab</span>

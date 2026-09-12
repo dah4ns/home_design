@@ -43,7 +43,10 @@
             turn_steps_count: 4,
             straight_risers_count: 15,
             straight_treads_count: 14,
+            horizontal_gain: 3640,
             straight_flight_run: 3640,
+            elevation_gain: 2625,
+            step5_to_d3_distance: 2174,
             end_x: 7189,
             total_rise: 3325,
             top_floor_elevation: 3330,
@@ -129,18 +132,27 @@
             s.total_risers = s.turn_steps_count + s.straight_risers_count;
 
             if (s._use_end_x && typeof s.end_x !== 'undefined' && typeof s.x !== 'undefined') {
-                s.straight_flight_run = s.end_x - s.x - (s.width || 1000);
-                s.step_length = Math.round((s.straight_flight_run / s.straight_treads_count) * 100) / 100;
+                s.horizontal_gain = s.end_x - s.x - (s.width || 1000);
+                s.straight_flight_run = s.horizontal_gain;
+                s.step_length = Math.round((s.horizontal_gain / s.straight_treads_count) * 100) / 100;
             } else if (typeof s.step_length !== 'undefined') {
-                s.straight_flight_run = s.straight_treads_count * s.step_length;
-                s.end_x = s.x + (s.width || 1000) + s.straight_flight_run;
+                s.horizontal_gain = s.straight_treads_count * s.step_length;
+                s.straight_flight_run = s.horizontal_gain;
+                s.end_x = s.x + (s.width || 1000) + s.horizontal_gain;
             } else if (typeof s.end_x !== 'undefined') {
-                s.straight_flight_run = s.end_x - s.x - (s.width || 1000);
-                s.step_length = Math.round((s.straight_flight_run / s.straight_treads_count) * 100) / 100;
+                s.horizontal_gain = s.end_x - s.x - (s.width || 1000);
+                s.straight_flight_run = s.horizontal_gain;
+                s.step_length = Math.round((s.horizontal_gain / s.straight_treads_count) * 100) / 100;
+            } else if (typeof s.horizontal_gain !== 'undefined') {
+                s.straight_flight_run = s.horizontal_gain;
+                s.step_length = Math.round((s.horizontal_gain / s.straight_treads_count) * 100) / 100;
+                s.end_x = s.x + (s.width || 1000) + s.horizontal_gain;
             }
 
             s.total_rise = s.total_risers * s.step_height;
             s.top_floor_elevation = s.flooring_height + s.total_rise;
+            s.elevation_gain = s.straight_risers_count * s.step_height; // Elevation gain after turn (15 risers * step_height)
+            s.step5_to_d3_distance = Math.round(5723 - (s.x + (s.width || 1000))); // Distance from Step 5 start to D3 left edge (5,723 mm nominal)
         },
 
         /**

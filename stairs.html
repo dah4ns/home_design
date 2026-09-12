@@ -769,9 +769,17 @@
                     </div>
 
                     <div class="slider-status-card">
-                        <div class="status-metric">
-                            <span class="status-label">Stairs Straight Run:</span>
+                        <div class="status-metric" title="Horizontal run of the straight flight along the North Wall (related only to the part after the turn)">
+                            <span class="status-label">Horizontal Gain (after turn):</span>
                             <span class="status-val" id="metric-flight-run">3,640 mm</span>
+                        </div>
+                        <div class="status-metric" title="Elevation rise between the turn and upper floor (15 risers × 175 mm, related only to the part after the turn)">
+                            <span class="status-label">Elevation Gain (after turn):</span>
+                            <span class="status-val" id="metric-elevation-gain" style="color: #047857;">2,625 mm</span>
+                        </div>
+                        <div class="status-metric" title="Horizontal distance along North Wall from Step 5 (start of straight flight) to Door D3 hole left edge">
+                            <span class="status-label">Step 5 → D3 Left Edge:</span>
+                            <span class="status-val" id="metric-step5-d3" style="color: #dc2626;">2,174 mm</span>
                         </div>
                         <div class="status-metric">
                             <span class="status-label">Step Length (14 Treads):</span>
@@ -780,6 +788,10 @@
                         <div class="status-metric">
                             <span class="status-label">Eyes to Ceiling Corner:</span>
                             <span class="status-val" id="metric-head-clearance" style="color: #0284c7;">45.5 cm (455 mm)</span>
+                        </div>
+                        <div class="status-metric">
+                            <span class="status-label">D3 Left Edge ∩ Slab:</span>
+                            <span class="status-val" id="metric-d3-intersect" style="color: #c2410c;">1,933 mm</span>
                         </div>
                         <button class="reset-sliders-btn" onclick="resetParametricSliders()" title="Reset parametric sliders to original design defaults">
                             ↺ Reset
@@ -802,7 +814,7 @@
                     - First Floor Finished Level (+3,33 m, 333 cm): Y = 307
                     - Right Suspended Ceiling (280 cm clear height, 15.5 cm cavity): Y = 359.5
                 -->
-                <svg class="elevation-svg" viewBox="-55 -40 1050 860" xmlns="http://www.w3.org/2000/svg">
+                <svg class="elevation-svg" viewBox="-55 -40 1050 900" xmlns="http://www.w3.org/2000/svg">
                     <defs>
                         <!-- Warm Interior Wall Plaster Gradient (North Wall Behind Stairs) -->
                         <linearGradient id="warm-north-wall" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -1177,16 +1189,6 @@
                     <!-- Subtle corner reveal shadow on wall edge -->
                     <rect id="under-stair-wall-shadow" x="688.3" y="347.8" width="2" height="292.2" fill="#000000" opacity="0.08" />
                     
-                    <!-- Wall Pier Label: 280 mm of wall next to D3 -->
-                    <g id="under-stair-wall-pier-badge" transform="translate(676.3, 510)">
-                        <rect x="-13" y="-12" width="26" height="23" rx="3.5" fill="#ffffff" fill-opacity="0.9" stroke="#786754"
-                            stroke-width="0.8" />
-                        <text x="0" y="0" font-family="'JetBrains Mono', monospace" font-size="8" font-weight="700" fill="#5c3a1b"
-                            text-anchor="middle">280</text>
-                        <text x="0" y="9" font-family="'Outfit', sans-serif" font-size="6.5" font-weight="600" fill="#786754"
-                            text-anchor="middle">wall</text>
-                    </g>
-                    
                     <!-- Open Under-Stairs Passage Label between X = 690.3 and X = 718.9 -->
                     <text id="under-stair-open-label" x="704.6" y="520" font-family="'Outfit', sans-serif" font-size="7.5" font-weight="600" fill="#8a7967"
                         text-anchor="middle" transform="rotate(-90 704.6 520)" letter-spacing="0.08em">OPEN UNDER STAIRS</text>
@@ -1332,29 +1334,6 @@
                     <g id="layer-headroom">
                         <!-- Headroom Datum Corner Marker at Slab Soffit (X = 346.5, Y = 344) -->
                         <circle cx="346.5" cy="344" r="3" fill="#b45309" stroke="#fff" stroke-width="1" />
-
-                        <!-- Clearance Line 1: 226 cm (Vertical clearance from slab soffit corner [X=346.5, Y=344] down to step tread level [X=346.5, Y=570]) -->
-                        <line x1="346.5" y1="344" x2="346.5" y2="570" stroke="#b45309" stroke-width="1.3"
-                            marker-start="url(#dim-tick)" marker-end="url(#dim-tick)" />
-                        <text x="336.5" y="460" font-family="'JetBrains Mono', monospace" font-size="13"
-                            font-weight="700" fill="#9a3412" transform="rotate(-90 336.5 460)"
-                            text-anchor="middle">226</text>
-
-                        <!-- Clearance Line 2: 209 cm (Sloped clearance from slab soffit corner [X=346.5, Y=344] to Step 5 nosing [X=354.9, Y=552.5]) -->
-                        <line id="headroom-sloped-line" x1="346.5" y1="344" x2="354.9" y2="552.5" stroke="#d97706" stroke-width="1.3"
-                            stroke-dasharray="4 2" marker-start="url(#dim-tick)" marker-end="url(#dim-tick)" />
-                        <text id="headroom-sloped-text" x="358" y="460" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="700"
-                            fill="#b45309" transform="rotate(-88 358 460)" text-anchor="middle">209</text>
-
-                        <!-- Headroom Callout Badge -->
-                        <g transform="translate(352, 350)">
-                            <rect x="0" y="0" width="108" height="24" rx="4" fill="#fffbeb" stroke="#fde68a"
-                                stroke-width="1" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.06))" />
-                            <text x="54" y="11" font-family="'Outfit', sans-serif" font-size="8.5" font-weight="700"
-                                fill="#92400e" text-anchor="middle">Headroom Clearance</text>
-                            <text x="54" y="20" font-family="'JetBrains Mono', monospace" font-size="7.5" fill="#b45309"
-                                text-anchor="middle">Min 209 cm (Req ≥ 205)</text>
-                        </g>
 
                         <!-- Clearance Line 3: Middle Person Head (Eyes) to Ceiling Corner -->
                         <g id="dim-person-headroom-group">
@@ -1601,7 +1580,7 @@
                             <text id="gf-dim-ov3-badge-val" x="536.9" y="24.5" font-family="'JetBrains Mono', monospace" font-size="11.5"
                                 font-weight="800" fill="#9a3412" text-anchor="middle">3,640 mm</text>
                             <text id="gf-dim-ov3-badge-sub" x="536.9" y="39" font-family="'Outfit', sans-serif" font-size="9"
-                                font-weight="700" fill="#78350f" text-anchor="middle">End of 4 Stairs → End of Stairs (on vertical line)</text>
+                                font-weight="700" fill="#78350f" text-anchor="middle">horizontal_gain (part after the turn only)</text>
 
                             <!-- Dedicated Highlighted Separate Row: 3,310 mm from D2 Right Edge (X=241.3) to Door D3 Hole (X=572.3) + 900 mm D3 Hole + 280 mm Wall -->
                             <g id="scale-highlight-row-d2-d3">
@@ -1651,6 +1630,31 @@
                                 <text id="d2-d3-seg3-badge-lbl" x="676.3" y="84" font-family="'Outfit', sans-serif" font-size="8.5" font-weight="700" fill="#9a3412"
                                     text-anchor="middle">Wall End</text>
                             </g>
+
+                            <!-- Dedicated Highlighted Separate Row: Step 5 (Straight Flight Start) to Door D3 Left Edge (2,174 mm project / 2,116 mm measured) -->
+                            <g id="scale-highlight-row-step5-d3">
+                                <!-- Subtle container highlight band for this separate row -->
+                                <rect id="step5-d3-row-box" x="345" y="98" width="237" height="42" rx="6" fill="#fff7ed" stroke="#fdba74"
+                                    stroke-width="1" stroke-dasharray="4 2" opacity="0.75" />
+
+                                <!-- Leader lines down from Step 5 and Door D3 left edge -->
+                                <line id="step5-d3-lead-step5" x1="354.9" y1="26" x2="354.9" y2="124" stroke="#dc2626" stroke-width="1.2" stroke-dasharray="3 2" />
+                                <line id="step5-d3-lead-d3-start" x1="572.3" y1="74" x2="572.3" y2="124" stroke="#dc2626" stroke-width="1.2" stroke-dasharray="3 2" />
+
+                                <!-- Dimension Segment: Step 5 Start (X = 354.9) to Door D3 Hole Left Edge (X = 572.3 nominal) -->
+                                <line id="step5-d3-tick-start" x1="354.9" y1="102" x2="354.9" y2="122" stroke="#dc2626" stroke-width="1.8" />
+                                <line id="step5-d3-tick-end" x1="572.3" y1="102" x2="572.3" y2="122" stroke="#dc2626" stroke-width="1.8" />
+                                <line id="step5-d3-line" x1="354.9" y1="112" x2="572.3" y2="112" stroke="#dc2626" stroke-width="2"
+                                    marker-start="url(#red-arrow-start)" marker-end="url(#red-arrow-end)" />
+                                
+                                <!-- Badge for 2,174 mm -->
+                                <rect id="step5-d3-badge-rect" x="398.6" y="100.5" width="130" height="23" rx="4.5" fill="#ffffff" stroke="#dc2626"
+                                    stroke-width="1.6" filter="drop-shadow(0 2px 4px rgba(220,38,38,0.22))" />
+                                <text id="step5-d3-badge-val" x="463.6" y="116.5" font-family="'JetBrains Mono', monospace" font-size="12.5"
+                                    font-weight="800" fill="#dc2626" text-anchor="middle">2,174 mm</text>
+                                <text id="step5-d3-badge-lbl" x="463.6" y="134" font-family="'Outfit', sans-serif" font-size="9"
+                                    font-weight="700" fill="#b91c1c" text-anchor="middle">★ Step 5 (North Wall Flight Start) → Door D3 (Left Edge)</text>
+                            </g>
                         </g>
 
                         <!-- DEDICATED RED DIMENSION DIRECTLY UNDER 4-STEP TURN BLOCK (Matching User Annotation) -->
@@ -1681,17 +1685,27 @@
                                 text-anchor="middle">2100</text>
                         </g>
 
-                        <!-- Door D3 Hole Height: 2100 mm (from floor Y = 640 to top of opening Y = 430 at X = 558 to left of D3) -->
-                        <g transform="translate(558, 0)">
+                        <!-- Door D3 Hole Height: 2100 mm (from floor Y = 640 to top of opening Y = 430, to the right of D3) -->
+                        <g id="dim-d3-height" transform="translate(674.3, 0)">
                             <line x1="0" y1="430" x2="0" y2="640" stroke="#c2410c" stroke-width="1.1" />
-                            <line x1="-5" y1="430" x2="5" y2="430" stroke="#c2410c" stroke-width="1.2" />
-                            <line x1="-5" y1="640" x2="5" y2="640" stroke="#c2410c" stroke-width="1.2" />
+                            <line x1="-4" y1="430" x2="4" y2="430" stroke="#c2410c" stroke-width="1.2" />
+                            <line x1="-4" y1="640" x2="4" y2="640" stroke="#c2410c" stroke-width="1.2" />
                             <line x1="-3" y1="433" x2="3" y2="427" stroke="#c2410c" stroke-width="1.4" />
                             <line x1="-3" y1="643" x2="3" y2="637" stroke="#c2410c" stroke-width="1.4" />
-                            <line x1="0" y1="430" x2="14.3" y2="430" stroke="#c2410c" stroke-width="0.8" stroke-dasharray="2 2" />
-                            <text x="-12" y="535" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" fill="#9a3412"
-                                transform="rotate(-90 -12 535)"
+                            <!-- Leader line from D3 opening top-right corner to height scale -->
+                            <line id="dim-d3-height-lead" x1="-12" y1="430" x2="0" y2="430" stroke="#c2410c" stroke-width="0.8" stroke-dasharray="2 2" />
+                            <text x="8" y="535" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" fill="#9a3412"
+                                transform="rotate(-90 8 535)" stroke="#ffffff" stroke-width="2.5" stroke-linejoin="round" paint-order="stroke fill"
                                 text-anchor="middle">2100</text>
+                        </g>
+
+                        <!-- D3 Left Edge Intersection with Stair Slab Bottom -->
+                        <g id="d3-stair-intersect-layer">
+                            <!-- Dot at Slab Bottom Intersection with D3 Left Edge -->
+                            <circle id="d3-intersect-dot-slab" cx="572.3" cy="446.7" r="3" fill="#c2410c" stroke="#ffffff" stroke-width="1.2"
+                                onclick="showElementDetails('door_d3')" style="cursor: pointer;">
+                                <title>D3 Left Edge ∩ Stair Slab Bottom: 1,933 mm</title>
+                            </circle>
                         </g>
 
                         <!-- RIGHT VERTICAL DIMENSION STACK: 17 + 20 + 15.5 + 280 cm (Positioned at X=860 beyond 80 mm brick wall) -->
@@ -1756,7 +1770,8 @@
                         <div class="spec-item"><div class="spec-label">turn_steps_count</div><div class="spec-value">4 steps (1 Straight + 3 Zabieg)</div></div>
                         <div class="spec-item"><div class="spec-label">straight_risers_count</div><div class="spec-value">15 risers (Steps 5 to 19)</div></div>
                         <div class="spec-item"><div class="spec-label">straight_treads_count</div><div class="spec-value">14 treads (Steps 5 to 18)</div></div>
-                        <div class="spec-item"><div class="spec-label">straight_flight_run</div><div class="spec-value">3,640 mm (14 × 260 mm)</div></div>
+                        <div class="spec-item"><div class="spec-label">horizontal_gain <span title="Straight flight run along North Wall (related only to the part after the turn)" style="cursor:help; color:#9a3412;">ℹ️</span></div><div class="spec-value">3,640 mm (14 × 260 mm) <span style="font-size:11px;color:#78350f;font-weight:normal;">[after turn only]</span></div></div>
+                        <div class="spec-item"><div class="spec-label">elevation_gain <span title="Elevation gain of the straight flight after the turn to upper floor (15 risers × 175 mm, related only to the part after the turn)" style="cursor:help; color:#047857;">ℹ️</span></div><div class="spec-value">2,625 mm (15 risers × 175 mm) <span style="font-size:11px;color:#047857;font-weight:normal;">[after turn only]</span></div></div>
                         <div class="spec-item"><div class="spec-label">end_x (end position)</div><div class="spec-value">X = 7,189 mm (on vertical axis)</div></div>
                         <div class="spec-item"><div class="spec-label">total_risers</div><div class="spec-value">19 risers (3,325 mm total rise)</div></div>
                         <div class="spec-item"><div class="spec-label">balustrade_height</div><div class="spec-value">900 mm (h=90 cm above pitch)</div></div>
@@ -1876,7 +1891,7 @@
                             <td>Main Stair Flight Along North Wall (Stairs 5–19)</td>
                             <td><strong>3,640 mm run</strong> · 15 risers × 175 mm (2625 mm rise) · 14 treads × 260 mm</td>
                             <td>+0,70 to +3,33 m</td>
-                            <td><strong>Object properties:</strong> <code>step_height: 175 mm</code>, <code>step_length: 260 mm</code> (stairs 5–19), <code>straight_flight_run: 3640 mm</code>, <code>end_x: 7189 mm</code>. 15 risers ascend straight along North Wall to +3,33 m finished floor slab with balustrada h=90 cm.</td>
+                            <td><strong>Object properties:</strong> <code>step_height: 175 mm</code>, <code>step_length: 260 mm</code> (stairs 5–19), <code>horizontal_gain: 3640 mm</code>, <code>elevation_gain: 2625 mm</code> (related only to the part after the turn), <code>step5_to_d3: 2174 mm</code> (project) / <code>2116 mm</code> (measured), <code>end_x: 7189 mm</code>. 15 risers ascend straight along North Wall to +3,33 m finished floor slab with balustrada h=90 cm.</td>
                         </tr>
                         <tr>
                             <td><strong>CL-01</strong></td>
@@ -2058,7 +2073,8 @@
                     { label: 'x (start position)', value: 'X = 2,549 mm (Post-Brick datum)' },
                     { label: 'global_x', value: 'X = 16,361 mm on North Facade map' },
                     { label: 'total_risers', value: '19 risers (4 turn + 15 straight flight)' },
-                    { label: 'straight_flight_run', value: '3,640 mm (14 treads × 260 mm)' },
+                    { label: 'horizontal_gain', value: '3,640 mm (14 treads × 260 mm) — related only to the part after the turn' },
+                    { label: 'elevation_gain', value: '2,625 mm (15 risers × 175 mm) — related only to the part after the turn' },
                     { label: 'end_x (end position)', value: 'X = 7,189 mm (on vertical axis)' },
                     { label: 'total_rise', value: '3,325 mm (~333 cm to +3,33 m slab)' },
                     { label: 'balustrade_height', value: '900 mm (h=90 cm)' },
@@ -2173,6 +2189,8 @@
                     { label: 'Door Hole', value: '900 × 2100 mm (90 × 210 cm)' },
                     { label: 'Door Leaf Size', value: '800 × 2050 mm (80 × 205 cm)' },
                     { label: 'Distance from D2 Right Edge', value: '3,310 mm (331.0 cm)' },
+                    { label: 'D3 Left Edge ∩ Stair Slab', value: '1,933 mm (+1.933 m, slab bottom)' },
+                    { label: 'Slab Encroachment', value: '167 mm into 2100 mm opening top' },
                     { label: 'Wall Next to D3 (Right)', value: '280 mm (X = 6,623 to 6,903 mm)' },
                     { label: 'Ground Floor Wall End', value: 'X = 6,903 mm (wall terminates here)' },
                     { label: 'Open Clearance under Stairs', value: 'X = 6,903 to 7,189 mm (286 mm span)' }
@@ -2185,6 +2203,8 @@
                     { label: 'Door Hole', value: '900 × 2100 mm (90 × 210 cm)' },
                     { label: 'Door Leaf Size', value: '800 × 2050 mm (80 × 205 cm)' },
                     { label: 'Distance from D2 Right Edge', value: '3,310 mm (331.0 cm)' },
+                    { label: 'D3 Left Edge ∩ Stair Slab', value: '1,933 mm (+1.933 m, slab bottom)' },
+                    { label: 'Slab Encroachment', value: '167 mm into 2100 mm opening top' },
                     { label: 'Wall Next to D3 (Right)', value: '280 mm (X = 6,623 to 6,903 mm)' },
                     { label: 'Ground Floor Wall End', value: 'X = 6,903 mm (wall terminates here)' },
                     { label: 'Open Clearance under Stairs', value: 'X = 6,903 to 7,189 mm (286 mm span)' }
@@ -2266,7 +2286,7 @@
                     points: "354.9,640 354.9,574.0 690.3,347.8 690.3,640",
                     termX: 690.3, termY: 347.8,
                     shadowX: 688.3, shadowY: 347.8, shadowH: 292.2,
-                    pierBadgeTranslate: "translate(676.3, 510)",
+                    d3HeightTranslate: "translate(674.3, 0)",
                     openLabelX: 704.6
                 },
                 dimChain: {
@@ -2286,6 +2306,20 @@
                     seg2BadgeRectX: 592.3, seg2BadgeTextX: 617.3, seg2Val: "900",
                     seg3TickEndX: 690.3, seg3LineStartX: 662.3, seg3LineEndX: 690.3,
                     seg3BadgeRectX: 664.3, seg3BadgeTextX: 676.3, seg3Val: "280"
+                },
+                step5D3Row: {
+                    leadStep5X: 354.9,
+                    leadD3StartX: 572.3,
+                    boxX: 345,
+                    boxW: 237,
+                    tickStartX: 354.9,
+                    tickEndX: 572.3,
+                    lineStartX: 354.9,
+                    lineEndX: 572.3,
+                    badgeRectX: 398.6,
+                    badgeTextX: 463.6,
+                    valMm: "2,174 mm",
+                    valNumeric: 2174
                 },
                 schedule: {
                     wl01Dim: "<strong>150 mm</strong> wide × 2800 mm tall",
@@ -2318,6 +2352,8 @@
                             { label: 'Door Hole', value: '900 × 2100 mm (90 × 210 cm)' },
                             { label: 'Door Leaf Size', value: '800 × 2050 mm (80 × 205 cm)' },
                             { label: 'Distance from D2 Right Edge', value: '3,310 mm (331.0 cm)' },
+                            { label: 'D3 Left Edge ∩ Stair Slab', value: '1,933 mm (+1.933 m, slab bottom)' },
+                            { label: 'Slab Encroachment', value: '167 mm into 2100 mm opening top' },
                             { label: 'Wall Next to D3 (Right)', value: '280 mm (X = 6,623 to 6,903 mm)' },
                             { label: 'Ground Floor Wall End', value: 'X = 6,903 mm (wall terminates here)' },
                             { label: 'Open Clearance under Stairs', value: 'X = 6,903 to 7,189 mm (286 mm span)' }
@@ -2355,7 +2391,7 @@
                     points: "354.9,640 354.9,574.0 689.5,348.3 689.5,640",
                     termX: 689.5, termY: 348.3,
                     shadowX: 687.5, shadowY: 348.3, shadowH: 291.7,
-                    pierBadgeTranslate: "translate(675.5, 510)",
+                    d3HeightTranslate: "translate(673.5, 0)",
                     openLabelX: 704.2
                 },
                 dimChain: {
@@ -2375,6 +2411,20 @@
                     seg2BadgeRectX: 589.0, seg2BadgeTextX: 614.0, seg2Val: "950",
                     seg3TickEndX: 689.5, seg3LineStartX: 661.5, seg3LineEndX: 689.5,
                     seg3BadgeRectX: 663.5, seg3BadgeTextX: 675.5, seg3Val: "280"
+                },
+                step5D3Row: {
+                    leadStep5X: 354.9,
+                    leadD3StartX: 566.5,
+                    boxX: 345,
+                    boxW: 231,
+                    tickStartX: 354.9,
+                    tickEndX: 566.5,
+                    lineStartX: 354.9,
+                    lineEndX: 566.5,
+                    badgeRectX: 395.7,
+                    badgeTextX: 460.7,
+                    valMm: "2,116 mm",
+                    valNumeric: 2116
                 },
                 schedule: {
                     wl01Dim: "<strong>140 mm</strong> wide × 2800 mm tall (measured)",
@@ -2408,6 +2458,8 @@
                             { label: 'Door Hole', value: '950 × 2100 mm (vs 900 project)' },
                             { label: 'Door Leaf Size', value: '800 × 2050 mm' },
                             { label: 'Distance from D2 Right Edge', value: '3,240 mm (vs 3310 project)' },
+                            { label: 'D3 Left Edge ∩ Stair Slab', value: '1,894 mm (+1.894 m, slab bottom)' },
+                            { label: 'Slab Encroachment', value: '206 mm into 2100 mm opening top' },
                             { label: 'Wall Next to D3 (Right)', value: '280 mm (X = 6,615 to 6,895 mm)' },
                             { label: 'Ground Floor Wall End', value: 'X = 6,895 mm (wall terminates here)' },
                             { label: 'Open Clearance under Stairs', value: 'X = 6,895 to 7,189 mm (294 mm span)' }
@@ -2531,8 +2583,10 @@
                 wallShadow.setAttribute('height', spec.wallUnderStair.shadowH);
             }
 
-            const wallPierBadge = document.getElementById('under-stair-wall-pier-badge');
-            if (wallPierBadge) wallPierBadge.setAttribute('transform', spec.wallUnderStair.pierBadgeTranslate);
+            const dimD3Height = document.getElementById('dim-d3-height');
+            if (dimD3Height && spec.wallUnderStair.d3HeightTranslate) {
+                dimD3Height.setAttribute('transform', spec.wallUnderStair.d3HeightTranslate);
+            }
 
             const openLabel = document.getElementById('under-stair-open-label');
             if (openLabel) {
@@ -2696,6 +2750,41 @@
             const seg3BadgeLbl = document.getElementById('d2-d3-seg3-badge-lbl');
             if (seg3BadgeLbl) seg3BadgeLbl.setAttribute('x', spec.d2d3Row.seg3BadgeTextX);
 
+            // 6b. Update Dedicated Row Step 5 -> D3
+            if (spec.step5D3Row) {
+                const s5d3LeadD3 = document.getElementById('step5-d3-lead-d3-start');
+                if (s5d3LeadD3) {
+                    s5d3LeadD3.setAttribute('x1', spec.step5D3Row.leadD3StartX);
+                    s5d3LeadD3.setAttribute('x2', spec.step5D3Row.leadD3StartX);
+                }
+                const s5d3TickEnd = document.getElementById('step5-d3-tick-end');
+                if (s5d3TickEnd) {
+                    s5d3TickEnd.setAttribute('x1', spec.step5D3Row.tickEndX);
+                    s5d3TickEnd.setAttribute('x2', spec.step5D3Row.tickEndX);
+                }
+                const s5d3Line = document.getElementById('step5-d3-line');
+                if (s5d3Line) {
+                    s5d3Line.setAttribute('x2', spec.step5D3Row.lineEndX);
+                }
+                const s5d3Box = document.getElementById('step5-d3-row-box');
+                if (s5d3Box) {
+                    s5d3Box.setAttribute('x', spec.step5D3Row.boxX);
+                    s5d3Box.setAttribute('width', spec.step5D3Row.boxW);
+                }
+                const s5d3BadgeRect = document.getElementById('step5-d3-badge-rect');
+                if (s5d3BadgeRect) s5d3BadgeRect.setAttribute('x', spec.step5D3Row.badgeRectX);
+                const s5d3BadgeVal = document.getElementById('step5-d3-badge-val');
+                if (s5d3BadgeVal) {
+                    s5d3BadgeVal.setAttribute('x', spec.step5D3Row.badgeTextX);
+                    s5d3BadgeVal.textContent = spec.step5D3Row.valMm;
+                }
+                const s5d3BadgeLbl = document.getElementById('step5-d3-badge-lbl');
+                if (s5d3BadgeLbl) s5d3BadgeLbl.setAttribute('x', spec.step5D3Row.badgeTextX);
+
+                const mStep5D3 = document.getElementById('metric-step5-d3');
+                if (mStep5D3) mStep5D3.textContent = spec.step5D3Row.valMm;
+            }
+
             // 7. Update Schedule Table (Tab 2)
             const sWl01 = document.getElementById('sched-wl01-dim');
             if (sWl01) sWl01.innerHTML = spec.schedule.wl01Dim;
@@ -2833,6 +2922,10 @@
             const mRun = document.getElementById('metric-flight-run');
             if (mRun) {
                 mRun.textContent = `${Math.round(flightRunMm).toLocaleString()} mm`;
+            }
+            const mElev = document.getElementById('metric-elevation-gain');
+            if (mElev) {
+                mElev.textContent = '2,625 mm';
             }
             const mStep = document.getElementById('metric-step-length');
             if (mStep) {
@@ -3043,16 +3136,7 @@
                 }
             }
 
-            // 8. Update Headroom Clearance Line 2
-            const headroomLine = document.getElementById('headroom-sloped-line');
-            if (headroomLine) headroomLine.setAttribute('x2', flightStartX.toFixed(1));
 
-            const headroomText = document.getElementById('headroom-sloped-text');
-            if (headroomText) {
-                const textX = (flightStartX + 3.1).toFixed(1);
-                headroomText.setAttribute('x', textX);
-                headroomText.setAttribute('transform', `rotate(-88 ${textX} 460)`);
-            }
 
             // 9. Update Lower Baseline Dimensions
             const gfBase = document.getElementById('gf-dim-baseline');
@@ -3177,8 +3261,66 @@
             const ov3BadgeSub = document.getElementById('gf-dim-ov3-badge-sub');
             if (ov3BadgeSub) ov3BadgeSub.setAttribute('x', midFlight.toFixed(1));
 
-            // 10. Update Under-Stair Partition Wall
             const isMeasured = (typeof currentGroundFloorMode !== 'undefined' && currentGroundFloorMode === 'measured');
+
+            // 9b. Update Step 5 -> D3 Row
+            const step5StartMm = Math.round(stairX + 1000); // 3549 - deltaMoveWall
+            const currentD3StartMm = isMeasured ? 5665 : 5723;
+            const currentD3StartX = isMeasured ? 566.5 : 572.3;
+            const distStep5ToD3Mm = Math.round(currentD3StartMm - step5StartMm);
+            const s5d3MidX = (flightStartX + currentD3StartX) / 2;
+
+            const s5d3LeadStep5 = document.getElementById('step5-d3-lead-step5');
+            if (s5d3LeadStep5) {
+                s5d3LeadStep5.setAttribute('x1', flightStartX.toFixed(1));
+                s5d3LeadStep5.setAttribute('x2', flightStartX.toFixed(1));
+            }
+            const s5d3LeadD3 = document.getElementById('step5-d3-lead-d3-start');
+            if (s5d3LeadD3) {
+                s5d3LeadD3.setAttribute('x1', currentD3StartX.toFixed(1));
+                s5d3LeadD3.setAttribute('x2', currentD3StartX.toFixed(1));
+            }
+            const s5d3TickStart = document.getElementById('step5-d3-tick-start');
+            if (s5d3TickStart) {
+                s5d3TickStart.setAttribute('x1', flightStartX.toFixed(1));
+                s5d3TickStart.setAttribute('x2', flightStartX.toFixed(1));
+            }
+            const s5d3TickEnd = document.getElementById('step5-d3-tick-end');
+            if (s5d3TickEnd) {
+                s5d3TickEnd.setAttribute('x1', currentD3StartX.toFixed(1));
+                s5d3TickEnd.setAttribute('x2', currentD3StartX.toFixed(1));
+            }
+            const s5d3Line = document.getElementById('step5-d3-line');
+            if (s5d3Line) {
+                s5d3Line.setAttribute('x1', flightStartX.toFixed(1));
+                s5d3Line.setAttribute('x2', currentD3StartX.toFixed(1));
+            }
+            const s5d3Box = document.getElementById('step5-d3-row-box');
+            if (s5d3Box) {
+                const boxX = Math.min(flightStartX, currentD3StartX) - 6;
+                const boxW = Math.abs(currentD3StartX - flightStartX) + 12;
+                s5d3Box.setAttribute('x', boxX.toFixed(1));
+                s5d3Box.setAttribute('width', boxW.toFixed(1));
+            }
+            const s5d3BadgeRect = document.getElementById('step5-d3-badge-rect');
+            if (s5d3BadgeRect) {
+                s5d3BadgeRect.setAttribute('x', (s5d3MidX - 65).toFixed(1));
+            }
+            const s5d3BadgeVal = document.getElementById('step5-d3-badge-val');
+            if (s5d3BadgeVal) {
+                s5d3BadgeVal.setAttribute('x', s5d3MidX.toFixed(1));
+                s5d3BadgeVal.textContent = `${distStep5ToD3Mm.toLocaleString()} mm`;
+            }
+            const s5d3BadgeLbl = document.getElementById('step5-d3-badge-lbl');
+            if (s5d3BadgeLbl) {
+                s5d3BadgeLbl.setAttribute('x', s5d3MidX.toFixed(1));
+            }
+            const mStep5D3 = document.getElementById('metric-step5-d3');
+            if (mStep5D3) {
+                mStep5D3.textContent = `${distStep5ToD3Mm.toLocaleString()} mm`;
+            }
+
+            // 10. Update Under-Stair Partition Wall
             const xTerm = isMeasured ? 689.5 : 690.3;
             // Slope from (flightStartX, 574.0) to (flightEndX, 328.5)
             const m = (328.5 - 574.0) / (flightEndX - flightStartX);
@@ -3198,7 +3340,45 @@
                 wallShadow.setAttribute('height', (640 - yTerm).toFixed(1));
             }
 
-            // 11. Re-render Inspector if inspecting staircase
+            // 11. Update Door D3 Left Edge Stair Slab Intersection
+            const xD3Left = isMeasured ? 566.5 : 572.3;
+            const ySoffit = 574.0 + m * (xD3Left - flightStartX);
+            const ySlab = ySoffit + 19.3;
+            const hSlabMm = Math.round((640.0 - ySlab) * 10);
+
+            const dotSlab = document.getElementById('d3-intersect-dot-slab');
+            if (dotSlab) {
+                dotSlab.setAttribute('cx', xD3Left.toFixed(1));
+                dotSlab.setAttribute('cy', ySlab.toFixed(1));
+            }
+            const metricD3Intersect = document.getElementById('metric-d3-intersect');
+            if (metricD3Intersect) {
+                metricD3Intersect.textContent = `${hSlabMm.toLocaleString()} mm`;
+            }
+
+            // Update D3 inspector specs dynamically
+            const encroachmentMm = 2100 - hSlabMm;
+            const d3Specs = [
+                { label: 'Dimension Mode', value: isMeasured ? 'Measured (Pomiar z natury)' : 'Project (Nominal)' },
+                { label: 'Door Hole', value: isMeasured ? '950 × 2100 mm (vs 900 project)' : '900 × 2100 mm (90 × 210 cm)' },
+                { label: 'Door Leaf Size', value: '800 × 2050 mm (80 × 205 cm)' },
+                { label: 'Distance from D2 Right Edge', value: isMeasured ? '3,240 mm (vs 3310 project)' : '3,310 mm (331.0 cm)' },
+                { label: 'Step 5 → D3 Left Edge', value: `${distStep5ToD3Mm.toLocaleString()} mm (from Step 5 start X=${Math.round(stairX + 1000)} to D3 X=${isMeasured ? '5,665' : '5,723'} mm)` },
+                { label: 'D3 Left Edge ∩ Stair Slab', value: `${hSlabMm.toLocaleString()} mm (+${(hSlabMm / 1000).toFixed(3)} m, slab bottom)` },
+                { label: 'Slab Encroachment', value: encroachmentMm > 0 ? `${encroachmentMm} mm into 2100 mm opening top` : 'Clear of opening' },
+                { label: 'Wall Next to D3 (Right)', value: isMeasured ? '280 mm (X = 6,615 to 6,895 mm)' : '280 mm (X = 6,623 to 6,903 mm)' },
+                { label: 'Ground Floor Wall End', value: isMeasured ? 'X = 6,895 mm (wall terminates here)' : 'X = 6,903 mm (wall terminates here)' },
+                { label: 'Open Clearance under Stairs', value: isMeasured ? `X = 6,895 to ${Math.round(stairEndX).toLocaleString()} mm` : `X = 6,903 to ${Math.round(stairEndX).toLocaleString()} mm` }
+            ];
+            if (typeof ELEMENT_SPECS !== 'undefined') {
+                if (ELEMENT_SPECS['door_d3']) ELEMENT_SPECS['door_d3'].specs = d3Specs;
+                if (ELEMENT_SPECS['under_stair_door']) ELEMENT_SPECS['under_stair_door'].specs = d3Specs;
+            }
+            if (window.currentInspectedElement === 'door_d3' || window.currentInspectedElement === 'under_stair_door') {
+                showElementDetails(window.currentInspectedElement);
+            }
+
+            // 12. Re-render Inspector if inspecting staircase
             if (window.currentInspectedElement === 'staircase') {
                 showElementDetails('staircase');
             }
@@ -3227,7 +3407,9 @@
                         <div class="spec-item"><div class="spec-label">turn_steps_count</div><div class="spec-value">${stair.turn_steps_count} steps (1 Straight + 3 Zabieg)</div></div>
                         <div class="spec-item"><div class="spec-label">straight_risers_count</div><div class="spec-value">${stair.straight_risers_count} risers (Steps 5 to 19)</div></div>
                         <div class="spec-item"><div class="spec-label">straight_treads_count</div><div class="spec-value">${stair.straight_treads_count} treads (Steps 5 to 18)</div></div>
-                        <div class="spec-item"><div class="spec-label">straight_flight_run</div><div class="spec-value">${Math.round(stair.straight_flight_run)} mm (14 × ${stepLenStr} mm)</div></div>
+                        <div class="spec-item"><div class="spec-label">horizontal_gain <span title="Straight flight run along North Wall (related only to the part after the turn)" style="cursor:help; color:#9a3412;">ℹ️</span></div><div class="spec-value">${Math.round(stair.horizontal_gain || stair.straight_flight_run)} mm (14 × ${stepLenStr} mm) <span style="font-size:11px;color:#78350f;font-weight:normal;">[after turn only]</span></div></div>
+                        <div class="spec-item"><div class="spec-label">elevation_gain <span title="Elevation gain of the straight flight after the turn to upper floor (15 risers × 175 mm, related only to the part after the turn)" style="cursor:help; color:#047857;">ℹ️</span></div><div class="spec-value">${stair.elevation_gain || (stair.straight_risers_count * stair.step_height)} mm (15 risers × ${stair.step_height} mm) <span style="font-size:11px;color:#047857;font-weight:normal;">[after turn only]</span></div></div>
+                        <div class="spec-item"><div class="spec-label">step5_to_d3_distance <span title="Distance along North Wall between Step 5 start (X=3,549 mm) and Door D3 left edge (X=5,723 mm nominal / 5,665 mm measured)" style="cursor:help; color:#dc2626;">ℹ️</span></div><div class="spec-value">${(typeof currentGroundFloorMode !== 'undefined' && currentGroundFloorMode === 'measured') ? '2,116' : '2,174'} mm <span style="font-size:11px;color:#dc2626;font-weight:normal;">[Step 5 → D3]</span></div></div>
                         <div class="spec-item"><div class="spec-label">end_x (end position)</div><div class="spec-value">X = ${Math.round(stair.end_x)} mm (on vertical axis)</div></div>
                         <div class="spec-item"><div class="spec-label">total_risers</div><div class="spec-value">${stair.total_risers} risers (3,325 mm total rise)</div></div>
                         <div class="spec-item"><div class="spec-label">balustrade_height</div><div class="spec-value">${stair.balustrade_height} mm (h=90 cm above pitch)</div></div>
