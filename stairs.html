@@ -572,6 +572,29 @@
             font-weight: 700;
         }
 
+        .btn-steps-opt {
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            border: none;
+            background: #ffffff;
+            color: #5c4e42;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .btn-steps-opt:hover {
+            background: #fbf5ec;
+            color: #29221c;
+        }
+
+        .btn-steps-opt.active {
+            background: #b45309;
+            color: #ffffff;
+            font-weight: 700;
+        }
+
         .elevation-wrapper {
             background: #fffcf8;
             padding: 20px;
@@ -840,8 +863,20 @@
                                         <span class="group-badge">Geometry</span>
                                     </div>
                                     <div class="group-content">
-                                        <!-- Stair Width -->
+                                        <!-- Step Count Selection (19 vs 18 Steps) -->
                                         <div class="slider-sub-item">
+                                            <div class="slider-header">
+                                                <span class="slider-title">🪜 Total Steps / Risers</span>
+                                                <span class="slider-badge" id="badge-total-steps">19 Steps (Default)</span>
+                                            </div>
+                                            <div style="display: inline-flex; border: 1px solid #d6cbbd; border-radius: 6px; overflow: hidden; background: #fff; width: 100%; margin-top: 3px;">
+                                                <button type="button" id="btn-steps-19" class="btn-steps-opt active" onclick="setTotalSteps(19)" style="flex: 1; text-align: center;">19 Steps (17.5 cm riser)</button>
+                                                <button type="button" id="btn-steps-18" class="btn-steps-opt" onclick="setTotalSteps(18)" style="flex: 1; text-align: center; border-left: 1px solid #d6cbbd;">18 Steps (18.5 cm riser)</button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Stair Width -->
+                                        <div class="slider-sub-item" style="border-top: 1px dashed #e2d7c7; padding-top: 6px;">
                                             <div class="slider-header">
                                                 <span class="slider-title">📏 Stair Width (4-Step Turn)</span>
                                                 <span class="slider-badge" id="badge-stair-width">100 cm (Default)</span>
@@ -2829,6 +2864,21 @@
         let currentD3Height = 2100; // 2100, 2050, 2000 mm (default 2100)
         let currentShrinkCeilCm = 0; // 0 to 20 cm (default 0)
         let deltaMoveD2Cm = 0;       // 0 to 13 cm (1 cm steps, default 0)
+        let currentTotalSteps = 19;  // 19 or 18 steps (default 19)
+
+        function setTotalSteps(steps) {
+            currentTotalSteps = (parseInt(steps, 10) === 18) ? 18 : 19;
+            const btn19 = document.getElementById('btn-steps-19');
+            const btn18 = document.getElementById('btn-steps-18');
+            if (btn19) btn19.classList.toggle('active', currentTotalSteps === 19);
+            if (btn18) btn18.classList.toggle('active', currentTotalSteps === 18);
+
+            const badge = document.getElementById('badge-total-steps');
+            if (badge) {
+                badge.textContent = currentTotalSteps === 19 ? '19 Steps (Default)' : '18 Steps (18.5 cm riser)';
+            }
+            updateParametricStairAdjustments();
+        }
 
         function onParametricSlidersChange() {
             const sExtend = document.getElementById('slider-extend-2nd');
@@ -2930,6 +2980,7 @@
         }
 
         function resetParametricSliders() {
+            currentTotalSteps = 19;
             deltaExtend2nd = 0;
             deltaMoveWall = 0;
             personStair = 5;
@@ -2939,6 +2990,14 @@
             currentD3Height = 2100;
             currentShrinkCeilCm = 0;
             deltaMoveD2Cm = 0;
+
+            const btnSteps19 = document.getElementById('btn-steps-19');
+            const btnSteps18 = document.getElementById('btn-steps-18');
+            if (btnSteps19) btnSteps19.classList.add('active');
+            if (btnSteps18) btnSteps18.classList.remove('active');
+
+            const badgeTotalSteps = document.getElementById('badge-total-steps');
+            if (badgeTotalSteps) badgeTotalSteps.textContent = '19 Steps (Default)';
 
             const sExtend = document.getElementById('slider-extend-2nd');
             const sWall = document.getElementById('slider-move-wall');
@@ -3000,6 +3059,11 @@
 
             if (typeof StairComponent !== 'undefined') {
                 StairComponent.update('main_staircase', {
+                    total_risers: 19,
+                    step_height: 175,
+                    straight_risers_count: 15,
+                    straight_treads_count: 14,
+                    elevation_gain: 2625,
                     plank_height: 40,
                     show_planks: true
                 });
@@ -3014,6 +3078,14 @@
             if (_isUpdatingParametric) return;
             _isUpdatingParametric = true;
             try {
+                const totalRisers = (currentTotalSteps === 18) ? 18 : 19;
+                const turnSteps = 4;
+                const straightRisers = totalRisers - turnSteps; // 15 for 19 steps; 14 for 18 steps
+                const straightTreads = straightRisers - 1;       // 14 for 19 steps; 13 for 18 steps
+                const stepHeightMm = (totalRisers === 18) ? 185 : 175;
+                const stepHeightSvg = stepHeightMm * 0.1; // 18.5 or 17.5 SVG units
+                const elevationGainMm = straightRisers * stepHeightMm; // 2,590 mm for 18 steps; 2,625 mm for 19 steps
+
                 const dE = deltaExtend2nd * 0.1; // SVG units (1 unit = 10 mm)
                 const dW = deltaMoveWall * 0.1;
 
@@ -3023,11 +3095,11 @@
                 const stairX = 2549 - deltaMoveWall;
                 const stairEndX = 7189 - deltaExtend2nd;
                 const flightRunMm = stairEndX - stairX - stairWidthMm;
-                const stepLengthMm = Math.round((flightRunMm / 14) * 100) / 100;
+                const stepLengthMm = Math.round((flightRunMm / straightTreads) * 100) / 100;
 
                 const flightStartX = (254.9 - dW) + stairWidthSvg;
                 const flightEndX = 718.9 - dE;
-                const stepLSvg = (flightEndX - flightStartX) / 14;
+                const stepLSvg = (flightEndX - flightStartX) / straightTreads;
 
                 const isMeasured = (typeof currentGroundFloorMode !== 'undefined' && currentGroundFloorMode === 'measured');
                 const d3RightX = isMeasured ? 661.5 : 662.3;
@@ -3062,6 +3134,10 @@
                 const d2ToD3DistMm = Math.round(d3LeftMm - curD2RightMm);
 
                 // 1. Update Badges & Metrics
+                const bTotalSteps = document.getElementById('badge-total-steps');
+                if (bTotalSteps) {
+                    bTotalSteps.textContent = (totalRisers === 19) ? '19 Steps (Default)' : '18 Steps (18.5 cm riser)';
+                }
                 const bD2 = document.getElementById('badge-move-d2');
                 if (bD2) {
                     bD2.textContent = deltaMoveD2Cm === 0 ? '0 cm (Default)' : `-${deltaMoveD2Cm} cm (${deltaMoveD2Cm * 10} mm left)`;
@@ -3088,7 +3164,7 @@
                 }
                 const mElev = document.getElementById('metric-elevation-gain');
                 if (mElev) {
-                    mElev.textContent = '2,625 mm';
+                    mElev.textContent = `${elevationGainMm.toLocaleString()} mm`;
                 }
                 const mStep = document.getElementById('metric-step-length');
                 if (mStep) {
@@ -3103,7 +3179,12 @@
                         end_x: stairEndX,
                         width: stairWidthMm,
                         step_length: stepLengthMm,
-                        d3_left_x: d3LeftMm
+                        d3_left_x: d3LeftMm,
+                        total_risers: totalRisers,
+                        step_height: stepHeightMm,
+                        straight_risers_count: straightRisers,
+                        straight_treads_count: straightTreads,
+                        elevation_gain: elevationGainMm
                     });
                 }
                 const plankH = (stair && typeof stair.plank_height === 'number') ? stair.plank_height : 40;
@@ -3332,13 +3413,13 @@
                 const s = personHeight / 170;
                 let p2Ytread;
                 if (personStair === 4) {
-                    p2Ytread = showPlanks ? 570.0 : flightStartY;
+                    p2Ytread = showPlanks ? (640.0 - (4 * stepHeightSvg)) : flightStartY;
                 } else {
                     const stepIdx = personStair - 5;
                     if (geom && geom.flightSteps && geom.flightSteps[stepIdx]) {
                         p2Ytread = showPlanks ? (geom.flightSteps[stepIdx].topY - geom.plankHSvg) : geom.flightSteps[stepIdx].topY;
                     } else {
-                        p2Ytread = 640.0 - (personStair * 17.5);
+                        p2Ytread = 640.0 - (personStair * stepHeightSvg);
                     }
                 }
                 let p2MidX;
@@ -3627,7 +3708,10 @@
                     ov3BadgeVal.textContent = `${Math.round(flightRunMm).toLocaleString()} mm`;
                 }
                 const ov3BadgeSub = document.getElementById('gf-dim-ov3-badge-sub');
-                if (ov3BadgeSub) ov3BadgeSub.setAttribute('x', midFlight.toFixed(1));
+                if (ov3BadgeSub) {
+                    ov3BadgeSub.setAttribute('x', midFlight.toFixed(1));
+                    ov3BadgeSub.textContent = `${straightTreads} treads (${(stepLengthMm / 10).toFixed(1)} cm each) — after turn only`;
+                }
 
                 // 9b. Update Door D3 Drawing & Measurements
                 const leafW = (currentD3Width === 950) ? 800 : (currentD3Width - 100);
@@ -4001,29 +4085,30 @@
             if (elementKey === 'staircase' && typeof StairComponent !== 'undefined') {
                 const stair = StairComponent.get('main_staircase');
                 if (stair) {
-                    document.getElementById('inspector-title').textContent = `${stair.name} [Parametric Object]`;
+                    document.getElementById('inspector-title').textContent = `${stair.name} [Parametric Object: ${stair.total_risers} Risers]`;
                     document.getElementById('inspector-desc').textContent = `${stair.description} (Object ID: ${stair.id})`;
                     const stepLenStr = typeof stair.step_length === 'number' ? stair.step_length.toFixed(1) : stair.step_length;
+                    const riserCm = (stair.step_height / 10).toFixed(1);
                     const specsContainer = document.getElementById('inspector-specs');
                     specsContainer.innerHTML = `
                         <div class="spec-item"><div class="spec-label">flooring_height</div><div class="spec-value">${stair.flooring_height} mm (+0,00 m datum)</div></div>
                         <div class="spec-item"><div class="spec-label">width</div><div class="spec-value">${stair.width} mm (${stair.width / 10} cm)</div></div>
-                        <div class="spec-item"><div class="spec-label">step_height</div><div class="spec-value">${stair.step_height} mm (17.5 cm riser)</div></div>
-                        <div class="spec-item"><div class="spec-label">step_length</div><div class="spec-value">${stepLenStr} mm (tread run, stairs 5–19)</div></div>
+                        <div class="spec-item"><div class="spec-label">step_height</div><div class="spec-value">${stair.step_height} mm (${riserCm} cm riser)</div></div>
+                        <div class="spec-item"><div class="spec-label">step_length</div><div class="spec-value">${stepLenStr} mm (tread run, stairs 5–${stair.total_risers})</div></div>
                         <div class="spec-item"><div class="spec-label">plank_height</div><div class="spec-value" style="display:flex;align-items:center;gap:6px;"><input id="quick-plank-h" type="number" min="0" max="80" step="5" value="${stair.plank_height || 40}" oninput="onQuickPlankChange(this.value)" onchange="onQuickPlankChange(this.value)" style="width:55px;padding:2px 4px;border:1px solid #cbd5e1;border-radius:4px;color:#b45309;font-weight:bold;"> mm</div></div>
                         <div class="spec-item"><div class="spec-label">first_step_concrete</div><div class="spec-value">${stair.step_height - stair.plank_height} mm (step_height - plank_height)</div></div>
-                        <div class="spec-item"><div class="spec-label">last_horizontal_step</div><div class="spec-value">${(stair.top_floor_elevation || 3330) - stair.step_height - stair.plank_height} mm (${stair.top_floor_elevation || 3330} - 175 - ${stair.plank_height || 40})</div></div>
+                        <div class="spec-item"><div class="spec-label">last_horizontal_step</div><div class="spec-value">${(stair.top_floor_elevation || 3330) - stair.step_height - stair.plank_height} mm (${stair.top_floor_elevation || 3330} - ${stair.step_height} - ${stair.plank_height || 40})</div></div>
                         <div class="spec-item"><div class="spec-label">stair_slab</div><div class="spec-value">${stair.stair_slab || 193} mm (vertical height of slab under stairs)</div></div>
                         <div class="spec-item"><div class="spec-label">x (start position)</div><div class="spec-value">X = ${Math.round(stair.x)} mm (post-brick wall)</div></div>
                         <div class="spec-item"><div class="spec-label">global_x</div><div class="spec-value">X = ${stair.global_x} mm on North Facade map</div></div>
                         <div class="spec-item"><div class="spec-label">turn_steps_count</div><div class="spec-value">${stair.turn_steps_count} steps (1 Straight + 3 Zabieg)</div></div>
-                        <div class="spec-item"><div class="spec-label">straight_risers_count</div><div class="spec-value">${stair.straight_risers_count} risers (Steps 5 to 19)</div></div>
-                        <div class="spec-item"><div class="spec-label">straight_treads_count</div><div class="spec-value">${stair.straight_treads_count} treads (Steps 5 to 18)</div></div>
-                        <div class="spec-item"><div class="spec-label">horizontal_gain <span title="Straight flight run along North Wall (related only to the part after the turn)" style="cursor:help; color:#9a3412;">ℹ️</span></div><div class="spec-value">${Math.round(stair.horizontal_gain || stair.straight_flight_run)} mm (14 × ${stepLenStr} mm) <span style="font-size:11px;color:#78350f;font-weight:normal;">[after turn only]</span></div></div>
-                        <div class="spec-item"><div class="spec-label">elevation_gain <span title="Elevation gain of the straight flight after the turn to upper floor (15 risers × 175 mm, related only to the part after the turn)" style="cursor:help; color:#047857;">ℹ️</span></div><div class="spec-value">${stair.elevation_gain || (stair.straight_risers_count * stair.step_height)} mm (15 risers × ${stair.step_height} mm) <span style="font-size:11px;color:#047857;font-weight:normal;">[after turn only]</span></div></div>
+                        <div class="spec-item"><div class="spec-label">straight_risers_count</div><div class="spec-value">${stair.straight_risers_count} risers (Steps 5 to ${stair.total_risers})</div></div>
+                        <div class="spec-item"><div class="spec-label">straight_treads_count</div><div class="spec-value">${stair.straight_treads_count} treads (Steps 5 to ${stair.total_risers - 1})</div></div>
+                        <div class="spec-item"><div class="spec-label">horizontal_gain <span title="Straight flight run along North Wall (related only to the part after the turn)" style="cursor:help; color:#9a3412;">ℹ️</span></div><div class="spec-value">${Math.round(stair.horizontal_gain || stair.straight_flight_run).toLocaleString()} mm (${stair.straight_treads_count} × ${stepLenStr} mm) <span style="font-size:11px;color:#78350f;font-weight:normal;">[after turn only]</span></div></div>
+                        <div class="spec-item"><div class="spec-label">elevation_gain <span title="Elevation gain of the straight flight after the turn to upper floor (${stair.straight_risers_count} risers × ${stair.step_height} mm, related only to the part after the turn)" style="cursor:help; color:#047857;">ℹ️</span></div><div class="spec-value">${(stair.elevation_gain || (stair.straight_risers_count * stair.step_height)).toLocaleString()} mm (${stair.straight_risers_count} risers × ${stair.step_height} mm) <span style="font-size:11px;color:#047857;font-weight:normal;">[after turn only]</span></div></div>
                         <div class="spec-item"><div class="spec-label">step5_to_d3_distance <span title="Distance along North Wall between Step 5 start and Door D3 left edge" style="cursor:help; color:#dc2626;">ℹ️</span></div><div class="spec-value">${Math.round(stair.step5_to_d3_distance || (5723 - (stair.x + (stair.width || 1000)))).toLocaleString()} mm <span style="font-size:11px;color:#dc2626;font-weight:normal;">[Step 5 → D3]</span></div></div>
                         <div class="spec-item"><div class="spec-label">end_x (end position)</div><div class="spec-value">X = ${Math.round(stair.end_x)} mm (on vertical axis)</div></div>
-                        <div class="spec-item"><div class="spec-label">total_risers</div><div class="spec-value">${stair.total_risers} risers (3,325 mm total rise)</div></div>
+                        <div class="spec-item"><div class="spec-label">total_risers</div><div class="spec-value">${stair.total_risers} risers (${(stair.total_rise || 3330).toLocaleString()} mm total rise)</div></div>
                         <div class="spec-item"><div class="spec-label">balustrade_height</div><div class="spec-value">${stair.balustrade_height} mm (h=90 cm above pitch)</div></div>
                         <div style="grid-column: 1 / -1; margin-top: 10px; display: flex; gap: 8px;">
                             <button class="toggle-btn active" style="flex: 1; justify-content: center; background: ${stair.show_planks ? '#7c2d12' : '#ea580c'}; color: white;" onclick="toggleStairPlanks()">

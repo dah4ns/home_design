@@ -127,10 +127,20 @@
             const s = _stairs[id];
             if (!s) return;
 
-            s.turn_steps_count = s.turn_steps_count || 4;
-            s.straight_risers_count = s.straight_risers_count || 15;
-            s.straight_treads_count = s.straight_treads_count || (s.straight_risers_count - 1);
-            s.total_risers = s.turn_steps_count + s.straight_risers_count;
+            s.turn_steps_count = 4;
+            s.total_risers = (s.total_risers === 18) ? 18 : 19;
+            s.straight_risers_count = s.total_risers - s.turn_steps_count;
+            s.straight_treads_count = s.straight_risers_count - 1;
+
+            if (s.total_risers === 18) {
+                s.step_height = (typeof s.step_height === 'number' && s.step_height !== 175) ? s.step_height : 185;
+                s.total_rise = (typeof s.total_rise === 'number' && s.total_rise !== 3325) ? s.total_rise : 3330;
+                s.description = "Two-flight interior staircase with 4-step winder entry turn (1 straight + 3 winder) in 1000×1000 mm corner, followed by a straight flight of 13 treads × 14 risers (185 mm) along the North Wall to finished +3,33 m.";
+            } else {
+                s.step_height = (typeof s.step_height === 'number' && s.step_height !== 185) ? s.step_height : 175;
+                s.total_rise = (typeof s.total_rise === 'number' && s.total_rise !== 3330) ? s.total_rise : 3325;
+                s.description = "Two-flight interior staircase with 4-step winder entry turn (1 straight + 3 winder) in 1000×1000 mm corner, followed by a 3,640 mm straight flight of 14 treads (260 mm) × 15 risers (175 mm) along the North Wall to finished +3,33 m.";
+            }
 
             if (s._use_end_x && typeof s.end_x !== 'undefined' && typeof s.x !== 'undefined') {
                 s.horizontal_gain = s.end_x - s.x - (s.width || 1000);
@@ -150,9 +160,8 @@
                 s.end_x = s.x + (s.width || 1000) + s.horizontal_gain;
             }
 
-            s.total_rise = s.total_risers * s.step_height;
-            s.top_floor_elevation = s.flooring_height + s.total_rise;
-            s.elevation_gain = s.straight_risers_count * s.step_height; // Elevation gain after turn (15 risers * step_height)
+            s.top_floor_elevation = s.flooring_height + (s.total_rise || 3330);
+            s.elevation_gain = s.straight_risers_count * s.step_height; // Elevation gain after turn (15 risers * 175 mm or 14 risers * 185 mm)
             s.step5_to_d3_distance = Math.round((s.d3_left_x || 5723) - (s.x + (s.width || 1000))); // Distance from Step 5 start to D3 left edge
         },
 
@@ -359,9 +368,9 @@
                 `;
             });
 
-            // Step 19 (Top Landing Riser to +3,325 m / +3,33 m on vertical line)
+            // Top Landing Riser to +3,33 m on vertical line (Step 19 for 19 risers, Step 18 for 18 risers)
             const topStepSvg = `
-                <!-- Step 19 (Top Landing Riser to +3,325 m): Riser at X = ${geom.topRiser.x.toFixed(1)} (Y = ${geom.topRiser.bottomY.toFixed(1)} -> ${geom.topRiser.topY.toFixed(1)}) -->
+                <!-- Step ${stair.total_risers} (Top Landing Riser to +3,33 m): Riser at X = ${geom.topRiser.x.toFixed(1)} (Y = ${geom.topRiser.bottomY.toFixed(1)} -> ${geom.topRiser.topY.toFixed(1)}) -->
                 <line x1="${geom.topRiser.x.toFixed(1)}" y1="${geom.topRiser.bottomY.toFixed(1)}" x2="${geom.topRiser.x.toFixed(1)}" y2="${geom.topRiser.topY.toFixed(1)}" stroke="${strokeColor}" stroke-width="${lineWidth}" />
             `;
 
@@ -369,7 +378,7 @@
                 ${slabSvg}
                 ${soffitSvg}
                 ${turnSvg}
-                <!-- ==================== B. STAIRS 5 TO 19: STRAIGHT FLIGHT (MATCHING COLOR & ZERO GAP SKELETON) ==================== -->
+                <!-- ==================== B. STAIRS 5 TO ${stair.total_risers}: STRAIGHT FLIGHT (MATCHING COLOR & ZERO GAP SKELETON) ==================== -->
                 ${flightStepsSvg}
                 ${topStepSvg}
             `;
