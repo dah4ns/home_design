@@ -845,12 +845,12 @@
                                 <div class="slider-sub-item" style="border-top: 1px dashed #fed7aa; padding-top: 6px;">
                                     <div class="slider-header">
                                         <span class="slider-title">🧱 Reposition Lower 80 mm Wall</span>
-                                        <span class="slider-badge" id="badge-move-wall">Move Left: 0 mm (X = 2,549)</span>
+                                        <span class="slider-badge" id="badge-move-wall">0 cm (Default, X = 2,549)</span>
                                     </div>
                                     <div class="slider-input-row">
-                                        <input type="range" id="slider-move-wall" min="0" max="200" step="10" value="0"
-                                            oninput="onParametricSlidersChange()">
-                                        <span class="slider-range-hint">0 – 200 mm</span>
+                                        <input type="range" id="slider-move-wall" min="-20" max="20" step="1" value="0"
+                                            oninput="onMoveWallChange(this.value)">
+                                        <span class="slider-range-hint">-20 cm (left) – +20 cm (right)</span>
                                     </div>
                                 </div>
                                 </div>
@@ -2856,7 +2856,8 @@
 
         // ==================== PARAMETRIC STAIR & SPATIAL ADJUSTMENT LOGIC ====================
         let deltaExtend2nd = 0; // 0 to 300 mm (10 mm steps)
-        let deltaMoveWall = 0;   // 0 to 200 mm (10 mm steps)
+        let deltaMoveWallCm = 0; // -20 to +20 cm (default 0, -20 left, +20 right)
+        let deltaMoveWall = 0;   // In mm (shiftWallMm = deltaMoveWallCm * 10)
         let personStair = 5;     // 4 to 10 (default 5)
         let personHeight = 180;  // 180 or 190 cm (default 180)
         let currentStairWidth = 100; // 90 to 100 cm (slider, default 100)
@@ -2884,8 +2885,13 @@
             const sExtend = document.getElementById('slider-extend-2nd');
             const sWall = document.getElementById('slider-move-wall');
             if (sExtend) deltaExtend2nd = parseInt(sExtend.value, 10) || 0;
-            if (sWall) deltaMoveWall = parseInt(sWall.value, 10) || 0;
+            if (sWall) deltaMoveWallCm = parseInt(sWall.value, 10) || 0;
 
+            updateParametricStairAdjustments();
+        }
+
+        function onMoveWallChange(val) {
+            deltaMoveWallCm = parseInt(val, 10) || 0;
             updateParametricStairAdjustments();
         }
 
@@ -2982,6 +2988,7 @@
         function resetParametricSliders() {
             currentTotalSteps = 19;
             deltaExtend2nd = 0;
+            deltaMoveWallCm = 0;
             deltaMoveWall = 0;
             personStair = 5;
             personHeight = 180;
@@ -3036,7 +3043,7 @@
             if (badgeExtend) badgeExtend.textContent = '+0 mm (Total: 940 mm)';
 
             const badgeWall = document.getElementById('badge-move-wall');
-            if (badgeWall) badgeWall.textContent = 'Move Left: 0 mm (X = 2,549)';
+            if (badgeWall) badgeWall.textContent = '0 cm (Default, X = 2,549)';
 
             const panelPlank = document.getElementById('panel-plank-h');
             if (panelPlank) panelPlank.value = 40;
@@ -3087,12 +3094,15 @@
                 const elevationGainMm = straightRisers * stepHeightMm; // 2,590 mm for 18 steps; 2,625 mm for 19 steps
 
                 const dE = deltaExtend2nd * 0.1; // SVG units (1 unit = 10 mm)
-                const dW = deltaMoveWall * 0.1;
+                const shiftWallCm = deltaMoveWallCm;
+                const shiftWallMm = shiftWallCm * 10;
+                deltaMoveWall = -shiftWallMm;
+                const dW = -shiftWallCm * 1.0; // SVG units (1 cm = 1.0 SVG unit = 10 mm)
 
                 const stairWidthMm = currentStairWidth * 10;
                 const stairWidthSvg = currentStairWidth * 1.0;
 
-                const stairX = 2549 - deltaMoveWall;
+                const stairX = 2549 + shiftWallMm;
                 const stairEndX = 7189 - deltaExtend2nd;
                 const flightRunMm = stairEndX - stairX - stairWidthMm;
                 const stepLengthMm = Math.round((flightRunMm / straightTreads) * 100) / 100;
@@ -3148,7 +3158,13 @@
                 }
                 const bWall = document.getElementById('badge-move-wall');
                 if (bWall) {
-                    bWall.textContent = `Move Left: ${deltaMoveWall} mm (X = ${stairX.toLocaleString()})`;
+                    if (shiftWallCm === 0) {
+                        bWall.textContent = `0 cm (Default, X = ${stairX.toLocaleString()})`;
+                    } else if (shiftWallCm < 0) {
+                        bWall.textContent = `${shiftWallCm} cm (${Math.abs(shiftWallCm) * 10} mm Left, X = ${stairX.toLocaleString()})`;
+                    } else {
+                        bWall.textContent = `+${shiftWallCm} cm (${shiftWallCm * 10} mm Right, X = ${stairX.toLocaleString()})`;
+                    }
                 }
                 const bStairW = document.getElementById('badge-stair-width');
                 if (bStairW) {
@@ -4066,8 +4082,17 @@
                             { label: 'Total to Brick Wall', value: `${Math.round(2469 - dW)} mm` }
                         ];
                     }
+                    if (ELEMENT_SPECS['brick_wall']) {
+                        ELEMENT_SPECS['brick_wall'].specs = [
+                            { label: 'Wall Thickness', value: '80 mm (8.0 cm)' },
+                            { label: 'Position along North Wall', value: `X = ${Math.round(2469 - dW)} to ${Math.round(2549 - dW)} mm` },
+                            { label: 'Reposition Adjustment', value: shiftWallCm === 0 ? '0 cm (Default datum)' : (shiftWallCm < 0 ? `${shiftWallCm} cm (${Math.abs(shiftWallCm) * 10} mm Left)` : `+${shiftWallCm} cm (${shiftWallCm * 10} mm Right)`) },
+                            { label: 'Wall Strip Before Brick Wall', value: `${curStripMm} mm` },
+                            { label: 'Stairs Start Position', value: `X = ${stairX.toLocaleString()} mm` }
+                        ];
+                    }
                 }
-                if (window.currentInspectedElement === 'door_d3' || window.currentInspectedElement === 'under_stair_door' || window.currentInspectedElement === 'upper_brick_wall' || window.currentInspectedElement === 'upper_slab' || window.currentInspectedElement === 'corridor_doors') {
+                if (window.currentInspectedElement === 'door_d3' || window.currentInspectedElement === 'under_stair_door' || window.currentInspectedElement === 'upper_brick_wall' || window.currentInspectedElement === 'upper_slab' || window.currentInspectedElement === 'corridor_doors' || window.currentInspectedElement === 'brick_wall') {
                     showElementDetails(window.currentInspectedElement);
                 }
 
