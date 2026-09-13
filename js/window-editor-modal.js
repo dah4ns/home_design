@@ -351,7 +351,7 @@
             if (elX) elX.value = s.x;
 
             if (btnPlanks) {
-                btnPlanks.innerHTML = s.show_planks ? '🪵 Switch to Pure Skeleton View' : '🪵 Preview with 40 mm Wood Planks';
+                btnPlanks.innerHTML = s.show_planks ? '🪵 Switch to Pure Skeleton View' : `🪵 Preview with ${s.plank_height || 40} mm Wood Planks`;
                 btnPlanks.style.background = s.show_planks ? '#7c2d12' : '#ea580c';
             }
 
@@ -414,6 +414,10 @@
 
             const updated = sc.update('main_staircase', updates);
             this._updateStairCalcs(updated);
+            const btn = document.getElementById('we-stair-toggle-planks-btn');
+            if (btn && !updated.show_planks) {
+                btn.innerHTML = `🪵 Preview with ${updated.plank_height || 40} mm Wood Planks`;
+            }
         },
 
         toggleStairPlanks: function () {
@@ -424,7 +428,7 @@
             const updated = sc.update('main_staircase', { show_planks: !s.show_planks });
             const btn = document.getElementById('we-stair-toggle-planks-btn');
             if (btn) {
-                btn.innerHTML = updated.show_planks ? '🪵 Switch to Pure Skeleton View' : '🪵 Preview with 40 mm Wood Planks';
+                btn.innerHTML = updated.show_planks ? '🪵 Switch to Pure Skeleton View' : `🪵 Preview with ${updated.plank_height || 40} mm Wood Planks`;
                 btn.style.background = updated.show_planks ? '#7c2d12' : '#ea580c';
             }
         },

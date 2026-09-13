@@ -247,7 +247,7 @@
       "total_rise": 3325,
       "top_floor_elevation": 3330,
       "balustrade_height": 900,
-      "show_planks": false,
+      "show_planks": true,
       "line_thickness": 1.0,
       "description": "Two-flight interior staircase with 4-step winder entry turn (1 straight + 3 winder) in 1000×1000 mm corner, followed by a 3,640 mm straight flight of 14 treads (260 mm) × 15 risers (175 mm) along the North Wall to finished +3,33 m."
     }

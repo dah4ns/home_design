@@ -52,7 +52,7 @@
             total_rise: 3325,
             top_floor_elevation: 3330,
             balustrade_height: 900,
-            show_planks: false,
+            show_planks: true,
             line_thickness: 1.0
         };
     }
