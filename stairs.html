@@ -1002,6 +1002,10 @@
                             <span class="status-label">Eyes to Ceiling Corner:</span>
                             <span class="status-val" id="metric-head-clearance" style="color: #0284c7;">45.5 cm</span>
                         </div>
+                        <div class="status-metric" title="Vertical length between Upper 80 mm Brick Wall (+2.96m soffit) and Step 5 tread">
+                            <span class="status-label">Brick Wall ↕ Step 5:</span>
+                            <span class="status-val" id="metric-brick-step5" style="color: #0284c7;">2,085 mm</span>
+                        </div>
                         <button class="reset-sliders-btn" onclick="resetParametricSliders()"
                             title="Reset parametric sliders to original design defaults" style="margin-left: auto;">
                             ↺ Reset
@@ -1024,7 +1028,7 @@
                     - First Floor Finished Level (+3,33 m, 333 cm): Y = 307
                     - Right Suspended Ceiling (280 cm clear height, 15.5 cm cavity): Y = 359.5
                 -->
-                <svg class="elevation-svg" viewBox="-55 -40 1050 900" xmlns="http://www.w3.org/2000/svg">
+                <svg class="elevation-svg" viewBox="-55 -40 1050 950" xmlns="http://www.w3.org/2000/svg">
                     <defs>
                         <!-- Warm Interior Wall Plaster Gradient (North Wall Behind Stairs) -->
                         <linearGradient id="warm-north-wall" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -1893,6 +1897,32 @@
                                     font-weight="800" fill="#dc2626" text-anchor="middle">2,174 mm</text>
                                 <text id="step5-d3-badge-lbl" x="463.6" y="134" font-family="'Outfit', sans-serif" font-size="9"
                                     font-weight="700" fill="#b91c1c" text-anchor="middle">★ Step 5 (North Wall Flight Start) → Door D3 (Left Edge)</text>
+                            </g>
+
+                            <!-- Dedicated Highlighted Separate Row: Vertical Length between Upper 80 mm Brick Wall (+2.96m Soffit) and Step 5 -->
+                            <g id="scale-highlight-row-brick-step5">
+                                <!-- Subtle container highlight band for this separate row -->
+                                <rect id="brick-step5-row-box" x="336.5" y="148" width="285" height="44" rx="6" fill="#f0f9ff" stroke="#38bdf8"
+                                    stroke-width="1" stroke-dasharray="4 2" opacity="0.85" />
+
+                                <!-- Leader lines down from Upper 80 mm Brick Wall right face (X=346.5, Y=344 -> local y=-346) and Step 5 start (X=354.9) -->
+                                <line id="brick-step5-lead-brick" x1="346.5" y1="-346" x2="346.5" y2="172" stroke="#0284c7" stroke-width="1.2" stroke-dasharray="3 2" />
+                                <line id="brick-step5-lead-step5" x1="354.9" y1="122" x2="354.9" y2="172" stroke="#0284c7" stroke-width="1.2" stroke-dasharray="3 2" />
+
+                                <!-- Dimension Segment & Ticks between Upper 80 mm Brick Wall (X=346.5) and Step 5 (X=354.9) -->
+                                <line id="brick-step5-tick-start" x1="346.5" y1="152" x2="346.5" y2="172" stroke="#0284c7" stroke-width="1.8" />
+                                <line id="brick-step5-tick-end" x1="354.9" y1="152" x2="354.9" y2="172" stroke="#0284c7" stroke-width="1.8" />
+                                <line id="brick-step5-line" x1="346.5" y1="162" x2="354.9" y2="162" stroke="#0284c7" stroke-width="2"
+                                    marker-start="url(#dim-tick-blue)" marker-end="url(#dim-tick-blue)" />
+                                <line id="brick-step5-ext-line" x1="354.9" y1="162" x2="368.9" y2="162" stroke="#0284c7" stroke-width="1.4" stroke-dasharray="2 2" />
+
+                                <!-- Badge for Vertical Length (2,085 mm default) & Horizontal Offset -->
+                                <rect id="brick-step5-badge-rect" x="368.9" y="150.5" width="242" height="23" rx="4.5" fill="#ffffff" stroke="#0284c7"
+                                    stroke-width="1.6" filter="drop-shadow(0 2px 4px rgba(2,132,199,0.22))" />
+                                <text id="brick-step5-badge-val" x="489.9" y="166.5" font-family="'JetBrains Mono', monospace" font-size="11.5"
+                                    font-weight="800" fill="#0369a1" text-anchor="middle">↕ 2,085 mm (208.5 cm)  |  ΔX: 84 mm</text>
+                                <text id="brick-step5-badge-lbl" x="489.9" y="185" font-family="'Outfit', sans-serif" font-size="8.8"
+                                    font-weight="700" fill="#0c4a6e" text-anchor="middle">★ Upper 80 mm Brick Wall (+2.96m Soffit) ↕ Step 5 (+0.875m) [Floor +3.33m: 2,455 mm]</text>
                             </g>
                         </g>
 
@@ -4006,6 +4036,78 @@
                     t5.setAttribute('x', (s5X - 18).toFixed(1));
                     t5.setAttribute('y', '470');
                     t5.textContent = `${Math.round(dist5)} cm (Step 5)`;
+                }
+
+                // 12b. Update Bottom Scale Row: Vertical Length between Upper 80 mm Brick Wall (+2.96m Soffit) and Step 5
+                const step5ElevMm = Math.round((640.0 - s5Y) * 10);
+                const vertSoffitToStep5Mm = 2960 - step5ElevMm;
+                const vertSoffitToStep5Cm = (vertSoffitToStep5Mm / 10).toFixed(1);
+                const vertFloorToStep5Mm = 3330 - step5ElevMm;
+                const brickEndMm = 3465 - shrinkMm;
+                const horizBrickToStep5Mm = step5StartMm - brickEndMm;
+                const horizSign = horizBrickToStep5Mm >= 0 ? '' : '-';
+                const absHorizMm = Math.abs(horizBrickToStep5Mm);
+
+                const minBrickStep5X = Math.min(brickEndX, flightStartX);
+                const maxBrickStep5X = Math.max(brickEndX, flightStartX);
+                const brickStep5BadgeX = maxBrickStep5X + 14.0;
+                const brickStep5BadgeW = 242.0;
+                const brickStep5BadgeCenterX = brickStep5BadgeX + brickStep5BadgeW / 2;
+
+                const bsLeadBrick = document.getElementById('brick-step5-lead-brick');
+                if (bsLeadBrick) {
+                    bsLeadBrick.setAttribute('x1', brickEndX.toFixed(1));
+                    bsLeadBrick.setAttribute('x2', brickEndX.toFixed(1));
+                }
+                const bsLeadStep5 = document.getElementById('brick-step5-lead-step5');
+                if (bsLeadStep5) {
+                    bsLeadStep5.setAttribute('x1', flightStartX.toFixed(1));
+                    bsLeadStep5.setAttribute('x2', flightStartX.toFixed(1));
+                }
+                const bsTickStart = document.getElementById('brick-step5-tick-start');
+                if (bsTickStart) {
+                    bsTickStart.setAttribute('x1', brickEndX.toFixed(1));
+                    bsTickStart.setAttribute('x2', brickEndX.toFixed(1));
+                }
+                const bsTickEnd = document.getElementById('brick-step5-tick-end');
+                if (bsTickEnd) {
+                    bsTickEnd.setAttribute('x1', flightStartX.toFixed(1));
+                    bsTickEnd.setAttribute('x2', flightStartX.toFixed(1));
+                }
+                const bsLine = document.getElementById('brick-step5-line');
+                if (bsLine) {
+                    bsLine.setAttribute('x1', minBrickStep5X.toFixed(1));
+                    bsLine.setAttribute('x2', maxBrickStep5X.toFixed(1));
+                }
+                const bsExtLine = document.getElementById('brick-step5-ext-line');
+                if (bsExtLine) {
+                    bsExtLine.setAttribute('x1', maxBrickStep5X.toFixed(1));
+                    bsExtLine.setAttribute('x2', brickStep5BadgeX.toFixed(1));
+                }
+                const bsBadgeRect = document.getElementById('brick-step5-badge-rect');
+                if (bsBadgeRect) {
+                    bsBadgeRect.setAttribute('x', brickStep5BadgeX.toFixed(1));
+                }
+                const bsBadgeVal = document.getElementById('brick-step5-badge-val');
+                if (bsBadgeVal) {
+                    bsBadgeVal.setAttribute('x', brickStep5BadgeCenterX.toFixed(1));
+                    bsBadgeVal.textContent = `↕ ${vertSoffitToStep5Mm.toLocaleString()} mm (${vertSoffitToStep5Cm} cm)  |  ΔX: ${horizSign}${absHorizMm} mm`;
+                }
+                const bsBadgeLbl = document.getElementById('brick-step5-badge-lbl');
+                if (bsBadgeLbl) {
+                    bsBadgeLbl.setAttribute('x', brickStep5BadgeCenterX.toFixed(1));
+                    bsBadgeLbl.textContent = `★ Upper 80 mm Brick Wall (+2.96m Soffit) ↕ Step 5 (+${(step5ElevMm / 1000).toFixed(3)}m) [Floor +3.33m: ${vertFloorToStep5Mm.toLocaleString()} mm]`;
+                }
+                const bsRowBox = document.getElementById('brick-step5-row-box');
+                if (bsRowBox) {
+                    const rowBoxX = minBrickStep5X - 10.0;
+                    const rowBoxW = (brickStep5BadgeX + brickStep5BadgeW + 10.0) - rowBoxX;
+                    bsRowBox.setAttribute('x', rowBoxX.toFixed(1));
+                    bsRowBox.setAttribute('width', rowBoxW.toFixed(1));
+                }
+                const mBrickStep5 = document.getElementById('metric-brick-step5');
+                if (mBrickStep5) {
+                    mBrickStep5.textContent = `${vertSoffitToStep5Mm.toLocaleString()} mm (${vertSoffitToStep5Cm} cm)`;
                 }
 
                 const l6 = document.getElementById('headroom-step6-line');
