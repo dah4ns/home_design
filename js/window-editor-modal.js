@@ -80,7 +80,7 @@
                             ">Window Openings</button>
                             <button id="we-tab-btn-views" onclick="WindowEditorModal.switchTab('views')" style="
                                 background: transparent; border: 1px solid transparent; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 600; color: #64748b; cursor: pointer;
-                            ">Architectural Views (2)</button>
+                            ">Architectural Views (4)</button>
                             <button id="we-tab-btn-stairs" onclick="WindowEditorModal.switchTab('stairs')" style="
                                 background: transparent; border: 1px solid transparent; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 600; color: #64748b; cursor: pointer;
                             ">Staircase Object (Schody)</button>
@@ -539,14 +539,17 @@
             if (!fb) return;
 
             const nfShift = CoordinateService.getShiftDirection('north_facade');
+            const sfShift = CoordinateService.getShiftDirection('south_facade');
             const kwShift = CoordinateService.getShiftDirection('kitchen_north_wall');
             const swShift = CoordinateService.getShiftDirection('stairs_north_wall');
             const nfCoords = CoordinateService.transform(win, 'north_facade');
+            const sfCoords = CoordinateService.transform(win, 'south_facade');
             const kwCoords = CoordinateService.transform(win, 'kitchen_north_wall');
             const swCoords = CoordinateService.transform(win, 'stairs_north_wall');
 
             fb.innerHTML = `
                 <div>• <strong>North Facade</strong> (dir: <em>${nfShift.direction}</em>): +ΔX shifts <strong style="color: #047857;">${nfShift.label}</strong> (Screen X = ${nfCoords.localX_mm} mm)</div>
+                <div>• <strong>South Facade</strong> (dir: <em>${sfShift.direction}</em>): +ΔX shifts <strong style="color: #0284c7;">${sfShift.label}</strong> (Screen X = ${sfCoords.localX_mm} mm)</div>
                 <div>• <strong>Kitchen North Wall</strong> (dir: <em>${kwShift.direction}</em>): +ΔX shifts <strong style="color: #b45309;">${kwShift.label}</strong> (Screen X = ${kwCoords.localX_mm} mm)</div>
                 <div>• <strong>Stairs North Wall</strong> (dir: <em>${swShift.direction}</em>): +ΔX shifts <strong style="color: #c2410c;">${swShift.label}</strong> (Screen X = ${swCoords.localX_mm} mm)</div>
             `;

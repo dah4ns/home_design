@@ -29,7 +29,7 @@
             const w = coords.width;
             const h = coords.height;
 
-            if (viewId === 'north_facade') {
+            if (viewId === 'north_facade' || viewId === 'south_facade') {
                 return this._renderExteriorNorthFacade(win, x, y, w, h);
             } else if (viewId === 'kitchen_back_wall' || viewId === 'kitchen_north_wall') {
                 return this._renderInteriorKitchen(win, x, y, w, h, styleType);
@@ -42,12 +42,59 @@
 
         _renderExteriorNorthFacade: function (win, x, y, w, h) {
             const isCorner = win.id === 'O13a';
-            const isFullHeight = win.id === '14a' || (win.floor === 'first' && win.sill <= 3430);
+            const isFullHeight = win.id === '14a'
+                || (win.floor === 'first' && win.sill <= 3430)
+                || (win.floor === 'ground' && win.sill <= 0);
             const midX = x + w / 2;
+            const numSashes = Math.max(1, Number(win.sashes) || 1);
 
             let sashesSvg = '';
-            if (win.sashes === 2 && win.hasMullion) {
-                sashesSvg = `<line x1="${midX}" y1="${y + 4}" x2="${midX}" y2="${y + h - 4}" stroke="#0f172a" stroke-width="2.5" />`;
+            if (numSashes >= 2 && win.hasMullion) {
+                for (let i = 1; i < numSashes; i++) {
+                    const mullionX = x + (w * i) / numSashes;
+                    sashesSvg += `<line x1="${mullionX}" y1="${y + 4}" x2="${mullionX}" y2="${y + h - 4}" stroke="#0f172a" stroke-width="3" />`;
+                }
+            }
+
+            // Optional tilt-and-turn casement dashed lines (matching architectural CAD elevation)
+            let casementSvg = '';
+            if (Array.isArray(win.tiltTurnSashes) && win.tiltTurnSashes.length > 0) {
+                const sashW = w / numSashes;
+                win.tiltTurnSashes.forEach(sashIdx => {
+                    const idx = Number(sashIdx) - 1;
+                    if (idx >= 0 && idx < numSashes) {
+                        const sx1 = x + idx * sashW + 4;
+                        const sx2 = x + (idx + 1) * sashW - 4;
+                        const sy1 = y + 4;
+                        const sy2 = y + h - 4;
+                        const smidX = (sx1 + sx2) / 2;
+                        const smidY = (sy1 + sy2) / 2;
+                        // Bottom-left & bottom-right to top-center (tilt) + left-top & left-bottom to right-center (turn)
+                        casementSvg += `
+                            <polyline points="${sx1},${sy2} ${smidX},${sy1} ${sx2},${sy2}" fill="none" stroke="#cbd5e1" stroke-width="0.9" stroke-dasharray="3 2" opacity="0.65" />
+                            <polyline points="${sx1},${sy1} ${sx2},${smidY} ${sx1},${sy2}" fill="none" stroke="#cbd5e1" stroke-width="0.9" stroke-dasharray="3 2" opacity="0.65" />
+                        `;
+                    }
+                });
+            }
+
+            // Optional HST sliding door arrows (central bi-parting panels 2 & 3)
+            let slidingSvg = '';
+            if (win.slidingArrows && numSashes >= 4) {
+                const sashW = w / numSashes;
+                const arrowY = y + h * 0.62;
+                // Left arrow in sash 2 (index 1)
+                const s2Mid = x + 1.5 * sashW;
+                // Right arrow in sash 3 (index 2)
+                const s3Mid = x + 2.5 * sashW;
+                slidingSvg = `
+                    <g stroke="#e2e8f0" stroke-width="1.6" fill="none" opacity="0.85">
+                        <line x1="${s2Mid + 16}" y1="${arrowY}" x2="${s2Mid - 16}" y2="${arrowY}" />
+                        <polyline points="${s2Mid - 9},${arrowY - 5} ${s2Mid - 16},${arrowY} ${s2Mid - 9},${arrowY + 5}" />
+                        <line x1="${s3Mid - 16}" y1="${arrowY}" x2="${s3Mid + 16}" y2="${arrowY}" />
+                        <polyline points="${s3Mid + 9},${arrowY - 5} ${s3Mid + 16},${arrowY} ${s3Mid + 9},${arrowY + 5}" />
+                    </g>
+                `;
             }
 
             // Sill plate
@@ -66,8 +113,10 @@
                     <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#1e293b" stroke="#0f172a" stroke-width="2" />
                     <!-- Glass pane with glare -->
                     <rect x="${x + 4}" y="${y + 4}" width="${w - 8}" height="${h - 8}" fill="url(#glass-glare)" />
+                    ${casementSvg}
                     <rect x="${x + 4}" y="${y + 4}" width="${w - 8}" height="${h - 8}" fill="none" stroke="#0f172a" stroke-width="3" />
                     ${sashesSvg}
+                    ${slidingSvg}
                     ${sillSvg}
                     <!-- Dimension Label Badge -->
                     <text x="${midX}" y="${y + h / 2 - 5}" font-family="'JetBrains Mono', monospace" font-size="${w > 150 ? 11 : 9.5}" fill="#ffffff" font-weight="700" text-anchor="middle" filter="drop-shadow(0 1px 2px black)">

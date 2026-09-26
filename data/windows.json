@@ -48,6 +48,19 @@
       "side": "interior",
       "floorY": 640,
       "description": "Interior staircase cross-section looking North towards the North wall. Left edge is at map coordinate 18910; positions decrease Eastward (left to right)."
+    },
+    "south_facade": {
+      "id": "south_facade",
+      "name": "South Facade Elevation",
+      "positionOnMap": 21000,
+      "leftEdge": 21000,
+      "floor": "all",
+      "direction": "east",
+      "length": 21000,
+      "scale": 0.1,
+      "wall": "south",
+      "side": "exterior",
+      "description": "Exterior architectural elevation looking North from the southern garden. Left edge is the West corner at map coordinate 21000; X decreases in the East direction (left to right)."
     }
   },
   "windows": {
@@ -240,6 +253,179 @@
         "frame": "Concealed head and sill perimeter framing",
         "sillExterior": "Continuous corner sheet metal sill at +4.18 m",
         "sillInterior": "Deep panoramic window bench"
+      }
+    },
+    "SO1": {
+      "id": "SO1",
+      "name": "SO1",
+      "x": 18440,
+      "sill": 4180,
+      "width": 2400,
+      "height": 1950,
+      "room": "1.01 Sypialnia Master",
+      "floor": "first",
+      "wall": "south",
+      "views": [
+        "south_facade"
+      ],
+      "sashes": 2,
+      "hasMullion": true,
+      "tiltTurnSashes": [2],
+      "handlePosition": "center",
+      "description": "Two-sash bedroom window on the West side of the South Facade (left fixed, right tilt-and-turn)",
+      "specs": {
+        "glazing": "Triple-pane insulated glass unit (Ug=0.5 W/m²K)",
+        "frame": "Matte anthracite aluminum profile (RAL 7016)",
+        "sillExterior": "Aluminum exterior sill at +4.18 m (hp=850 mm)",
+        "sillInterior": "Internal window board at hp=850 mm"
+      }
+    },
+    "SO2": {
+      "id": "SO2",
+      "name": "SO2",
+      "x": 11000,
+      "sill": 3430,
+      "width": 4000,
+      "height": 2700,
+      "room": "1.05 Sypialnia",
+      "floor": "first",
+      "wall": "south",
+      "views": [
+        "south_facade"
+      ],
+      "sashes": 3,
+      "hasMullion": true,
+      "handlePosition": "center",
+      "description": "Three-panel full-height floor-to-ceiling bedroom glazing on the South Facade",
+      "specs": {
+        "glazing": "Safety tempered and laminated glass (VSG/ESG)",
+        "frame": "Slimline aluminum triple-panel frame (RAL 7016)",
+        "sillExterior": "Flush threshold on intermediate cornice (+3.43 m)",
+        "sillInterior": "Flush floor threshold (hp=0 mm)"
+      }
+    },
+    "SO3": {
+      "id": "SO3",
+      "name": "SO3",
+      "x": 7500,
+      "sill": 4180,
+      "width": 1000,
+      "height": 1950,
+      "room": "1.06 Łazienka / Garderoba",
+      "floor": "first",
+      "wall": "south",
+      "views": [
+        "south_facade"
+      ],
+      "sashes": 1,
+      "hasMullion": false,
+      "tiltTurnSashes": [1],
+      "handlePosition": "left",
+      "description": "Single-sash vertical tilt-and-turn window on the South Facade",
+      "specs": {
+        "glazing": "Acoustic and privacy matte laminated glass",
+        "frame": "Anthracite aluminum tilt-and-turn profile",
+        "sillExterior": "Exterior sill at +4.18 m (hp=850 mm)",
+        "sillInterior": "Internal window sill at hp=850 mm"
+      }
+    },
+    "SO4": {
+      "id": "SO4",
+      "name": "SO4",
+      "x": 200,
+      "sill": 3430,
+      "width": 6300,
+      "height": 2700,
+      "room": "1.04 Sypialnia Wschodnia",
+      "floor": "first",
+      "wall": "south",
+      "views": [
+        "south_facade"
+      ],
+      "sashes": 4,
+      "hasMullion": true,
+      "handlePosition": "center",
+      "description": "Four-panel full-height floor-to-ceiling panoramic glazing on the East side of the first floor",
+      "specs": {
+        "glazing": "Safety tempered and laminated glass (VSG/ESG)",
+        "frame": "Concealed slimline 4-panel aluminum frame (RAL 7016)",
+        "sillExterior": "Flush threshold on intermediate cornice (+3.43 m)",
+        "sillInterior": "Flush floor threshold (hp=0 mm)"
+      }
+    },
+    "SO5": {
+      "id": "SO5",
+      "name": "SO5",
+      "x": 15000,
+      "sill": 800,
+      "width": 3200,
+      "height": 2000,
+      "room": "0.09 Pokój / Pomieszczenie",
+      "floor": "ground",
+      "wall": "south",
+      "views": [
+        "south_facade"
+      ],
+      "sashes": 3,
+      "hasMullion": true,
+      "tiltTurnSashes": [1, 2],
+      "handlePosition": "center",
+      "description": "Three-sash ground floor window (two tilt-and-turn sashes on left, one fixed sash on right) with clinker brick parapet",
+      "specs": {
+        "glazing": "Triple-pane insulated glass unit (Ug=0.5 W/m²K)",
+        "frame": "Matte anthracite aluminum 3-sash profile (RAL 7016)",
+        "sillExterior": "Sheet metal sill at +0.80 m over clinker brick parapet",
+        "sillInterior": "Internal window board at hp=800 mm"
+      }
+    },
+    "SO6": {
+      "id": "SO6",
+      "name": "SO6",
+      "x": 7650,
+      "sill": 0,
+      "width": 6350,
+      "height": 2800,
+      "room": "0.12 Jadalnia / Salon",
+      "floor": "ground",
+      "wall": "south",
+      "views": [
+        "south_facade"
+      ],
+      "sashes": 4,
+      "hasMullion": true,
+      "slidingArrows": true,
+      "handlePosition": "center",
+      "description": "Four-panel full-height HST lift-and-slide terrace glazing (central bi-parting doors ← →) in dining/living area",
+      "specs": {
+        "glazing": "Triple-pane safety solar-control glass (VSG/ESG)",
+        "frame": "Heavy-duty HST lift-and-slide aluminum system (RAL 7016)",
+        "sillExterior": "Zero-barrier flush terrace threshold (-0.02 m / ±0.00 m)",
+        "sillInterior": "Trench heater integrated flush floor track"
+      }
+    },
+    "SO7": {
+      "id": "SO7",
+      "name": "SO7",
+      "x": 200,
+      "sill": 0,
+      "width": 6300,
+      "height": 2800,
+      "room": "0.11 Salon (Część Wschodnia)",
+      "floor": "ground",
+      "wall": "south",
+      "views": [
+        "south_facade"
+      ],
+      "sashes": 4,
+      "hasMullion": true,
+      "slidingArrows": true,
+      "handlePosition": "center",
+      "description": "Four-panel full-height HST lift-and-slide terrace glazing (central bi-parting doors ← →) in eastern living room",
+      "specs": {
+        "glazing": "Triple-pane safety solar-control glass (VSG/ESG)",
+        "frame": "Heavy-duty HST lift-and-slide aluminum system (RAL 7016)",
+        "sillExterior": "Zero-barrier flush terrace threshold (-0.02 m / ±0.00 m)",
+        "sillInterior": "Trench heater integrated flush floor track"
       }
     }
   },

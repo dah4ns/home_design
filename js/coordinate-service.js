@@ -57,6 +57,19 @@
             wall: 'north',
             side: 'interior',
             floorY: 640
+        },
+        'south_facade': {
+            id: 'south_facade',
+            name: 'South Facade Elevation',
+            positionOnMap: 21000,
+            leftEdge: 21000,
+            floor: 'all',
+            direction: 'east',
+            length: 21000,
+            scale: 0.1,
+            wall: 'south',
+            side: 'exterior',
+            floorY: 0
         }
     };
 
