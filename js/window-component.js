@@ -42,7 +42,7 @@
 
         _renderExteriorNorthFacade: function (win, x, y, w, h) {
             const isCorner = win.id === 'O13a';
-            const isFullHeight = win.id === '14a';
+            const isFullHeight = win.id === '14a' || (win.floor === 'first' && win.sill <= 3430);
             const midX = x + w / 2;
 
             let sashesSvg = '';
@@ -53,8 +53,12 @@
             // Sill plate
             let sillSvg = '';
             if (!isFullHeight && !isCorner) {
-                sillSvg = `<rect x="${x - 5}" y="${y + h}" width="${w + 10}" height="5" fill="#0f172a" />`;
+                sillSvg = `<rect x="${x - 2}" y="${y + h}" width="${w + 4}" height="4" fill="#0f172a" />`;
             }
+
+            const hpVal = (win.floor === 'first')
+                ? (win.sill <= 3430 ? 0 : Math.round((win.sill - 3330) / 10))
+                : Math.round(win.sill / 10);
 
             return `
                 <g class="interactive-element window-component" data-window-id="${win.id}" onclick="showElementDetails('${win.id}')" style="cursor: pointer;">
@@ -70,7 +74,7 @@
                         ${win.name} (${Math.round(win.width / 10)}×${Math.round(win.height / 10)})
                     </text>
                     <text x="${midX}" y="${y + h / 2 + 12}" font-family="'JetBrains Mono', monospace" font-size="8.5" fill="#93c5fd" font-weight="600" text-anchor="middle">
-                        hp=${Math.round(win.sill / 10)}
+                        hp=${hpVal}
                     </text>
                 </g>
             `;
@@ -174,13 +178,24 @@
                 return () => {};
             }
 
+            if (typeof el._unmountWindowComponent === 'function') {
+                el._unmountWindowComponent();
+            }
+
+            el.setAttribute('data-window-component', windowId);
+
             function update() {
                 const win = WindowStore.get(windowId);
                 if (!win) {
-                    el.innerHTML = '';
+                    el.replaceChildren();
                     return;
                 }
-                el.innerHTML = WindowComponent.createSVG(win, viewId, styleType);
+                const svgMarkup = `<svg xmlns="http://www.w3.org/2000/svg">${WindowComponent.createSVG(win, viewId, styleType)}</svg>`;
+                const doc = new DOMParser().parseFromString(svgMarkup, 'image/svg+xml');
+                const parsedGroup = doc.documentElement.firstElementChild;
+                if (parsedGroup) {
+                    el.replaceChildren(document.importNode(parsedGroup, true));
+                }
             }
 
             // Initial render
@@ -193,6 +208,7 @@
                 }
             });
 
+            el._unmountWindowComponent = unsubscribe;
             return unsubscribe;
         },
 

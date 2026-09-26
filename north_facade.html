@@ -653,6 +653,18 @@
         <div id="TabElevation" class="tab-content active">
             <!-- Controls Bar -->
             <div class="controls-bar">
+                <div class="layer-toggles" style="border-right: 1px solid #cbd5e1; padding-right: 16px;">
+                    <span style="font-size: 13px; font-weight: 700; color: #0f172a;">Master Bedroom Windows:</span>
+                    <button id="btn-opt-current" class="toggle-btn active" onclick="setMasterBedroomWindowOption('current')" style="font-weight: 600;">
+                        <span>🪟</span> 1) current windows
+                    </button>
+                    <button id="btn-opt-bigger" class="toggle-btn" onclick="setMasterBedroomWindowOption('bigger')" style="font-weight: 600;">
+                        <span>↔️</span> 2) bigger windows (O15: to floor &amp; +1350 mm right)
+                    </button>
+                    <span id="master-window-opt-badge" class="badge accent" style="font-size: 11.5px; padding: 4px 10px;">
+                        Active: current windows (O11: 1000×1950 mm, hp=850 mm)
+                    </span>
+                </div>
                 <div class="layer-toggles">
                     <span style="font-size: 13px; font-weight: 600; color: #334155;">Display Layers:</span>
                     <button id="toggleDims" class="toggle-btn active amber" onclick="toggleLayer('layer-dims', this)">
@@ -903,15 +915,8 @@
                         <!-- Timber wall body -->
                         <rect x="759" y="-613" width="1300" height="270" fill="url(#wood-slats-pattern)" stroke="#8a7356" stroke-width="1.5" />
 
-                        <!-- Window O11_1 - Bathroom 1.03 (1000mm wide x 1950mm high, hp=850mm) -->
-                        <!-- Located at X = 876 to 976, Y = -613 to -418 -->
-                        <g class="interactive-element" onclick="showElementDetails('O11_1')">
-                            <rect x="876" y="-613" width="100" height="195" fill="#1e293b" stroke="#0f172a" stroke-width="2" />
-                            <rect x="880" y="-609" width="92" height="187" fill="url(#glass-glare)" />
-                            <rect x="880" y="-609" width="92" height="187" fill="none" stroke="#0f172a" stroke-width="3" />
-                            <rect x="874" y="-418" width="104" height="4" fill="#0f172a" />
-                            <text x="926" y="-510" font-family="'JetBrains Mono', monospace" font-size="10" fill="#ffffff" font-weight="700" text-anchor="middle" filter="drop-shadow(0 1px 2px black)">O11</text>
-                        </g>
+                        <!-- Dynamic Reusable Window Component: Master Bedroom Slot (Swaps between O11_1 ['O11'] and O15 ['O15']) -->
+                        <g data-window-component="O11_1" data-view-id="north_facade" data-window-style="exterior" id="facade-window-master-slot"></g>
 
                         <!-- Window O11_2 - Bathroom 1.02 (1000mm wide x 1950mm high, hp=850mm) -->
                         <!-- Located at X = 1146 to 1246, Y = -613 to -418 -->
@@ -1036,8 +1041,8 @@
                             <line x1="0" y1="0" x2="0" y2="22" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
                             <line x1="640" y1="0" x2="640" y2="22" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
                             <line x1="759" y1="0" x2="759" y2="22" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
-                            <line x1="876" y1="0" x2="876" y2="22" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
-                            <line x1="976" y1="0" x2="976" y2="22" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
+                            <line id="dim-o11-1-lwitness" x1="876" y1="0" x2="876" y2="22" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
+                            <line id="dim-o11-1-witness" x1="976" y1="0" x2="976" y2="22" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
                             <line x1="1146" y1="0" x2="1146" y2="22" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
                             <line x1="1246" y1="0" x2="1246" y2="22" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
                             <line x1="1410" y1="0" x2="1410" y2="22" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
@@ -1057,20 +1062,20 @@
                             <rect x="657.5" y="-12" width="84" height="18" fill="#ffffff" rx="2" stroke="#10b981" stroke-width="0.8" />
                             <text x="699.5" y="2" class="dim-text" font-weight="700" fill="#047857">1 190 (14a)</text>
 
-                            <!-- Pier between 14a and O11_1 (759 to 876) = 1170 mm -->
+                            <!-- Pier between 14a and O11_1/O15 (759 to 876) = 1170 mm -->
                             <line x1="759" y1="-7" x2="759" y2="7" class="tick" />
-                            <rect x="797.5" y="-12" width="40" height="18" fill="#ffffff" rx="2" />
-                            <text x="817.5" y="2" class="dim-text">1 170</text>
+                            <rect id="dim-pier-14a-o11-box" x="797.5" y="-12" width="40" height="18" fill="#ffffff" rx="2" />
+                            <text id="dim-pier-14a-o11-text" x="817.5" y="2" class="dim-text">1 170</text>
 
-                            <!-- Window O11_1 (876 to 976) = 1000 mm -->
-                            <line x1="876" y1="-7" x2="876" y2="7" class="tick" />
-                            <rect x="906" y="-12" width="40" height="18" fill="#ffffff" rx="2" />
-                            <text x="926" y="2" class="dim-text">1 000</text>
+                            <!-- Window O11_1 / O15 (876 to 976 = 1000 mm in current windows; 876 to 1111 = 2350 mm in bigger windows) -->
+                            <line id="dim-o11-1-ltick" x1="876" y1="-7" x2="876" y2="7" class="tick" />
+                            <rect id="dim-o11-1-box" x="906" y="-12" width="40" height="18" fill="#ffffff" rx="2" />
+                            <text id="dim-o11-1-text" x="926" y="2" class="dim-text">1 000</text>
 
-                            <!-- Pier between O11_1 and O11_2 (976 to 1146) = 1700 mm -->
-                            <line x1="976" y1="-7" x2="976" y2="7" class="tick" />
-                            <rect x="1041" y="-12" width="40" height="18" fill="#ffffff" rx="2" />
-                            <text x="1061" y="2" class="dim-text">1 700</text>
+                            <!-- Pier between O11_1 and O11_2 (976 to 1146 = 1700 mm in current windows; 1111 to 1146 = 350 mm in bigger windows) -->
+                            <line id="dim-o11-1-rtick" x1="976" y1="-7" x2="976" y2="7" class="tick" />
+                            <rect id="dim-pier-o11-1-2-box" x="1041" y="-12" width="40" height="18" fill="#ffffff" rx="2" />
+                            <text id="dim-pier-o11-1-2-text" x="1061" y="2" class="dim-text">1 700</text>
 
                             <!-- Window O11_2 (1146 to 1246) = 1000 mm -->
                             <line x1="1146" y1="-7" x2="1146" y2="7" class="tick" />
@@ -1105,8 +1110,8 @@
                             <line x1="0" y1="0" x2="0" y2="-113" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
                             <line x1="115" y1="0" x2="115" y2="-113" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
                             <line x1="235" y1="0" x2="235" y2="-113" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
-                            <line x1="845" y1="0" x2="845" y2="-113" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
-                            <line x1="1040" y1="0" x2="1040" y2="-113" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
+                            <line x1="875" y1="0" x2="875" y2="-113" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
+                            <line x1="1110" y1="0" x2="1110" y2="-113" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
                             <line x1="1201" y1="0" x2="1201" y2="-113" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
                             <line x1="2059" y1="0" x2="2059" y2="-113" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.5" />
 
@@ -1128,15 +1133,15 @@
                             <rect x="560" y="-12" width="50" height="18" fill="#ffffff" rx="2" stroke="#f59e0b" stroke-width="0.8" id="nf-dim-o2-o1-box" />
                             <text x="585" y="2" class="dim-text" font-weight="700" fill="#b45309" id="nf-dim-o2-o1-text">5 800</text>
 
-                            <!-- Kitchen Window O1 (875 to 1125) = 2500 mm -->
+                            <!-- Kitchen Window O1 (875 to 1110) = 2350 mm -->
                             <line x1="875" y1="-7" x2="875" y2="7" class="tick" id="nf-dim-o1-ltick" />
-                            <rect x="962" y="-12" width="76" height="18" fill="#ffffff" rx="2" stroke="#f59e0b" stroke-width="0.8" id="nf-dim-o1-box" />
-                            <text x="1000" y="2" class="dim-text" font-weight="700" fill="#b45309" id="nf-dim-o1-text">2 500 (O1)</text>
+                            <rect x="954.5" y="-12" width="76" height="18" fill="#ffffff" rx="2" stroke="#f59e0b" stroke-width="0.8" id="nf-dim-o1-box" />
+                            <text x="992.5" y="2" class="dim-text" font-weight="700" fill="#b45309" id="nf-dim-o1-text">2 350 (O1)</text>
 
-                            <!-- Pier to Garage corner (1125 to 1201) = 760 mm -->
-                            <line x1="1125" y1="-7" x2="1125" y2="7" class="tick" id="nf-dim-o1-rtick" />
-                            <rect x="1141" y="-12" width="45" height="18" fill="#ffffff" rx="2" id="nf-dim-o1-garage-box" />
-                            <text x="1163" y="2" class="dim-text" id="nf-dim-o1-garage-text">760</text>
+                            <!-- Pier to Garage corner (1110 to 1201) = 910 mm -->
+                            <line x1="1110" y1="-7" x2="1110" y2="7" class="tick" id="nf-dim-o1-rtick" />
+                            <rect x="1133.5" y="-12" width="45" height="18" fill="#ffffff" rx="2" id="nf-dim-o1-garage-box" />
+                            <text x="1155.5" y="2" class="dim-text" id="nf-dim-o1-garage-text">910</text>
 
                             <!-- Garage blind wall (1201 to 2059) = 8580 mm -->
                             <line x1="1201" y1="-7" x2="1201" y2="7" class="tick" />
@@ -1413,7 +1418,7 @@
                             6
                             <div class="hotspot-tooltip">
                                 <strong>6. Kitchen 0.13 Window (O1)</strong><br>
-                                Width: 2,500 mm | Height: 1,400 mm (hp = 1,100 mm)<br>
+                                Width: 2,350 mm | Height: 1,400 mm (hp = 1,100 mm)<br>
                                 Distance from O2: 5,800 mm | Lintel: +2.50 m
                             </div>
                         </div>
@@ -1588,7 +1593,7 @@
                             <tr>
                                 <td><span class="badge-tag badge-blue">O1</span></td>
                                 <td>Ground Floor: <strong>0.13 Kuchnia</strong></td>
-                                <td><strong>2 500</strong></td>
+                                <td><strong>2 350</strong></td>
                                 <td><strong>1 400</strong></td>
                                 <td>hp = 1 100 mm (+1.10 m)</td>
                                 <td>+2.50 m</td>
@@ -1605,15 +1610,15 @@
                                 <td>Study window (starts 77+38=1150 mm from left edge)</td>
                                 <td>Tilt & turn, aluminum sill at hp=800mm, brick parapet below</td>
                             </tr>
-                            <tr>
-                                <td><span class="badge-tag badge-amber">O11</span></td>
-                                <td>First Floor: <strong>1.03 Łazienka</strong></td>
-                                <td><strong>1 000</strong></td>
-                                <td><strong>1 950</strong></td>
-                                <td>hp = 850 mm</td>
+                            <tr id="schedule-row-o11-1">
+                                <td><span class="badge-tag badge-amber" id="sched-o11-1-symbol">O11</span></td>
+                                <td id="sched-o11-1-room">First Floor: <strong>1.03 Łazienka / Master Bedroom (current windows)</strong></td>
+                                <td><strong id="sched-o11-1-width">1 000</strong></td>
+                                <td><strong id="sched-o11-1-height">1 950</strong></td>
+                                <td id="sched-o11-1-sill">hp = 850 mm (+4.18 m)</td>
                                 <td>+6.13 m</td>
-                                <td>Vertical slot window (tilt & turn)</td>
-                                <td>Acoustic & privacy laminated glass, concealed hinges</td>
+                                <td id="sched-o11-1-type">Vertical slot window (tilt &amp; turn)</td>
+                                <td id="sched-o11-1-specs">Acoustic &amp; privacy laminated glass, concealed hinges</td>
                             </tr>
                             <tr>
                                 <td><span class="badge-tag badge-amber">O11</span></td>
@@ -1699,6 +1704,8 @@
 
     <!-- Interactive Script -->
     <script>
+        let currentSelectedKey = null;
+
         function openTab(evt, tabName) {
             const tabcontent = document.getElementsByClassName("tab-content");
             for (let i = 0; i < tabcontent.length; i++) {
@@ -1730,7 +1737,7 @@
             'O1': {
                 title: 'Window O1 — Kitchen (Kuchnia 0.13)',
                 subtitle: 'Horizontal Ribbon Window over Countertop / Sink',
-                dims: 'Width: 2,500 mm | Height: 1,400 mm | Sill Height: hp = 1,100 mm (+1.10 m) | Top Lintel: +2.50 m | Distance from O2: 5,800 mm',
+                dims: 'Width: 2,350 mm | Height: 1,400 mm | Sill Height: hp = 1,100 mm (+1.10 m) | Top Lintel: +2.50 m | Distance from O2: 5,800 mm',
                 room: 'Ground Floor, Room 0.13 Kuchnia (Area: 44.27 m²). Positioned 5,800 mm east of Window O2. Perfectly shares the +2.50 m lintel line with O2.',
                 specs: 'Triple-pane insulated glass unit (Ug=0.5 W/m²K), matte anthracite aluminum frame (RAL 7016), exterior sheet metal sill at +1.10 m.'
             },
@@ -1763,17 +1770,24 @@
                 specs: 'Architectural cassette metal panel cladding (Alucobond / dark anthracite) with vertical joints every ~90cm, drip edge at +3.43m, underside shadow reveal at +2.80m, extending 500 mm beyond building corner on East (left, X = -500 mm) and West (right, X = 21,090 mm).'
             },
             'O11_1': {
-                title: 'Window O11 — Bathroom (Łazienka 1.03)',
+                title: 'Window O11 (Leftmost) — Master Bedroom / 1.03 (current windows)',
                 subtitle: 'Vertical Architectural Window Slot',
-                dims: 'Width: 1,000 mm | Height: 1,950 mm | Sill Height: hp = 850 mm | Top Lintel: +6.13 m | Start: X = 8,760 mm',
-                room: 'First Floor, Room 1.03 Łazienka (Area: 9.05 m²). Distance from Window 14a: 1,170 mm.',
-                specs: 'Matte acoustic glazing for privacy, micro-ventilation fitting, concealed hardware.'
+                dims: 'Width: 1,000 mm | Height: 1,950 mm | Sill Height: hp = 850 mm (+4.18 m) | Top Lintel: +6.13 m | Start: X = 8,760 mm | End: X = 9,760 mm',
+                room: 'First Floor, Master Bedroom / 1.03. Distance from Window 14a: 1,170 mm. Distance to next O11: 1,700 mm.',
+                specs: 'Matte acoustic glazing, micro-ventilation fitting, concealed hardware.'
+            },
+            'O15': {
+                title: 'Window O15 — Master Bedroom Full-Height Glazing (bigger windows)',
+                subtitle: 'Full-Height Floor-to-Ceiling Architectural Window (+1,350 mm Right & Extended to Floor)',
+                dims: 'Width: 2,350 mm | Height: 2,700 mm | Sill Height: hp = 0 mm (+3.43 m) | Top Lintel: +6.13 m | Start: X = 8,760 mm | End: X = 11,110 mm',
+                room: 'First Floor, 1.04 Sypialnia Master. Distance from Window 14a: 1,170 mm. Remaining pier to O11_2 (X=11,460 mm): 350 mm.',
+                specs: 'Safety tempered and laminated glass (VSG/ESG), concealed slimline aluminum frame (RAL 7016), flush floor threshold at +3.43 m.'
             },
             'O11_2': {
                 title: 'Window O11 — Bathroom (Łazienka 1.02)',
                 subtitle: 'Vertical Architectural Window Slot',
                 dims: 'Width: 1,000 mm | Height: 1,950 mm | Sill Height: hp = 850 mm | Top Lintel: +6.13 m | Start: X = 11,460 mm',
-                room: 'First Floor, Room 1.02 Łazienka (Area: 6.46 m²). Distance from first O11: 1,700 mm.',
+                room: 'First Floor, Room 1.02 Łazienka (Area: 6.46 m²). Distance from first opening: 1,700 mm (or 350 mm in bigger windows option).',
                 specs: 'Triple glazed, warm frame, tilt-and-turn function.'
             },
             'O11_3': {
@@ -1797,13 +1811,6 @@
                 room: 'Ground Floor, 0.01 Garaż (42.63 m²) + 0.02 Magazyn (8.05 m²).',
                 specs: 'Hand-formed graphite clinker brickwork, ventilated cavity wall with 18cm mineral wool insulation, unheated flat roof with 3% slope and hidden rainwater downpipes.'
             },
-            'TERRACE': {
-                title: 'First Floor Terrace (Taras 17.3 m²)',
-                subtitle: 'Private Cantilevered Balcony over Gabinet',
-                dims: 'Width: 6,440 mm | Depth: 3,120 mm | Finished Level: +3.31 m | Balustrade Height: 1,000 mm',
-                room: 'First Floor, Accessible directly from Bedroom 1.04 via sliding door O14b (188×270cm).',
-                specs: 'Gres porcelain exterior tiles on adjustable pedestals, black powder-coated steel posts with tempered laminated safety glass balustrade, black circular support column.'
-            },
             'ROOF': {
                 title: 'Cantilevered Roof Fascia & Attica Overhang',
                 subtitle: 'Modernist Horizontal Architectural Floating Roof Band',
@@ -1813,7 +1820,74 @@
             }
         };
 
+        let activeMasterWindowId = 'O11_1';
+
+        function setMasterBedroomWindowOption(option) {
+            const isBigger = (option === 'bigger');
+            activeMasterWindowId = isBigger ? 'O15' : 'O11_1';
+
+            // 1. Toggle active state on option buttons and badge
+            const btnCurrent = document.getElementById('btn-opt-current');
+            const btnBigger = document.getElementById('btn-opt-bigger');
+            const badge = document.getElementById('master-window-opt-badge');
+
+            if (btnCurrent) btnCurrent.classList.toggle('active', !isBigger);
+            if (btnBigger) btnBigger.classList.toggle('active', isBigger);
+            if (badge) {
+                badge.textContent = isBigger
+                    ? 'Active: bigger windows (O15: 2350×2700 mm, hp=0 mm)'
+                    : 'Active: current windows (O11: 1000×1950 mm, hp=850 mm)';
+            }
+
+            // 2. Replace one window object with the other in WindowStore views & mount in SVG
+            if (typeof WindowStore !== 'undefined' && WindowStore.update) {
+                WindowStore.update('O11_1', {
+                    views: isBigger ? [] : ['north_facade']
+                });
+                WindowStore.update('O15', {
+                    views: isBigger ? ['north_facade'] : []
+                });
+            }
+
+            if (typeof WindowComponent !== 'undefined' && WindowComponent.mount) {
+                WindowComponent.mount('facade-window-master-slot', activeMasterWindowId, 'north_facade', 'exterior');
+            }
+
+            // 3. Update dimensions & schedule from the active database window object
+            if (typeof updateNorthFacadeDimensions === 'function') {
+                updateNorthFacadeDimensions();
+            }
+
+            // 4. Update Schedule Table row
+            const schedSymbol = document.getElementById('sched-o11-1-symbol');
+            const schedWidth = document.getElementById('sched-o11-1-width');
+            const schedHeight = document.getElementById('sched-o11-1-height');
+            const schedSill = document.getElementById('sched-o11-1-sill');
+            const schedType = document.getElementById('sched-o11-1-type');
+            const schedSpecs = document.getElementById('sched-o11-1-specs');
+
+            if (schedSymbol) {
+                schedSymbol.textContent = isBigger ? 'O15' : 'O11';
+                schedSymbol.className = isBigger ? 'badge-tag badge-emerald' : 'badge-tag badge-amber';
+            }
+            if (schedWidth) schedWidth.textContent = isBigger ? '2 350' : '1 000';
+            if (schedHeight) schedHeight.textContent = isBigger ? '2 700' : '1 950';
+            if (schedSill) schedSill.textContent = isBigger ? 'hp = 0 mm (+3.43 m)' : 'hp = 850 mm (+4.18 m)';
+            if (schedType) schedType.textContent = isBigger
+                ? 'Full-height floor-to-ceiling window (extended +1350 mm right — bigger windows)'
+                : 'Vertical slot window (tilt & turn — current windows)';
+            if (schedSpecs) schedSpecs.textContent = isBigger
+                ? 'Safety tempered & laminated floor-to-ceiling glazing (VSG/ESG), flush floor threshold'
+                : 'Acoustic & privacy laminated glass, concealed hinges';
+
+            // 5. Refresh detail drawer if open for either O11_1 or O15
+            if (currentSelectedKey === 'O11_1' || currentSelectedKey === 'O15') {
+                showElementDetails(activeMasterWindowId);
+            }
+        }
+
         function showElementDetails(key) {
+            currentSelectedKey = key;
             const data = elementData[key];
             if (!data) return;
 
@@ -1840,7 +1914,6 @@
         function updateNorthFacadeDimensions() {
             const o1 = WindowStore.get('O1');
             const o2 = WindowStore.get('O2');
-            if (!o1 && !o2) return;
 
             let o2End = 295;
             if (o2) {
@@ -1921,6 +1994,78 @@
             if (pierBox) {
                 pierBox.setAttribute('x', pierMid - 25);
             }
+
+            // Upper Floor Master Bedroom Window Slot (O11_1 vs O15)
+            const masterWin = WindowStore.get(activeMasterWindowId);
+            if (masterWin) {
+                const mCoords = CoordinateService.transform(masterWin, 'north_facade');
+                const mStartSvg = mCoords.x;
+                const mEndSvg = mCoords.x + mCoords.width;
+                const mMidSvg = mStartSvg + mCoords.width / 2;
+                const o11_2StartSvg = 1146;
+                const pierLenMm = Math.round((o11_2StartSvg - mEndSvg) * 10);
+                const pierMidSvg = (mEndSvg + o11_2StartSvg) / 2;
+                const isO15 = (masterWin.id === 'O15');
+
+                const lWitness = document.getElementById('dim-o11-1-lwitness');
+                const lTick = document.getElementById('dim-o11-1-ltick');
+                const pierBox1 = document.getElementById('dim-pier-14a-o11-box');
+                const pierText1 = document.getElementById('dim-pier-14a-o11-text');
+                const w14aEndSvg = 759;
+                const pier1LenMm = Math.round((mStartSvg - w14aEndSvg) * 10);
+                const pier1MidSvg = (w14aEndSvg + mStartSvg) / 2;
+
+                if (lWitness) {
+                    lWitness.setAttribute('x1', mStartSvg);
+                    lWitness.setAttribute('x2', mStartSvg);
+                }
+                if (lTick) {
+                    lTick.setAttribute('x1', mStartSvg);
+                    lTick.setAttribute('x2', mStartSvg);
+                }
+                if (pierBox1) {
+                    pierBox1.setAttribute('x', pier1MidSvg - 20);
+                }
+                if (pierText1) {
+                    pierText1.setAttribute('x', pier1MidSvg);
+                    pierText1.textContent = pier1LenMm.toLocaleString();
+                }
+
+                const witness = document.getElementById('dim-o11-1-witness');
+                const rTick = document.getElementById('dim-o11-1-rtick');
+                const o11Box = document.getElementById('dim-o11-1-box');
+                const o11Text = document.getElementById('dim-o11-1-text');
+                const pierBox2 = document.getElementById('dim-pier-o11-1-2-box');
+                const pierText2 = document.getElementById('dim-pier-o11-1-2-text');
+
+                if (witness) {
+                    witness.setAttribute('x1', mEndSvg);
+                    witness.setAttribute('x2', mEndSvg);
+                }
+                if (rTick) {
+                    rTick.setAttribute('x1', mEndSvg);
+                    rTick.setAttribute('x2', mEndSvg);
+                }
+                if (o11Box) {
+                    o11Box.setAttribute('x', isO15 ? (mMidSvg - 48) : (mMidSvg - 20));
+                    o11Box.setAttribute('width', isO15 ? 96 : 40);
+                    o11Box.setAttribute('stroke', isO15 ? '#10b981' : 'none');
+                    o11Box.setAttribute('stroke-width', isO15 ? '0.8' : '0');
+                }
+                if (o11Text) {
+                    o11Text.setAttribute('x', mMidSvg);
+                    o11Text.setAttribute('fill', isO15 ? '#047857' : '#d97706');
+                    o11Text.textContent = isO15 ? `${masterWin.width.toLocaleString()} (${masterWin.name})` : masterWin.width.toLocaleString();
+                }
+                if (pierBox2) {
+                    pierBox2.setAttribute('x', isO15 ? (pierMidSvg - 16) : (pierMidSvg - 20));
+                    pierBox2.setAttribute('width', isO15 ? 32 : 40);
+                }
+                if (pierText2) {
+                    pierText2.setAttribute('x', pierMidSvg);
+                    pierText2.textContent = pierLenMm.toLocaleString();
+                }
+            }
         }
         const updateNorthFacadeO1Dimensions = updateNorthFacadeDimensions;
 
@@ -1930,7 +2075,7 @@
 
             // Hook live WindowStore updates into technical drawer elementData & dimensions
             WindowStore.subscribe(function(id, win) {
-                if (id === 'O1' || id === 'O2' || id === '*') {
+                if (id === 'O1' || id === 'O2' || id === 'O11_1' || id === 'O15' || id === '*') {
                     updateNorthFacadeDimensions();
                 }
                 if (!win) return;

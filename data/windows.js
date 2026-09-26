@@ -70,7 +70,7 @@
                 "name": "O1",
                 "x": 8750,
                 "sill": 1100,
-                "width": 2500,
+                "width": 2350,
                 "height": 1400,
                 "room": "0.13 Kuchnia",
                 "floor": "ground",
@@ -145,12 +145,34 @@
                 "sashes": 1,
                 "hasMullion": false,
                 "handlePosition": "right",
-                "description": "Vertical slot bathroom window",
+                "description": "Vertical slot bathroom window (Option 1: current windows)",
                 "specs": {
                     "glazing": "Acoustic and privacy matte laminated glass",
                     "frame": "Anthracite aluminum tilt-and-turn profile",
                     "sillExterior": "Exterior sill at +4.18 m",
                     "sillInterior": "Tile-integrated sill at hp=850 mm"
+                }
+            },
+            "O15": {
+                "id": "O15",
+                "name": "O15",
+                "x": 8760,
+                "sill": 3430,
+                "width": 2350,
+                "height": 2700,
+                "room": "1.04 Sypialnia Master",
+                "floor": "first",
+                "wall": "north",
+                "views": [],
+                "sashes": 1,
+                "hasMullion": false,
+                "handlePosition": "left",
+                "description": "Full-height floor-to-ceiling Master Bedroom window extended to the floor and +1,350 mm to the right (Option 2: bigger windows)",
+                "specs": {
+                    "glazing": "Safety tempered and laminated glass (VSG/ESG)",
+                    "frame": "Concealed slimline aluminum frame (RAL 7016)",
+                    "sillExterior": "Flush threshold on intermediate cornice (+3.43 m)",
+                    "sillInterior": "Flush floor threshold (hp=0 mm)"
                 }
             },
             "O11_2": {
