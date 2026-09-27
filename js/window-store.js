@@ -89,24 +89,21 @@
                 .then(res => res.json())
                 .then(json => {
                     if (json && (json.views || json.windows)) {
-                        let changed = false;
-                        if (json.views) {
-                            Object.keys(json.views).forEach(vId => {
-                                if (JSON.stringify(state.views[vId]) !== JSON.stringify(json.views[vId])) {
-                                    state.views[vId] = JSON.parse(JSON.stringify(json.views[vId]));
-                                    changed = true;
-                                }
-                            });
-                        }
-                        if (json.windows) {
-                            Object.keys(json.windows).forEach(wId => {
-                                if (JSON.stringify(state.windows[wId]) !== JSON.stringify(json.windows[wId])) {
-                                    state.windows[wId] = JSON.parse(JSON.stringify(json.windows[wId]));
-                                    changed = true;
-                                }
-                            });
-                        }
-                        if (changed) {
+                        const fetchedDiskSig = JSON.stringify({
+                            views: json.views || {},
+                            windows: json.windows || {}
+                        });
+                        const savedDiskSig = window.localStorage ? window.localStorage.getItem('jetski_db_disk_signature') : null;
+
+                        if (savedDiskSig !== fetchedDiskSig) {
+                            // Underlying disk JSON has changed since last signature; update base state and clear stale cache
+                            if (json.views) state.views = JSON.parse(JSON.stringify(json.views));
+                            if (json.windows) state.windows = JSON.parse(JSON.stringify(json.windows));
+                            if (window.localStorage) {
+                                window.localStorage.removeItem(STORAGE_KEY_WINDOWS);
+                                window.localStorage.removeItem(STORAGE_KEY_VIEWS);
+                                window.localStorage.setItem('jetski_db_disk_signature', fetchedDiskSig);
+                            }
                             subscribers.forEach(cb => cb('*', null, WindowStore.getAll()));
                             window.dispatchEvent(new CustomEvent('window-updated', { detail: { id: '*', liveSync: true } }));
                             window.dispatchEvent(new CustomEvent('view-updated', { detail: { id: '*', liveSync: true } }));
@@ -118,6 +115,24 @@
     }
 
     init();
+
+    // Synchronize state across browser tabs/windows when localStorage changes
+    if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+        window.addEventListener('storage', function (e) {
+            if (e.key === STORAGE_KEY_WINDOWS && e.newValue) {
+                try {
+                    const parsed = JSON.parse(e.newValue);
+                    Object.keys(parsed).forEach(id => {
+                        state.windows[id] = { ...(state.windows[id] || {}), ...parsed[id] };
+                    });
+                    subscribers.forEach(cb => cb('*', null, WindowStore.getAll()));
+                    window.dispatchEvent(new CustomEvent('window-updated', { detail: { id: '*', storageSync: true } }));
+                } catch (err) {
+                    console.warn('WindowStore: Failed to sync storage update:', err);
+                }
+            }
+        });
+    }
 
     const WindowStore = {
         /**
