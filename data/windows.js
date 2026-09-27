@@ -2,7 +2,7 @@
  * windows.js - Universal Module Definition for Building Views and Windows Database
  * Enables local execution under file:// protocol without CORS restriction,
  * while remaining fully compatible with Node.js and ES modules.
- * Version: 1.1.0
+ * Version: 2.0.0 (2D Plan Coordinate System: X = East→West, Y = North→South)
  */
 (function (root, factory) {
     if (typeof module === 'object' && typeof module.exports === 'object') {
@@ -13,12 +13,13 @@
 }(typeof self !== 'undefined' ? self : this, function () {
     return {
         "metadata": {
-            "version": "1.1.0",
-            "description": "Canonical database of building views and window openings with multi-view spatial orientation",
+            "version": "2.0.0",
+            "description": "Canonical 2D (X, Y) database of building views and window openings with multi-view spatial orientation",
             "coordinateSystem": {
-                "origin": "Eastmost point of the building at the start of the North Facade (X = 0 mm)",
-                "horizontalAxis": "Positive X extends Westward across North Facade (0 to 20,590 mm)",
-                "verticalAxis": "Positive Y extends upward from finished ground floor datum (+0.00 m = 0 mm)",
+                "origin": "North-East corner of the building at (X = 0 mm, Y = 0 mm)",
+                "xAxis": "East-West axis (<east - west>): X = 0 mm at the East edge, increasing Westward (0 to 20,590 / 21,000 mm)",
+                "yAxis": "North-South axis (<north - south>): Y = 0 mm at the North edge, increasing Southward (0 to 21,415 mm)",
+                "verticalAxis": "Positive sill / elevation extends upward from finished ground floor datum (+0.00 m = 0 mm)",
                 "units": "millimeters (mm)"
             }
         },
@@ -26,6 +27,8 @@
             "north_facade": {
                 "id": "north_facade",
                 "name": "North Facade Elevation",
+                "axis": "x",
+                "origin": { "x": 0, "y": 0 },
                 "positionOnMap": 0,
                 "leftEdge": 0,
                 "floor": "all",
@@ -34,11 +37,13 @@
                 "scale": 0.1,
                 "wall": "north",
                 "side": "exterior",
-                "description": "Exterior architectural elevation looking South from the garden. Position 0 is the East corner; X grows in the West direction (left to right)."
+                "description": "Exterior architectural elevation looking South from the garden. Origin (0,0) is the North-East corner; X grows Westward (left to right)."
             },
             "kitchen_north_wall": {
                 "id": "kitchen_north_wall",
                 "name": "Kitchen North Wall Elevation",
+                "axis": "x",
+                "origin": { "x": 12150, "y": 0 },
                 "positionOnMap": 12150,
                 "leftEdge": 12150,
                 "floor": "ground",
@@ -47,11 +52,13 @@
                 "scale": 0.1,
                 "wall": "north",
                 "side": "interior",
-                "description": "Interior kitchen back wall elevation looking North. Left edge is at map coordinate 12150; positions decrease in the East direction (left to right)."
+                "description": "Interior kitchen back wall elevation looking North. Left edge is at X = 12,150 mm; X decreases Eastward (left to right)."
             },
             "stairs_north_wall": {
                 "id": "stairs_north_wall",
                 "name": "Stairs North Wall Elevation",
+                "axis": "x",
+                "origin": { "x": 18910, "y": 0 },
                 "positionOnMap": 18910,
                 "leftEdge": 18910,
                 "floor": "all",
@@ -61,11 +68,13 @@
                 "wall": "north",
                 "side": "interior",
                 "floorY": 640,
-                "description": "Interior staircase cross-section looking North towards the North wall. Left edge is at map coordinate 18910; positions decrease Eastward (left to right)."
+                "description": "Interior staircase cross-section looking North towards the North wall. Left edge is at X = 18,910 mm; X decreases Eastward (left to right)."
             },
             "south_facade": {
                 "id": "south_facade",
                 "name": "South Facade Elevation",
+                "axis": "x",
+                "origin": { "x": 21000, "y": 21415 },
                 "positionOnMap": 21000,
                 "leftEdge": 21000,
                 "floor": "all",
@@ -74,7 +83,22 @@
                 "scale": 0.1,
                 "wall": "south",
                 "side": "exterior",
-                "description": "Exterior architectural elevation looking North from the southern garden. Left edge is the West corner at map coordinate 21000; X decreases in the East direction (left to right)."
+                "description": "Exterior architectural elevation looking North from the southern garden. Left edge is the South-West corner (X = 21,000 mm, Y = 21,415 mm); X decreases Eastward (left to right)."
+            },
+            "west_facade": {
+                "id": "west_facade",
+                "name": "West Facade Elevation",
+                "axis": "y",
+                "origin": { "x": 20590, "y": 0 },
+                "positionOnMap": 0,
+                "leftEdge": 0,
+                "floor": "all",
+                "direction": "south",
+                "length": 21415,
+                "scale": 0.1,
+                "wall": "west",
+                "side": "exterior",
+                "description": "Exterior architectural elevation looking East towards the West facade. Left edge is the North-West corner (X = 20,590 mm, Y = 0 mm); Y grows Southward (left to right) up to 21,415 mm."
             }
         },
         "windows": {
@@ -82,6 +106,7 @@
                 "id": "O1",
                 "name": "O1",
                 "x": 8750,
+                "y": 0,
                 "sill": 1100,
                 "width": 2350,
                 "height": 1400,
@@ -104,6 +129,7 @@
                 "id": "O2",
                 "name": "O2",
                 "x": 1150,
+                "y": 0,
                 "sill": 800,
                 "width": 1800,
                 "height": 1700,
@@ -126,6 +152,7 @@
                 "id": "14a",
                 "name": "14a",
                 "x": 6400,
+                "y": 0,
                 "sill": 3430,
                 "width": 1190,
                 "height": 2700,
@@ -148,6 +175,7 @@
                 "id": "O11_1",
                 "name": "O11",
                 "x": 8760,
+                "y": 0,
                 "sill": 4180,
                 "width": 1000,
                 "height": 1950,
@@ -170,8 +198,9 @@
                 "id": "O15",
                 "name": "O15",
                 "x": 8760,
+                "y": 0,
                 "sill": 3430,
-                "width": 2350,
+                "width": 1900,
                 "height": 2700,
                 "room": "1.04 Sypialnia Master",
                 "floor": "first",
@@ -180,7 +209,7 @@
                 "sashes": 1,
                 "hasMullion": false,
                 "handlePosition": "left",
-                "description": "Full-height floor-to-ceiling Master Bedroom window extended to the floor and +1,350 mm to the right (Option 2: bigger windows)",
+                "description": "Full-height floor-to-ceiling Master Bedroom window extended to the floor and +900 mm to the right (Option 2: bigger windows)",
                 "specs": {
                     "glazing": "Safety tempered and laminated glass (VSG/ESG)",
                     "frame": "Concealed slimline aluminum frame (RAL 7016)",
@@ -192,6 +221,7 @@
                 "id": "O11_2",
                 "name": "O11",
                 "x": 11460,
+                "y": 0,
                 "sill": 4180,
                 "width": 1000,
                 "height": 1950,
@@ -214,6 +244,7 @@
                 "id": "O11_3",
                 "name": "O11",
                 "x": 14100,
+                "y": 0,
                 "sill": 4180,
                 "width": 1000,
                 "height": 1950,
@@ -236,6 +267,7 @@
                 "id": "O13a",
                 "name": "O13a",
                 "x": 18210,
+                "y": 3100,
                 "sill": 4180,
                 "width": 2380,
                 "height": 1950,
@@ -258,6 +290,7 @@
                 "id": "SO1",
                 "name": "SO1",
                 "x": 18440,
+                "y": 21415,
                 "sill": 4180,
                 "width": 2400,
                 "height": 1950,
@@ -281,6 +314,7 @@
                 "id": "SO2",
                 "name": "SO2",
                 "x": 11000,
+                "y": 21415,
                 "sill": 3430,
                 "width": 4000,
                 "height": 2700,
@@ -303,6 +337,7 @@
                 "id": "SO3",
                 "name": "SO3",
                 "x": 7500,
+                "y": 21415,
                 "sill": 4180,
                 "width": 1000,
                 "height": 1950,
@@ -326,6 +361,7 @@
                 "id": "SO4",
                 "name": "SO4",
                 "x": 200,
+                "y": 21415,
                 "sill": 3430,
                 "width": 6300,
                 "height": 2700,
@@ -348,6 +384,7 @@
                 "id": "SO5",
                 "name": "SO5",
                 "x": 15000,
+                "y": 21415,
                 "sill": 800,
                 "width": 3200,
                 "height": 2000,
@@ -371,6 +408,7 @@
                 "id": "SO6",
                 "name": "SO6",
                 "x": 7650,
+                "y": 21415,
                 "sill": 0,
                 "width": 6350,
                 "height": 2800,
@@ -394,6 +432,7 @@
                 "id": "SO7",
                 "name": "SO7",
                 "x": 200,
+                "y": 21415,
                 "sill": 0,
                 "width": 6300,
                 "height": 2800,
@@ -411,6 +450,124 @@
                     "frame": "Heavy-duty HST lift-and-slide aluminum system (RAL 7016)",
                     "sillExterior": "Zero-barrier flush terrace threshold (-0.02 m / ±0.00 m)",
                     "sillInterior": "Trench heater integrated flush floor track"
+                }
+            },
+            "O13b": {
+                "id": "O13b",
+                "name": "O13b",
+                "x": 20590,
+                "y": 3180,
+                "sill": 4180,
+                "width": 2400,
+                "height": 1950,
+                "room": "1.01 Sypialnia Master",
+                "floor": "first",
+                "wall": "west",
+                "views": ["west_facade"],
+                "sashes": 1,
+                "hasMullion": false,
+                "handlePosition": "none",
+                "description": "Frameless panoramic corner window (West face of Master Bedroom 1.01, meeting O13a at North-West upper corner)",
+                "specs": {
+                    "glazing": "Structural silicone butt-glazed safety glass (szkło na styk)",
+                    "frame": "Concealed head and sill perimeter framing (RAL 7016)",
+                    "sillExterior": "Continuous corner sheet metal sill at +4.18 m (hp=850 mm)",
+                    "sillInterior": "Deep panoramic window bench"
+                }
+            },
+            "WO2": {
+                "id": "WO2",
+                "name": "WO2",
+                "x": 20590,
+                "y": 9400,
+                "sill": 4180,
+                "width": 2400,
+                "height": 1950,
+                "room": "1.05 Sypialnia Zachodnia",
+                "floor": "first",
+                "wall": "west",
+                "views": ["west_facade"],
+                "sashes": 1,
+                "hasMullion": false,
+                "handlePosition": "right",
+                "description": "Large picture bedroom window on the South-West side of the upper floor",
+                "specs": {
+                    "glazing": "Triple-pane insulated glass unit (Ug=0.5 W/m²K)",
+                    "frame": "Matte anthracite aluminum profile (RAL 7016)",
+                    "sillExterior": "Aluminum exterior sill at +4.18 m (hp=850 mm)",
+                    "sillInterior": "Internal window board at hp=850 mm"
+                }
+            },
+            "GD1": {
+                "id": "GD1",
+                "name": "Brama GD1",
+                "x": 20590,
+                "y": 1000,
+                "sill": 0,
+                "width": 5150,
+                "height": 2250,
+                "room": "0.01 Garaż Dwustanowiskowy",
+                "floor": "ground",
+                "wall": "west",
+                "views": ["west_facade"],
+                "sashes": 1,
+                "hasMullion": false,
+                "openingType": "garage_door",
+                "handlePosition": "none",
+                "description": "Wide double-car insulated sectional garage door with horizontal flush panel ribs",
+                "specs": {
+                    "glazing": "Insulated sandwich steel/aluminum panels (U=0.9 W/m²K)",
+                    "frame": "Anthracite concealed reveal frame (RAL 7016)",
+                    "sillExterior": "Heated driveway threshold at ±0.00 m / -0.02 m",
+                    "sillInterior": "Epoxy/gres garage floor slab with linear drainage"
+                }
+            },
+            "D_EXT": {
+                "id": "D_EXT",
+                "name": "Drzwi D1",
+                "x": 20590,
+                "y": 9260,
+                "sill": 0,
+                "width": 1570,
+                "height": 2250,
+                "room": "0.04 Wiatrołap (Wejście Główne)",
+                "floor": "ground",
+                "wall": "west",
+                "views": ["west_facade"],
+                "sashes": 2,
+                "hasMullion": true,
+                "openingType": "entrance_door",
+                "handlePosition": "center",
+                "description": "Main architectural entrance door (920 mm active door leaf + 650 mm glazed sidelight) in recessed clinker entry niche",
+                "specs": {
+                    "glazing": "Laminated anti-burglary P4A sidelight glazing",
+                    "frame": "Flush aluminum panel door with vertical stainless/black pull bar",
+                    "sillExterior": "Heated granite entry step threshold",
+                    "sillInterior": "Flush vestibule gres floor transition"
+                }
+            },
+            "WO3": {
+                "id": "WO3",
+                "name": "WO3",
+                "x": 20590,
+                "y": 11950,
+                "sill": 2150,
+                "width": 9115,
+                "height": 650,
+                "room": "0.11 / 0.12 Salon i Jadalnia",
+                "floor": "ground",
+                "wall": "west",
+                "views": ["west_facade"],
+                "sashes": 5,
+                "hasMullion": true,
+                "tiltTurnSashes": [1],
+                "handlePosition": "left",
+                "description": "Five-panel high clerestory ribbon window directly beneath the intermediate cornice (1st sash tilt-and-turn, 4 sashes fixed)",
+                "specs": {
+                    "glazing": "Triple-pane solar and acoustic control glass (Ug=0.5 W/m²K)",
+                    "frame": "Slimline 5-bay aluminum clerestory frame (RAL 7016)",
+                    "sillExterior": "Continuous aluminum sill at +2.15 m (hp=2150 mm) over clinker wall",
+                    "sillInterior": "High clerestory reveal providing western afternoon daylight while preserving privacy"
                 }
             }
         },

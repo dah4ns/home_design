@@ -574,7 +574,10 @@
                     Back to Dashboard
                 </a>
                 <a href="south_facade.html" class="back-btn" style="background-color: #e0f2fe; color: #0369a1; border-color: #bae6fd; font-weight: 600;">
-                    <span>☀️</span> Switch to South Facade (dir: east)
+                    <span>☀️</span> South Facade (dir: east)
+                </a>
+                <a href="west_facade.html" class="back-btn" style="background-color: #f3e8ff; color: #6d28d9; border-color: #ddd6fe; font-weight: 600;">
+                    <span>🚪</span> West Facade (dir: south)
                 </a>
             </div>
 
@@ -664,7 +667,7 @@
                         <span>🪟</span> 1) current windows
                     </button>
                     <button id="btn-opt-bigger" class="toggle-btn" onclick="setMasterBedroomWindowOption('bigger')" style="font-weight: 600;">
-                        <span>↔️</span> 2) bigger windows (O15: to floor &amp; +1350 mm right)
+                        <span>↔️</span> 2) bigger windows (O15: 1900 mm wide, to floor)
                     </button>
                     <span id="master-window-opt-badge" class="badge accent" style="font-size: 11.5px; padding: 4px 10px;">
                         Active: current windows (O11: 1000×1950 mm, hp=850 mm)
@@ -1072,12 +1075,12 @@
                             <rect id="dim-pier-14a-o11-box" x="797.5" y="-12" width="40" height="18" fill="#ffffff" rx="2" />
                             <text id="dim-pier-14a-o11-text" x="817.5" y="2" class="dim-text">1 170</text>
 
-                            <!-- Window O11_1 / O15 (876 to 976 = 1000 mm in current windows; 876 to 1111 = 2350 mm in bigger windows) -->
+                            <!-- Window O11_1 / O15 (876 to 976 = 1000 mm in current windows; 876 to 1066 = 1900 mm in bigger windows) -->
                             <line id="dim-o11-1-ltick" x1="876" y1="-7" x2="876" y2="7" class="tick" />
                             <rect id="dim-o11-1-box" x="906" y="-12" width="40" height="18" fill="#ffffff" rx="2" />
                             <text id="dim-o11-1-text" x="926" y="2" class="dim-text">1 000</text>
 
-                            <!-- Pier between O11_1 and O11_2 (976 to 1146 = 1700 mm in current windows; 1111 to 1146 = 350 mm in bigger windows) -->
+                            <!-- Pier between O11_1 and O11_2 (976 to 1146 = 1700 mm in current windows; 1066 to 1146 = 800 mm in bigger windows) -->
                             <line id="dim-o11-1-rtick" x1="976" y1="-7" x2="976" y2="7" class="tick" />
                             <rect id="dim-pier-o11-1-2-box" x="1041" y="-12" width="40" height="18" fill="#ffffff" rx="2" />
                             <text id="dim-pier-o11-1-2-text" x="1061" y="2" class="dim-text">1 700</text>
@@ -1783,16 +1786,16 @@
             },
             'O15': {
                 title: 'Window O15 — Master Bedroom Full-Height Glazing (bigger windows)',
-                subtitle: 'Full-Height Floor-to-Ceiling Architectural Window (+1,350 mm Right & Extended to Floor)',
-                dims: 'Width: 2,350 mm | Height: 2,700 mm | Sill Height: hp = 0 mm (+3.43 m) | Top Lintel: +6.13 m | Start: X = 8,760 mm | End: X = 11,110 mm',
-                room: 'First Floor, 1.04 Sypialnia Master. Distance from Window 14a: 1,170 mm. Remaining pier to O11_2 (X=11,460 mm): 350 mm.',
+                subtitle: 'Full-Height Floor-to-Ceiling Architectural Window (1,900 mm Wide & Extended to Floor)',
+                dims: 'Width: 1,900 mm | Height: 2,700 mm | Sill Height: hp = 0 mm (+3.43 m) | Top Lintel: +6.13 m | Start: X = 8,760 mm | End: X = 10,660 mm',
+                room: 'First Floor, 1.04 Sypialnia Master. Distance from Window 14a: 1,170 mm. Remaining pier to O11_2 (X=11,460 mm): 800 mm.',
                 specs: 'Safety tempered and laminated glass (VSG/ESG), concealed slimline aluminum frame (RAL 7016), flush floor threshold at +3.43 m.'
             },
             'O11_2': {
                 title: 'Window O11 — Bathroom (Łazienka 1.02)',
                 subtitle: 'Vertical Architectural Window Slot',
                 dims: 'Width: 1,000 mm | Height: 1,950 mm | Sill Height: hp = 850 mm | Top Lintel: +6.13 m | Start: X = 11,460 mm',
-                room: 'First Floor, Room 1.02 Łazienka (Area: 6.46 m²). Distance from first opening: 1,700 mm (or 350 mm in bigger windows option).',
+                room: 'First Floor, Room 1.02 Łazienka (Area: 6.46 m²). Distance from first opening: 1,700 mm (or 800 mm in bigger windows option).',
                 specs: 'Triple glazed, warm frame, tilt-and-turn function.'
             },
             'O11_3': {
@@ -1840,7 +1843,7 @@
             if (btnBigger) btnBigger.classList.toggle('active', isBigger);
             if (badge) {
                 badge.textContent = isBigger
-                    ? 'Active: bigger windows (O15: 2350×2700 mm, hp=0 mm)'
+                    ? 'Active: bigger windows (O15: 1900×2700 mm, hp=0 mm)'
                     : 'Active: current windows (O11: 1000×1950 mm, hp=850 mm)';
             }
 
@@ -1875,11 +1878,11 @@
                 schedSymbol.textContent = isBigger ? 'O15' : 'O11';
                 schedSymbol.className = isBigger ? 'badge-tag badge-emerald' : 'badge-tag badge-amber';
             }
-            if (schedWidth) schedWidth.textContent = isBigger ? '2 350' : '1 000';
+            if (schedWidth) schedWidth.textContent = isBigger ? '1 900' : '1 000';
             if (schedHeight) schedHeight.textContent = isBigger ? '2 700' : '1 950';
             if (schedSill) schedSill.textContent = isBigger ? 'hp = 0 mm (+3.43 m)' : 'hp = 850 mm (+4.18 m)';
             if (schedType) schedType.textContent = isBigger
-                ? 'Full-height floor-to-ceiling window (extended +1350 mm right — bigger windows)'
+                ? 'Full-height floor-to-ceiling window (1,900 mm wide — bigger windows)'
                 : 'Vertical slot window (tilt & turn — current windows)';
             if (schedSpecs) schedSpecs.textContent = isBigger
                 ? 'Safety tempered & laminated floor-to-ceiling glazing (VSG/ESG), flush floor threshold'

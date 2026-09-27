@@ -253,7 +253,7 @@
             }
 
             // Sanitize geometric numeric fields if provided
-            const numericFields = ['x', 'sill', 'width', 'height'];
+            const numericFields = ['x', 'y', 'sill', 'width', 'height'];
             numericFields.forEach(field => {
                 if (updates[field] !== undefined) {
                     updates[field] = Number(updates[field]);
@@ -297,16 +297,23 @@
         },
 
         /**
-         * Shift a window's global horizontal coordinate by deltaX mm
+         * Shift a window's global horizontal coordinate along its active axis (X for North/South walls, Y for West/East walls)
          * @param {string} id
-         * @param {number} deltaX - offset in mm, e.g. +100 or -100
+         * @param {number} delta - offset in mm, e.g. +100 or -100
+         * @param {'x'|'y'} [axis] - optional explicit axis ('x' or 'y'); defaults based on window's wall
          * @returns {object} updated window
          */
-        shiftWindow: function (id, deltaX) {
+        shiftWindow: function (id, delta, axis) {
             const win = this.get(id);
             if (!win) throw new Error(`Window "${id}" not found`);
-            const newX = win.x + Number(deltaX);
-            return this.update(id, { x: newX });
+            const targetAxis = axis || ((win.wall === 'west' || win.wall === 'east') ? 'y' : 'x');
+            if (targetAxis === 'y') {
+                const newY = (win.y !== undefined ? Number(win.y) : 0) + Number(delta);
+                return this.update(id, { y: newY });
+            } else {
+                const newX = (win.x !== undefined ? Number(win.x) : 0) + Number(delta);
+                return this.update(id, { x: newX });
+            }
         },
 
         /**
@@ -350,7 +357,7 @@
          */
         toJSON: function () {
             return JSON.stringify({
-                version: "1.1.0",
+                version: "2.0.0",
                 exportedAt: new Date().toISOString(),
                 views: state.views,
                 windows: state.windows

@@ -80,7 +80,7 @@
                             ">Window Openings</button>
                             <button id="we-tab-btn-views" onclick="WindowEditorModal.switchTab('views')" style="
                                 background: transparent; border: 1px solid transparent; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 600; color: #64748b; cursor: pointer;
-                            ">Architectural Views (4)</button>
+                            ">Architectural Views (5)</button>
                             <button id="we-tab-btn-stairs" onclick="WindowEditorModal.switchTab('stairs')" style="
                                 background: transparent; border: 1px solid transparent; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 600; color: #64748b; cursor: pointer;
                             ">Staircase Object (Schody)</button>
@@ -101,7 +101,7 @@
                                 <!-- Direction-Aware Shift Tester Card -->
                                 <div style="background: #fffbeb; border: 1px solid #fef3c7; border-left: 4px solid #f59e0b; padding: 12px 14px; border-radius: 8px; margin-bottom: 14px;">
                                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                                        <span style="font-size: 12px; font-weight: 700; color: #92400e;">⚡ Direction-Aware Shift Tester (ΔX = ±100 mm)</span>
+                                        <span id="we-shift-title" style="font-size: 12px; font-weight: 700; color: #92400e;">⚡ 2D Direction-Aware Shift Tester (ΔX / ΔY = ±100 mm)</span>
                                         <div style="display: flex; gap: 6px;">
                                             <button onclick="WindowEditorModal.shiftCurrentWindow(-100)" style="background: #ffffff; border: 1px solid #d97706; color: #b45309; border-radius: 4px; padding: 4px 10px; font-size: 11.5px; font-weight: 700; cursor: pointer;">
                                                 ◀ Shift -100 mm
@@ -127,19 +127,25 @@
                                     </div>
 
                                     <div>
-                                        <label style="display: block; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 3px;">5) Unique ID</label>
+                                        <label style="display: block; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 3px;">Unique ID</label>
                                         <input id="we-prop-id" type="text" readonly style="width: 100%; box-sizing: border-box; padding: 7px; border: 1px solid #e2e8f0; background: #f8fafc; border-radius: 6px; font-family: monospace; font-size: 13px; color: #64748b;" />
                                     </div>
 
                                     <div>
-                                        <label style="display: block; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 3px;">6) Display Name</label>
+                                        <label style="display: block; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 3px;">Display Name</label>
                                         <input id="we-prop-name" type="text" oninput="WindowEditorModal.applyLiveChange()" style="width: 100%; box-sizing: border-box; padding: 7px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; font-weight: 600;" />
                                     </div>
 
                                     <div>
-                                        <label style="display: block; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 3px;">1) Horizontal X (mm from East datum)</label>
+                                        <label style="display: block; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 3px;">1a) Plan X &lt;east - west&gt; (mm)</label>
                                         <input id="we-prop-x" type="number" step="10" oninput="WindowEditorModal.applyLiveChange()" style="width: 100%; box-sizing: border-box; padding: 7px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: monospace; font-size: 13px; font-weight: 700; color: #0284c7;" />
-                                        <span style="font-size: 10px; color: #94a3b8;">Eastmost building point = 0 mm</span>
+                                        <span style="font-size: 10px; color: #94a3b8;">NE corner (0,0): East = 0 → West</span>
+                                    </div>
+
+                                    <div>
+                                        <label style="display: block; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 3px;">1b) Plan Y &lt;north - south&gt; (mm)</label>
+                                        <input id="we-prop-y" type="number" step="10" oninput="WindowEditorModal.applyLiveChange()" style="width: 100%; box-sizing: border-box; padding: 7px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: monospace; font-size: 13px; font-weight: 700; color: #7c3aed;" />
+                                        <span style="font-size: 10px; color: #94a3b8;">NE corner (0,0): North = 0 → South</span>
                                     </div>
 
                                     <div>
@@ -149,12 +155,12 @@
                                     </div>
 
                                     <div>
-                                        <label style="display: block; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 3px;">3) Window Width (mm)</label>
+                                        <label style="display: block; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 3px;">3) Opening Width (mm)</label>
                                         <input id="we-prop-width" type="number" step="10" oninput="WindowEditorModal.applyLiveChange()" style="width: 100%; box-sizing: border-box; padding: 7px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: monospace; font-size: 13px; font-weight: 700; color: #16a34a;" />
                                     </div>
 
-                                    <div>
-                                        <label style="display: block; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 3px;">4) Window Height (mm)</label>
+                                    <div style="grid-column: span 2;">
+                                        <label style="display: block; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 3px;">4) Opening Height (mm)</label>
                                         <input id="we-prop-height" type="number" step="10" oninput="WindowEditorModal.applyLiveChange()" style="width: 100%; box-sizing: border-box; padding: 7px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: monospace; font-size: 13px; font-weight: 700; color: #16a34a;" />
                                     </div>
                                 </div>
@@ -163,7 +169,7 @@
                             <!-- ================= TAB 2: VIEWS ================= -->
                             <div id="we-panel-views" style="display: none;">
                                 <p style="margin: 0 0 12px 0; font-size: 12px; color: #475569;">
-                                    Each architectural view is registered with its global reference position, floor level, orientation direction, and length:
+                                    Each architectural view is registered in the 2D building coordinate system (Origin <code>(0,0)</code> = North-East corner, <code>x</code> = East→West, <code>y</code> = North→South):
                                 </p>
                                 <div id="we-views-list" style="display: flex; flex-direction: column; gap: 12px;">
                                     <!-- Populated dynamically -->
@@ -457,16 +463,17 @@
 
             Object.keys(views).forEach(viewId => {
                 const v = views[viewId];
-                const isWest = (v.direction === 'west');
-                const badgeColor = isWest ? '#0284c7' : '#d97706';
-                const badgeBg = isWest ? '#e0f2fe' : '#fef3c7';
+                const isPositiveDir = (v.direction === 'west' || v.direction === 'south');
+                const badgeColor = isPositiveDir ? '#0284c7' : '#d97706';
+                const badgeBg = isPositiveDir ? '#e0f2fe' : '#fef3c7';
+                const axisLabel = (v.axis === 'y' || v.direction === 'south' || v.direction === 'north') ? 'Y (<north-south>)' : 'X (<east-west>)';
 
                 html += `
                     <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                             <strong style="font-size: 13px; color: #0f172a;">${v.name} (<code>${v.id}</code>)</strong>
                             <span style="background: ${badgeBg}; color: ${badgeColor}; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; text-transform: uppercase;">
-                                Direction: ${v.direction}
+                                Direction: ${v.direction} • Axis: ${(v.axis || 'x').toUpperCase()}
                             </span>
                         </div>
                         <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; font-size: 11.5px; background: white; padding: 8px 10px; border-radius: 6px; border: 1px solid #cbd5e1;">
@@ -475,8 +482,8 @@
                                 <strong style="color: #0f172a;">${v.positionOnMap !== undefined ? v.positionOnMap : v.leftEdge} mm</strong>
                             </div>
                             <div>
-                                <span style="color: #64748b; display: block; font-size: 10px; text-transform: uppercase;">2) Floor</span>
-                                <strong style="color: #0f172a;">${v.floor}</strong>
+                                <span style="color: #64748b; display: block; font-size: 10px; text-transform: uppercase;">2) Plan Axis</span>
+                                <strong style="color: #0f172a;">${axisLabel}</strong>
                             </div>
                             <div>
                                 <span style="color: #64748b; display: block; font-size: 10px; text-transform: uppercase;">3) Direction</span>
@@ -522,12 +529,22 @@
 
             document.getElementById('we-prop-id').value = win.id;
             document.getElementById('we-prop-name').value = win.name;
-            document.getElementById('we-prop-x').value = win.x;
+            document.getElementById('we-prop-x').value = win.x !== undefined ? win.x : 0;
+            const yInput = document.getElementById('we-prop-y');
+            if (yInput) yInput.value = win.y !== undefined ? win.y : 0;
             document.getElementById('we-prop-sill').value = win.sill;
             document.getElementById('we-prop-width').value = win.width;
             document.getElementById('we-prop-height').value = win.height;
 
-            document.getElementById('we-info-room').textContent = `${win.room} (Floor: ${win.floor})`;
+            const isYWall = (win.wall === 'west' || win.wall === 'east');
+            const shiftTitle = document.getElementById('we-shift-title');
+            if (shiftTitle) {
+                shiftTitle.textContent = isYWall
+                    ? '⚡ 2D Direction-Aware Shift Tester (Active Axis: ΔY = ±100 mm)'
+                    : '⚡ 2D Direction-Aware Shift Tester (Active Axis: ΔX = ±100 mm)';
+            }
+
+            document.getElementById('we-info-room').textContent = `${win.room} (Floor: ${win.floor}, Wall: ${win.wall || 'north'})`;
             document.getElementById('we-info-views').textContent = `Views: ${(win.views || []).join(', ')}`;
             document.getElementById('we-info-desc').textContent = win.description || '';
 
@@ -540,18 +557,21 @@
 
             const nfShift = CoordinateService.getShiftDirection('north_facade');
             const sfShift = CoordinateService.getShiftDirection('south_facade');
+            const wfShift = CoordinateService.getShiftDirection('west_facade');
             const kwShift = CoordinateService.getShiftDirection('kitchen_north_wall');
             const swShift = CoordinateService.getShiftDirection('stairs_north_wall');
             const nfCoords = CoordinateService.transform(win, 'north_facade');
             const sfCoords = CoordinateService.transform(win, 'south_facade');
+            const wfCoords = CoordinateService.transform(win, 'west_facade');
             const kwCoords = CoordinateService.transform(win, 'kitchen_north_wall');
             const swCoords = CoordinateService.transform(win, 'stairs_north_wall');
 
             fb.innerHTML = `
-                <div>• <strong>North Facade</strong> (dir: <em>${nfShift.direction}</em>): +ΔX shifts <strong style="color: #047857;">${nfShift.label}</strong> (Screen X = ${nfCoords.localX_mm} mm)</div>
-                <div>• <strong>South Facade</strong> (dir: <em>${sfShift.direction}</em>): +ΔX shifts <strong style="color: #0284c7;">${sfShift.label}</strong> (Screen X = ${sfCoords.localX_mm} mm)</div>
-                <div>• <strong>Kitchen North Wall</strong> (dir: <em>${kwShift.direction}</em>): +ΔX shifts <strong style="color: #b45309;">${kwShift.label}</strong> (Screen X = ${kwCoords.localX_mm} mm)</div>
-                <div>• <strong>Stairs North Wall</strong> (dir: <em>${swShift.direction}</em>): +ΔX shifts <strong style="color: #c2410c;">${swShift.label}</strong> (Screen X = ${swCoords.localX_mm} mm)</div>
+                <div>• <strong>North Facade</strong> (dir: <em>${nfShift.direction}</em>, axis: X): +ΔX shifts <strong style="color: #047857;">${nfShift.label}</strong> (Screen X = ${nfCoords.localX_mm} mm)</div>
+                <div>• <strong>South Facade</strong> (dir: <em>${sfShift.direction}</em>, axis: X): +ΔX shifts <strong style="color: #0284c7;">${sfShift.label}</strong> (Screen X = ${sfCoords.localX_mm} mm)</div>
+                <div>• <strong>West Facade</strong> (dir: <em>${wfShift.direction}</em>, axis: Y): +ΔY shifts <strong style="color: #7c3aed;">${wfShift.label}</strong> (Screen X = ${wfCoords.localX_mm} mm)</div>
+                <div>• <strong>Kitchen North Wall</strong> (dir: <em>${kwShift.direction}</em>, axis: X): +ΔX shifts <strong style="color: #b45309;">${kwShift.label}</strong> (Screen X = ${kwCoords.localX_mm} mm)</div>
+                <div>• <strong>Stairs North Wall</strong> (dir: <em>${swShift.direction}</em>, axis: X): +ΔX shifts <strong style="color: #c2410c;">${swShift.label}</strong> (Screen X = ${swCoords.localX_mm} mm)</div>
             `;
         },
 
@@ -559,9 +579,11 @@
             const id = document.getElementById('we-prop-id').value;
             if (!id) return;
 
+            const yInput = document.getElementById('we-prop-y');
             const updates = {
                 name: document.getElementById('we-prop-name').value,
                 x: Number(document.getElementById('we-prop-x').value),
+                y: yInput ? Number(yInput.value) : 0,
                 sill: Number(document.getElementById('we-prop-sill').value),
                 width: Number(document.getElementById('we-prop-width').value),
                 height: Number(document.getElementById('we-prop-height').value)
@@ -571,11 +593,13 @@
             this._updateShiftFeedback(updated);
         },
 
-        shiftCurrentWindow: function (deltaX) {
+        shiftCurrentWindow: function (delta) {
             const id = document.getElementById('we-prop-id').value;
             if (!id) return;
-            const updated = WindowStore.shiftWindow(id, deltaX);
-            document.getElementById('we-prop-x').value = updated.x;
+            const updated = WindowStore.shiftWindow(id, delta);
+            document.getElementById('we-prop-x').value = updated.x !== undefined ? updated.x : 0;
+            const yInput = document.getElementById('we-prop-y');
+            if (yInput) yInput.value = updated.y !== undefined ? updated.y : 0;
             this._updateShiftFeedback(updated);
         },
 

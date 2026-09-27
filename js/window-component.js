@@ -29,7 +29,12 @@
             const w = coords.width;
             const h = coords.height;
 
-            if (viewId === 'north_facade' || viewId === 'south_facade') {
+            if (viewId === 'north_facade' || viewId === 'south_facade' || viewId === 'west_facade') {
+                if (win.openingType === 'garage_door') {
+                    return this._renderExteriorGarageDoor(win, x, y, w, h);
+                } else if (win.openingType === 'entrance_door') {
+                    return this._renderExteriorEntranceDoor(win, x, y, w, h);
+                }
                 return this._renderExteriorNorthFacade(win, x, y, w, h);
             } else if (viewId === 'kitchen_back_wall' || viewId === 'kitchen_north_wall') {
                 return this._renderInteriorKitchen(win, x, y, w, h, styleType);
@@ -40,11 +45,87 @@
             return this._renderGeneric(win, x, y, w, h);
         },
 
+        _renderExteriorGarageDoor: function (win, x, y, w, h) {
+            const midX = x + w / 2;
+            const numPanels = 4;
+            let panelsSvg = '';
+            for (let i = 1; i < numPanels; i++) {
+                const py = y + (h * i) / numPanels;
+                panelsSvg += `
+                    <line x1="${x + 4}" y1="${py}" x2="${x + w - 4}" y2="${py}" stroke="#0f172a" stroke-width="2" />
+                    <line x1="${x + 4}" y1="${py + 1.5}" x2="${x + w - 4}" y2="${py + 1.5}" stroke="#475569" stroke-width="0.8" opacity="0.6" />
+                `;
+            }
+            return `
+                <g class="interactive-element window-component garage-door-component" data-window-id="${win.id}" onclick="showElementDetails('${win.id}')" style="cursor: pointer;">
+                    <!-- Deep Masonry Reveal Shadow -->
+                    <rect x="${x - 3}" y="${y - 3}" width="${w + 6}" height="${h + 3}" fill="#0f172a" opacity="0.55" />
+                    <!-- Outer Frame -->
+                    <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#1e293b" stroke="#0f172a" stroke-width="2.5" />
+                    <!-- Sectional Door Leaf (Anthracite Matte Metallic) -->
+                    <rect x="${x + 4}" y="${y + 4}" width="${w - 8}" height="${h - 4}" fill="#273244" stroke="#0f172a" stroke-width="1.5" />
+                    ${panelsSvg}
+                    <!-- Subtle Vertical Center Stile Stiffener Hint -->
+                    <line x1="${midX}" y1="${y + 4}" x2="${midX}" y2="${y + h}" stroke="#1e293b" stroke-width="1" stroke-dasharray="2 3" opacity="0.5" />
+                    <!-- Bottom Rubber Threshold Seal -->
+                    <rect x="${x}" y="${y + h - 3}" width="${w}" height="3" fill="#090d16" />
+                    <!-- Technical Badge -->
+                    <rect x="${midX - 75}" y="${y + h / 2 - 18}" width="150" height="34" rx="4" fill="#0f172a" fill-opacity="0.82" stroke="#334155" stroke-width="1" />
+                    <text x="${midX}" y="${y + h / 2 - 3}" font-family="'JetBrains Mono', monospace" font-size="11" fill="#ffffff" font-weight="700" text-anchor="middle">
+                        ${win.name} (${Math.round(win.width / 10)}×${Math.round(win.height / 10)})
+                    </text>
+                    <text x="${midX}" y="${y + h / 2 + 11}" font-family="'JetBrains Mono', monospace" font-size="8.5" fill="#93c5fd" font-weight="600" text-anchor="middle">
+                        Brama garażowa • hp=0
+                    </text>
+                </g>
+            `;
+        },
+
+        _renderExteriorEntranceDoor: function (win, x, y, w, h) {
+            const midX = x + w / 2;
+            const doorW = Math.round(w * 0.60); // ~94px (940mm door leaf)
+            const sideW = w - doorW;            // ~63px (630mm glazed sidelight)
+            const mullionX = x + doorW;
+
+            // Casement dashed lines on main door leaf
+            const sx1 = x + 4;
+            const sx2 = mullionX - 2;
+            const sy1 = y + 4;
+            const sy2 = y + h - 4;
+            const smidY = (sy1 + sy2) / 2;
+
+            return `
+                <g class="interactive-element window-component entrance-door-component" data-window-id="${win.id}" onclick="showElementDetails('${win.id}')" style="cursor: pointer;">
+                    <!-- Outer Frame -->
+                    <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#1e293b" stroke="#0f172a" stroke-width="2.5" />
+                    <!-- Main Door Leaf (Left) -->
+                    <rect x="${x + 4}" y="${y + 4}" width="${doorW - 6}" height="${h - 8}" fill="#292524" stroke="#0f172a" stroke-width="2" />
+                    <!-- Vertical Decorative Groove & Stainless Pull Bar on Door Leaf -->
+                    <line x1="${x + doorW * 0.35}" y1="${y + 6}" x2="${x + doorW * 0.35}" y2="${y + h - 6}" stroke="#1c1917" stroke-width="1.5" />
+                    <rect x="${mullionX - 14}" y="${y + h * 0.25}" width="3" height="${h * 0.5}" rx="1.5" fill="#cbd5e1" stroke="#475569" stroke-width="0.6" />
+                    <!-- Door Opening Dashed Triangle -->
+                    <polyline points="${sx1},${sy1} ${sx2},${smidY} ${sx1},${sy2}" fill="none" stroke="#cbd5e1" stroke-width="0.9" stroke-dasharray="3 2" opacity="0.65" />
+                    <!-- Glazed Sidelight (Right) -->
+                    <rect x="${mullionX + 2}" y="${y + 4}" width="${sideW - 6}" height="${h - 8}" fill="url(#glass-glare)" stroke="#0f172a" stroke-width="2" />
+                    <!-- Mullion Post -->
+                    <line x1="${mullionX}" y1="${y}" x2="${mullionX}" y2="${y + h}" stroke="#0f172a" stroke-width="3.5" />
+                    <!-- Label Badge -->
+                    <text x="${midX}" y="${y + h / 2 - 5}" font-family="'JetBrains Mono', monospace" font-size="10" fill="#ffffff" font-weight="700" text-anchor="middle" filter="drop-shadow(0 1px 2px black)">
+                        ${win.name} (${Math.round(win.width / 10)}×${Math.round(win.height / 10)})
+                    </text>
+                    <text x="${midX}" y="${y + h / 2 + 10}" font-family="'JetBrains Mono', monospace" font-size="8" fill="#fde68a" font-weight="600" text-anchor="middle" filter="drop-shadow(0 1px 2px black)">
+                        Drzwi wejściowe
+                    </text>
+                </g>
+            `;
+        },
+
         _renderExteriorNorthFacade: function (win, x, y, w, h) {
-            const isCorner = win.id === 'O13a';
+            const isCorner = win.id === 'O13a' || win.id === 'O13b';
             const isFullHeight = win.id === '14a'
                 || (win.floor === 'first' && win.sill <= 3430)
                 || (win.floor === 'ground' && win.sill <= 0);
+            const isCompactRibbon = h <= 75;
             const midX = x + w / 2;
             const numSashes = Math.max(1, Number(win.sashes) || 1);
 
@@ -107,6 +188,21 @@
                 ? (win.sill <= 3430 ? 0 : Math.round((win.sill - 3330) / 10))
                 : Math.round(win.sill / 10);
 
+            const labelSvg = isCompactRibbon
+                ? `
+                    <text x="${midX}" y="${y + h / 2 + 4}" font-family="'JetBrains Mono', monospace" font-size="10" fill="#ffffff" font-weight="700" text-anchor="middle" filter="drop-shadow(0 1px 2px black)">
+                        ${win.name} (${Math.round(win.width / 10)}×${Math.round(win.height / 10)}) • hp=${hpVal}
+                    </text>
+                `
+                : `
+                    <text x="${midX}" y="${y + h / 2 - 5}" font-family="'JetBrains Mono', monospace" font-size="${w > 150 ? 11 : 9.5}" fill="#ffffff" font-weight="700" text-anchor="middle" filter="drop-shadow(0 1px 2px black)">
+                        ${win.name} (${Math.round(win.width / 10)}×${Math.round(win.height / 10)})
+                    </text>
+                    <text x="${midX}" y="${y + h / 2 + 12}" font-family="'JetBrains Mono', monospace" font-size="8.5" fill="#93c5fd" font-weight="600" text-anchor="middle">
+                        hp=${hpVal}
+                    </text>
+                `;
+
             return `
                 <g class="interactive-element window-component" data-window-id="${win.id}" onclick="showElementDetails('${win.id}')" style="cursor: pointer;">
                     <!-- Outer reveal / frame -->
@@ -119,12 +215,7 @@
                     ${slidingSvg}
                     ${sillSvg}
                     <!-- Dimension Label Badge -->
-                    <text x="${midX}" y="${y + h / 2 - 5}" font-family="'JetBrains Mono', monospace" font-size="${w > 150 ? 11 : 9.5}" fill="#ffffff" font-weight="700" text-anchor="middle" filter="drop-shadow(0 1px 2px black)">
-                        ${win.name} (${Math.round(win.width / 10)}×${Math.round(win.height / 10)})
-                    </text>
-                    <text x="${midX}" y="${y + h / 2 + 12}" font-family="'JetBrains Mono', monospace" font-size="8.5" fill="#93c5fd" font-weight="600" text-anchor="middle">
-                        hp=${hpVal}
-                    </text>
+                    ${labelSvg}
                 </g>
             `;
         },
