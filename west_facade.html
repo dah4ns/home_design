@@ -789,11 +789,11 @@
                         <!-- Main Clinker Brick Wall Body (X = 0 to 2141.5, Y = -280 to 2) -->
                         <rect x="0" y="-280" width="2141.5" height="282" fill="url(#brick-pattern)" stroke="#1e222a" stroke-width="1.8" onclick="showElementDetails('BRICK_WALL')" class="interactive-element" />
 
-                        <!-- Recessed Entrance Alcove (Wnęka Wejściowa, Y = 8,600 to 11,000 mm -> X = 860 to 1100) -->
-                        <rect x="860" y="-280" width="240" height="280" fill="url(#brick-recessed-pattern)" stroke="#181b20" stroke-width="1.2" onclick="showElementDetails('ENTRANCE_NICHE')" class="interactive-element" />
-                        <!-- Vertical return corner line at X = 860 and X = 1100 -->
+                        <!-- Recessed Entrance Alcove (Wnęka Wejściowa, Y = 8,600 to 11,300 mm -> X = 860 to 1130, 630 mm left of O8c) -->
+                        <rect id="wf-entrance-nook-rect" x="860" y="-280" width="270" height="280" fill="url(#brick-recessed-pattern)" stroke="#181b20" stroke-width="1.2" onclick="showElementDetails('ENTRANCE_NICHE')" class="interactive-element" />
+                        <!-- Vertical return corner line at X = 860 and X = 1130 -->
                         <line x1="860" y1="-280" x2="860" y2="0" stroke="#0f172a" stroke-width="2" />
-                        <line x1="1100" y1="-280" x2="1100" y2="0" stroke="#0f172a" stroke-width="1.5" />
+                        <line id="wf-entrance-nook-rline" x1="1130" y1="-280" x2="1130" y2="0" stroke="#0f172a" stroke-width="1.5" />
 
                         <!-- Dynamic Component: GD1 (Garage Sectional Door, 5150×2250 mm, Y = 1000..6150 mm) -->
                         <g data-window-component="GD1" data-view-id="west_facade" data-window-style="exterior" id="facade-window-GD1"></g>
@@ -801,8 +801,14 @@
                         <!-- Dynamic Component: D_EXT (Main Entrance Door + Sidelight, 1570×2250 mm, Y = 9260..10830 mm) -->
                         <g data-window-component="D_EXT" data-view-id="west_facade" data-window-style="exterior" id="facade-window-D_EXT"></g>
 
-                        <!-- Dynamic Component: WO3 (5-Sash High Clerestory Ribbon Window, 9115×650 mm, hp=2150 mm, Y = 11950..21065 mm) -->
-                        <g data-window-component="WO3" data-view-id="west_facade" data-window-style="exterior" id="facade-window-WO3"></g>
+                        <!-- Dynamic Component: O8c (Left Clerestory Window, 1440×650 mm, hp=2150 mm, Y = 11930..13370 mm) -->
+                        <g data-window-component="O8c" data-view-id="west_facade" data-window-style="exterior" id="facade-window-O8c"></g>
+
+                        <!-- Dynamic Component: O8b (Middle Clerestory Window, 1620×650 mm, hp=2150 mm, Y = 13650..15270 mm) -->
+                        <g data-window-component="O8b" data-view-id="west_facade" data-window-style="exterior" id="facade-window-O8b"></g>
+
+                        <!-- Dynamic Component: O8a (Right 3-Pane Clerestory Window, 5485×650 mm, hp=2150 mm, Y = 15550..21035 mm) -->
+                        <g data-window-component="O8a" data-view-id="west_facade" data-window-style="exterior" id="facade-window-O8a"></g>
                     </g>
 
                     <!-- ==================================== -->
@@ -902,7 +908,7 @@
                         <!-- Intermediate cornice shadow on ground floor wall -->
                         <rect x="0" y="-280" width="2141.5" height="16" fill="#000000" opacity="0.32" />
                         <!-- Angled sunlight shadow inside the recessed entrance alcove (matching architectural drawing) -->
-                        <polygon points="860,-280 1100,-280 1100,-225 975,-225 860,-140" fill="#090d16" opacity="0.52" />
+                        <polygon id="wf-entrance-nook-shadow" points="860,-280 1130,-280 1130,-225 975,-225 860,-140" fill="#090d16" opacity="0.52" />
                     </g>
 
                     <!-- ==================================== -->
@@ -942,6 +948,11 @@
 
                         <!-- TIER 3 (BOTTOM): GROUND FLOOR OPENINGS & PIERS at Y = +115 -->
                         <g id="wf-ground-dims-group" transform="translate(0, 115)">
+                            <!-- Populated & synchronized dynamically by updateWestFacadeDimensions() -->
+                        </g>
+
+                        <!-- TIER 4 (SUB-TOTAL): RIGHT WING SPAN (FROM START OF 630 WALL AT Y=11,300 TO RIGHT BUILDING EDGE AT Y=21,415) at Y = +185 -->
+                        <g id="wf-south-wing-dims-group" transform="translate(0, 185)">
                             <!-- Populated & synchronized dynamically by updateWestFacadeDimensions() -->
                         </g>
                     </g>
@@ -991,12 +1002,12 @@
                             <text x="24" y="-5" class="level-label" font-weight="600" fill="#b45309">Gzyms pośredni (Wierzch)</text>
                         </g>
 
-                        <!-- +2.80m Bottom of Intermediate Cornice / WO3 Head -->
+                        <!-- +2.80m Bottom of Intermediate Cornice / O8a-O8c Head -->
                         <g transform="translate(-210, -280)">
                             <line x1="0" y1="0" x2="200" y2="0" class="level-marker" stroke="#d97706" stroke-width="1.4" stroke-dasharray="3 2" />
                             <polygon points="0,0 16,-7 16,7" fill="#d97706" />
                             <text x="-10" y="4" class="level-text" font-weight="700" fill="#d97706" text-anchor="end">+2,80</text>
-                            <text x="24" y="-5" class="level-label" font-weight="600" fill="#b45309">Gzyms pośredni (Spód / Nadproże WO3)</text>
+                            <text x="24" y="-5" class="level-label" font-weight="600" fill="#b45309">Gzyms pośredni (Spód / Nadproże O8a–O8c)</text>
                         </g>
 
                         <!-- +2.25m Garage Door GD1 & Entrance Door D_EXT Head -->
@@ -1037,9 +1048,9 @@
                             <text x="80" y="4" class="level-text" font-weight="700" fill="#d97706" text-anchor="start">+2,80</text>
                         </g>
                         <g transform="translate(2210, -215)">
-                            <line x1="-103.5" y1="0" x2="70" y2="0" class="level-marker" stroke="#f59e0b" stroke-dasharray="2 2" />
+                            <line x1="-106.5" y1="0" x2="70" y2="0" class="level-marker" stroke="#f59e0b" stroke-dasharray="2 2" />
                             <polygon points="70,0 54,-6 54,6" fill="#f59e0b" />
-                            <text x="80" y="4" class="level-text" fill="#b45309" text-anchor="start">+2,15 (hp WO3)</text>
+                            <text x="80" y="4" class="level-text" fill="#b45309" text-anchor="start">+2,15 (hp O8a–O8c)</text>
                         </g>
                         <g transform="translate(2210, 2)">
                             <line x1="-68.5" y1="0" x2="70" y2="0" class="level-marker" stroke-dasharray="3 2" />
@@ -1133,23 +1144,33 @@
                             </div>
                         </div>
 
-                        <!-- Hotspot 5: WO3 5-Sash Clerestory Ribbon Window -->
-                        <div class="hotspot" style="top: 63.5%; left: 69.8%;" onclick="showElementDetails('WO3')">
+                        <!-- Hotspot 5: O8c Left Clerestory Window -->
+                        <div class="hotspot" style="top: 63.5%; left: 57.0%;" onclick="showElementDetails('O8c')">
                             5
                             <div class="hotspot-tooltip">
-                                <strong>5. Clerestory Ribbon Window WO3 (0.11/0.12 Salon)</strong><br>
-                                Y = 11,950..21,065 mm | Width: 9,115 mm | Height: 650 mm<br>
-                                5-panel high band window (hp = 2,150 mm, head at +2.80 m)
+                                <strong>5. Clerestory Window O8c (0.12 Jadalnia)</strong><br>
+                                Y = 11,930..13,370 mm | Width: 1,440 mm | Height: 650 mm<br>
+                                Fixed window (630 mm right of entry nook)
                             </div>
                         </div>
 
-                        <!-- Hotspot 6: Roof Chimney +7.26 m -->
-                        <div class="hotspot" style="top: 25.5%; left: 37.5%;" onclick="showElementDetails('ROOF')">
+                        <!-- Hotspot 6: O8b Middle Clerestory Window -->
+                        <div class="hotspot" style="top: 63.5%; left: 64.2%;" onclick="showElementDetails('O8b')">
                             6
                             <div class="hotspot-tooltip">
-                                <strong>6. Roof Fascia (+6.88 m) &amp; Chimney (+7.26 m)</strong><br>
-                                Upper floor spans Y = 3,100..11,900 mm (8,800 mm)<br>
-                                Chimney shaft at Y = 6,450..7,400 mm, top at +7.26 m
+                                <strong>6. Clerestory Window O8b (0.12 Jadalnia)</strong><br>
+                                Y = 13,650..15,270 mm | Width: 1,620 mm | Height: 650 mm<br>
+                                Fixed window flanked by 280 mm clinker brick piers
+                            </div>
+                        </div>
+
+                        <!-- Hotspot 7: O8a Right 3-Pane Clerestory Window -->
+                        <div class="hotspot" style="top: 63.5%; left: 77.5%;" onclick="showElementDetails('O8a')">
+                            7
+                            <div class="hotspot-tooltip">
+                                <strong>7. 3-Pane Clerestory Window O8a (0.11 Salon)</strong><br>
+                                Y = 15,550..21,035 mm | Width: 5,485 mm | Height: 650 mm<br>
+                                3 equal windows, 380 mm from South-West corner
                             </div>
                         </div>
                     </div>
@@ -1203,7 +1224,7 @@
             <div class="diagram-box">
                 <h3 style="margin: 0 0 8px 0; font-size: 18px; color: #0f172a;">West Facade Openings Schedule (Zestawienie Stolarki Elewacji Zachodniej)</h3>
                 <p style="margin: 0 0 20px 0; font-size: 14px; color: #64748b;">
-                    Complete schedule of all 5 openings (windows, garage door, entrance door) on the West Facade (<code>21,415 mm</code> overall length, <code>direction: "south"</code>). Values synchronize in real time with the 2D Architecture Database.
+                    Complete schedule of all 7 openings (windows, garage door, entrance door) on the West Facade (<code>21,415 mm</code> overall length, <code>direction: "south"</code>). Values synchronize in real time with the 2D Architecture Database.
                 </p>
 
                 <div class="table-responsive">
@@ -1291,20 +1312,34 @@
                 title: 'Main Entrance Door D_EXT — Vestibule (0.04 Wiatrołap)',
                 subtitle: 'Recessed Exterior Entrance Door Leaf with Right Glazed Sidelight',
                 dims: 'Width: 1,570 mm (940 mm door + 630 mm sidelight) | Height: 2,250 mm | Threshold: hp = 0 mm | Plan (X, Y): (19,800, 9,260 mm) | Span Y: 9,260 to 10,830 mm',
-                room: 'Ground Floor, Main Entrance Vestibule (0.04). Set inside the sheltered entrance alcove (Y = 8,600 to 11,000 mm) under the intermediate cornice.',
+                room: 'Ground Floor, Main Entrance Vestibule (0.04). Set inside the sheltered entrance alcove (Y = 8,600 to 11,300 mm) under the intermediate cornice.',
                 specs: 'High-insulation aluminum entrance door (Ud=0.75 W/m²K) with full-height vertical stainless steel pull bar and triple safety glass sidelight.'
             },
-            'WO3': {
-                title: 'Clerestory Ribbon Window WO3 — Living & Dining Room (0.11 / 0.12)',
-                subtitle: 'Five-Sash High-Level Horizontal Band Window',
-                dims: 'Width: 9,115 mm | Height: 650 mm | Sill: hp = 2,150 mm (+2.15 m to +2.80 m) | Plan (X, Y): (20,590, 11,950 mm) | Span Y: 11,950 to 21,065 mm',
-                room: 'Ground Floor, Western Wall of Living & Dining Area (0.11 / 0.12). Spans almost the entire single-story southern wing, ending 350 mm from the South-West corner (21,415 mm).',
-                specs: '5 equal horizontal sashes (~1,823 mm each); first (northernmost) sash equipped with tilt-and-turn ventilation hardware, remaining 4 sashes fixed; head flush with intermediate cornice at +2.80 m.'
+            'O8c': {
+                title: 'Clerestory Window O8c — Dining & Living Room (0.12 Jadalnia)',
+                subtitle: 'Single-Pane High-Level Fixed Clerestory Window',
+                dims: 'Width: 1,440 mm | Height: 650 mm | Sill: hp = 2,150 mm (+2.15 m to +2.80 m) | Plan (X, Y): (20,590, 11,930 mm) | Span Y: 11,930 to 13,370 mm',
+                room: 'Ground Floor, Western Wall of Dining Area (0.12). Positioned 630 mm south of the entrance nook (Y = 11,300 mm) and 280 mm north of O8b.',
+                specs: 'Single fixed triple-glazed pane (1,440 × 650 mm) in matte anthracite aluminum frame; head flush with intermediate cornice at +2.80 m.'
+            },
+            'O8b': {
+                title: 'Clerestory Window O8b — Dining & Living Room (0.12 Jadalnia)',
+                subtitle: 'Single-Pane High-Level Fixed Clerestory Window',
+                dims: 'Width: 1,620 mm | Height: 650 mm | Sill: hp = 2,150 mm (+2.15 m to +2.80 m) | Plan (X, Y): (20,590, 13,650 mm) | Span Y: 13,650 to 15,270 mm',
+                room: 'Ground Floor, Western Wall of Dining / Living Area (0.12). Flanked by 280 mm clinker brick masonry piers on both sides (between O8c and O8a).',
+                specs: 'Single fixed triple-glazed pane (1,620 × 650 mm) in matte anthracite aluminum frame; head flush with intermediate cornice at +2.80 m.'
+            },
+            'O8a': {
+                title: 'Clerestory Ribbon Window O8a — Living Room (0.11 Salon)',
+                subtitle: 'Three-Pane Equal-Split High-Level Clerestory Window',
+                dims: 'Width: 5,485 mm (3 equal panes) | Height: 650 mm | Sill: hp = 2,150 mm (+2.15 m to +2.80 m) | Plan (X, Y): (20,590, 15,550 mm) | Span Y: 15,550 to 21,035 mm',
+                room: 'Ground Floor, Western Wall of Living Area (0.11). Positioned 280 mm south of O8b and ending 380 mm from the South-West corner (21,415 mm).',
+                specs: '3 equal horizontal fixed windows (cumulative length 5,485 mm, ~1,828 mm each); head flush with intermediate cornice at +2.80 m.'
             },
             'ENTRANCE_NICHE': {
                 title: 'Recessed Main Entrance Alcove (Wnęka Wejściowa)',
                 subtitle: 'Sheltered Clinker Brick Entryway Niche under Intermediate Cornice',
-                dims: 'Span Y: 8,600 mm to 11,000 mm (Width: 2,400 mm) | Height: 2,800 mm (±0.00 m to +2.80 m)',
+                dims: 'Span Y: 8,600 mm to 11,300 mm (Width: 2,700 mm) | Height: 2,800 mm (±0.00 m to +2.80 m) | 630 mm normal wall to O8c',
                 room: 'Shelters main entrance door D_EXT (0.04 Wiatrołap) from wind and precipitation while creating an architectural shadow line.',
                 specs: 'Recessed clinker brick return walls with integrated soffit lighting under the +2.80 m intermediate cornice.'
             },
@@ -1326,7 +1361,7 @@
                 title: 'Ground Floor Clinker Brick Facade (Parter)',
                 subtitle: 'Load-Bearing Exterior Wall with Clinker Brick Cladding (-0.02 m to +2.80 m)',
                 dims: 'Total Length Y: 21,415 mm (North Y=0 to South Y=21,415 mm) | Height: 2,820 mm',
-                room: 'Ground floor western exterior wall housing Garage Door GD1, Recessed Entrance D_EXT, and Living Room Ribbon Window WO3.',
+                room: 'Ground floor western exterior wall housing Garage Door GD1, Recessed Entrance D_EXT, and Living Room Clerestory Windows O8c, O8b, and O8a.',
                 specs: 'Dark graphite hand-formed clinker brick slips over insulated masonry wall.'
             },
             'TIMBER_WALL': {
@@ -1365,7 +1400,7 @@
         /**
          * Build an SVG dimension chain group along the 21,415 mm West Facade (North Y=0 to South Y=21415)
          */
-        function buildDimensionChainSVG(windowIds, witnessDropY, isUpper) {
+        function buildDimensionChainSVG(windowIds, witnessDropY, isUpper, extraBreaksMm) {
             const view = CoordinateService.getView('west_facade');
             const totalLenMm = (view && view.length) ? view.length : 21415;
             const scale = (view && view.scale) ? view.scale : 0.1;
@@ -1389,24 +1424,28 @@
             });
             items.sort((a, b) => a.startSvg - b.startSvg);
 
-            const segments = [];
+            const rawSegments = [];
             let cursorMm = 0;
             let cursorSvg = 0;
 
             items.forEach(item => {
                 const pierMm = item.startMm - cursorMm;
                 if (pierMm > 0) {
-                    segments.push({
+                    rawSegments.push({
                         type: 'pier',
+                        startMm: cursorMm,
+                        endMm: item.startMm,
                         lenMm: pierMm,
                         startSvg: cursorSvg,
                         endSvg: item.startSvg
                     });
                 }
-                segments.push({
+                rawSegments.push({
                     type: 'window',
                     id: item.id,
                     name: item.name,
+                    startMm: item.startMm,
+                    endMm: item.endMm,
                     lenMm: item.widthMm,
                     startSvg: item.startSvg,
                     endSvg: item.endSvg
@@ -1416,13 +1455,47 @@
             });
 
             if (totalLenMm - cursorMm > 0) {
-                segments.push({
+                rawSegments.push({
                     type: 'pier',
+                    startMm: cursorMm,
+                    endMm: totalLenMm,
                     lenMm: totalLenMm - cursorMm,
                     startSvg: cursorSvg,
                     endSvg: totalSvg
                 });
             }
+
+            // Split pier segments at any architectural break points (e.g. entrance nook edge at 11,300 mm)
+            const breaks = Array.isArray(extraBreaksMm) ? extraBreaksMm.slice().sort((a, b) => a - b) : [];
+            const segments = [];
+            rawSegments.forEach(seg => {
+                if (seg.type !== 'pier' || breaks.length === 0) {
+                    segments.push(seg);
+                    return;
+                }
+                let sMm = seg.startMm;
+                breaks.forEach(brk => {
+                    if (brk > sMm && brk < seg.endMm) {
+                        segments.push({
+                            type: 'pier',
+                            startMm: sMm,
+                            endMm: brk,
+                            lenMm: brk - sMm,
+                            startSvg: sMm * scale,
+                            endSvg: brk * scale
+                        });
+                        sMm = brk;
+                    }
+                });
+                segments.push({
+                    type: 'pier',
+                    startMm: sMm,
+                    endMm: seg.endMm,
+                    lenMm: seg.endMm - sMm,
+                    startSvg: sMm * scale,
+                    endSvg: seg.endMm * scale
+                });
+            });
 
             let svgStr = `<line x1="0" y1="0" x2="${totalSvg}" y2="0" class="dim-solid" />`;
 
@@ -1441,13 +1514,13 @@
                 const labelText = isWin
                     ? `${seg.lenMm.toLocaleString()} (${seg.name})`
                     : `${seg.lenMm.toLocaleString()}`;
-                const boxW = isWin ? Math.max(82, Math.min(spanSvg - 4, 125)) : Math.max(32, Math.min(spanSvg - 2, 58));
+                const boxW = isWin ? Math.max(82, Math.min(spanSvg - 4, 125)) : Math.max(26, Math.min(spanSvg - 2, 58));
                 const strokeAttr = isWin
                     ? (isUpper ? 'stroke="#7c3aed" stroke-width="0.8"' : 'stroke="#f59e0b" stroke-width="0.8"')
                     : '';
                 const textFill = isWin ? (isUpper ? '#6d28d9' : '#b45309') : '#d97706';
-                const fontSize = spanSvg < 36 ? 9.5 : 11.5;
-                const labelYOffset = (spanSvg < 36) ? -16 : 0;
+                const fontSize = spanSvg < 42 ? 9.5 : 11.5;
+                const labelYOffset = (spanSvg < 42) ? -18 : 0;
 
                 svgStr += `
                     <rect x="${midSvg - boxW / 2}" y="${-12 + labelYOffset}" width="${boxW}" height="18" fill="#ffffff" rx="2" ${strokeAttr} />
@@ -1462,7 +1535,7 @@
             const tbody = document.getElementById('wf-schedule-tbody');
             if (!tbody) return;
 
-            const order = ['O13b', 'WO2', 'GD1', 'D_EXT', 'WO3'];
+            const order = ['O13b', 'WO2', 'GD1', 'D_EXT', 'O8c', 'O8b', 'O8a'];
             tbody.replaceChildren();
 
             order.forEach(id => {
@@ -1518,9 +1591,28 @@
         }
 
         function updateWestFacadeDimensions() {
+            const view = CoordinateService.getView('west_facade');
+            const totalLenMm = (view && view.length) ? view.length : 21415;
+            const scale = (view && view.scale) ? view.scale : 0.1;
+            const o8c = WindowStore.get('O8c');
+            const nookRightMm = (o8c && typeof o8c.y === 'number') ? (o8c.y - 630) : 11300;
+            const nookRightSvg = nookRightMm * scale;
+
+            const nookRect = document.getElementById('wf-entrance-nook-rect');
+            if (nookRect) nookRect.setAttribute('width', nookRightSvg - 860);
+            const nookRLine = document.getElementById('wf-entrance-nook-rline');
+            if (nookRLine) {
+                nookRLine.setAttribute('x1', nookRightSvg);
+                nookRLine.setAttribute('x2', nookRightSvg);
+            }
+            const nookShadow = document.getElementById('wf-entrance-nook-shadow');
+            if (nookShadow) {
+                nookShadow.setAttribute('points', `860,-280 ${nookRightSvg},-280 ${nookRightSvg},-225 975,-225 860,-140`);
+            }
+
             const upperGroup = document.getElementById('wf-upper-dims-group');
             if (upperGroup) {
-                const upperSvg = `<svg xmlns="http://www.w3.org/2000/svg"><g>${buildDimensionChainSVG(['O13b', 'WO2'], 152, true)}</g></svg>`;
+                const upperSvg = `<svg xmlns="http://www.w3.org/2000/svg"><g>${buildDimensionChainSVG(['O13b', 'WO2'], 152, true, [])}</g></svg>`;
                 const doc = new DOMParser().parseFromString(upperSvg, 'image/svg+xml');
                 const g = doc.documentElement.firstElementChild;
                 if (g) {
@@ -1530,11 +1622,36 @@
 
             const groundGroup = document.getElementById('wf-ground-dims-group');
             if (groundGroup) {
-                const groundSvg = `<svg xmlns="http://www.w3.org/2000/svg"><g>${buildDimensionChainSVG(['GD1', 'D_EXT', 'WO3'], -113, false)}</g></svg>`;
+                const groundSvg = `<svg xmlns="http://www.w3.org/2000/svg"><g>${buildDimensionChainSVG(['GD1', 'D_EXT', 'O8c', 'O8b', 'O8a'], -113, false, [8600, nookRightMm])}</g></svg>`;
                 const doc = new DOMParser().parseFromString(groundSvg, 'image/svg+xml');
                 const g = doc.documentElement.firstElementChild;
                 if (g) {
                     groundGroup.replaceChildren(...Array.from(g.childNodes).map(n => document.importNode(n, true)));
+                }
+            }
+
+            const southWingGroup = document.getElementById('wf-south-wing-dims-group');
+            if (southWingGroup) {
+                const startMm = nookRightMm; // Start of 630 mm normal wall (right edge of entrance nook)
+                const endMm = totalLenMm; // Right edge of building (after 380 mm pier)
+                const spanMm = endMm - startMm;
+                const startSvg = startMm * scale;
+                const endSvg = endMm * scale;
+                const midSvg = (startSvg + endSvg) / 2;
+
+                const subScaleSvg = `<svg xmlns="http://www.w3.org/2000/svg"><g>
+                    <line x1="${startSvg}" y1="0" x2="${startSvg}" y2="-70" stroke="#d97706" stroke-width="0.8" stroke-dasharray="3 3" opacity="0.6" />
+                    <line x1="${endSvg}" y1="0" x2="${endSvg}" y2="-70" stroke="#d97706" stroke-width="0.8" stroke-dasharray="3 3" opacity="0.6" />
+                    <line x1="${startSvg}" y1="0" x2="${endSvg}" y2="0" class="dim-solid" />
+                    <line x1="${startSvg}" y1="-9" x2="${startSvg}" y2="9" class="tick" />
+                    <line x1="${endSvg}" y1="-9" x2="${endSvg}" y2="9" class="tick" />
+                    <rect x="${midSvg - 40}" y="-13" width="80" height="20" fill="#ffffff" stroke="#fde68a" rx="4" />
+                    <text x="${midSvg}" y="2" class="dim-text" font-size="13" font-weight="700">${spanMm.toLocaleString()}</text>
+                </g></svg>`;
+                const doc = new DOMParser().parseFromString(subScaleSvg, 'image/svg+xml');
+                const g = doc.documentElement.firstElementChild;
+                if (g) {
+                    southWingGroup.replaceChildren(...Array.from(g.childNodes).map(n => document.importNode(n, true)));
                 }
             }
 

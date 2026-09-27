@@ -190,7 +190,7 @@
 
             const labelSvg = isCompactRibbon
                 ? `
-                    <text x="${midX}" y="${y + h / 2 + 4}" font-family="'JetBrains Mono', monospace" font-size="10" fill="#ffffff" font-weight="700" text-anchor="middle" filter="drop-shadow(0 1px 2px black)">
+                    <text x="${midX}" y="${y + h / 2 + 3.5}" font-family="'JetBrains Mono', monospace" font-size="${w < 180 ? 8.5 : 10}" fill="#ffffff" font-weight="700" text-anchor="middle" filter="drop-shadow(0 1px 2px black)">
                         ${win.name} (${Math.round(win.width / 10)}×${Math.round(win.height / 10)}) • hp=${hpVal}
                     </text>
                 `
