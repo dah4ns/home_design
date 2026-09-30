@@ -326,7 +326,7 @@
 
             function update() {
                 const win = WindowStore.get(windowId);
-                if (!win) {
+                if (!win || (Array.isArray(win.views) && !win.views.includes(viewId))) {
                     el.replaceChildren();
                     return;
                 }

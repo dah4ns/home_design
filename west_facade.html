@@ -675,6 +675,24 @@
         <div id="TabElevation" class="tab-content active">
             <!-- Controls Bar -->
             <div class="controls-bar">
+                <div class="layer-toggles" style="border-right: 1px solid #cbd5e1; padding-right: 16px;">
+                    <span style="font-size: 13px; font-weight: 700; color: #0f172a;">Clerestory Windows (O8c / O8b):</span>
+                    <button id="btn-o8-default" class="toggle-btn active" onclick="setClerestoryO8Option('default')" style="font-weight: 600;">
+                        <span>🪟</span> 1) Default (O8c: 1440, O8b: 1620)
+                    </button>
+                    <button id="btn-o8-extended" class="toggle-btn" onclick="setClerestoryO8Option('extended')" style="font-weight: 600;">
+                        <span>↔️</span> 2) O8c +60 right &amp; O8b +60 left
+                    </button>
+                    <button id="btn-o8-no-o8b" class="toggle-btn" onclick="setClerestoryO8Option('no_o8b')" style="font-weight: 600;">
+                        <span>➖</span> 3) O8c +60 right &amp; no O8b
+                    </button>
+                    <button id="btn-o8-no-o8b-o8c" class="toggle-btn" onclick="setClerestoryO8Option('no_o8b_o8c')" style="font-weight: 600;">
+                        <span>🚫</span> 4) No O8b &amp; no O8c (only O8a)
+                    </button>
+                    <span id="o8-window-opt-badge" class="badge accent" style="font-size: 11.5px; padding: 4px 10px;">
+                        O8c: 1440 mm | Pier: 280 mm | O8b: 1620 mm
+                    </span>
+                </div>
                 <div class="layer-toggles">
                     <span style="font-size: 13px; font-weight: 600; color: #334155;">Display Layers:</span>
                     <button id="toggleDims" class="toggle-btn active amber" onclick="toggleLayer('layer-dims', this)">
@@ -801,13 +819,13 @@
                         <!-- Dynamic Component: D_EXT (Main Entrance Door + Sidelight, 1570×2250 mm, Y = 9260..10830 mm) -->
                         <g data-window-component="D_EXT" data-view-id="west_facade" data-window-style="exterior" id="facade-window-D_EXT"></g>
 
-                        <!-- Dynamic Component: O8c (Left Clerestory Window, 1440×650 mm, hp=2150 mm, Y = 11930..13370 mm) -->
+                        <!-- Dynamic Component: O8c (Left Clerestory Window, 1440×740 mm, hp=2060 mm, Y = 11930..13370 mm) -->
                         <g data-window-component="O8c" data-view-id="west_facade" data-window-style="exterior" id="facade-window-O8c"></g>
 
-                        <!-- Dynamic Component: O8b (Middle Clerestory Window, 1620×650 mm, hp=2150 mm, Y = 13650..15270 mm) -->
+                        <!-- Dynamic Component: O8b (Middle Clerestory Window, 1620×740 mm, hp=2060 mm, Y = 13650..15270 mm) -->
                         <g data-window-component="O8b" data-view-id="west_facade" data-window-style="exterior" id="facade-window-O8b"></g>
 
-                        <!-- Dynamic Component: O8a (Right 3-Pane Clerestory Window, 5485×650 mm, hp=2150 mm, Y = 15550..21035 mm) -->
+                        <!-- Dynamic Component: O8a (Right 3-Pane Clerestory Window, 5485×740 mm, hp=2060 mm, Y = 15550..21035 mm) -->
                         <g data-window-component="O8a" data-view-id="west_facade" data-window-style="exterior" id="facade-window-O8a"></g>
                     </g>
 
@@ -1047,10 +1065,10 @@
                             <polygon points="70,0 54,-6 54,6" fill="#d97706" />
                             <text x="80" y="4" class="level-text" font-weight="700" fill="#d97706" text-anchor="start">+2,80</text>
                         </g>
-                        <g transform="translate(2210, -215)">
+                        <g transform="translate(2210, -206)">
                             <line x1="-106.5" y1="0" x2="70" y2="0" class="level-marker" stroke="#f59e0b" stroke-dasharray="2 2" />
                             <polygon points="70,0 54,-6 54,6" fill="#f59e0b" />
-                            <text x="80" y="4" class="level-text" fill="#b45309" text-anchor="start">+2,15 (hp O8a–O8c)</text>
+                            <text x="80" y="4" class="level-text" fill="#b45309" text-anchor="start">+2,06 (hp O8a–O8c)</text>
                         </g>
                         <g transform="translate(2210, 2)">
                             <line x1="-68.5" y1="0" x2="70" y2="0" class="level-marker" stroke-dasharray="3 2" />
@@ -1145,22 +1163,22 @@
                         </div>
 
                         <!-- Hotspot 5: O8c Left Clerestory Window -->
-                        <div class="hotspot" style="top: 63.5%; left: 57.0%;" onclick="showElementDetails('O8c')">
+                        <div id="hotspot-o8c" class="hotspot" style="top: 63.5%; left: 57.0%;" onclick="showElementDetails('O8c')">
                             5
                             <div class="hotspot-tooltip">
                                 <strong>5. Clerestory Window O8c (0.12 Jadalnia)</strong><br>
-                                Y = 11,930..13,370 mm | Width: 1,440 mm | Height: 650 mm<br>
+                                <span id="hotspot-o8c-dims">Y = 11,930..13,370 mm | Width: 1,440 mm | Height: 740 mm</span><br>
                                 Fixed window (630 mm right of entry nook)
                             </div>
                         </div>
 
                         <!-- Hotspot 6: O8b Middle Clerestory Window -->
-                        <div class="hotspot" style="top: 63.5%; left: 64.2%;" onclick="showElementDetails('O8b')">
+                        <div id="hotspot-o8b" class="hotspot" style="top: 63.5%; left: 64.2%;" onclick="showElementDetails('O8b')">
                             6
                             <div class="hotspot-tooltip">
                                 <strong>6. Clerestory Window O8b (0.12 Jadalnia)</strong><br>
-                                Y = 13,650..15,270 mm | Width: 1,620 mm | Height: 650 mm<br>
-                                Fixed window flanked by 280 mm clinker brick piers
+                                <span id="hotspot-o8b-dims">Y = 13,650..15,270 mm | Width: 1,620 mm | Height: 740 mm</span><br>
+                                <span id="hotspot-o8b-desc">Fixed window flanked by 280 mm clinker brick piers</span>
                             </div>
                         </div>
 
@@ -1169,7 +1187,7 @@
                             7
                             <div class="hotspot-tooltip">
                                 <strong>7. 3-Pane Clerestory Window O8a (0.11 Salon)</strong><br>
-                                Y = 15,550..21,035 mm | Width: 5,485 mm | Height: 650 mm<br>
+                                Y = 15,550..21,035 mm | Width: 5,485 mm | Height: 740 mm<br>
                                 3 equal windows, 380 mm from South-West corner
                             </div>
                         </div>
@@ -1318,21 +1336,21 @@
             'O8c': {
                 title: 'Clerestory Window O8c — Dining & Living Room (0.12 Jadalnia)',
                 subtitle: 'Single-Pane High-Level Fixed Clerestory Window',
-                dims: 'Width: 1,440 mm | Height: 650 mm | Sill: hp = 2,150 mm (+2.15 m to +2.80 m) | Plan (X, Y): (20,590, 11,930 mm) | Span Y: 11,930 to 13,370 mm',
+                dims: 'Width: 1,440 mm | Height: 740 mm | Sill: hp = 2,060 mm (+2.06 m to +2.80 m) | Plan (X, Y): (20,590, 11,930 mm) | Span Y: 11,930 to 13,370 mm',
                 room: 'Ground Floor, Western Wall of Dining Area (0.12). Positioned 630 mm south of the entrance nook (Y = 11,300 mm) and 280 mm north of O8b.',
-                specs: 'Single fixed triple-glazed pane (1,440 × 650 mm) in matte anthracite aluminum frame; head flush with intermediate cornice at +2.80 m.'
+                specs: 'Single fixed triple-glazed pane (1,440 × 740 mm) in matte anthracite aluminum frame; head flush with intermediate cornice at +2.80 m.'
             },
             'O8b': {
                 title: 'Clerestory Window O8b — Dining & Living Room (0.12 Jadalnia)',
                 subtitle: 'Single-Pane High-Level Fixed Clerestory Window',
-                dims: 'Width: 1,620 mm | Height: 650 mm | Sill: hp = 2,150 mm (+2.15 m to +2.80 m) | Plan (X, Y): (20,590, 13,650 mm) | Span Y: 13,650 to 15,270 mm',
+                dims: 'Width: 1,620 mm | Height: 740 mm | Sill: hp = 2,060 mm (+2.06 m to +2.80 m) | Plan (X, Y): (20,590, 13,650 mm) | Span Y: 13,650 to 15,270 mm',
                 room: 'Ground Floor, Western Wall of Dining / Living Area (0.12). Flanked by 280 mm clinker brick masonry piers on both sides (between O8c and O8a).',
-                specs: 'Single fixed triple-glazed pane (1,620 × 650 mm) in matte anthracite aluminum frame; head flush with intermediate cornice at +2.80 m.'
+                specs: 'Single fixed triple-glazed pane (1,620 × 740 mm) in matte anthracite aluminum frame; head flush with intermediate cornice at +2.80 m.'
             },
             'O8a': {
                 title: 'Clerestory Ribbon Window O8a — Living Room (0.11 Salon)',
                 subtitle: 'Three-Pane Equal-Split High-Level Clerestory Window',
-                dims: 'Width: 5,485 mm (3 equal panes) | Height: 650 mm | Sill: hp = 2,150 mm (+2.15 m to +2.80 m) | Plan (X, Y): (20,590, 15,550 mm) | Span Y: 15,550 to 21,035 mm',
+                dims: 'Width: 5,485 mm (3 equal panes) | Height: 740 mm | Sill: hp = 2,060 mm (+2.06 m to +2.80 m) | Plan (X, Y): (20,590, 15,550 mm) | Span Y: 15,550 to 21,035 mm',
                 room: 'Ground Floor, Western Wall of Living Area (0.11). Positioned 280 mm south of O8b and ending 380 mm from the South-West corner (21,415 mm).',
                 specs: '3 equal horizontal fixed windows (cumulative length 5,485 mm, ~1,828 mm each); head flush with intermediate cornice at +2.80 m.'
             },
@@ -1397,6 +1415,89 @@
             card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
+        function setClerestoryO8Option(optionKey) {
+            if (typeof WindowStore === 'undefined' || !WindowStore.update) return;
+
+            if (optionKey === 'extended') {
+                // Option 2: extend O8c 60 to the right (1440 -> 1500 mm, y = 11930), and O8b 60 to the left (1620 -> 1680 mm, y = 13590)
+                WindowStore.update('O8c', {
+                    y: 11930,
+                    width: 1500,
+                    height: 740,
+                    sill: 2060,
+                    views: ['west_facade'],
+                    description: 'Single-pane high clerestory fixed window (1500×740 mm, hp=2060 mm, extended 60 mm right), 630 mm south of the entrance nook'
+                });
+                WindowStore.update('O8b', {
+                    y: 13590,
+                    width: 1680,
+                    height: 740,
+                    sill: 2060,
+                    views: ['west_facade'],
+                    description: 'Single-pane high clerestory fixed window (1680×740 mm, hp=2060 mm, extended 60 mm left), 160 mm south of O8c and 280 mm north of O8a'
+                });
+            } else if (optionKey === 'no_o8b') {
+                // Option 3: extend O8c 60 to the right (1440 -> 1500 mm, y = 11930) and remove O8b at all
+                WindowStore.update('O8c', {
+                    y: 11930,
+                    width: 1500,
+                    height: 740,
+                    sill: 2060,
+                    views: ['west_facade'],
+                    description: 'Single-pane high clerestory fixed window (1500×740 mm, hp=2060 mm, extended 60 mm right), 630 mm south of the entrance nook and 2120 mm north of O8a'
+                });
+                WindowStore.update('O8b', {
+                    y: 13650,
+                    width: 1620,
+                    height: 740,
+                    sill: 2060,
+                    views: []
+                });
+                if (currentSelectedKey === 'O8b') {
+                    showElementDetails('O8c');
+                }
+            } else if (optionKey === 'no_o8b_o8c') {
+                // Option 4: remove both O8b and O8c at all (only O8a remains)
+                WindowStore.update('O8c', {
+                    y: 11930,
+                    width: 1440,
+                    height: 740,
+                    sill: 2060,
+                    views: []
+                });
+                WindowStore.update('O8b', {
+                    y: 13650,
+                    width: 1620,
+                    height: 740,
+                    sill: 2060,
+                    views: []
+                });
+                if (currentSelectedKey === 'O8b' || currentSelectedKey === 'O8c') {
+                    showElementDetails('O8a');
+                }
+            } else {
+                // Option 1 (default): O8c = 1440 mm (y = 11930), O8b = 1620 mm (y = 13650)
+                WindowStore.update('O8c', {
+                    y: 11930,
+                    width: 1440,
+                    height: 740,
+                    sill: 2060,
+                    views: ['west_facade'],
+                    description: 'Single-pane high clerestory fixed window (1440×740 mm, hp=2060 mm) beneath the intermediate cornice, 630 mm south of the entrance nook'
+                });
+                WindowStore.update('O8b', {
+                    y: 13650,
+                    width: 1620,
+                    height: 740,
+                    sill: 2060,
+                    views: ['west_facade'],
+                    description: 'Single-pane high clerestory fixed window (1620×740 mm, hp=2060 mm) flanked by 280 mm clinker masonry piers'
+                });
+            }
+
+            updateWestFacadeDimensions();
+        }
+
         /**
          * Build an SVG dimension chain group along the 21,415 mm West Facade (North Y=0 to South Y=21415)
          */
@@ -1409,7 +1510,7 @@
             const items = [];
             windowIds.forEach(id => {
                 const win = WindowStore.get(id);
-                if (win) {
+                if (win && (!Array.isArray(win.views) || win.views.includes('west_facade'))) {
                     const coords = CoordinateService.transform(win, 'west_facade');
                     items.push({
                         id: win.id,
@@ -1540,7 +1641,7 @@
 
             order.forEach(id => {
                 const win = WindowStore.get(id);
-                if (!win) return;
+                if (!win || (Array.isArray(win.views) && !win.views.includes('west_facade'))) return;
                 const coords = CoordinateService.transform(win, 'west_facade');
                 const startMm = Math.round(coords.localX_mm);
                 const endMm = Math.round(coords.localX_mm + win.width);
@@ -1595,8 +1696,61 @@
             const totalLenMm = (view && view.length) ? view.length : 21415;
             const scale = (view && view.scale) ? view.scale : 0.1;
             const o8c = WindowStore.get('O8c');
+            const o8b = WindowStore.get('O8b');
+            const hasO8c = Boolean(o8c && (!Array.isArray(o8c.views) || o8c.views.includes('west_facade')));
+            const hasO8b = Boolean(o8b && (!Array.isArray(o8b.views) || o8b.views.includes('west_facade')));
             const nookRightMm = (o8c && typeof o8c.y === 'number') ? (o8c.y - 630) : 11300;
             const nookRightSvg = nookRightMm * scale;
+
+            // Sync O8c / O8b option buttons, badge, and hotspots
+            const o8cW = o8c ? Number(o8c.width) : 1440;
+            const o8bW = o8b ? Number(o8b.width) : 1620;
+            const o8bY = o8b ? Number(o8b.y) : 13650;
+
+            const isDefaultOpt = hasO8c && hasO8b && o8cW === 1440 && o8bW === 1620 && o8bY === 13650;
+            const isExtendedOpt = hasO8c && hasO8b && o8cW === 1500 && o8bW === 1680 && o8bY === 13590;
+            const isNoO8bOpt = hasO8c && !hasO8b && o8cW === 1500;
+            const isNoO8bO8cOpt = !hasO8c && !hasO8b;
+
+            const btnDefault = document.getElementById('btn-o8-default');
+            const btnExtended = document.getElementById('btn-o8-extended');
+            const btnNoO8b = document.getElementById('btn-o8-no-o8b');
+            const btnNoO8bO8c = document.getElementById('btn-o8-no-o8b-o8c');
+            if (btnDefault) btnDefault.classList.toggle('active', isDefaultOpt);
+            if (btnExtended) btnExtended.classList.toggle('active', isExtendedOpt);
+            if (btnNoO8b) btnNoO8b.classList.toggle('active', isNoO8bOpt);
+            if (btnNoO8bO8c) btnNoO8bO8c.classList.toggle('active', isNoO8bO8cOpt);
+
+            const optBadge = document.getElementById('o8-window-opt-badge');
+            if (optBadge && o8c) {
+                if (!hasO8c && !hasO8b) {
+                    const pierNookToO8a = 15550 - nookRightMm;
+                    optBadge.textContent = `O8c & O8b: removed | Pier to O8a: ${pierNookToO8a} mm`;
+                } else if (!hasO8b) {
+                    const pierToO8a = 15550 - (o8c.y + o8c.width);
+                    optBadge.textContent = `O8c: ${o8c.width} mm | Pier: ${pierToO8a} mm | O8b: removed`;
+                } else {
+                    const pierBetween = o8b.y - (o8c.y + o8c.width);
+                    optBadge.textContent = `O8c: ${o8c.width} mm | Pier: ${pierBetween} mm | O8b: ${o8b.width} mm`;
+                }
+            }
+
+            const hotspotO8c = document.getElementById('hotspot-o8c');
+            if (hotspotO8c) {
+                hotspotO8c.style.display = hasO8c ? 'flex' : 'none';
+            }
+            const hotspotO8cDims = document.getElementById('hotspot-o8c-dims');
+            if (hotspotO8cDims && o8c) {
+                hotspotO8cDims.textContent = `Y = ${o8c.y.toLocaleString()}..${(o8c.y + o8c.width).toLocaleString()} mm | Width: ${o8c.width.toLocaleString()} mm | Height: ${o8c.height.toLocaleString()} mm`;
+            }
+            const hotspotO8b = document.getElementById('hotspot-o8b');
+            if (hotspotO8b) {
+                hotspotO8b.style.display = hasO8b ? 'flex' : 'none';
+            }
+            const hotspotO8bDims = document.getElementById('hotspot-o8b-dims');
+            if (hotspotO8bDims && o8b) {
+                hotspotO8bDims.textContent = `Y = ${o8b.y.toLocaleString()}..${(o8b.y + o8b.width).toLocaleString()} mm | Width: ${o8b.width.toLocaleString()} mm | Height: ${o8b.height.toLocaleString()} mm`;
+            }
 
             const nookRect = document.getElementById('wf-entrance-nook-rect');
             if (nookRect) nookRect.setAttribute('width', nookRightSvg - 860);
@@ -1666,6 +1820,12 @@
         }
 
         window.addEventListener('DOMContentLoaded', function () {
+            ['O8c', 'O8b', 'O8a'].forEach(function (id) {
+                const w = WindowStore.get(id);
+                if (w && (w.height !== 740 || w.sill !== 2060)) {
+                    WindowStore.update(id, { height: 740, sill: 2060 });
+                }
+            });
             WindowComponent.autoMountAll();
             updateWestFacadeDimensions();
 

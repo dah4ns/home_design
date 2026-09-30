@@ -589,9 +589,9 @@
       "name": "O8c",
       "x": 20590,
       "y": 11930,
-      "sill": 2150,
+      "sill": 2060,
       "width": 1440,
-      "height": 650,
+      "height": 740,
       "room": "0.12 Jadalnia / Salon",
       "floor": "ground",
       "wall": "west",
@@ -601,11 +601,11 @@
       "sashes": 1,
       "hasMullion": false,
       "handlePosition": "none",
-      "description": "Single-pane high clerestory fixed window (1440×650 mm, hp=2150 mm) beneath the intermediate cornice, 630 mm south of the entrance nook",
+      "description": "Single-pane high clerestory fixed window (1440×740 mm, hp=2060 mm) beneath the intermediate cornice, 630 mm south of the entrance nook",
       "specs": {
         "glazing": "Triple-pane solar and acoustic control glass (Ug=0.5 W/m²K)",
         "frame": "Slimline aluminum clerestory fixed frame (RAL 7016)",
-        "sillExterior": "Aluminum sill at +2.15 m (hp=2150 mm) over clinker wall",
+        "sillExterior": "Aluminum sill at +2.06 m (hp=2060 mm) over clinker wall",
         "sillInterior": "High clerestory reveal providing western afternoon daylight"
       }
     },
@@ -614,9 +614,9 @@
       "name": "O8b",
       "x": 20590,
       "y": 13650,
-      "sill": 2150,
+      "sill": 2060,
       "width": 1620,
-      "height": 650,
+      "height": 740,
       "room": "0.12 Jadalnia / Salon",
       "floor": "ground",
       "wall": "west",
@@ -626,11 +626,11 @@
       "sashes": 1,
       "hasMullion": false,
       "handlePosition": "none",
-      "description": "Single-pane high clerestory fixed window (1620×650 mm, hp=2150 mm) flanked by 280 mm clinker masonry piers",
+      "description": "Single-pane high clerestory fixed window (1620×740 mm, hp=2060 mm) flanked by 280 mm clinker masonry piers",
       "specs": {
         "glazing": "Triple-pane solar and acoustic control glass (Ug=0.5 W/m²K)",
         "frame": "Slimline aluminum clerestory fixed frame (RAL 7016)",
-        "sillExterior": "Aluminum sill at +2.15 m (hp=2150 mm) over clinker wall",
+        "sillExterior": "Aluminum sill at +2.06 m (hp=2060 mm) over clinker wall",
         "sillInterior": "High clerestory reveal providing western afternoon daylight"
       }
     },
@@ -639,9 +639,9 @@
       "name": "O8a",
       "x": 20590,
       "y": 15550,
-      "sill": 2150,
+      "sill": 2060,
       "width": 5485,
-      "height": 650,
+      "height": 740,
       "room": "0.11 Salon",
       "floor": "ground",
       "wall": "west",
@@ -651,11 +651,11 @@
       "sashes": 3,
       "hasMullion": true,
       "handlePosition": "none",
-      "description": "Three-pane equal-split high clerestory ribbon window (5485×650 mm, 3 equal windows, hp=2150 mm), ending 380 mm from the South-West corner",
+      "description": "Three-pane equal-split high clerestory ribbon window (5485×740 mm, 3 equal windows, hp=2060 mm), ending 380 mm from the South-West corner",
       "specs": {
         "glazing": "Triple-pane solar and acoustic control glass (Ug=0.5 W/m²K)",
         "frame": "Slimline 3-bay equal-split aluminum clerestory frame (RAL 7016)",
-        "sillExterior": "Continuous aluminum sill at +2.15 m (hp=2150 mm) over clinker wall",
+        "sillExterior": "Continuous aluminum sill at +2.06 m (hp=2060 mm) over clinker wall",
         "sillInterior": "High clerestory reveal providing western afternoon daylight while preserving privacy"
       }
     }
