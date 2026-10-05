@@ -33,26 +33,26 @@
                 "leftEdge": 0,
                 "floor": "all",
                 "direction": "west",
-                "length": 20590,
+                "length": 20505,
                 "scale": 0.1,
                 "wall": "north",
                 "side": "exterior",
-                "description": "Exterior architectural elevation looking South from the garden. Origin (0,0) is the North-East corner; X grows Westward (left to right)."
+                "description": "Exterior architectural elevation looking South from the garden. Origin (0,0) is Point 0 (beginning of upper balcony; 270 mm right of the ground-floor wall start at X = -270 mm); X grows Westward (left to right)."
             },
             "kitchen_north_wall": {
                 "id": "kitchen_north_wall",
                 "name": "Kitchen North Wall Elevation",
                 "axis": "x",
-                "origin": { "x": 12150, "y": 0 },
-                "positionOnMap": 12150,
-                "leftEdge": 12150,
+                "origin": { "x": 11880, "y": 0 },
+                "positionOnMap": 11880,
+                "leftEdge": 11880,
                 "floor": "ground",
                 "direction": "east",
                 "length": 5400,
                 "scale": 0.1,
                 "wall": "north",
                 "side": "interior",
-                "description": "Interior kitchen back wall elevation looking North. Left edge is at X = 12,150 mm; X decreases Eastward (left to right)."
+                "description": "Interior kitchen back wall elevation looking North. Left edge is at X = 11,880 mm (12,150 mm from ground-floor wall start); X decreases Eastward (left to right)."
             },
             "stairs_north_wall": {
                 "id": "stairs_north_wall",
@@ -105,7 +105,7 @@
             "O1": {
                 "id": "O1",
                 "name": "O1",
-                "x": 8750,
+                "x": 8480,
                 "y": 0,
                 "sill": 1100,
                 "width": 2350,
@@ -128,7 +128,7 @@
             "O2": {
                 "id": "O2",
                 "name": "O2",
-                "x": 1150,
+                "x": 880,
                 "y": 0,
                 "sill": 800,
                 "width": 1800,
@@ -140,7 +140,7 @@
                 "sashes": 2,
                 "hasMullion": true,
                 "handlePosition": "center",
-                "description": "Study / office north window with (77+38) corner offset",
+                "description": "Study / office north window with (77+38) = 1,150 mm offset from ground-floor wall start (X = 880 mm from Point 0)",
                 "specs": {
                     "glazing": "Triple-pane insulated glass unit",
                     "frame": "Matte anthracite aluminum profile (RAL 7016)",
@@ -151,7 +151,7 @@
             "14a": {
                 "id": "14a",
                 "name": "14a",
-                "x": 6400,
+                "x": 6315,
                 "y": 0,
                 "sill": 3430,
                 "width": 1190,
@@ -163,7 +163,7 @@
                 "sashes": 1,
                 "hasMullion": false,
                 "handlePosition": "left",
-                "description": "Full-height floor-to-ceiling architectural window starting immediately after 6,400mm balcony",
+                "description": "Full-height floor-to-ceiling architectural window starting immediately after 6,315mm balcony",
                 "specs": {
                     "glazing": "Safety tempered and laminated glass (VSG/ESG)",
                     "frame": "Concealed slimline aluminum frame",
@@ -174,7 +174,7 @@
             "O11_1": {
                 "id": "O11_1",
                 "name": "O11",
-                "x": 8760,
+                "x": 8675,
                 "y": 0,
                 "sill": 4180,
                 "width": 1000,
@@ -197,7 +197,7 @@
             "O15": {
                 "id": "O15",
                 "name": "O15",
-                "x": 8760,
+                "x": 8675,
                 "y": 0,
                 "sill": 3430,
                 "width": 1900,
@@ -220,7 +220,7 @@
             "O11_2": {
                 "id": "O11_2",
                 "name": "O11",
-                "x": 11460,
+                "x": 11375,
                 "y": 0,
                 "sill": 4180,
                 "width": 1000,
@@ -243,7 +243,7 @@
             "O11_3": {
                 "id": "O11_3",
                 "name": "O11",
-                "x": 14100,
+                "x": 14015,
                 "y": 0,
                 "sill": 4180,
                 "width": 1000,
@@ -266,7 +266,7 @@
             "O13a": {
                 "id": "O13a",
                 "name": "O13a",
-                "x": 18210,
+                "x": 18125,
                 "y": 3100,
                 "sill": 4180,
                 "width": 2380,
