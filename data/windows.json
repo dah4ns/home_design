@@ -70,18 +70,18 @@
       "name": "South Facade Elevation",
       "axis": "x",
       "origin": {
-        "x": 21000,
+        "x": 20990,
         "y": 21170
       },
-      "positionOnMap": 21000,
-      "leftEdge": 21000,
+      "positionOnMap": 20990,
+      "leftEdge": 20990,
       "floor": "all",
       "direction": "east",
-      "length": 21000,
+      "length": 20990,
       "scale": 0.1,
       "wall": "south",
       "side": "exterior",
-      "description": "Exterior architectural elevation looking North from the southern garden. Left edge is the South-West corner (X = 21,000 mm, Y = 21,170 mm); X decreases Eastward (left to right)."
+      "description": "Exterior architectural elevation looking North from the southern garden. Left edge is the South-West corner (X = 20,990 mm, Y = 21,170 mm); X decreases Eastward (left to right)."
     },
     "west_facade": {
       "id": "west_facade",
@@ -309,10 +309,10 @@
     "O13a_2": {
       "id": "O13a_2",
       "name": "O13a",
-      "x": 18440,
+      "x": 18410,
       "y": 21170,
       "sill": 4180,
-      "width": 2400,
+      "width": 2380,
       "height": 1950,
       "room": "1.01 Sypialnia Master",
       "floor": "first",
@@ -324,7 +324,7 @@
       "hasMullion": true,
       "tiltTurnSashes": [2],
       "handlePosition": "center",
-      "description": "Two-sash bedroom window on the West side of the South Facade (left fixed, right tilt-and-turn)",
+      "description": "Two-sash bedroom window on the West side of the South Facade (2380×1950 mm, 200 mm from West edge, left fixed, right tilt-and-turn)",
       "specs": {
         "glazing": "Triple-pane insulated glass unit (Ug=0.5 W/m²K)",
         "frame": "Matte anthracite aluminum profile (RAL 7016)",
@@ -335,7 +335,7 @@
     "O12": {
       "id": "O12",
       "name": "O12",
-      "x": 11000,
+      "x": 10980,
       "y": 21170,
       "sill": 3430,
       "width": 4000,
@@ -411,10 +411,10 @@
     "O7": {
       "id": "O7",
       "name": "O7",
-      "x": 15000,
+      "x": 15180,
       "y": 21170,
       "sill": 800,
-      "width": 3200,
+      "width": 3000,
       "height": 2000,
       "room": "0.09 Pokój / Pomieszczenie",
       "floor": "ground",
@@ -426,7 +426,7 @@
       "hasMullion": true,
       "tiltTurnSashes": [1, 2],
       "handlePosition": "center",
-      "description": "Three-sash ground floor window (3200×2000 mm, hp=800 mm) in Smaller windows; single fixed window (2000×2800 mm, hp=0 mm) in Bigger windows",
+      "description": "Three-sash ground floor window (3000×2000 mm, hp=800 mm, 200 mm brick pier on right) in Smaller windows; single fixed window (2000×2800 mm, hp=0 mm) in Bigger windows",
       "specs": {
         "glazing": "Triple-pane insulated glass unit (Ug=0.5 W/m²K)",
         "frame": "Matte anthracite aluminum profile (RAL 7016)",
@@ -437,10 +437,10 @@
     "O5": {
       "id": "O5",
       "name": "O5",
-      "x": 7650,
+      "x": 7500,
       "y": 21170,
       "sill": 0,
-      "width": 6350,
+      "width": 6480,
       "height": 2800,
       "room": "0.12 Jadalnia / Salon",
       "floor": "ground",
