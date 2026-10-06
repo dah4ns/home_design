@@ -100,6 +100,24 @@
       "wall": "west",
       "side": "exterior",
       "description": "Exterior architectural elevation looking East towards the West facade. Point 0 / Axis A (Y = 0 mm) is 270 mm to the right of the lower-level wall start (Y = -270 mm); Y grows Southward (left to right) to 21,170 mm (total lower-level wall length = 21,440 mm)."
+    },
+    "east_facade": {
+      "id": "east_facade",
+      "name": "East Facade Elevation",
+      "axis": "y",
+      "origin": {
+        "x": 0,
+        "y": 21125
+      },
+      "positionOnMap": 21125,
+      "leftEdge": 21125,
+      "floor": "all",
+      "direction": "north",
+      "length": 21415,
+      "scale": 0.1,
+      "wall": "east",
+      "side": "exterior",
+      "description": "Exterior architectural elevation looking West towards the East facade. View direction is South to North (left to right). Point 0 / Axis A (Y = 0 mm) is 290 mm from the right edge of the wall (at Screen X = 21,125 mm; total wall length = 21,415 mm)."
     }
   },
   "windows": {
@@ -661,6 +679,142 @@
         "frame": "Slimline 3-bay equal-split aluminum clerestory frame (RAL 7016)",
         "sillExterior": "Continuous aluminum sill at +2.06 m (hp=2060 mm) over clinker wall",
         "sillInterior": "High clerestory reveal providing western afternoon daylight while preserving privacy"
+      }
+    },
+    "O6b": {
+      "id": "O6b",
+      "name": "O6b",
+      "x": 14980,
+      "y": 15285,
+      "sill": 0,
+      "width": 5640,
+      "height": 2800,
+      "room": "0.10 Siłownia",
+      "floor": "ground",
+      "wall": "east",
+      "views": [
+        "east_facade"
+      ],
+      "sashes": 3,
+      "pillarWidth": 90,
+      "hasMullion": true,
+      "slidingArrows": true,
+      "handlePosition": "center",
+      "description": "Full-height 3-pane HST terrace glazing in the recessed South-West gym wing with 90 mm inner pillars (3 × 1,820 mm + 2 × 90 mm = 5,640 mm, 200 mm left pier, middle sash sliding left ←)",
+      "specs": {
+        "glazing": "Triple-pane safety solar-control glass (VSG/ESG)",
+        "frame": "Heavy-duty HST lift-and-slide aluminum system with 90 mm inner pillars (RAL 7016)",
+        "sillExterior": "Zero-barrier flush terrace threshold (-0.02 m / ±0.00 m)",
+        "sillInterior": "Trench heater integrated flush floor track"
+      }
+    },
+    "O6a": {
+      "id": "O6a",
+      "name": "O6a",
+      "x": 14980,
+      "y": 13275,
+      "sill": 2060,
+      "width": 1760,
+      "height": 740,
+      "room": "0.12 Komunikacja",
+      "floor": "ground",
+      "wall": "east",
+      "views": [
+        "east_facade"
+      ],
+      "sashes": 1,
+      "hasMullion": false,
+      "handlePosition": "none",
+      "description": "Single-pane high clerestory fixed ribbon window in the recessed ground-floor wing (1,760 × 740 mm, hp=2,060 mm, 250 mm right of O6b)",
+      "specs": {
+        "glazing": "Triple-pane solar and acoustic control glass (Ug=0.5 W/m²K)",
+        "frame": "Slimline aluminum clerestory fixed frame (RAL 7016)",
+        "sillExterior": "Aluminum sill at +2.06 m (hp=2060 mm) over recessed clinker wall",
+        "sillInterior": "High clerestory reveal providing eastern morning daylight to hall/corridor"
+      }
+    },
+    "O3": {
+      "id": "O3",
+      "name": "O3",
+      "x": 0,
+      "y": 6310,
+      "sill": 0,
+      "width": 5090,
+      "height": 2800,
+      "room": "0.11 Salon",
+      "floor": "ground",
+      "wall": "east",
+      "views": [
+        "east_facade"
+      ],
+      "sashes": 3,
+      "pillarWidth": 90,
+      "hasMullion": true,
+      "handlePosition": "center",
+      "description": "Full-height panoramic living room glazing on the projecting central East Facade with 90 mm inner pillars (Smaller: 3 × 1,636.7 mm + 2 × 90 mm = 5,090 mm; Bigger: 2 × 2,500 mm + 1 × 90 mm = 5,090 mm)",
+      "specs": {
+        "glazing": "Triple-pane safety solar-control glass (VSG/ESG)",
+        "frame": "Slimline multi-panel aluminum system with 90 mm inner pillars (RAL 7016)",
+        "sillExterior": "Flush threshold at ±0.00 m (-0.02 m)",
+        "sillInterior": "Trench heater integrated flush floor track"
+      }
+    },
+    "O9": {
+      "id": "O9",
+      "name": "O9",
+      "x": 0,
+      "y": 6310,
+      "sill": 3430,
+      "width": 5090,
+      "height": 2700,
+      "room": "1.04 Sypialnia Wschodnia",
+      "floor": "first",
+      "wall": "east",
+      "views": [
+        "east_facade"
+      ],
+      "sashes": 3,
+      "pillarWidth": 90,
+      "hasMullion": true,
+      "handlePosition": "center",
+      "description": "Full-height panoramic bedroom glazing on the projecting central East Facade with 90 mm inner pillars, vertically aligned with O3 (Smaller: 3 × 1,636.7 mm + 2 × 90 mm = 5,090 mm; Bigger: 2 × 2,500 mm + 1 × 90 mm = 5,090 mm)",
+      "specs": {
+        "glazing": "Safety tempered and laminated glass (VSG/ESG)",
+        "frame": "Slimline multi-panel aluminum frame with 90 mm inner pillars (RAL 7016)",
+        "sillExterior": "Flush threshold on intermediate cornice (+3.43 m)",
+        "sillInterior": "Flush floor threshold (hp=0 mm)"
+      }
+    },
+    "O14b": {
+      "id": "O14b",
+      "name": "O14b",
+      "x": 6315,
+      "y": 3190,
+      "sill": 3430,
+      "width": 2635,
+      "height": 2700,
+      "room": "1.04 Sypialnia / Taras (D1 + O14b)",
+      "floor": "first",
+      "wall": "east",
+      "views": [
+        "east_facade"
+      ],
+      "sashes": 2,
+      "sashWidths": [
+        900,
+        1735
+      ],
+      "tiltTurnSashes": [
+        1
+      ],
+      "hasMullion": true,
+      "handlePosition": "left",
+      "description": "Upper floor covered terrace glazing & balcony door assembly (2,635 × 2,700 mm: 900 mm left tilt-and-turn terrace door D1 + 1,735 mm right fixed window O14b behind 900 mm glass balustrade)",
+      "specs": {
+        "glazing": "Safety tempered and laminated glass (VSG/ESG) with 900 mm exterior glass balustrade",
+        "frame": "Anthracite aluminum tilt-and-turn terrace door + fixed panoramic frame (RAL 7016)",
+        "sillExterior": "Covered upper terrace gres deck (+3.31 m / +3.43 m)",
+        "sillInterior": "Bedroom threshold at +3.33 m"
       }
     }
   },

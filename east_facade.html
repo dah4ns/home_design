@@ -1,0 +1,1703 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>East Facade Elevation - Elewacja Wschodnia</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --card-border: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --accent-amber: #d97706;
+            --accent-amber-light: #fef3c7;
+            --accent-blue: #2563eb;
+            --accent-slate: #334155;
+            --accent-dark: #0f172a;
+            --dim-color: #d97706;
+            --axis-color: #ef4444;
+            --level-color: #0284c7;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 30px 20px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1560px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 35px 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 25px rgba(15, 23, 42, 0.06);
+            border: 1px solid var(--card-border);
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 18px;
+            background-color: #f1f5f9;
+            color: #334155;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            border: 1px solid #e2e8f0;
+        }
+
+        .back-btn:hover {
+            background-color: #e2e8f0;
+            color: #0f172a;
+            transform: translateX(-2px);
+        }
+
+        .switch-facade-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 16px;
+            background-color: #fffbeb;
+            color: #b45309;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13.5px;
+            transition: all 0.2s ease;
+            border: 1px solid #fde68a;
+        }
+
+        .switch-facade-btn:hover {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .header-meta {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            font-family: 'JetBrains Mono', monospace;
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
+
+        .badge.accent {
+            background: var(--accent-amber-light);
+            color: #92400e;
+            border-color: #fde68a;
+        }
+
+        .badge.direction-north {
+            background: #dcfce7;
+            color: #166534;
+            border-color: #bbf7d0;
+            font-weight: 700;
+        }
+
+        .header-title-area {
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0 0 8px 0;
+            color: #0f172a;
+            letter-spacing: -0.02em;
+        }
+
+        p.subtitle {
+            color: var(--text-secondary);
+            margin: 0;
+            font-size: 15px;
+            max-width: 1020px;
+        }
+
+        /* Tabs styling */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 10px;
+            overflow-x: auto;
+        }
+
+        .tab-link {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            outline: none;
+            cursor: pointer;
+            padding: 10px 22px;
+            transition: all 0.25s ease;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            color: #64748b;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .tab-link:hover {
+            background-color: #f1f5f9;
+            color: #1e293b;
+        }
+
+        .tab-link.active {
+            background-color: #0f172a;
+            color: #ffffff;
+            border-color: #0f172a;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(4px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Controls bar */
+        .controls-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+            padding: 12px 20px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .layer-toggles {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .toggle-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            background: white;
+            border: 1px solid #cbd5e1;
+            color: #334155;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .toggle-btn.active {
+            background: #eff6ff;
+            border-color: #3b82f6;
+            color: #1d4ed8;
+        }
+
+        .toggle-btn.active.amber {
+            background: #fffbeb;
+            border-color: #f59e0b;
+            color: #b45309;
+        }
+
+        .toggle-btn.active.emerald {
+            background: #ecfdf5;
+            border-color: #10b981;
+            color: #047857;
+        }
+
+        /* Elevation SVG Wrapper */
+        .elevation-wrapper {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px;
+            overflow-x: auto;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.02);
+            position: relative;
+        }
+
+        svg.elevation-svg {
+            display: block;
+            margin: 0 auto;
+            max-width: 100%;
+            height: auto;
+            font-family: 'JetBrains Mono', monospace;
+            user-select: none;
+        }
+
+        /* SVG Element Styles */
+        .dim-line {
+            stroke: var(--dim-color);
+            stroke-width: 1;
+            stroke-dasharray: 2 2;
+        }
+
+        .dim-solid {
+            stroke: var(--dim-color);
+            stroke-width: 1.2;
+        }
+
+        .dim-text {
+            fill: var(--dim-color);
+            font-size: 11px;
+            font-weight: 600;
+            text-anchor: middle;
+        }
+
+        .axis-line {
+            stroke: var(--axis-color);
+            stroke-width: 1.5;
+            stroke-dasharray: 8 4 2 4;
+        }
+
+        .level-marker {
+            stroke: var(--level-color);
+            stroke-width: 1.2;
+        }
+
+        .level-text {
+            fill: var(--level-color);
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .level-label {
+            fill: #64748b;
+            font-size: 9.5px;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .tick {
+            stroke: var(--dim-color);
+            stroke-width: 1.5;
+        }
+
+        .interactive-element {
+            cursor: pointer;
+            transition: filter 0.2s ease, opacity 0.2s ease;
+        }
+
+        .interactive-element:hover {
+            filter: brightness(1.12);
+        }
+
+        /* Reference Photo / Drawing Tab */
+        .photo-tab-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .photo-viewer-card {
+            background: #0f172a;
+            border-radius: 12px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .photo-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 1360px;
+            margin: 0 auto;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #334155;
+            background: #ffffff;
+        }
+
+        .photo-wrapper img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .hotspot {
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            background: rgba(217, 119, 6, 0.92);
+            border: 2px solid #ffffff;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            cursor: pointer;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+
+        .hotspot:hover {
+            transform: translate(-50%, -50%) scale(1.2);
+            background: #2563eb;
+            z-index: 20;
+        }
+
+        .hotspot-tooltip {
+            position: absolute;
+            bottom: 36px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 23, 42, 0.95);
+            color: #f8fafc;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 400;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            border: 1px solid #475569;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .hotspot:hover .hotspot-tooltip {
+            opacity: 1;
+        }
+
+        /* Info Cards & Tables */
+        .info-panel {
+            margin-top: 25px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px 24px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+            gap: 18px;
+            margin-top: 15px;
+        }
+
+        .info-card {
+            background: white;
+            padding: 18px 20px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        }
+
+        .info-card h4 {
+            margin: 0 0 10px 0;
+            font-size: 15px;
+            font-weight: 600;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-card p {
+            margin: 0;
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.5;
+        }
+
+        /* Schedule Table */
+        .table-responsive {
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+
+        table.schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            text-align: left;
+        }
+
+        table.schedule-table th {
+            background: #f1f5f9;
+            color: #334155;
+            font-weight: 600;
+            padding: 12px 14px;
+            border-bottom: 2px solid #cbd5e1;
+        }
+
+        table.schedule-table td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #1e293b;
+        }
+
+        table.schedule-table tr:hover td {
+            background-color: #f8fafc;
+        }
+
+        .badge-tag {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .badge-blue {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .badge-amber {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .badge-emerald {
+            background: #d1fae5;
+            color: #047857;
+        }
+
+        .diagram-box {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 20px;
+        }
+
+        .key-takeaway-banner {
+            background: linear-gradient(135deg, #ecfdf5 0%, #e0f2fe 55%, #fef3c7 100%);
+            border: 1px solid #a7f3d0;
+            border-radius: 10px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+        }
+
+        .key-takeaway-banner svg {
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .key-takeaway-text h3 {
+            margin: 0 0 4px 0;
+            font-size: 15px;
+            font-weight: 600;
+            color: #065f46;
+        }
+
+        .key-takeaway-text p {
+            margin: 0;
+            font-size: 13px;
+            color: #1e293b;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Top Navigation -->
+        <div class="top-nav">
+            <div class="nav-links">
+                <a href="index.html" class="back-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Back to Dashboard
+                </a>
+                <a href="north_facade.html" class="switch-facade-btn">
+                    <span>🧭</span> North Facade (dir: west)
+                </a>
+                <a href="south_facade.html" class="switch-facade-btn">
+                    <span>☀️</span> South Facade (dir: east)
+                </a>
+                <a href="west_facade.html" class="switch-facade-btn" style="background-color: #f3e8ff; color: #6d28d9; border-color: #ddd6fe;">
+                    <span>🚪</span> West Facade (dir: south)
+                </a>
+            </div>
+
+            <div class="header-meta">
+                <span class="badge accent">Point 0 = Axis A (Oś A, 290 mm from right edge)</span>
+                <span class="badge direction-north">Direction: NORTH (South → North | Axis: Y)</span>
+                <span class="badge">Overall Length: 21,415 mm</span>
+                <span class="badge">Height: +6.88 m (+7.26 m)</span>
+            </div>
+        </div>
+
+        <!-- Header Title Area -->
+        <div class="header-title-area">
+            <h1>East Facade Elevation (Elewacja Wschodnia — Ogrodowa)</h1>
+            <p class="subtitle">
+                Exterior architectural elevation of the eastern garden facade looking West towards the building.
+                Configured in the <strong>2D Building Coordinate System</strong> with <code>direction: "north"</code> (South &rarr; North from left to right), active horizontal plan axis <code>Y (&lt;north - south&gt;)</code>,
+                <strong>Point 0 / Axis A (Oś A)</strong> at <code>Y = 0 mm</code> located <strong>290 mm from the right edge of the wall</strong> (same Axis A as on the West Facade),
+                and overall elevation length of <strong>21,415 mm</strong>.
+            </p>
+        </div>
+
+        <!-- Notice Banner explaining South->North orientation & Recessed Left/Right Ground Wings -->
+        <div class="key-takeaway-banner">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 16 16 12 12 8"></polyline>
+                <line x1="8" y1="12" x2="16" y2="12"></line>
+            </svg>
+            <div class="key-takeaway-text">
+                <h3>East Facade Massing Depth &amp; Spatial Orientation (<code>direction: "north"</code>, South &rarr; North)</h3>
+                <p>
+                    Looking <strong>West</strong> at the East Facade, the <strong>South edge is on the LEFT</strong> and the <strong>North edge is on the RIGHT</strong> (where <strong>Axis A / Point 0</strong> sits <code>290 mm</code> from the right edge).
+                    The central two-story volume (<code>9,525 – 18,315 mm</code>, width <code>8,790 mm</code>, containing the central windows <strong>O9</strong> &amp; <strong>O3</strong> and upper terrace <strong>O14b</strong>) projects forward in the front,
+                    while both the <strong>left ground-floor wing (<code>0 – 9,525 mm</code> with O6b &amp; O6a)</strong> and the <strong>right ground-floor wing (<code>18,315 – 21,415 mm</code>, width <code>3,100 mm</code>)</strong> without an upper floor are <strong>recessed in the back</strong>.
+                </p>
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="tabs">
+            <button class="tab-link active" onclick="openTab(event, 'TabElevation')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+                    <line x1="3" y1="9" x2="21" y2="9"></line>
+                    <line x1="9" y1="21" x2="9" y2="9"></line>
+                </svg>
+                2D Architectural CAD Elevation
+            </button>
+            <button class="tab-link" onclick="openTab(event, 'TabDrawing')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+                Reference Drawing &amp; Hotspots
+            </button>
+            <button class="tab-link" onclick="openTab(event, 'TabOrientation')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                </svg>
+                Northward Coordinate Logic &amp; Massing Depth
+            </button>
+            <button class="tab-link" onclick="openTab(event, 'TabSchedule')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="8" y1="6" x2="21" y2="6"></line>
+                    <line x1="8" y1="12" x2="21" y2="12"></line>
+                    <line x1="8" y1="18" x2="21" y2="18"></line>
+                    <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                    <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                    <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                </svg>
+                Window &amp; Opening Schedule
+            </button>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 1: 2D ARCHITECTURAL CAD ELEVATION -->
+        <!-- ========================================== -->
+        <div id="TabElevation" class="tab-content active">
+            <!-- Controls Bar -->
+            <div class="controls-bar">
+                <div class="layer-toggles" style="border-right: 1px solid #cbd5e1; padding-right: 16px;">
+                    <span style="font-size: 13px; font-weight: 700; color: #0f172a;">Center Windows Version (O9 &amp; O3):</span>
+                    <button id="btn-ef-smaller" class="toggle-btn active" onclick="setEastFacadeWindowOption('smaller')" style="font-weight: 600;">
+                        <span>🪟</span> Smaller windows (3 in a row • default)
+                    </button>
+                    <button id="btn-ef-bigger" class="toggle-btn" onclick="setEastFacadeWindowOption('bigger')" style="font-weight: 600;">
+                        <span>↔️</span> Bigger windows (2 in a row)
+                    </button>
+                    <span id="ef-window-opt-badge" class="badge accent" style="font-size: 11.5px; padding: 4px 10px;">
+                        Active: Smaller windows (90 mm inner pillars | O9 &amp; O3: 3×1,636.7 mm each = 6 panes in center)
+                    </span>
+                </div>
+                <div class="layer-toggles">
+                    <span style="font-size: 13px; font-weight: 600; color: #334155;">Display Layers:</span>
+                    <button id="toggleDims" class="toggle-btn active amber" onclick="toggleLayer('layer-dims', this)">
+                        <span>📏</span> Dimensions (Wymiary Y)
+                    </button>
+                    <button id="toggleLevels" class="toggle-btn active" onclick="toggleLayer('layer-levels', this)">
+                        <span>📐</span> Elevation Levels (Rzędne)
+                    </button>
+                    <button id="toggleShadows" class="toggle-btn active" onclick="toggleLayer('layer-shadows', this)">
+                        <span>⛅</span> 3D Depth Shadows
+                    </button>
+                </div>
+                <div style="font-size: 12px; color: #64748b; font-family: 'JetBrains Mono', monospace;">
+                    View: <strong>east_facade</strong> | Dir: <strong>north</strong> | Length: <strong>21,415 mm</strong> | Scale: 1:100
+                </div>
+            </div>
+
+            <!-- SVG Container -->
+            <div class="elevation-wrapper">
+                <svg class="elevation-svg" width="100%" height="760" viewBox="-360 -980 2840 1260" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <!-- Foreground Clinker Brick Pattern (Projecting Central Volume) -->
+                        <pattern id="brick-pattern" width="25" height="12" patternUnits="userSpaceOnUse">
+                            <rect width="25" height="12" fill="#383d47" />
+                            <line x1="0" y1="6" x2="25" y2="6" stroke="#252830" stroke-width="0.8" />
+                            <line x1="0" y1="12" x2="25" y2="12" stroke="#252830" stroke-width="0.8" />
+                            <line x1="12.5" y1="0" x2="12.5" y2="6" stroke="#252830" stroke-width="0.8" />
+                            <line x1="0" y1="6" x2="0" y2="12" stroke="#252830" stroke-width="0.8" />
+                            <line x1="25" y1="6" x2="25" y2="12" stroke="#252830" stroke-width="0.8" />
+                            <rect x="2" y="2" width="8" height="2" fill="#434955" opacity="0.35" />
+                            <rect x="14" y="8" width="8" height="2" fill="#2d313a" opacity="0.4" />
+                        </pattern>
+
+                        <!-- Darker Recessed Clinker Brick Pattern (Left & Right Recessed Ground-Floor Wings in the Back) -->
+                        <pattern id="brick-recessed-pattern" width="25" height="12" patternUnits="userSpaceOnUse">
+                            <rect width="25" height="12" fill="#252932" />
+                            <line x1="0" y1="6" x2="25" y2="6" stroke="#161920" stroke-width="0.8" />
+                            <line x1="0" y1="12" x2="25" y2="12" stroke="#161920" stroke-width="0.8" />
+                            <line x1="12.5" y1="0" x2="12.5" y2="6" stroke="#161920" stroke-width="0.8" />
+                            <line x1="0" y1="6" x2="0" y2="12" stroke="#161920" stroke-width="0.8" />
+                            <line x1="25" y1="6" x2="25" y2="12" stroke="#161920" stroke-width="0.8" />
+                        </pattern>
+
+                        <!-- Vertical Natural Timber Slat Cladding Pattern (Upper Floor) -->
+                        <pattern id="wood-slats-pattern" width="8" height="40" patternUnits="userSpaceOnUse">
+                            <rect width="8" height="40" fill="#cbb497" />
+                            <rect x="0" y="0" width="6.5" height="40" fill="#d8c5ab" />
+                            <line x1="6.5" y1="0" x2="6.5" y2="40" stroke="#8a7356" stroke-width="0.7" />
+                            <line x1="7.5" y1="0" x2="7.5" y2="40" stroke="#5d4c38" stroke-width="0.8" />
+                            <line x1="2" y1="0" x2="2" y2="40" stroke="#eedec9" stroke-width="0.5" opacity="0.4" />
+                        </pattern>
+
+                        <!-- Cross-Hatched Earth / Subgrade Pattern matching architectural drawing -->
+                        <pattern id="earth-hatch" width="10" height="10" patternUnits="userSpaceOnUse">
+                            <rect width="10" height="10" fill="#e2e8f0" />
+                            <line x1="0" y1="10" x2="10" y2="0" stroke="#64748b" stroke-width="0.8" opacity="0.55" />
+                            <line x1="0" y1="0" x2="10" y2="10" stroke="#64748b" stroke-width="0.8" opacity="0.55" />
+                        </pattern>
+
+                        <!-- Metal Fascia / Attica Gradient (Foreground Projecting Volume) -->
+                        <linearGradient id="fascia-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#222731" />
+                            <stop offset="50%" stop-color="#181b22" />
+                            <stop offset="100%" stop-color="#0d0f14" />
+                        </linearGradient>
+
+                        <!-- Darker Metal Fascia Gradient for Recessed Left & Right Wings -->
+                        <linearGradient id="fascia-recessed-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#161a22" />
+                            <stop offset="50%" stop-color="#101319" />
+                            <stop offset="100%" stop-color="#080a0d" />
+                        </linearGradient>
+
+                        <!-- Lateral 3D Depth Shadow Gradients Cast by Projecting Center Block -->
+                        <linearGradient id="left-wing-shadow-grad" x1="100%" y1="0%" x2="0%" y2="0%">
+                            <stop offset="0%" stop-color="#000000" stop-opacity="0.52" />
+                            <stop offset="60%" stop-color="#000000" stop-opacity="0.22" />
+                            <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+                        </linearGradient>
+
+                        <linearGradient id="right-wing-shadow-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#000000" stop-opacity="0.52" />
+                            <stop offset="60%" stop-color="#000000" stop-opacity="0.22" />
+                            <stop offset="100%" stop-color="#000000" stop-opacity="0" />
+                        </linearGradient>
+
+                        <!-- Glass Glazing Gradient (Reflective Tinted Glass) -->
+                        <linearGradient id="glass-glare" x1="20%" y1="0%" x2="80%" y2="100%">
+                            <stop offset="0%" stop-color="#7dd3fc" stop-opacity="0.38" />
+                            <stop offset="35%" stop-color="#0284c7" stop-opacity="0.28" />
+                            <stop offset="70%" stop-color="#1e293b" stop-opacity="0.42" />
+                            <stop offset="100%" stop-color="#0f172a" stop-opacity="0.62" />
+                        </linearGradient>
+
+                        <!-- Soft Drop Shadow Filter -->
+                        <filter id="shadow" x="-5%" y="-5%" width="110%" height="120%">
+                            <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#000000" flood-opacity="0.4" />
+                        </filter>
+                    </defs>
+
+                    <!-- ==================================== -->
+                    <!-- ENVIRONMENT & BACKGROUND SILHOUETTE -->
+                    <!-- ==================================== -->
+                    <rect x="-360" y="-980" width="2840" height="1260" fill="#f8fafc" />
+
+                    <!-- Pine Trees Silhouette (Izabelin Forest) -->
+                    <g id="pine-trees" opacity="0.14" fill="#1e293b">
+                        <polygon points="-300,2 -280,-650 -260,2" />
+                        <polygon points="-240,2 -220,-720 -200,2" />
+                        <polygon points="-170,2 -150,-580 -130,2" />
+                        <polygon points="1080,-688 1095,-850 1110,-688" />
+                        <polygon points="1640,-688 1655,-870 1670,-688" />
+                        <polygon points="2220,2 2240,-680 2260,2" />
+                        <polygon points="2280,2 2295,-730 2310,2" />
+                        <polygon points="2340,2 2360,-760 2380,2" />
+                    </g>
+
+                    <!-- Ground / Terrace Grade Line (-0.02 m = Y: 2) -->
+                    <g id="ground-plane">
+                        <rect x="-360" y="2" width="2840" height="42" fill="url(#earth-hatch)" />
+                        <line x1="-360" y1="2" x2="2480" y2="2" stroke="#0f172a" stroke-width="2.5" />
+                        <rect x="-360" y="44" width="2840" height="220" fill="#f1f5f9" />
+                        <line x1="-360" y1="44" x2="2480" y2="44" stroke="#94a3b8" stroke-width="1" />
+                    </g>
+
+                    <!-- ==================================== -->
+                    <!-- GROUND FLOOR ELEVATION (PARTER) -->
+                    <!-- Wall height from -0.02m (Y=2) to +2.80m (Y=-280) -->
+                    <!-- Overall length: 21,415 mm (X = 0 to 2141.5) -->
+                    <!-- 1) Left Recessed South Wing (IN THE BACK): X = 0 to 952.5 (9,525 mm) -->
+                    <!-- 2) Right Recessed North Wing (IN THE BACK): X = 1831.5 to 2141.5 (3,100 mm) -->
+                    <!-- 3) Center Projecting Two-Story Volume (IN FRONT): X = 952.5 to 1831.5 (8,790 mm) -->
+                    <!-- ==================================== -->
+                    <g id="ground-floor-facade">
+                        <!-- 1. LEFT RECESSED GROUND-FLOOR WING (South Wing, 0 to 9,525 mm — IN THE BACK) -->
+                        <g id="ground-left-recessed-wing">
+                            <rect x="0" y="-280" width="952.5" height="282" fill="url(#brick-recessed-pattern)" stroke="#181b20" stroke-width="1.5" onclick="showElementDetails('LEFT_RECESSED_WING')" class="interactive-element" />
+
+                            <!-- Dynamic Window Component: O6b (3-pane HST sliding door, 5580×2800 mm, hp=0 mm, 90 mm pillars) -->
+                            <g data-window-component="O6b" data-view-id="east_facade" data-window-style="exterior" id="facade-window-O6b"></g>
+
+                            <!-- Dynamic Window Component: O6a (high clerestory ribbon window, 1805×740 mm, hp=2060 mm) -->
+                            <g data-window-component="O6a" data-view-id="east_facade" data-window-style="exterior" id="facade-window-O6a"></g>
+
+                            <!-- Subtle Depth Veil indicating Left Wing is Recessed in the Back -->
+                            <rect x="0" y="-280" width="952.5" height="282" fill="#0f172a" opacity="0.16" pointer-events="none" />
+                        </g>
+
+                        <!-- 2. RIGHT RECESSED GROUND-FLOOR WING (North Wing, 18,315 to 21,415 mm — IN THE BACK) -->
+                        <g id="ground-right-recessed-wing">
+                            <rect x="1831.5" y="-280" width="310" height="282" fill="url(#brick-recessed-pattern)" stroke="#181b20" stroke-width="1.5" onclick="showElementDetails('RIGHT_RECESSED_WING')" class="interactive-element" />
+
+                            <!-- Exterior Vent / Technical Box near Top Right of Right Recessed Wing (matching drawing) -->
+                            <rect x="2058" y="-263" width="38" height="24" fill="#cbd5e1" stroke="#334155" stroke-width="1.2" />
+
+                            <!-- Subtle Depth Veil indicating Right Wing is Recessed in the Back -->
+                            <rect x="1831.5" y="-280" width="310" height="282" fill="#0f172a" opacity="0.16" pointer-events="none" />
+                        </g>
+
+                        <!-- 3. CENTER PROJECTING GROUND-FLOOR VOLUME (Main East Wall, 9,525 to 18,315 mm — IN FRONT) -->
+                        <g id="ground-center-front-volume">
+                            <rect x="952.5" y="-280" width="879" height="282" fill="url(#brick-pattern)" stroke="#0f172a" stroke-width="2.2" filter="url(#shadow)" onclick="showElementDetails('CENTER_FRONT_VOLUME')" class="interactive-element" />
+                            <!-- Vertical corner lines at X = 952.5 (left step) and X = 1831.5 (right step) -->
+                            <line x1="952.5" y1="-280" x2="952.5" y2="2" stroke="#0f172a" stroke-width="2.5" />
+                            <line x1="1831.5" y1="-280" x2="1831.5" y2="2" stroke="#0f172a" stroke-width="2.5" />
+
+                            <!-- Dynamic Window Component: O3 (Living room tall glazing, 4910×2800 mm, hp=0 mm, 90 mm pillars) -->
+                            <g data-window-component="O3" data-view-id="east_facade" data-window-style="exterior" id="facade-window-O3"></g>
+                        </g>
+                    </g>
+
+                    <!-- ==================================== -->
+                    <!-- INTERMEDIATE CORNICE (GZYMS POŚREDNI) -->
+                    <!-- Level: +2.80m (Y=-280) to +3.43m (Y=-343) = 630 mm high -->
+                    <!-- Recessed Left Wing (-10 to 952.5), Projecting Center (952.5 to 1831.5), Recessed Right Wing (1831.5 to 2151.5) -->
+                    <!-- ==================================== -->
+                    <g id="intermediate-cornice" class="interactive-element" onclick="showElementDetails('CORNICE')">
+                        <!-- Left Recessed Wing Cornice (-10 to 952.5) -->
+                        <rect x="-10" y="-280" width="962.5" height="6" fill="#090b0e" />
+                        <polygon points="-10,-343 952.5,-343 952.5,-280 -10,-280" fill="url(#fascia-recessed-gradient)" stroke="#0a0c10" stroke-width="1.4" />
+                        <line x1="0" y1="-343" x2="0" y2="-280" stroke="#2d3748" stroke-width="1.2" />
+                        <line x1="115" y1="-343" x2="115" y2="-280" stroke="#2d3748" stroke-width="1" />
+                        <line x1="230" y1="-343" x2="230" y2="-280" stroke="#2d3748" stroke-width="1" />
+                        <line x1="345" y1="-343" x2="345" y2="-280" stroke="#2d3748" stroke-width="1" />
+                        <line x1="460" y1="-343" x2="460" y2="-280" stroke="#2d3748" stroke-width="1" />
+                        <line x1="575" y1="-343" x2="575" y2="-280" stroke="#2d3748" stroke-width="1" />
+                        <line x1="690" y1="-343" x2="690" y2="-280" stroke="#2d3748" stroke-width="1" />
+                        <line x1="805" y1="-343" x2="805" y2="-280" stroke="#2d3748" stroke-width="1" />
+                        <line x1="920" y1="-343" x2="920" y2="-280" stroke="#2d3748" stroke-width="1" />
+
+                        <!-- Right Recessed Wing Cornice (1831.5 to 2151.5) -->
+                        <rect x="1831.5" y="-280" width="320" height="6" fill="#090b0e" />
+                        <polygon points="1831.5,-343 2151.5,-343 2151.5,-280 1831.5,-280" fill="url(#fascia-recessed-gradient)" stroke="#0a0c10" stroke-width="1.4" />
+                        <line x1="1910" y1="-343" x2="1910" y2="-280" stroke="#2d3748" stroke-width="1" />
+                        <line x1="1990" y1="-343" x2="1990" y2="-280" stroke="#2d3748" stroke-width="1" />
+                        <line x1="2070" y1="-343" x2="2070" y2="-280" stroke="#2d3748" stroke-width="1" />
+                        <line x1="2141.5" y1="-343" x2="2141.5" y2="-280" stroke="#2d3748" stroke-width="1.2" />
+
+                        <!-- Center Projecting Volume Cornice (952.5 to 1831.5 — IN FRONT) -->
+                        <rect x="952.5" y="-280" width="879" height="6" fill="#090b0e" />
+                        <polygon points="952.5,-343 1831.5,-343 1831.5,-280 952.5,-280" fill="url(#fascia-gradient)" stroke="#0a0c10" stroke-width="1.8" filter="url(#shadow)" />
+                        <line x1="952.5" y1="-343" x2="1831.5" y2="-343" stroke="#64748b" stroke-width="1.4" />
+                        <line x1="952.5" y1="-343" x2="952.5" y2="-280" stroke="#0f172a" stroke-width="2.2" />
+                        <line x1="1040" y1="-343" x2="1040" y2="-280" stroke="#334155" stroke-width="1" />
+                        <line x1="1150" y1="-343" x2="1150" y2="-280" stroke="#334155" stroke-width="1" />
+                        <line x1="1260" y1="-343" x2="1260" y2="-280" stroke="#334155" stroke-width="1" />
+                        <line x1="1370" y1="-343" x2="1370" y2="-280" stroke="#334155" stroke-width="1" />
+                        <line x1="1481.5" y1="-343" x2="1481.5" y2="-280" stroke="#334155" stroke-width="1" />
+                        <line x1="1595" y1="-343" x2="1595" y2="-280" stroke="#334155" stroke-width="1" />
+                        <line x1="1710" y1="-343" x2="1710" y2="-280" stroke="#334155" stroke-width="1" />
+                        <line x1="1831.5" y1="-343" x2="1831.5" y2="-280" stroke="#0f172a" stroke-width="2.2" />
+                    </g>
+
+                    <!-- ==================================== -->
+                    <!-- UPPER FLOOR ELEVATION (PIĘTRO — ONLY OVER CENTER VOLUME) -->
+                    <!-- Wall height from +3.43m (Y=-343) to +6.13m (Y=-613) = 2,700 mm -->
+                    <!-- Span: X = 952.5 to 1831.5 (8,790 mm) -->
+                    <!-- ==================================== -->
+                    <g id="upper-timber-facade">
+                        <!-- Timber Wall Body across Central Two-Story Block (952.5 to 1831.5) -->
+                        <rect x="952.5" y="-613" width="879" height="270" fill="url(#wood-slats-pattern)" stroke="#8a7356" stroke-width="1.8" onclick="showElementDetails('TIMBER_WALL')" class="interactive-element" />
+
+                        <!-- Dynamic Window Component: O9 (Upper East Bedroom tall glazing, 4910×2700 mm, hp=0 mm, 90 mm pillars) -->
+                        <g data-window-component="O9" data-view-id="east_facade" data-window-style="exterior" id="facade-window-O9"></g>
+
+                        <!-- Dynamic Window Component: O14b (Upper Covered Terrace door D1 + window O14b, 2635×2700 mm) -->
+                        <g data-window-component="O14b" data-view-id="east_facade" data-window-style="exterior" id="facade-window-O14b"></g>
+
+                        <!-- Glass Balustrade in front of Covered Upper Terrace (min. 90 cm = 90px high from -343 to -433, across X = 1530 to 1793.5) -->
+                        <g id="upper-terrace-balustrade" pointer-events="none">
+                            <rect x="1530" y="-433" width="263.5" height="90" fill="#bae6fd" fill-opacity="0.18" stroke="#475569" stroke-width="1.5" />
+                            <line x1="1530" y1="-433" x2="1793.5" y2="-433" stroke="#1e293b" stroke-width="2.5" />
+                        </g>
+                    </g>
+
+                    <!-- ==================================== -->
+                    <!-- MAIN ROOF OVERHANG & ATTICA CORNICE -->
+                    <!-- Level: +6.13m (Y=-613) to +6.88m (Y=-688) = 750 mm high -->
+                    <!-- Overhang: 300 mm on Left (X=922.5) and Right (X=1861.5) of Center Two-Story Block -->
+                    <!-- Chimney at X = 1390 to 1480, Top at +7.26m (Y=-726) -->
+                    <!-- ==================================== -->
+                    <g id="main-roof-structure" class="interactive-element" onclick="showElementDetails('ROOF')">
+                        <!-- Roof Chimney / Ventilation Shaft (at +7.26m, X = 1390 to 1480) -->
+                        <rect x="1390" y="-726" width="90" height="38" fill="#e2e8f0" stroke="#0f172a" stroke-width="1.5" />
+                        <rect x="1385" y="-730" width="100" height="5" fill="#0f172a" />
+
+                        <!-- Cantilevered Roof Slab over Center Block (X = 922.5 to 1861.5, Y = -688 to -613) -->
+                        <polygon points="922.5,-688 1861.5,-688 1861.5,-613 952.5,-613 922.5,-638" fill="url(#fascia-gradient)" stroke="#0a0c10" stroke-width="2" filter="url(#shadow)" />
+
+                        <!-- Fascia panel joint reveals matching drawing -->
+                        <line x1="952.5" y1="-688" x2="952.5" y2="-613" stroke="#2d3748" stroke-width="1.2" />
+                        <line x1="1040" y1="-688" x2="1040" y2="-613" stroke="#2d3748" stroke-width="1" />
+                        <line x1="1150" y1="-688" x2="1150" y2="-613" stroke="#2d3748" stroke-width="1" />
+                        <line x1="1260" y1="-688" x2="1260" y2="-613" stroke="#2d3748" stroke-width="1" />
+                        <line x1="1370" y1="-688" x2="1370" y2="-613" stroke="#2d3748" stroke-width="1" />
+                        <line x1="1481.5" y1="-688" x2="1481.5" y2="-613" stroke="#2d3748" stroke-width="1" />
+                        <line x1="1595" y1="-688" x2="1595" y2="-613" stroke="#2d3748" stroke-width="1" />
+                        <line x1="1710" y1="-688" x2="1710" y2="-613" stroke="#2d3748" stroke-width="1" />
+                        <line x1="1831.5" y1="-688" x2="1831.5" y2="-613" stroke="#2d3748" stroke-width="1.2" />
+                    </g>
+
+                    <!-- Depth Shadows Layer -->
+                    <g id="layer-shadows" pointer-events="none">
+                        <!-- 3D Lateral Depth Shadow cast by Center Projecting Block (X=952.5..1831.5) onto Left Recessed Wing (X=875..952.5) -->
+                        <rect x="875" y="-343" width="77.5" height="345" fill="url(#left-wing-shadow-grad)" />
+                        <!-- 3D Lateral Depth Shadow cast by Center Projecting Block (X=952.5..1831.5) onto Right Recessed Wing (X=1831.5..1909) -->
+                        <rect x="1831.5" y="-343" width="77.5" height="345" fill="url(#right-wing-shadow-grad)" />
+
+                        <!-- Roof overhang soffit shadow on upper floor -->
+                        <rect x="952.5" y="-613" width="879" height="24" fill="#000000" opacity="0.35" />
+                        <!-- Deeper shadow inside recessed upper terrace (X=1530 to 1793.5) -->
+                        <rect x="1530" y="-613" width="263.5" height="38" fill="#000000" opacity="0.28" />
+
+                        <!-- Intermediate cornice shadow on ground floor walls -->
+                        <rect x="0" y="-280" width="952.5" height="18" fill="#000000" opacity="0.38" />
+                        <rect x="952.5" y="-280" width="879" height="15" fill="#000000" opacity="0.26" />
+                        <rect x="1831.5" y="-280" width="310" height="18" fill="#000000" opacity="0.38" />
+                    </g>
+
+                    <!-- ==================================== -->
+                    <!-- LAYER: DIMENSIONS (WYMIARY) -->
+                    <!-- ==================================== -->
+                    <g id="layer-dims">
+                        <!-- VERTICAL REFERENCE LINE FOR POINT 0 / AXIS A (290 mm from Right Edge: Screen X = 21,125 mm / SVG x = 2112.5) -->
+                        <g id="point-zero-reference">
+                            <line x1="2112.5" y1="-895" x2="2112.5" y2="235" stroke="#ef4444" stroke-width="1.8" stroke-dasharray="6 3" opacity="0.9" />
+
+                            <!-- Top Architectural Axis A Bubble (Oś A / Axis A = Point 0) -->
+                            <circle cx="2112.5" cy="-912" r="16" fill="#ef4444" stroke="#ffffff" stroke-width="2" />
+                            <text x="2112.5" y="-912" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="800" fill="#ffffff" text-anchor="middle" dominant-baseline="central">A</text>
+
+                            <!-- Lower Level Point 0 / Axis A Offset (290 mm from right edge at X = 2141.5) -->
+                            <line x1="2141.5" y1="2" x2="2141.5" y2="66" stroke="#ef4444" stroke-width="1" stroke-dasharray="2 2" opacity="0.85" />
+                            <line x1="2112.5" y1="52" x2="2141.5" y2="52" stroke="#ef4444" stroke-width="1.8" />
+                            <line x1="2112.5" y1="45" x2="2112.5" y2="59" stroke="#ef4444" stroke-width="1.8" />
+                            <line x1="2141.5" y1="45" x2="2141.5" y2="59" stroke="#ef4444" stroke-width="1.8" />
+                            <rect x="2108.5" y="27" width="37" height="17" rx="3" fill="#fef2f2" stroke="#ef4444" stroke-width="1" />
+                            <text x="2127" y="39" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="800" fill="#b91c1c" text-anchor="middle">290</text>
+                        </g>
+
+                        <!-- TIER 1 (TOP): TOTAL EAST FACADE WIDTH (21,415 mm) at Y = -840 -->
+                        <g transform="translate(0, -840)">
+                            <line x1="0" y1="0" x2="0" y2="497" stroke="#d97706" stroke-width="0.8" stroke-dasharray="3 3" opacity="0.55" />
+                            <line x1="952.5" y1="0" x2="952.5" y2="152" stroke="#d97706" stroke-width="0.8" stroke-dasharray="3 3" opacity="0.55" />
+                            <line x1="1831.5" y1="0" x2="1831.5" y2="152" stroke="#d97706" stroke-width="0.8" stroke-dasharray="3 3" opacity="0.55" />
+                            <line x1="2141.5" y1="0" x2="2141.5" y2="497" stroke="#d97706" stroke-width="0.8" stroke-dasharray="3 3" opacity="0.55" />
+                            <line x1="0" y1="0" x2="2141.5" y2="0" class="dim-solid" />
+                            <line x1="0" y1="-10" x2="0" y2="10" class="tick" />
+                            <line x1="2141.5" y1="-10" x2="2141.5" y2="10" class="tick" />
+                            <rect x="920.75" y="-14" width="300" height="22" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5" rx="4" />
+                            <text x="1070.75" y="2" class="dim-text" font-size="13.5" font-weight="800" fill="#b45309">21 415 mm (21.415 m | South → North)</text>
+                        </g>
+
+                        <!-- TIER 2: UPPER FLOOR OPENINGS & MASSING ZONES at Y = -765 -->
+                        <g id="ef-upper-dims-group" transform="translate(0, -765)">
+                            <!-- Populated & synchronized dynamically by updateEastFacadeDimensions() -->
+                        </g>
+
+                        <!-- TIER 3 (BOTTOM): GROUND FLOOR OPENINGS & PIERS at Y = +115 -->
+                        <g id="ef-ground-dims-group" transform="translate(0, 115)">
+                            <!-- Populated & synchronized dynamically by updateEastFacadeDimensions() -->
+                        </g>
+                    </g>
+
+                    <!-- ==================================== -->
+                    <!-- LAYER: VERTICAL ELEVATION LEVELS -->
+                    <!-- ==================================== -->
+                    <g id="layer-levels">
+                        <!-- Chimney Level Annotation (+7.26 m) directly above chimney as in attached drawing -->
+                        <g transform="translate(1480, -726)">
+                            <line x1="-90" y1="0" x2="55" y2="0" class="level-marker" />
+                            <polygon points="12,0 2,-10 22,-10" fill="none" stroke="var(--level-color)" stroke-width="1.2" />
+                            <line x1="12" y1="-10" x2="12" y2="-24" class="level-marker" />
+                            <text x="16" y="-14" class="level-text">+7,26</text>
+                        </g>
+
+                        <!-- UPPER FLOOR LEFT LEVEL ANNOTATIONS (at Left Edge of Center Block, matching drawing) -->
+                        <g transform="translate(835, -688)">
+                            <line x1="0" y1="0" x2="87.5" y2="0" class="level-marker" stroke-dasharray="3 2" />
+                            <polygon points="14,0 4,-10 24,-10" fill="none" stroke="var(--level-color)" stroke-width="1.2" />
+                            <line x1="14" y1="-10" x2="14" y2="-24" class="level-marker" />
+                            <text x="18" y="-14" class="level-text">+6,88</text>
+                        </g>
+                        <g transform="translate(835, -613)">
+                            <line x1="0" y1="0" x2="117.5" y2="0" class="level-marker" stroke-dasharray="3 2" />
+                            <polygon points="14,0 4,10 24,10" fill="none" stroke="var(--level-color)" stroke-width="1.2" />
+                            <line x1="14" y1="10" x2="14" y2="24" class="level-marker" />
+                            <text x="18" y="22" class="level-text">+6,13</text>
+                        </g>
+
+                        <!-- UPPER FLOOR RIGHT LEVEL ANNOTATIONS (at Right Edge of Center Block, matching drawing) -->
+                        <g transform="translate(1945, -688)">
+                            <line x1="-83.5" y1="0" x2="45" y2="0" class="level-marker" stroke-dasharray="3 2" />
+                            <polygon points="14,0 4,-10 24,-10" fill="none" stroke="var(--level-color)" stroke-width="1.2" />
+                            <line x1="14" y1="-10" x2="14" y2="-24" class="level-marker" />
+                            <text x="18" y="-14" class="level-text">+6,88</text>
+                        </g>
+                        <g transform="translate(1945, -613)">
+                            <line x1="-113.5" y1="0" x2="45" y2="0" class="level-marker" stroke-dasharray="3 2" />
+                            <polygon points="14,0 4,10 24,10" fill="none" stroke="var(--level-color)" stroke-width="1.2" />
+                            <line x1="14" y1="10" x2="14" y2="24" class="level-marker" />
+                            <text x="18" y="22" class="level-text">+6,13</text>
+                        </g>
+
+                        <!-- LEFT MARGIN LEVEL ANNOTATIONS (South Side, matching attached drawing) -->
+                        <!-- +3.43m Top of Intermediate Cornice -->
+                        <g transform="translate(-210, -343)">
+                            <line x1="0" y1="0" x2="200" y2="0" class="level-marker" stroke="#d97706" stroke-width="1.4" stroke-dasharray="3 2" />
+                            <polygon points="0,0 16,-7 16,7" fill="#d97706" />
+                            <text x="-10" y="4" class="level-text" font-weight="700" fill="#d97706" text-anchor="end">+3,43</text>
+                            <text x="24" y="-5" class="level-label" font-weight="600" fill="#b45309">Gzyms pośredni (Wierzch / Próg O9, O14b)</text>
+                        </g>
+
+                        <!-- +2.80m Bottom of Intermediate Cornice / Ground Floor Lintel -->
+                        <g transform="translate(-210, -280)">
+                            <line x1="0" y1="0" x2="200" y2="0" class="level-marker" stroke="#d97706" stroke-width="1.4" stroke-dasharray="3 2" />
+                            <polygon points="0,0 16,-7 16,7" fill="#d97706" />
+                            <text x="-10" y="4" class="level-text" font-weight="700" fill="#d97706" text-anchor="end">+2,80</text>
+                            <text x="24" y="-5" class="level-label" font-weight="600" fill="#b45309">Gzyms pośredni (Spód / Nadproże parteru)</text>
+                        </g>
+
+                        <!-- +2.06m Clerestory Window O6a Sill (hp=206cm) -->
+                        <g transform="translate(-210, -206)">
+                            <line x1="0" y1="0" x2="210" y2="0" class="level-marker" stroke="#f59e0b" stroke-dasharray="2 2" opacity="0.8" />
+                            <polygon points="0,0 14,-6 14,6" fill="#f59e0b" />
+                            <text x="-10" y="4" class="level-text" fill="#b45309" text-anchor="end">+2,06</text>
+                            <text x="24" y="-5" class="level-label" fill="#92400e">Parapet okna O6a (hp=206 cm)</text>
+                        </g>
+
+                        <!-- -0.02m Exterior Ground / Terrace Level -->
+                        <g transform="translate(-210, 2)">
+                            <line x1="0" y1="0" x2="210" y2="0" class="level-marker" stroke-width="1.4" stroke-dasharray="3 2" />
+                            <polygon points="0,0 16,-7 16,7" fill="var(--level-color)" />
+                            <text x="-10" y="4" class="level-text" text-anchor="end">-0,02</text>
+                            <text x="24" y="-5" class="level-label">Poziom terenu / Taras ogrodowy</text>
+                        </g>
+                    </g>
+                </svg>
+            </div>
+
+            <!-- Dynamic Detail Drawer / Info Card -->
+            <div id="element-detail-card" class="info-panel" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                    <div>
+                        <h3 id="detail-title" style="margin: 0 0 4px 0; font-size: 18px; color: #0f172a;">Element Details</h3>
+                        <p id="detail-subtitle" style="margin: 0; font-size: 13px; color: #64748b;">Technical &amp; Architectural Specifications</p>
+                    </div>
+                    <button onclick="document.getElementById('element-detail-card').style.display='none'" style="background: none; border: none; font-size: 20px; cursor: pointer; color: #94a3b8;">&times;</button>
+                </div>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h4>📏 Exact Dimensions</h4>
+                        <p id="detail-dims">-</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>📍 Plan Position &amp; Room</h4>
+                        <p id="detail-room">-</p>
+                    </div>
+                    <div class="info-card">
+                        <h4>🎨 Materials &amp; Specifications</h4>
+                        <p id="detail-specs">-</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 2: REFERENCE DRAWING & HOTSPOTS -->
+        <!-- ========================================== -->
+        <div id="TabDrawing" class="tab-content">
+            <div class="photo-tab-container">
+                <div class="photo-viewer-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; color: white;">
+                        <div>
+                            <h3 style="margin: 0 0 4px 0; font-size: 16px; font-weight: 600;">Official Architectural Drawing — East Facade (Elewacja Wschodnia)</h3>
+                            <p style="margin: 0; font-size: 12px; color: #94a3b8;">Hover or click the numbered markers on the source architectural drawing to inspect each opening and recessed/projecting massing zone.</p>
+                        </div>
+                        <span class="badge" style="background: rgba(255,255,255,0.1); color: #e2e8f0; border: none;">Source: Architectural Elevation</span>
+                    </div>
+
+                    <div class="photo-wrapper">
+                        <img src="east_facade_drawing.png" alt="East Facade Architectural Elevation Drawing">
+
+                        <!-- Hotspot 1: O6b Left Recessed Wing HST Door -->
+                        <div class="hotspot" style="top: 76%; left: 23.2%;" onclick="showElementDetails('O6b')">
+                            1
+                            <div class="hotspot-tooltip">
+                                <strong>1. HST Terrace Glazing O6b (0.10 Siłownia — Recessed Wing)</strong><br>
+                                Width: 5,640 mm | Height: 2,800 mm (hp = 0 mm, 200 mm left pier)<br>
+                                3 × 1,820 mm panes + 2 × 90 mm inner pillars (middle sliding ←)
+                            </div>
+                        </div>
+
+                        <!-- Hotspot 2: O6a High Clerestory Window -->
+                        <div class="hotspot" style="top: 67%; left: 38.6%;" onclick="showElementDetails('O6a')">
+                            2
+                            <div class="hotspot-tooltip">
+                                <strong>2. Clerestory Window O6a (0.12 Komunikacja — Recessed Wing)</strong><br>
+                                Width: 1,760 mm | Height: 740 mm (hp = 2,060 mm, 250 mm from O6b)<br>
+                                Single fixed ribbon window on recessed South wing
+                            </div>
+                        </div>
+
+                        <!-- Hotspot 3: O9 Upper Center Tall Glazing -->
+                        <div class="hotspot" style="top: 43%; left: 59.8%;" onclick="showElementDetails('O9')">
+                            3
+                            <div class="hotspot-tooltip">
+                                <strong>3. Upper Center Window O9 (1.04 Sypialnia — Front Volume)</strong><br>
+                                Width: 5,090 mm | Height: 2,700 mm (hp = 0 mm, 200 mm left pier)<br>
+                                90 mm pillars: 3 parts (1,636.7 mm) in Smaller / 2 parts (2,500 mm) in Bigger
+                            </div>
+                        </div>
+
+                        <!-- Hotspot 4: O3 Ground Center Tall Glazing -->
+                        <div class="hotspot" style="top: 76%; left: 59.8%;" onclick="showElementDetails('O3')">
+                            4
+                            <div class="hotspot-tooltip">
+                                <strong>4. Ground Center Window O3 (0.11 Salon — Front Volume)</strong><br>
+                                Width: 5,090 mm | Height: 2,800 mm (hp = 0 mm, 200 mm left pier)<br>
+                                90 mm pillars: 3 parts (1,636.7 mm) in Smaller / 2 parts (2,500 mm) in Bigger
+                            </div>
+                        </div>
+
+                        <!-- Hotspot 5: O14b + D1 Upper Covered Terrace Glazing -->
+                        <div class="hotspot" style="top: 43%; left: 77.5%;" onclick="showElementDetails('O14b')">
+                            5
+                            <div class="hotspot-tooltip">
+                                <strong>5. Upper Terrace Glazing D1 + O14b (1.04 Sypialnia / Taras)</strong><br>
+                                Width: 2,635 mm (900 mm door D1 + 1,735 mm window O14b) | Height: 2,700 mm<br>
+                                Recessed behind covered upper terrace with 900 mm glass balustrade
+                            </div>
+                        </div>
+
+                        <!-- Hotspot 6: Right Recessed Ground-Floor Wing & Axis A -->
+                        <div class="hotspot" style="top: 76%; left: 90.0%;" onclick="showElementDetails('RIGHT_RECESSED_WING')">
+                            6
+                            <div class="hotspot-tooltip">
+                                <strong>6. Right Ground-Floor Wing (Recessed in Back) &amp; Axis A</strong><br>
+                                Width: 3,100 mm (18,315 – 21,415 mm) | In the back (no upper floor)<br>
+                                Point 0 / Axis A located 290 mm from right edge (at 21,125 mm)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 3: NORTHWARD COORDINATE LOGIC & MASSING DEPTH -->
+        <!-- ========================================== -->
+        <div id="TabOrientation" class="tab-content">
+            <div class="diagram-box">
+                <h3 style="margin: 0 0 8px 0; font-size: 18px; color: #0f172a;">Northward Coordinate Transformation (South &rarr; North) &amp; Axis A Reference</h3>
+                <p style="margin: 0 0 20px 0; font-size: 14px; color: #64748b;">
+                    Unlike the West Facade (which looks East and has <code>direction: "south"</code>), the East Facade looks <strong>West</strong> from the eastern garden and has <code>direction: "north"</code> (moving South to North from left to right).
+                </p>
+
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h4>🧭 1. View Definition (<code>east_facade</code>)</h4>
+                        <p>
+                            • <strong>Position on Map (Left Edge):</strong> <code>Y = 21,125 mm</code> (South Edge)<br>
+                            • <strong>Direction:</strong> <code>"north"</code> (Left-to-right moves South &rarr; North)<br>
+                            • <strong>Overall Length:</strong> <code>21,415 mm</code> (North Edge at <code>Y = -290 mm</code>)<br>
+                            • <strong>Point 0 / Axis A (Oś A, Y = 0):</strong> Located <code>290 mm</code> from the right edge (at Screen X = <code>21,125 mm</code>)<br>
+                            • <strong>Screen Formula:</strong> <code>localX = 21,125 - (win.y + win.width)</code>
+                        </p>
+                    </div>
+                    <div class="info-card">
+                        <h4>🎯 2. Three Depth Planes (Recessed Left &amp; Right vs. Center Front)</h4>
+                        <p>
+                            • <strong>Left Ground Wing (0 – 9,525 mm):</strong> No upper floor; recessed in the back (<code>X = 14,980 mm</code>). Sequence: <code>200 mm</code> left pier + <code>5,640 mm</code> <code>O6b</code> + <code>250 mm</code> pier + <code>1,760 mm</code> <code>O6a</code> + <code>1,675 mm</code> wall.<br>
+                            • <strong>Center 2-Story Volume (9,525 – 18,315 mm, width 8,790 mm):</strong> Projects forward in the front (<code>X = 0 mm</code> along Axis 6). Sequence: <code>200 mm</code> left pier + <code>5,090 mm</code> <code>O9</code>/<code>O3</code> + <code>3,500 mm</code> right zone.<br>
+                            • <strong>Right Ground Wing (18,315 – 21,415 mm, width 3,100 mm):</strong> No upper floor; recessed in the back. Contains Axis A <code>290 mm</code> from the right edge.
+                        </p>
+                    </div>
+                    <div class="info-card">
+                        <h4>🪟 3. Two Center Window Versions &amp; 90 mm Inner Pillars</h4>
+                        <p>
+                            • <strong>Smaller Windows (Default — 3 in a row):</strong> Both <code>O9</code> (upper) and <code>O3</code> (ground) are split into 3 equal symmetric panes of <code>1,636.7 mm</code> separated by <code>2 × 90 mm</code> inner window pillars (<code>5,090 mm</code> total width, 6 panes in center).<br>
+                            • <strong>Bigger Windows (2 in a row):</strong> Both <code>O9</code> and <code>O3</code> are split into 2 equal symmetric panes of <code>2,500 mm</code> separated by <code>1 × 90 mm</code> inner window pillar (<code>5,090 mm</code> total width, 4 panes in center).
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 4: WINDOW & OPENING SCHEDULE -->
+        <!-- ========================================== -->
+        <div id="TabSchedule" class="tab-content">
+            <div class="diagram-box">
+                <h3 style="margin: 0 0 8px 0; font-size: 18px; color: #0f172a;">East Facade Openings Schedule (Zestawienie Stolarki Elewacji Wschodniej)</h3>
+                <p style="margin: 0 0 20px 0; font-size: 14px; color: #64748b;">
+                    Complete schedule of all 5 window and terrace glazing assemblies on the East Facade (<code>21,415 mm</code> overall length). Values synchronize automatically with the active window version and live Architecture Database.
+                </p>
+
+                <div class="table-responsive">
+                    <table class="schedule-table">
+                        <thead>
+                            <tr>
+                                <th>Symbol</th>
+                                <th>Floor / Room &amp; Depth Plane</th>
+                                <th>Screen Offset (South → North)</th>
+                                <th>Global Y (from Axis A)</th>
+                                <th>Width (mm)</th>
+                                <th>Height (mm)</th>
+                                <th>Sill (hp)</th>
+                                <th>Sashes &amp; 90 mm Pillar Configuration</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ef-schedule-tbody">
+                            <!-- Populated dynamically from WindowStore -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Building Architectural Data & Dynamic Window Components -->
+    <script src="data/windows.js"></script>
+    <script src="js/window-store.js"></script>
+    <script src="js/coordinate-service.js"></script>
+    <script src="js/window-component.js"></script>
+    <script src="js/window-editor-modal.js"></script>
+    <script>
+        let currentSelectedKey = null;
+        let currentEastWindowMode = 'smaller';
+
+        function openTab(evt, tabName) {
+            const tabcontent = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+            const tablinks = document.getElementsByClassName("tab-link");
+            for (let i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+            document.getElementById(tabName).classList.add("active");
+            if (evt && evt.currentTarget) {
+                evt.currentTarget.classList.add("active");
+            }
+        }
+
+        function toggleLayer(layerId, btn) {
+            const layer = document.getElementById(layerId);
+            if (!layer) return;
+            if (layer.style.display === "none") {
+                layer.style.display = "inline";
+                btn.classList.add("active");
+            } else {
+                layer.style.display = "none";
+                btn.classList.remove("active");
+            }
+        }
+
+        const elementData = {
+            'O6b': {
+                title: 'HST Terrace Glazing O6b — Ground Floor Gym Wing (0.10 Siłownia — Recessed in Back)',
+                subtitle: 'Three-Panel Full-Height HST Sliding Door (3 × 1,820 mm + 2 × 90 mm Inner Pillars = 5,640 mm)',
+                dims: 'Width: 5,640 mm (3 × 1,820 mm + 2 × 90 mm pillars) | Height: 2,800 mm | Sill: hp = 0 mm (±0.00 m) | Screen X: 200 to 5,840 mm | Global Y: 15,285 mm',
+                room: 'Ground Floor, Room 0.10 (Siłownia) on the Left (South) Ground-Floor Wing (200 mm from the South edge), which has no upper floor and is recessed in the back.',
+                specs: 'Heavy-duty aluminum HST lift-and-slide terrace door with 90 mm solid inner window pillars and middle sliding sash (←).'
+            },
+            'O6a': {
+                title: 'Clerestory Window O6a — Ground Floor Corridor (0.12 Komunikacja — Recessed in Back)',
+                subtitle: 'Single-Pane High Clerestory Ribbon Window (1,760 × 740 mm, hp = 2,060 mm)',
+                dims: 'Width: 1,760 mm | Height: 740 mm | Sill: hp = 2,060 mm (+2.06 m) | Head: +2.80 m | Screen X: 6,090 to 7,850 mm | Global Y: 13,275 mm',
+                room: 'Ground Floor, Room 0.12 (Komunikacja) on the Left (South) Recessed Ground-Floor Wing, positioned 250 mm right of O6b and 1,675 mm left of the projecting central volume.',
+                specs: 'Triple-pane insulated glass unit (Ug=0.5 W/m²K) in matte anthracite aluminum fixed clerestory frame (RAL 7016).'
+            },
+            'O3': {
+                title: 'Window O3 — Ground Floor Living Room (0.11 Salon — Projecting Center Volume)',
+                subtitle: 'Three-Panel Full-Height Glazing (3 × 1,636.7 mm + 2 × 90 mm Inner Pillars = 5,090 mm)',
+                dims: 'Width: 5,090 mm | Height: 2,800 mm | Sill: hp = 0 mm (±0.00 m) | Head: +2.80 m | Screen X: 9,725 to 14,815 mm | Global Y: 6,310 mm',
+                room: 'Ground Floor, Eastern Living Room (0.11 Salon) on the projecting central two-story volume (200 mm from the left step corner). Vertically aligned with upper bedroom window O9.',
+                specs: 'Full-height panoramic glazing with 90 mm inner window pillars: 3 equal panes of 1,636.7 mm in Smaller windows (default), or 2 equal panes of 2,500 mm in Bigger windows.'
+            },
+            'O9': {
+                title: 'Window O9 — Upper Floor East Bedroom (1.04 Sypialnia — Projecting Center Volume)',
+                subtitle: 'Three-Panel Full-Height Glazing (3 × 1,636.7 mm + 2 × 90 mm Inner Pillars = 5,090 mm)',
+                dims: 'Width: 5,090 mm | Height: 2,700 mm | Sill: hp = 0 mm (+3.43 m) | Head: +6.13 m | Screen X: 9,725 to 14,815 mm | Global Y: 6,310 mm',
+                room: 'First Floor, Eastern Bedroom (1.04 Sypialnia) on the projecting central two-story volume (200 mm from the left step corner). Vertically aligned with ground floor living room window O3.',
+                specs: 'Full-height safety tempered & laminated glazing (VSG/ESG) with 90 mm inner window pillars: 3 equal panes of 1,636.7 mm in Smaller windows (default), or 2 equal panes of 2,500 mm in Bigger windows.'
+            },
+            'O14b': {
+                title: 'Terrace Glazing D1 + O14b — Upper Covered Terrace (1.04 Sypialnia / Taras)',
+                subtitle: 'Tilt-and-Turn Terrace Door D1 (900 mm) + Fixed Panoramic Window O14b (1,735 mm) = 2,635 mm',
+                dims: 'Width: 2,635 mm (900 mm left sash + 1,735 mm right sash) | Height: 2,700 mm | Sill: +3.43 m | Screen X: 15,300 to 17,935 mm | Global Y: 3,190 mm',
+                room: 'First Floor, Eastern Bedroom (1.04) opening onto the covered North-East corner terrace (17.3 m²), flanked by a 485 mm timber pier on the left and a 380 mm corner post on the right.',
+                specs: 'Anthracite aluminum tilt-and-turn balcony door (left sash with dashed opening lines) + fixed panoramic window behind a 900 mm high glass balustrade.'
+            },
+            'LEFT_RECESSED_WING': {
+                title: 'Left Ground-Floor Wing (South Wing — Recessed in the Back)',
+                subtitle: 'Single-Story Recessed Clinker Brick Volume (0 to 9,525 mm)',
+                dims: 'Width: 9,525 mm (200 pier + 5,640 O6b + 250 pier + 1,760 O6a + 1,675 wall) | Height: 2,820 mm (+3.43 m with cornice)',
+                room: 'Contains 0.10 Siłownia, 0.12 Komunikacja, and 0.08 Pralnia. Has no upper floor and is stepped back ~14.98 m West of the central East facade plane.',
+                specs: 'Dark graphite clinker brick facade rendered with recessed shading and lateral depth shadow cast by the projecting central two-story block.'
+            },
+            'RIGHT_RECESSED_WING': {
+                title: 'Right Ground-Floor Wing (North Wing — Recessed in the Back)',
+                subtitle: 'Single-Story Recessed Clinker Brick Volume (18,315 to 21,415 mm) with Axis A',
+                dims: 'Width: 3,100 mm | Height: 2,820 mm (+3.43 m with cornice) | Axis A (Point 0): 290 mm from right edge (at 21,125 mm)',
+                room: 'Northern ground-floor wing (0.14 Spiżarnia / 0.13 Kuchnia). Has no upper floor and is stepped back in the rear relative to the central two-story volume.',
+                specs: 'Dark graphite clinker brick facade with exterior ventilation box near top right and Point 0 / Axis A reference line 290 mm from the northern wall edge.'
+            },
+            'CENTER_FRONT_VOLUME': {
+                title: 'Center Projecting Two-Story Volume (Main East Facade along Axis 6)',
+                subtitle: 'Foreground Two-Story Massing Block (9,525 to 18,315 mm = 8,790 mm)',
+                dims: 'Width: 8,790 mm (200 left pier + 5,090 O3/O9 + 3,500 right zone) | Height: +6.88 m (+7.26 m chimney)',
+                room: 'Projects forward toward the eastern garden. Houses 0.11 Salon & 0.15 Gabinet on the ground floor and 1.04 Sypialnia & Covered Terrace on the first floor.',
+                specs: 'Hand-formed graphite clinker brick on the ground floor, vertical natural timber slat cladding on the upper floor, and cantilevered cassette roof fascia.'
+            },
+            'CORNICE': {
+                title: 'Intermediate Cornice (Gzyms Pośredni)',
+                subtitle: 'Horizontal Band between Ground and First Floor (+2.80 m to +3.43 m)',
+                dims: 'Height: 630 mm | Levels: +2.80 m to +3.43 m | Total Span: 21,415 mm (+100 mm overhangs at South & North ends)',
+                room: 'Caps the left and right recessed ground-floor wings and separates the ground and first floors across the projecting central volume.',
+                specs: 'Anthracite architectural aluminum composite cassette panels with vertical joint reveals.'
+            },
+            'ROOF': {
+                title: 'Main Roof Attica Overhang & Chimney (+6.13 m to +6.88 m / +7.26 m)',
+                subtitle: 'Cantilevered Flat Roof Fascia over Central Two-Story Block',
+                dims: 'Fascia Height: 750 mm (+6.13 m to +6.88 m) | Overhangs: 300 mm South & North | Chimney Top: +7.26 m',
+                room: 'Crowns the 8,790 mm central two-story volume (spanning 9,390 mm with overhangs from 9,225 to 18,615 mm).',
+                specs: 'Modular cassette fascia panels with integrated soffit drip edge; roof chimney rising 380 mm above attica to +7.26 m.'
+            },
+            'TIMBER_WALL': {
+                title: 'Upper Floor Vertical Timber Cladding (Piętro)',
+                subtitle: 'Ventilated Natural Wood Slat Facade (+3.43 m to +6.13 m)',
+                dims: 'Central Block Span: 8,790 mm (9,525 to 18,315 mm) | Height: 2,700 mm | Piers: 200 mm, 485 mm, 380 mm',
+                room: 'First floor eastern wall framing panoramic window O9 (5,090 mm) and covered terrace assembly O14b (2,635 mm).',
+                specs: 'Vertical thermo-ash / larch timber profile boarding on ventilated sub-frame.'
+            }
+        };
+
+        function formatMmValue(val) {
+            if (Math.abs(val - Math.round(val)) < 0.05) {
+                return Math.round(val).toLocaleString();
+            }
+            return Number(val.toFixed(1)).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+        }
+
+        function setEastFacadeWindowOption(mode) {
+            currentEastWindowMode = (mode === 'bigger') ? 'bigger' : 'smaller';
+            const btnSmaller = document.getElementById('btn-ef-smaller');
+            const btnBigger = document.getElementById('btn-ef-bigger');
+            const badge = document.getElementById('ef-window-opt-badge');
+
+            if (currentEastWindowMode === 'bigger') {
+                if (btnSmaller) btnSmaller.classList.remove('active');
+                if (btnBigger) btnBigger.classList.add('active');
+                if (badge) {
+                    badge.textContent = 'Active: Bigger windows (90 mm inner pillars | O9 & O3: 2×2,500 mm each = 4 panes in center)';
+                }
+
+                WindowStore.update('O9', {
+                    sashes: 2,
+                    pillarWidth: 90,
+                    hasMullion: true,
+                    description: 'Two-panel full-height panoramic bedroom glazing on the projecting central East Facade (2 equal symmetric panes of 2,500 mm with 1 × 90 mm inner pillar = 5,090 mm)'
+                });
+                WindowStore.update('O3', {
+                    sashes: 2,
+                    pillarWidth: 90,
+                    hasMullion: true,
+                    description: 'Two-panel full-height panoramic living room glazing on the projecting central East Facade (2 equal symmetric panes of 2,500 mm with 1 × 90 mm inner pillar = 5,090 mm)'
+                });
+
+                elementData['O9'].subtitle = 'Two-Panel Full-Height Glazing (2 × 2,500 mm + 1 × 90 mm Inner Pillar = 5,090 mm)';
+                elementData['O3'].subtitle = 'Two-Panel Full-Height Glazing (2 × 2,500 mm + 1 × 90 mm Inner Pillar = 5,090 mm)';
+            } else {
+                if (btnSmaller) btnSmaller.classList.add('active');
+                if (btnBigger) btnBigger.classList.remove('active');
+                if (badge) {
+                    badge.textContent = 'Active: Smaller windows (90 mm inner pillars | O9 & O3: 3×1,636.7 mm each = 6 panes in center)';
+                }
+
+                WindowStore.update('O9', {
+                    sashes: 3,
+                    pillarWidth: 90,
+                    hasMullion: true,
+                    description: 'Three-panel full-height panoramic bedroom glazing on the projecting central East Facade (3 equal symmetric panes of 1,636.7 mm with 2 × 90 mm inner pillars = 5,090 mm)'
+                });
+                WindowStore.update('O3', {
+                    sashes: 3,
+                    pillarWidth: 90,
+                    hasMullion: true,
+                    description: 'Three-panel full-height panoramic living room glazing on the projecting central East Facade (3 equal symmetric panes of 1,636.7 mm with 2 × 90 mm inner pillars = 5,090 mm)'
+                });
+
+                elementData['O9'].subtitle = 'Three-Panel Full-Height Glazing (3 × 1,636.7 mm + 2 × 90 mm Inner Pillars = 5,090 mm)';
+                elementData['O3'].subtitle = 'Three-Panel Full-Height Glazing (3 × 1,636.7 mm + 2 × 90 mm Inner Pillars = 5,090 mm)';
+            }
+
+            updateEastFacadeDimensions();
+        }
+
+        function showElementDetails(key) {
+            currentSelectedKey = key;
+            const win = (typeof WindowStore !== 'undefined') ? WindowStore.get(key) : null;
+            if (win && elementData[key]) {
+                const coords = CoordinateService.transform(win, 'east_facade');
+                const startMm = Math.round(coords.localX_mm);
+                const endMm = Math.round(coords.localX_mm + win.width);
+                const pillarMm = Number(win.pillarWidth) || 0;
+                const numSashes = Math.max(1, Number(win.sashes) || 1);
+                let splitInfo = `Sashes: ${numSashes}`;
+                if (pillarMm > 0 && numSashes >= 2) {
+                    const paneMm = (win.width - (numSashes - 1) * pillarMm) / numSashes;
+                    splitInfo = `Panes: ${numSashes} × ${formatMmValue(paneMm)} mm + ${numSashes - 1} × ${pillarMm} mm inner pillars`;
+                } else if (Array.isArray(win.sashWidths) && win.sashWidths.length >= 2) {
+                    splitInfo = `Panes: ${win.sashWidths.map(v => v.toLocaleString() + ' mm').join(' + ')}`;
+                }
+                elementData[key].dims = `Total Width: ${win.width.toLocaleString()} mm (${splitInfo}) | Height: ${win.height.toLocaleString()} mm | Sill: hp = ${win.sill} mm | Screen X (South→North): ${startMm.toLocaleString()} to ${endMm.toLocaleString()} mm | Global Y (from Axis A): ${win.y.toLocaleString()} mm`;
+            }
+
+            const data = elementData[key];
+            if (!data) return;
+
+            document.getElementById('detail-title').textContent = data.title;
+            document.getElementById('detail-subtitle').textContent = data.subtitle;
+            document.getElementById('detail-dims').textContent = data.dims;
+            document.getElementById('detail-room').textContent = data.room;
+            document.getElementById('detail-specs').textContent = data.specs;
+
+            const card = document.getElementById('element-detail-card');
+            card.style.display = 'block';
+            card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        /**
+         * Build an SVG dimension chain group along the 21,415 mm East Facade
+         */
+        function buildEastDimensionChainSVG(windowIds, witnessDropY, isUpper) {
+            const view = CoordinateService.getView('east_facade');
+            const totalLenMm = (view && view.length) ? view.length : 21415;
+            const scale = (view && view.scale) ? view.scale : 0.1;
+            const totalSvg = totalLenMm * scale;
+            const leftStepMm = 9525;
+            const rightStepMm = 18315;
+
+            const items = [];
+            windowIds.forEach(id => {
+                const win = WindowStore.get(id);
+                if (win) {
+                    const coords = CoordinateService.transform(win, 'east_facade');
+                    items.push({
+                        id: win.id,
+                        name: win.name,
+                        startMm: Math.round(coords.localX_mm),
+                        endMm: Math.round(coords.localX_mm + win.width),
+                        widthMm: Math.round(win.width),
+                        startSvg: coords.x,
+                        endSvg: coords.x + coords.width
+                    });
+                }
+            });
+            items.sort((a, b) => a.startSvg - b.startSvg);
+
+            // Include massing step-back boundaries at 9,525 mm and 18,315 mm so recessed left/right wings are clearly dimensioned
+            const stepBoundaries = [leftStepMm, rightStepMm];
+            const segments = [];
+            let cursorMm = 0;
+
+            function pushPierSegments(fromMm, toMm) {
+                let cur = fromMm;
+                stepBoundaries.forEach(stepMm => {
+                    if (stepMm > cur && stepMm < toMm) {
+                        segments.push({
+                            type: 'pier',
+                            lenMm: stepMm - cur,
+                            startSvg: cur * scale,
+                            endSvg: stepMm * scale,
+                            isRecessedSpan: (cur === 0 && stepMm === leftStepMm) || (cur === rightStepMm && stepMm === totalLenMm)
+                        });
+                        cur = stepMm;
+                    }
+                });
+                if (toMm > cur) {
+                    segments.push({
+                        type: 'pier',
+                        lenMm: toMm - cur,
+                        startSvg: cur * scale,
+                        endSvg: toMm * scale,
+                        isRecessedSpan: isUpper && ((cur === 0 && toMm === leftStepMm) || (cur === rightStepMm && toMm === totalLenMm))
+                    });
+                }
+            }
+
+            items.forEach(item => {
+                if (item.startMm > cursorMm) {
+                    pushPierSegments(cursorMm, item.startMm);
+                }
+                segments.push({
+                    type: 'window',
+                    id: item.id,
+                    name: item.name,
+                    lenMm: item.widthMm,
+                    startSvg: item.startSvg,
+                    endSvg: item.endSvg
+                });
+                cursorMm = item.endMm;
+            });
+
+            if (totalLenMm > cursorMm) {
+                pushPierSegments(cursorMm, totalLenMm);
+            }
+
+            let svgStr = `<line x1="0" y1="0" x2="${totalSvg}" y2="0" class="dim-solid" />`;
+
+            const boundaryPoints = [0];
+            segments.forEach(seg => boundaryPoints.push(seg.endSvg));
+
+            boundaryPoints.forEach(pt => {
+                svgStr += `<line x1="${pt}" y1="0" x2="${pt}" y2="${witnessDropY}" stroke="#d97706" stroke-width="0.7" stroke-dasharray="2 2" opacity="0.55" />`;
+                svgStr += `<line x1="${pt}" y1="-7" x2="${pt}" y2="7" class="tick" />`;
+            });
+
+            segments.forEach(seg => {
+                const midSvg = (seg.startSvg + seg.endSvg) / 2;
+                const spanSvg = seg.endSvg - seg.startSvg;
+                const isWin = seg.type === 'window';
+                let labelText = isWin
+                    ? `${seg.lenMm.toLocaleString()} (${seg.name})`
+                    : `${seg.lenMm.toLocaleString()}`;
+                if (seg.isRecessedSpan) {
+                    labelText = `${seg.lenMm.toLocaleString()} (in back)`;
+                }
+
+                const boxW = isWin
+                    ? Math.max(76, Math.min(spanSvg - 4, 115))
+                    : (seg.isRecessedSpan ? 110 : Math.max(28, Math.min(spanSvg - 2, 54)));
+                const strokeAttr = isWin
+                    ? (isUpper ? 'stroke="#0284c7" stroke-width="0.8"' : 'stroke="#f59e0b" stroke-width="0.8"')
+                    : (seg.isRecessedSpan ? 'stroke="#10b981" stroke-width="0.8"' : '');
+                const textFill = isWin
+                    ? (isUpper ? '#0369a1' : '#b45309')
+                    : (seg.isRecessedSpan ? '#047857' : '#d97706');
+                const fontSize = spanSvg < 28 ? 9.5 : 11;
+                const labelYOffset = (spanSvg < 25) ? -16 : 0;
+
+                svgStr += `
+                    <rect x="${midSvg - boxW / 2}" y="${-12 + labelYOffset}" width="${boxW}" height="18" fill="#ffffff" rx="2" ${strokeAttr} />
+                    <text x="${midSvg}" y="${2 + labelYOffset}" class="dim-text" font-size="${fontSize}" font-weight="${isWin || seg.isRecessedSpan ? '700' : '600'}" fill="${textFill}">${labelText}</text>
+                `;
+            });
+
+            return svgStr;
+        }
+
+        function updateEastFacadeSchedule() {
+            const tbody = document.getElementById('ef-schedule-tbody');
+            if (!tbody) return;
+
+            const order = ['O9', 'O14b', 'O6b', 'O6a', 'O3'];
+            tbody.replaceChildren();
+
+            order.forEach(id => {
+                const win = WindowStore.get(id);
+                if (!win) return;
+                const coords = CoordinateService.transform(win, 'east_facade');
+                const startMm = Math.round(coords.localX_mm);
+                const endMm = Math.round(coords.localX_mm + win.width);
+                const isFirst = win.floor === 'first';
+                const hpMm = isFirst ? Math.max(0, win.sill - 3430) : win.sill;
+                const sillElev = (win.sill / 1000).toFixed(2);
+                const isRecessedWing = (id === 'O6b' || id === 'O6a');
+
+                const tr = document.createElement('tr');
+                tr.style.cursor = 'pointer';
+                tr.onclick = function () { showElementDetails(id); };
+
+                const tdSym = document.createElement('td');
+                const badge = document.createElement('span');
+                badge.className = 'badge-tag ' + (isFirst ? 'badge-blue' : (isRecessedWing ? 'badge-emerald' : 'badge-amber'));
+                badge.textContent = win.name;
+                tdSym.appendChild(badge);
+
+                const tdRoom = document.createElement('td');
+                const planeLabel = isRecessedWing ? ' [Recessed in Back]' : ' [Center Front Volume]';
+                tdRoom.textContent = `${isFirst ? 'First Floor' : 'Ground Floor'}: ${win.room}${planeLabel}`;
+
+                const tdScreen = document.createElement('td');
+                tdScreen.style.fontFamily = "'JetBrains Mono', monospace";
+                tdScreen.textContent = `${startMm.toLocaleString()} – ${endMm.toLocaleString()} mm`;
+
+                const tdGlobal = document.createElement('td');
+                tdGlobal.style.fontFamily = "'JetBrains Mono', monospace";
+                tdGlobal.textContent = `Y = ${win.y.toLocaleString()} mm`;
+
+                const tdW = document.createElement('td');
+                const strongW = document.createElement('strong');
+                strongW.textContent = win.width.toLocaleString();
+                tdW.appendChild(strongW);
+
+                const tdH = document.createElement('td');
+                const strongH = document.createElement('strong');
+                strongH.textContent = win.height.toLocaleString();
+                tdH.appendChild(strongH);
+
+                const tdSill = document.createElement('td');
+                tdSill.textContent = `hp = ${hpMm} mm (+${sillElev} m)`;
+
+                const tdDesc = document.createElement('td');
+                tdDesc.textContent = win.description || '';
+
+                [tdSym, tdRoom, tdScreen, tdGlobal, tdW, tdH, tdSill, tdDesc].forEach(td => tr.appendChild(td));
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateEastFacadeDimensions() {
+            const upperGroup = document.getElementById('ef-upper-dims-group');
+            if (upperGroup) {
+                const upperSvg = `<svg xmlns="http://www.w3.org/2000/svg"><g>${buildEastDimensionChainSVG(['O9', 'O14b'], 77, true)}</g></svg>`;
+                const doc = new DOMParser().parseFromString(upperSvg, 'image/svg+xml');
+                const g = doc.documentElement.firstElementChild;
+                if (g) {
+                    upperGroup.replaceChildren(...Array.from(g.childNodes).map(n => document.importNode(n, true)));
+                }
+            }
+
+            const groundGroup = document.getElementById('ef-ground-dims-group');
+            if (groundGroup) {
+                const groundSvg = `<svg xmlns="http://www.w3.org/2000/svg"><g>${buildEastDimensionChainSVG(['O6b', 'O6a', 'O3'], -113, false)}</g></svg>`;
+                const doc = new DOMParser().parseFromString(groundSvg, 'image/svg+xml');
+                const g = doc.documentElement.firstElementChild;
+                if (g) {
+                    groundGroup.replaceChildren(...Array.from(g.childNodes).map(n => document.importNode(n, true)));
+                }
+            }
+
+            updateEastFacadeSchedule();
+
+            if (currentSelectedKey) {
+                const card = document.getElementById('element-detail-card');
+                if (card && card.style.display !== 'none') {
+                    showElementDetails(currentSelectedKey);
+                }
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', function () {
+            WindowComponent.autoMountAll();
+            setEastFacadeWindowOption('smaller');
+
+            WindowStore.subscribe(function () {
+                updateEastFacadeDimensions();
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -29,7 +29,7 @@
             const w = coords.width;
             const h = coords.height;
 
-            if (viewId === 'north_facade' || viewId === 'south_facade' || viewId === 'west_facade') {
+            if (viewId === 'north_facade' || viewId === 'south_facade' || viewId === 'west_facade' || viewId === 'east_facade') {
                 if (win.openingType === 'garage_door') {
                     return this._renderExteriorGarageDoor(win, x, y, w, h);
                 } else if (win.openingType === 'entrance_door') {
@@ -167,7 +167,7 @@
                     }
                 }
 
-                // Optional HST sliding door arrows (central bi-parting panels 2 & 3)
+                // Optional HST sliding door arrows
                 let slidingSvg = '';
                 if (win.slidingArrows && numSashes >= 4) {
                     const arrowY = y + h * 0.62;
@@ -179,6 +179,15 @@
                             <polyline points="${s2Mid - 9},${arrowY - 5} ${s2Mid - 16},${arrowY} ${s2Mid - 9},${arrowY + 5}" />
                             <line x1="${s3Mid - 16}" y1="${arrowY}" x2="${s3Mid + 16}" y2="${arrowY}" />
                             <polyline points="${s3Mid + 9},${arrowY - 5} ${s3Mid + 16},${arrowY} ${s3Mid + 9},${arrowY + 5}" />
+                        </g>
+                    `;
+                } else if (win.slidingArrows && numSashes === 3) {
+                    const arrowY = y + h * 0.62;
+                    const s2Mid = x + 1 * (paneW + pillarSvg) + paneW / 2;
+                    slidingSvg = `
+                        <g stroke="#e2e8f0" stroke-width="1.6" fill="none" opacity="0.85">
+                            <line x1="${s2Mid + 16}" y1="${arrowY}" x2="${s2Mid - 16}" y2="${arrowY}" />
+                            <polyline points="${s2Mid - 9},${arrowY - 5} ${s2Mid - 16},${arrowY} ${s2Mid - 9},${arrowY + 5}" />
                         </g>
                     `;
                 }
@@ -238,12 +247,21 @@
             // Optional tilt-and-turn casement dashed lines (matching architectural CAD elevation)
             let casementSvg = '';
             if (Array.isArray(win.tiltTurnSashes) && win.tiltTurnSashes.length > 0) {
-                const sashW = w / numSashes;
+                const totalSplitMm = customSashWidths
+                    ? (customSashWidths.reduce((acc, val) => acc + Number(val || 0), 0) || win.width)
+                    : win.width;
                 win.tiltTurnSashes.forEach(sashIdx => {
                     const idx = Number(sashIdx) - 1;
                     if (idx >= 0 && idx < numSashes) {
-                        const sx1 = x + idx * sashW + 4;
-                        const sx2 = x + (idx + 1) * sashW - 4;
+                        let sx1 = x + idx * (w / numSashes) + 4;
+                        let sx2 = x + (idx + 1) * (w / numSashes) - 4;
+                        if (customSashWidths && idx < customSashWidths.length) {
+                            let startMm = 0;
+                            for (let k = 0; k < idx; k++) startMm += Number(customSashWidths[k] || 0);
+                            const endMm = startMm + Number(customSashWidths[idx] || 0);
+                            sx1 = x + (w * startMm) / totalSplitMm + 4;
+                            sx2 = x + (w * endMm) / totalSplitMm - 4;
+                        }
                         const sy1 = y + 4;
                         const sy2 = y + h - 4;
                         const smidX = (sx1 + sx2) / 2;

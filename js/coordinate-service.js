@@ -100,6 +100,21 @@
             wall: 'west',
             side: 'exterior',
             floorY: 0
+        },
+        'east_facade': {
+            id: 'east_facade',
+            name: 'East Facade Elevation',
+            positionOnMap: 21125,
+            leftEdge: 21125,
+            origin: { x: 0, y: 21125 },
+            axis: 'y',
+            floor: 'all',
+            direction: 'north',
+            length: 21415,
+            scale: 0.1,
+            wall: 'east',
+            side: 'exterior',
+            floorY: 0
         }
     };
 
