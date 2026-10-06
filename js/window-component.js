@@ -128,6 +128,90 @@
             const isCompactRibbon = h <= 75;
             const midX = x + w / 2;
             const numSashes = Math.max(1, Number(win.sashes) || 1);
+            const pillarMm = Number(win.pillarWidth) || 0;
+
+            const hpVal = (win.floor === 'first')
+                ? (win.sill <= 3430 ? 0 : Math.round((win.sill - 3330) / 10))
+                : Math.round(win.sill / 10);
+
+            // Tall windows with 90 mm inner window pillars/mullions (part of the window itself)
+            if (pillarMm > 0 && numSashes >= 2) {
+                const scale = w / (win.width || 1);
+                const pillarSvg = pillarMm * scale;
+                const paneWidthMm = (win.width - (numSashes - 1) * pillarMm) / numSashes;
+                const paneW = (w - (numSashes - 1) * pillarSvg) / numSashes;
+                const paneMmLabel = (Math.abs(paneWidthMm - Math.round(paneWidthMm)) < 0.05)
+                    ? Math.round(paneWidthMm)
+                    : Number(paneWidthMm.toFixed(1));
+
+                let pillarsSvg = '';
+                let splitLabelsSvg = '';
+
+                for (let i = 0; i < numSashes; i++) {
+                    const px = x + i * (paneW + pillarSvg);
+                    const paneMidX = px + paneW / 2;
+
+                    // Subtle symmetric pane width indicator near bottom of each pane
+                    splitLabelsSvg += `
+                        <text x="${paneMidX}" y="${y + h - 12}" font-family="'JetBrains Mono', monospace" font-size="8" fill="#cbd5e1" font-weight="600" text-anchor="middle" opacity="0.9">
+                            ${paneMmLabel}
+                        </text>
+                    `;
+
+                    if (i < numSashes - 1) {
+                        const pilX = px + paneW;
+                        pillarsSvg += `
+                            <!-- Inner window pillar ${i + 1} (${pillarMm} mm wide, solid flat fill) -->
+                            <rect x="${pilX}" y="${y + 4}" width="${pillarSvg}" height="${h - 8}" fill="#0f172a" />
+                        `;
+                    }
+                }
+
+                // Optional HST sliding door arrows (central bi-parting panels 2 & 3)
+                let slidingSvg = '';
+                if (win.slidingArrows && numSashes >= 4) {
+                    const arrowY = y + h * 0.62;
+                    const s2Mid = x + 1 * (paneW + pillarSvg) + paneW / 2;
+                    const s3Mid = x + 2 * (paneW + pillarSvg) + paneW / 2;
+                    slidingSvg = `
+                        <g stroke="#e2e8f0" stroke-width="1.6" fill="none" opacity="0.85">
+                            <line x1="${s2Mid + 16}" y1="${arrowY}" x2="${s2Mid - 16}" y2="${arrowY}" />
+                            <polyline points="${s2Mid - 9},${arrowY - 5} ${s2Mid - 16},${arrowY} ${s2Mid - 9},${arrowY + 5}" />
+                            <line x1="${s3Mid - 16}" y1="${arrowY}" x2="${s3Mid + 16}" y2="${arrowY}" />
+                            <polyline points="${s3Mid + 9},${arrowY - 5} ${s3Mid + 16},${arrowY} ${s3Mid + 9},${arrowY + 5}" />
+                        </g>
+                    `;
+                }
+
+                let sillSvg = '';
+                if (!isFullHeight && !isCorner) {
+                    sillSvg = `<rect x="${x - 2}" y="${y + h}" width="${w + 4}" height="4" fill="#0f172a" />`;
+                }
+
+                return `
+                    <g class="interactive-element window-component" data-window-id="${win.id}" onclick="showElementDetails('${win.id}')" style="cursor: pointer;">
+                        <!-- Single unified window outer reveal / frame -->
+                        <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#1e293b" stroke="#0f172a" stroke-width="2" />
+                        <!-- Continuous glass pane with glare -->
+                        <rect x="${x + 4}" y="${y + 4}" width="${w - 8}" height="${h - 8}" fill="url(#glass-glare)" />
+                        <rect x="${x + 4}" y="${y + 4}" width="${w - 8}" height="${h - 8}" fill="none" stroke="#0f172a" stroke-width="3" />
+                        <!-- 90 mm inner window pillars (solid flat fill, part of window) -->
+                        ${pillarsSvg}
+                        ${slidingSvg}
+                        ${sillSvg}
+                        <!-- Internal symmetric pane widths -->
+                        ${splitLabelsSvg}
+                        <!-- Main Window Dimension Badge -->
+                        <text x="${midX}" y="${y + h / 2 - 5}" font-family="'JetBrains Mono', monospace" font-size="11" fill="#ffffff" font-weight="700" text-anchor="middle" filter="drop-shadow(0 1px 2px black)">
+                            ${win.name} (${Math.round(win.width / 10)}×${Math.round(win.height / 10)})
+                        </text>
+                        <text x="${midX}" y="${y + h / 2 + 12}" font-family="'JetBrains Mono', monospace" font-size="8.5" fill="#93c5fd" font-weight="600" text-anchor="middle">
+                            hp=${hpVal}
+                        </text>
+                    </g>
+                `;
+            }
+
             const customSashWidths = (Array.isArray(win.sashWidths) && win.sashWidths.length >= 2)
                 ? win.sashWidths
                 : ((win.id === 'O1' && Math.round(win.width) === 2500) ? [900, 1600] : null);
@@ -197,10 +281,6 @@
             if (!isFullHeight && !isCorner) {
                 sillSvg = `<rect x="${x - 2}" y="${y + h}" width="${w + 4}" height="4" fill="#0f172a" />`;
             }
-
-            const hpVal = (win.floor === 'first')
-                ? (win.sill <= 3430 ? 0 : Math.round((win.sill - 3330) / 10))
-                : Math.round(win.sill / 10);
 
             const labelSvg = isCompactRibbon
                 ? `

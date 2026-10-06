@@ -324,12 +324,13 @@
                 "wall": "south",
                 "views": ["south_facade"],
                 "sashes": 3,
+                "pillarWidth": 90,
                 "hasMullion": true,
                 "handlePosition": "center",
-                "description": "Three-panel full-height floor-to-ceiling bedroom glazing on the South Facade (3 equal parts in Smaller windows; 2 equal parts in Bigger windows)",
+                "description": "Full-height bedroom glazing on the South Facade with 90 mm inner pillars (Smaller: 3×1273.3 mm + 2×90 mm = 4000 mm; Bigger: 2×1955 mm + 1×90 mm = 4000 mm)",
                 "specs": {
                     "glazing": "Safety tempered and laminated glass (VSG/ESG)",
-                    "frame": "Slimline aluminum multi-panel frame (RAL 7016)",
+                    "frame": "Slimline aluminum multi-panel frame with 90 mm inner pillars (RAL 7016)",
                     "sillExterior": "Flush threshold on intermediate cornice (+3.43 m)",
                     "sillInterior": "Flush floor threshold (hp=0 mm)"
                 }
@@ -371,12 +372,13 @@
                 "wall": "south",
                 "views": ["south_facade"],
                 "sashes": 4,
+                "pillarWidth": 90,
                 "hasMullion": true,
                 "handlePosition": "center",
-                "description": "Four-panel full-height floor-to-ceiling panoramic glazing on the East side of the first floor (4 equal parts in Smaller windows; 3 equal parts in Bigger windows)",
+                "description": "Full-height panoramic glazing on the East side of the first floor with 90 mm inner pillars (Smaller: 4×1507.5 mm + 3×90 mm = 6300 mm; Bigger: 3×2040 mm + 2×90 mm = 6300 mm)",
                 "specs": {
                     "glazing": "Safety tempered and laminated glass (VSG/ESG)",
-                    "frame": "Concealed slimline multi-panel aluminum frame (RAL 7016)",
+                    "frame": "Concealed slimline multi-panel aluminum frame with 90 mm inner pillars (RAL 7016)",
                     "sillExterior": "Flush threshold on intermediate cornice (+3.43 m)",
                     "sillInterior": "Flush floor threshold (hp=0 mm)"
                 }
@@ -418,13 +420,14 @@
                 "wall": "south",
                 "views": ["south_facade"],
                 "sashes": 4,
+                "pillarWidth": 90,
                 "hasMullion": true,
                 "slidingArrows": true,
                 "handlePosition": "center",
-                "description": "Four-panel full-height HST lift-and-slide terrace glazing in dining/living area (4 equal parts in Smaller windows; 3 equal parts in Bigger windows)",
+                "description": "Full-height HST terrace glazing in dining/living area with 90 mm inner pillars (Smaller: 4×1552.5 mm + 3×90 mm = 6480 mm; Bigger: 3×2100 mm + 2×90 mm = 6480 mm)",
                 "specs": {
                     "glazing": "Triple-pane safety solar-control glass (VSG/ESG)",
-                    "frame": "Heavy-duty HST lift-and-slide aluminum system (RAL 7016)",
+                    "frame": "Heavy-duty HST lift-and-slide aluminum system with 90 mm inner pillars (RAL 7016)",
                     "sillExterior": "Zero-barrier flush terrace threshold (-0.02 m / ±0.00 m)",
                     "sillInterior": "Trench heater integrated flush floor track"
                 }
@@ -442,13 +445,14 @@
                 "wall": "south",
                 "views": ["south_facade"],
                 "sashes": 4,
+                "pillarWidth": 90,
                 "hasMullion": true,
                 "slidingArrows": true,
                 "handlePosition": "center",
-                "description": "Four-panel full-height HST lift-and-slide terrace glazing in eastern living room (4 equal parts in Smaller windows; 3 equal parts in Bigger windows)",
+                "description": "Full-height HST terrace glazing in eastern living room with 90 mm inner pillars (Smaller: 4×1507.5 mm + 3×90 mm = 6300 mm; Bigger: 3×2040 mm + 2×90 mm = 6300 mm)",
                 "specs": {
                     "glazing": "Triple-pane safety solar-control glass (VSG/ESG)",
-                    "frame": "Heavy-duty HST lift-and-slide aluminum system (RAL 7016)",
+                    "frame": "Heavy-duty HST lift-and-slide aluminum system with 90 mm inner pillars (RAL 7016)",
                     "sillExterior": "Zero-barrier flush terrace threshold (-0.02 m / ±0.00 m)",
                     "sillInterior": "Trench heater integrated flush floor track"
                 }
