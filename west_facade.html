@@ -595,9 +595,9 @@
             </div>
 
             <div class="header-meta">
-                <span class="badge accent">2D Origin (0,0) = NE Corner</span>
+                <span class="badge accent">Point 0 = Axis A (Oś A, +270 mm from wall start)</span>
                 <span class="badge direction-south">Direction: SOUTH (North → South | Axis: Y)</span>
-                <span class="badge">Overall Length: 21,415 mm</span>
+                <span class="badge">Length from Axis A (0): 21,170 mm (Wall: 21,440 mm)</span>
                 <span class="badge">Height: +6.88 m (+7.26 m)</span>
             </div>
         </div>
@@ -608,7 +608,8 @@
             <p class="subtitle">
                 Exterior architectural elevation of the western entrance and driveway facade looking East towards the building.
                 Configured in the <strong>2D Building Coordinate System</strong> with <code>direction: "south"</code>, active horizontal plan axis <code>Y (&lt;north - south&gt;)</code>,
-                North left edge at <code>Y = 0 mm</code>, and overall ground floor length of <strong>21,415 mm</strong>.
+                <strong>Point 0 / Axis A (Oś A)</strong> at <code>Y = 0 mm</code> (located <code>270 mm</code> right of the lower-level wall start at <code>Y = -270 mm</code>),
+                length from Point 0 / Axis A of <strong>21,170 mm</strong>, and total lower-level wall length of <strong>21,440 mm</strong>.
             </p>
         </div>
 
@@ -620,11 +621,10 @@
                 <line x1="8" y1="12" x2="16" y2="12"></line>
             </svg>
             <div class="key-takeaway-text">
-                <h3>2D Building Coordinate System: <code>(0, 0)</code> at North-East Corner &bull; West Facade <code>direction: "south"</code></h3>
+                <h3>Point 0 = Axis A (Oś A) at <code>Y = 0 mm</code> &bull; West Facade <code>direction: "south"</code></h3>
                 <p>
-                    Building coordinates are now 2D <code>(x, y)</code> where <code>x</code> is <strong>&lt;east - west&gt;</strong> and <code>y</code> is <strong>&lt;north - south&gt;</strong>, with <code>(0, 0)</code> at the <strong>North-East corner</strong>.
-                    Looking East at the West Facade, the <strong>North edge (<code>Y = 0 mm</code>) is on your LEFT</strong> and the <strong>South edge (<code>Y = 21,415 mm</code>) is on your RIGHT</strong>.
-                    Moving left-to-right across the drawing progresses <strong>Southward</strong> (<code>localX = win.y - 0</code>), so increasing global <code>Y</code> shifts openings to the <strong>RIGHT</strong>.
+                    Looking East at the West Facade, <strong>Point 0 / Axis A (Oś A, <code>Y = 0 mm</code>)</strong> is located <strong>270 mm (27 cm)</strong> to the right of the lower-level wall's northern edge (<code>Y = -270 mm</code>).
+                    From <strong>Point 0 / Axis A</strong> moving Southward (left-to-right): <code>690 mm</code> wall &rarr; <code>5,200×2,200 mm</code> garage door <strong>Z2</strong> &rarr; <code>2,670 mm</code> wall &rarr; <code>2,500 mm</code> entrance nook (<code>400 mm</code> wall + <code>1,700 mm</code> door <strong>Z1</strong> + <code>400 mm</code> wall) &rarr; <code>10,110 mm</code> living wing = <strong>21,170 mm</strong> (total lower-level wall = <strong>21,440 mm</strong>).
                 </p>
             </div>
         </div>
@@ -677,20 +677,20 @@
             <div class="controls-bar">
                 <div class="layer-toggles" style="border-right: 1px solid #cbd5e1; padding-right: 16px;">
                     <span style="font-size: 13px; font-weight: 700; color: #0f172a;">Clerestory Windows (O8c / O8b):</span>
-                    <button id="btn-o8-default" class="toggle-btn active" onclick="setClerestoryO8Option('default')" style="font-weight: 600;">
-                        <span>🪟</span> 1) Default (O8c: 1440, O8b: 1620)
+                    <button id="btn-o8-no-o8b-o8c" class="toggle-btn active" onclick="setClerestoryO8Option('no_o8b_o8c')" style="font-weight: 600;">
+                        <span>🚫</span> 1) Default: No O8b &amp; no O8c (only O8a)
+                    </button>
+                    <button id="btn-o8-default" class="toggle-btn" onclick="setClerestoryO8Option('default')" style="font-weight: 600;">
+                        <span>🪟</span> 2) O8c: 1440, O8b: 1620
                     </button>
                     <button id="btn-o8-extended" class="toggle-btn" onclick="setClerestoryO8Option('extended')" style="font-weight: 600;">
-                        <span>↔️</span> 2) O8c +60 right &amp; O8b +60 left
+                        <span>↔️</span> 3) O8c +60 right &amp; O8b +60 left
                     </button>
                     <button id="btn-o8-no-o8b" class="toggle-btn" onclick="setClerestoryO8Option('no_o8b')" style="font-weight: 600;">
-                        <span>➖</span> 3) O8c +60 right &amp; no O8b
-                    </button>
-                    <button id="btn-o8-no-o8b-o8c" class="toggle-btn" onclick="setClerestoryO8Option('no_o8b_o8c')" style="font-weight: 600;">
-                        <span>🚫</span> 4) No O8b &amp; no O8c (only O8a)
+                        <span>➖</span> 4) O8c +60 right &amp; no O8b
                     </button>
                     <span id="o8-window-opt-badge" class="badge accent" style="font-size: 11.5px; padding: 4px 10px;">
-                        O8c: 1440 mm | Pier: 280 mm | O8b: 1620 mm
+                        O8c &amp; O8b: removed | Pier to O8a: 4230 mm
                     </span>
                 </div>
                 <div class="layer-toggles">
@@ -709,13 +709,13 @@
                     </button>
                 </div>
                 <div style="font-size: 12px; color: #64748b; font-family: 'JetBrains Mono', monospace;">
-                    View: <strong>west_facade</strong> | Dir: <strong>south</strong> | Axis: <strong>Y</strong> | Length: <strong>21,415 mm</strong>
+                    View: <strong>west_facade</strong> | Axis A (0): <strong>21,170 mm</strong> | Wall: <strong>21,440 mm</strong>
                 </div>
             </div>
 
             <!-- SVG Container -->
             <div class="elevation-wrapper">
-                <svg class="elevation-svg" width="100%" height="760" viewBox="-360 -960 2820 1240" xmlns="http://www.w3.org/2000/svg">
+                <svg class="elevation-svg" width="100%" height="780" viewBox="-360 -960 2820 1260" xmlns="http://www.w3.org/2000/svg">
                     <defs>
                         <!-- Dark Graphite Clinker Brick Pattern (Ground Floor) -->
                         <pattern id="brick-pattern" width="25" height="12" patternUnits="userSpaceOnUse">
@@ -777,7 +777,7 @@
                     <!-- ==================================== -->
                     <!-- ENVIRONMENT & BACKGROUND SILHOUETTE -->
                     <!-- ==================================== -->
-                    <rect x="-360" y="-960" width="2820" height="1240" fill="#f8fafc" />
+                    <rect x="-360" y="-960" width="2820" height="1260" fill="#f8fafc" />
 
                     <!-- Pine Trees Silhouette (Izabelin Forest) -->
                     <g id="pine-trees" opacity="0.14" fill="#1e293b">
@@ -794,53 +794,55 @@
                     <g id="ground-plane">
                         <rect x="-360" y="2" width="2820" height="42" fill="url(#earth-hatch)" />
                         <line x1="-360" y1="2" x2="2440" y2="2" stroke="#0f172a" stroke-width="2.5" />
-                        <rect x="-360" y="44" width="2820" height="220" fill="#f1f5f9" />
+                        <rect x="-360" y="44" width="2820" height="236" fill="#f1f5f9" />
                         <line x1="-360" y1="44" x2="2440" y2="44" stroke="#94a3b8" stroke-width="1" />
                     </g>
 
                     <!-- ==================================== -->
                     <!-- GROUND FLOOR ELEVATION (PARTER) -->
                     <!-- Wall height from -0.02m (Y=2) to +2.80m (Y=-280) -->
-                    <!-- Overall length: 21,415 mm (North Y=0 at X=0 to South Y=21415 at X=2141.5) -->
+                    <!-- Wall starts at Y = -270 mm (X = -27), Point 0 / Axis A at Y = 0 mm (X = 0), South edge at Y = 21,170 mm (X = 2117) -->
+                    <!-- Total Lower-Level Wall Length: 21,440 mm (21,170 mm from Point 0 / Axis A) -->
                     <!-- ==================================== -->
                     <g id="ground-floor-facade">
-                        <!-- Main Clinker Brick Wall Body (X = 0 to 2141.5, Y = -280 to 2) -->
-                        <rect x="0" y="-280" width="2141.5" height="282" fill="url(#brick-pattern)" stroke="#1e222a" stroke-width="1.8" onclick="showElementDetails('BRICK_WALL')" class="interactive-element" />
+                        <!-- Main Clinker Brick Wall Body (X = -27 to 2117, width = 2144, Y = -280 to 2) -->
+                        <rect x="-27" y="-280" width="2144" height="282" fill="url(#brick-pattern)" stroke="#1e222a" stroke-width="1.8" onclick="showElementDetails('BRICK_WALL')" class="interactive-element" />
 
-                        <!-- Recessed Entrance Alcove (Wnęka Wejściowa, Y = 8,600 to 11,300 mm -> X = 860 to 1130, 630 mm left of O8c) -->
-                        <rect id="wf-entrance-nook-rect" x="860" y="-280" width="270" height="280" fill="url(#brick-recessed-pattern)" stroke="#181b20" stroke-width="1.2" onclick="showElementDetails('ENTRANCE_NICHE')" class="interactive-element" />
-                        <!-- Vertical return corner line at X = 860 and X = 1130 -->
-                        <line x1="860" y1="-280" x2="860" y2="0" stroke="#0f172a" stroke-width="2" />
-                        <line id="wf-entrance-nook-rline" x1="1130" y1="-280" x2="1130" y2="0" stroke="#0f172a" stroke-width="1.5" />
+                        <!-- Recessed Entrance Alcove (Wnęka Wejściowa, Y = 8,560 to 11,060 mm -> X = 856 to 1106, width = 2,500 mm: 400 wall + 1700 Z1 + 400 wall) -->
+                        <rect id="wf-entrance-nook-rect" x="856" y="-280" width="250" height="280" fill="url(#brick-recessed-pattern)" stroke="#181b20" stroke-width="1.2" onclick="showElementDetails('ENTRANCE_NICHE')" class="interactive-element" />
+                        <!-- Vertical return corner line at X = 856 and X = 1106 -->
+                        <line id="wf-entrance-nook-lline" x1="856" y1="-280" x2="856" y2="0" stroke="#0f172a" stroke-width="2" />
+                        <line id="wf-entrance-nook-rline" x1="1106" y1="-280" x2="1106" y2="0" stroke="#0f172a" stroke-width="1.5" />
 
-                        <!-- Dynamic Component: GD1 (Garage Sectional Door, 5150×2250 mm, Y = 1000..6150 mm) -->
-                        <g data-window-component="GD1" data-view-id="west_facade" data-window-style="exterior" id="facade-window-GD1"></g>
+                        <!-- Dynamic Component: Z2 (Garage Sectional Door, 5200×2200 mm, Y = 690..5890 mm) -->
+                        <g data-window-component="Z2" data-view-id="west_facade" data-window-style="exterior" id="facade-window-Z2"></g>
 
-                        <!-- Dynamic Component: D_EXT (Main Entrance Door + Sidelight, 1570×2250 mm, Y = 9260..10830 mm) -->
-                        <g data-window-component="D_EXT" data-view-id="west_facade" data-window-style="exterior" id="facade-window-D_EXT"></g>
+                        <!-- Dynamic Component: Z1 (Main Entrance Door + Sidelight, 1700×2250 mm, Y = 8960..10660 mm) -->
+                        <g data-window-component="Z1" data-view-id="west_facade" data-window-style="exterior" id="facade-window-Z1"></g>
 
-                        <!-- Dynamic Component: O8c (Left Clerestory Window, 1440×740 mm, hp=2060 mm, Y = 11930..13370 mm) -->
+                        <!-- Dynamic Component: O8c (Left Clerestory Window, 1440×740 mm, hp=2060 mm, Y = 11690..13130 mm) -->
                         <g data-window-component="O8c" data-view-id="west_facade" data-window-style="exterior" id="facade-window-O8c"></g>
 
-                        <!-- Dynamic Component: O8b (Middle Clerestory Window, 1620×740 mm, hp=2060 mm, Y = 13650..15270 mm) -->
+                        <!-- Dynamic Component: O8b (Middle Clerestory Window, 1620×740 mm, hp=2060 mm, Y = 13410..15030 mm) -->
                         <g data-window-component="O8b" data-view-id="west_facade" data-window-style="exterior" id="facade-window-O8b"></g>
 
-                        <!-- Dynamic Component: O8a (Right 3-Pane Clerestory Window, 5485×740 mm, hp=2060 mm, Y = 15550..21035 mm) -->
+                        <!-- Dynamic Component: O8a (Right 3-Pane Clerestory Window, 5500×740 mm, hp=2060 mm, Y = 15290..20790 mm) -->
                         <g data-window-component="O8a" data-view-id="west_facade" data-window-style="exterior" id="facade-window-O8a"></g>
                     </g>
 
                     <!-- ==================================== -->
                     <!-- INTERMEDIATE CORNICE (GZYMS POŚREDNI) -->
                     <!-- Level: +2.80m (Y=-280) to +3.43m (Y=-343) = 630 mm high -->
-                    <!-- Spans entire 21,415 mm ground floor with 100 mm overhangs (X = -10 to 2151.5) -->
+                    <!-- Spans entire 21,440 mm ground floor (X = -27 to 2117) with 100 mm overhangs (X = -37 to 2127) -->
                     <!-- ==================================== -->
                     <g id="intermediate-cornice" class="interactive-element" onclick="showElementDetails('CORNICE')">
-                        <rect x="-10" y="-280" width="2161.5" height="6" fill="#090b0e" />
-                        <polygon points="-10,-343 2151.5,-343 2151.5,-280 -10,-280" fill="url(#fascia-gradient)" stroke="#0a0c10" stroke-width="1.5" filter="url(#shadow)" />
-                        <line x1="-10" y1="-343" x2="2151.5" y2="-343" stroke="#475569" stroke-width="1.2" />
-                        <line x1="-10" y1="-280" x2="2151.5" y2="-280" stroke="#1e293b" stroke-width="1" />
+                        <rect x="-37" y="-280" width="2164" height="6" fill="#090b0e" />
+                        <polygon points="-37,-343 2127,-343 2127,-280 -37,-280" fill="url(#fascia-gradient)" stroke="#0a0c10" stroke-width="1.5" filter="url(#shadow)" />
+                        <line x1="-37" y1="-343" x2="2127" y2="-343" stroke="#475569" stroke-width="1.2" />
+                        <line x1="-37" y1="-280" x2="2127" y2="-280" stroke="#1e293b" stroke-width="1" />
 
                         <!-- Vertical Cassette Panel Seams matching attached drawing -->
+                        <line x1="-27" y1="-343" x2="-27" y2="-280" stroke="#2d3748" stroke-width="1.2" />
                         <line x1="0" y1="-343" x2="0" y2="-280" stroke="#2d3748" stroke-width="1.2" />
                         <line x1="80" y1="-343" x2="80" y2="-280" stroke="#2d3748" stroke-width="1" />
                         <line x1="160" y1="-343" x2="160" y2="-280" stroke="#2d3748" stroke-width="1" />
@@ -868,7 +870,7 @@
                         <line x1="1920" y1="-343" x2="1920" y2="-280" stroke="#2d3748" stroke-width="1" />
                         <line x1="2000" y1="-343" x2="2000" y2="-280" stroke="#2d3748" stroke-width="1" />
                         <line x1="2080" y1="-343" x2="2080" y2="-280" stroke="#2d3748" stroke-width="1" />
-                        <line x1="2141.5" y1="-343" x2="2141.5" y2="-280" stroke="#2d3748" stroke-width="1.2" />
+                        <line x1="2117" y1="-343" x2="2117" y2="-280" stroke="#2d3748" stroke-width="1.2" />
                     </g>
 
                     <!-- ==================================== -->
@@ -883,11 +885,11 @@
                         <!-- North-West Corner Window Wrap-Around Mullion Post (X = 310..318, Y = -613..-418) -->
                         <rect x="310" y="-613" width="8" height="195" fill="#0f172a" stroke="#1e293b" stroke-width="1" />
 
-                        <!-- Dynamic Window Component: O13b (Corner Window West Face, 2400×1950 mm, hp=850 mm, Y = 3180..5580 mm) -->
-                        <g data-window-component="O13b" data-view-id="west_facade" data-window-style="exterior" id="facade-window-O13b"></g>
+                        <!-- Dynamic Window Component: O13b_1 (Corner Window West Face, 2400×1950 mm, hp=850 mm, Y = 3180..5580 mm) -->
+                        <g data-window-component="O13b_1" data-view-id="west_facade" data-window-style="exterior" id="facade-window-O13b_1"></g>
 
-                        <!-- Dynamic Window Component: WO2 (South-West Bedroom Window, 2400×1950 mm, hp=850 mm, Y = 9400..11800 mm) -->
-                        <g data-window-component="WO2" data-view-id="west_facade" data-window-style="exterior" id="facade-window-WO2"></g>
+                        <!-- Dynamic Window Component: O13b_2 (South-West Bedroom Window, 2400×1950 mm, hp=850 mm, Y = 9400..11800 mm) -->
+                        <g data-window-component="O13b_2" data-view-id="west_facade" data-window-style="exterior" id="facade-window-O13b_2"></g>
                     </g>
 
                     <!-- ==================================== -->
@@ -924,21 +926,21 @@
                         <!-- Roof overhang soffit shadow on upper floor -->
                         <rect x="310" y="-613" width="880" height="22" fill="#000000" opacity="0.35" />
                         <!-- Intermediate cornice shadow on ground floor wall -->
-                        <rect x="0" y="-280" width="2141.5" height="16" fill="#000000" opacity="0.32" />
+                        <rect x="-27" y="-280" width="2144" height="16" fill="#000000" opacity="0.32" />
                         <!-- Angled sunlight shadow inside the recessed entrance alcove (matching architectural drawing) -->
-                        <polygon id="wf-entrance-nook-shadow" points="860,-280 1130,-280 1130,-225 975,-225 860,-140" fill="#090d16" opacity="0.52" />
+                        <polygon id="wf-entrance-nook-shadow" points="856,-280 1106,-280 1106,-225 971,-225 856,-140" fill="#090d16" opacity="0.52" />
                     </g>
 
                     <!-- ==================================== -->
                     <!-- LAYER: MASSING STEP-BACKS & CORNER AXES -->
                     <!-- ==================================== -->
                     <g id="layer-setbacks" pointer-events="none">
-                        <!-- North Upper Floor Step-Back Axis at Y = 3,100 mm (Garage Protrusion = 3,100 mm) -->
+                        <!-- North Upper Floor Step-Back Axis at Y = 3,100 mm (Garage Protrusion from Axis A = 3,100 mm) -->
                         <line x1="310" y1="-705" x2="310" y2="25" stroke="#10b981" stroke-width="1.3" stroke-dasharray="6 4" opacity="0.85" />
                         <rect x="215" y="-322" width="190" height="18" rx="3" fill="#065f46" opacity="0.92" />
                         <text x="310" y="-310" font-family="'JetBrains Mono', monospace" font-size="9" fill="#ecfdf5" font-weight="700" text-anchor="middle">UPPER START: Y = 3 100 mm</text>
 
-                        <!-- South Upper Floor Step-Back Axis at Y = 11,900 mm (Living Wing Setback = 9,515 mm) -->
+                        <!-- South Upper Floor Step-Back Axis at Y = 11,900 mm (Living Wing Setback = 9,270 mm) -->
                         <line x1="1190" y1="-705" x2="1190" y2="25" stroke="#10b981" stroke-width="1.3" stroke-dasharray="6 4" opacity="0.85" />
                         <rect x="1095" y="-322" width="190" height="18" rx="3" fill="#065f46" opacity="0.92" />
                         <text x="1190" y="-310" font-family="'JetBrains Mono', monospace" font-size="9" fill="#ecfdf5" font-weight="700" text-anchor="middle">UPPER END: Y = 11 900 mm</text>
@@ -948,15 +950,49 @@
                     <!-- LAYER: DIMENSIONS (WYMIARY Y: NORTH -> SOUTH) -->
                     <!-- ==================================== -->
                     <g id="layer-dims">
-                        <!-- TIER 1 (TOP): TOTAL WEST FACADE LENGTH (21,415 mm) at Y = -840 -->
-                        <g transform="translate(0, -840)">
-                            <line x1="0" y1="0" x2="0" y2="495" stroke="#d97706" stroke-width="0.8" stroke-dasharray="3 3" opacity="0.5" />
-                            <line x1="2141.5" y1="0" x2="2141.5" y2="495" stroke="#d97706" stroke-width="0.8" stroke-dasharray="3 3" opacity="0.5" />
-                            <line x1="0" y1="0" x2="2141.5" y2="0" class="dim-solid" />
-                            <line x1="0" y1="-10" x2="0" y2="10" class="tick" />
-                            <line x1="2141.5" y1="-10" x2="2141.5" y2="10" class="tick" />
-                            <rect x="910" y="-14" width="320" height="22" fill="#ffffff" stroke="#fde68a" rx="4" />
-                            <text x="1070" y="2" class="dim-text" font-size="14" font-weight="700">21 415 mm (21.415 m | North Y=0 → South)</text>
+                        <!-- VERTICAL REFERENCE LINE FOR POINT 0 / AXIS A (Y = 0 mm) -->
+                        <!-- Located 270 mm (27 cm) to the right from the beginning of the lower-level wall (Y = -270 mm) -->
+                        <g id="point-zero-reference">
+                            <line x1="0" y1="-895" x2="0" y2="245" stroke="#ef4444" stroke-width="1.8" stroke-dasharray="6 3" opacity="0.9" />
+
+                            <!-- Top Architectural Axis A Bubble (Oś A / Axis A = Point 0) -->
+                            <circle cx="0" cy="-912" r="16" fill="#ef4444" stroke="#ffffff" stroke-width="2" />
+                            <text x="0" y="-912" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="800" fill="#ffffff" text-anchor="middle" dominant-baseline="central">A</text>
+                            <rect x="20" y="-923" width="160" height="22" rx="4" fill="#fef2f2" stroke="#ef4444" stroke-width="1.2" />
+                            <text x="100" y="-908" font-family="'JetBrains Mono', monospace" font-size="10.5" font-weight="800" fill="#b91c1c" text-anchor="middle">Oś A / Axis A (Punkt 0)</text>
+
+                            <!-- Lower Level Point 0 / Axis A Marker (+270 mm to the right from beginning of ground-floor wall at Y = -270 mm) -->
+                            <line x1="-27" y1="2" x2="-27" y2="66" stroke="#ef4444" stroke-width="1" stroke-dasharray="2 2" opacity="0.85" />
+                            <line x1="-27" y1="52" x2="0" y2="52" stroke="#ef4444" stroke-width="1.8" />
+                            <line x1="-27" y1="45" x2="-27" y2="59" stroke="#ef4444" stroke-width="1.8" />
+                            <line x1="0" y1="45" x2="0" y2="59" stroke="#ef4444" stroke-width="1.8" />
+                            <rect x="-32" y="27" width="37" height="17" rx="3" fill="#fef2f2" stroke="#ef4444" stroke-width="1" />
+                            <text x="-13.5" y="39" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="800" fill="#b91c1c" text-anchor="middle">270</text>
+
+                            <circle cx="0" cy="52" r="11" fill="#ef4444" stroke="#ffffff" stroke-width="1.5" />
+                            <text x="0" y="52" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="800" fill="#ffffff" text-anchor="middle" dominant-baseline="central">0</text>
+                            <rect x="15" y="42" width="232" height="20" rx="4" fill="#fef2f2" stroke="#ef4444" stroke-width="1" />
+                            <text x="131" y="56" font-family="'JetBrains Mono', monospace" font-size="9.5" font-weight="700" fill="#b91c1c" text-anchor="middle">0 = Axis A / Oś A (+270 mm od początku ściany)</text>
+                        </g>
+
+                        <!-- TIER 1A (TOP): TOTAL LOWER-LEVEL WALL LENGTH (21,440 mm: Y = -270 to 21,170 mm) at Y = -865 -->
+                        <g transform="translate(0, -865)">
+                            <line x1="-27" y1="0" x2="-27" y2="520" stroke="#d97706" stroke-width="0.8" stroke-dasharray="3 3" opacity="0.5" />
+                            <line x1="2117" y1="0" x2="2117" y2="520" stroke="#d97706" stroke-width="0.8" stroke-dasharray="3 3" opacity="0.5" />
+                            <line x1="-27" y1="0" x2="2117" y2="0" class="dim-solid" />
+                            <line x1="-27" y1="-8" x2="-27" y2="8" class="tick" />
+                            <line x1="2117" y1="-8" x2="2117" y2="8" class="tick" />
+                            <rect x="835" y="-13" width="420" height="20" fill="#ffffff" stroke="#fde68a" rx="4" />
+                            <text x="1045" y="1" class="dim-text" font-size="12.5" font-weight="700">21 440 mm (Całkowita dł. ściany parteru: Y = -270 → 21 170)</text>
+                        </g>
+
+                        <!-- TIER 1B: LENGTH FROM POINT 0 / AXIS A (21,170 mm: Y = 0 to 21,170 mm) at Y = -820 -->
+                        <g transform="translate(0, -820)">
+                            <line x1="0" y1="0" x2="2117" y2="0" class="dim-solid" />
+                            <line x1="0" y1="-8" x2="0" y2="8" class="tick" />
+                            <line x1="2117" y1="-8" x2="2117" y2="8" class="tick" />
+                            <rect x="865" y="-13" width="380" height="20" fill="#ffffff" stroke="#fde68a" rx="4" />
+                            <text x="1055" y="1" class="dim-text" font-size="12.5" font-weight="700">21 170 mm (Od Osi A / Punktu 0: Y = 0 → 21 170)</text>
                         </g>
 
                         <!-- TIER 2: UPPER FLOOR SETBACKS & OPENINGS at Y = -765 -->
@@ -969,7 +1005,7 @@
                             <!-- Populated & synchronized dynamically by updateWestFacadeDimensions() -->
                         </g>
 
-                        <!-- TIER 4 (SUB-TOTAL): RIGHT WING SPAN (FROM START OF 630 WALL AT Y=11,300 TO RIGHT BUILDING EDGE AT Y=21,415) at Y = +185 -->
+                        <!-- TIER 4 (SUB-TOTAL): ENTRANCE NOOK (2,500 mm) & RIGHT WING SPAN (10,110 mm) at Y = +185 -->
                         <g id="wf-south-wing-dims-group" transform="translate(0, 185)">
                             <!-- Populated & synchronized dynamically by updateWestFacadeDimensions() -->
                         </g>
@@ -1004,17 +1040,17 @@
                             <text x="24" y="-5" class="level-label">Nadproże okien piętra / Spód gzymsu</text>
                         </g>
 
-                        <!-- +4.18m Upper Window Sill hp=85cm (O13b & WO2) -->
+                        <!-- +4.18m Upper Window Sill hp=85cm (O13b_1 & O13b_2) -->
                         <g transform="translate(-210, -418)">
                             <line x1="0" y1="0" x2="520" y2="0" class="level-marker" stroke-dasharray="2 2" opacity="0.75" />
                             <polygon points="0,0 14,-6 14,6" fill="var(--level-color)" />
                             <text x="-10" y="4" class="level-text" text-anchor="end">+4,18</text>
-                            <text x="24" y="-5" class="level-label">Parapet okien O13b i WO2 (hp=85)</text>
+                            <text x="24" y="-5" class="level-label">Parapet okien O13b (hp=85)</text>
                         </g>
 
                         <!-- +3.43m Top of Intermediate Cornice -->
                         <g transform="translate(-210, -343)">
-                            <line x1="0" y1="0" x2="200" y2="0" class="level-marker" stroke="#d97706" stroke-width="1.4" stroke-dasharray="3 2" />
+                            <line x1="0" y1="0" x2="173" y2="0" class="level-marker" stroke="#d97706" stroke-width="1.4" stroke-dasharray="3 2" />
                             <polygon points="0,0 16,-7 16,7" fill="#d97706" />
                             <text x="-10" y="4" class="level-text" font-weight="700" fill="#d97706" text-anchor="end">+3,43</text>
                             <text x="24" y="-5" class="level-label" font-weight="600" fill="#b45309">Gzyms pośredni (Wierzch)</text>
@@ -1022,26 +1058,26 @@
 
                         <!-- +2.80m Bottom of Intermediate Cornice / O8a-O8c Head -->
                         <g transform="translate(-210, -280)">
-                            <line x1="0" y1="0" x2="200" y2="0" class="level-marker" stroke="#d97706" stroke-width="1.4" stroke-dasharray="3 2" />
+                            <line x1="0" y1="0" x2="173" y2="0" class="level-marker" stroke="#d97706" stroke-width="1.4" stroke-dasharray="3 2" />
                             <polygon points="0,0 16,-7 16,7" fill="#d97706" />
                             <text x="-10" y="4" class="level-text" font-weight="700" fill="#d97706" text-anchor="end">+2,80</text>
                             <text x="24" y="-5" class="level-label" font-weight="600" fill="#b45309">Gzyms pośredni (Spód / Nadproże O8a–O8c)</text>
                         </g>
 
-                        <!-- +2.25m Garage Door GD1 & Entrance Door D_EXT Head -->
-                        <g transform="translate(-210, -225)">
-                            <line x1="0" y1="0" x2="210" y2="0" class="level-marker" stroke="#f59e0b" stroke-dasharray="2 2" opacity="0.8" />
+                        <!-- +2.20m Garage Door Z2 Head (+2.25m for Z1) -->
+                        <g transform="translate(-210, -220)">
+                            <line x1="0" y1="0" x2="279" y2="0" class="level-marker" stroke="#f59e0b" stroke-dasharray="2 2" opacity="0.8" />
                             <polygon points="0,0 14,-6 14,6" fill="#f59e0b" />
-                            <text x="-10" y="4" class="level-text" fill="#b45309" text-anchor="end">+2,25</text>
-                            <text x="24" y="-5" class="level-label" fill="#92400e">Nadproże bramy GD1 i drzwi D_EXT</text>
+                            <text x="-10" y="4" class="level-text" fill="#b45309" text-anchor="end">+2,20</text>
+                            <text x="24" y="-5" class="level-label" fill="#92400e">Nadproże bramy Z2 (220 cm) | Z1: +2,25</text>
                         </g>
 
                         <!-- -0.02m Exterior Ground / Driveway Level -->
                         <g transform="translate(-210, 2)">
-                            <line x1="0" y1="0" x2="210" y2="0" class="level-marker" stroke-width="1.4" stroke-dasharray="3 2" />
+                            <line x1="0" y1="0" x2="183" y2="0" class="level-marker" stroke-width="1.4" stroke-dasharray="3 2" />
                             <polygon points="0,0 16,-7 16,7" fill="var(--level-color)" />
                             <text x="-10" y="4" class="level-text" text-anchor="end">-0,02</text>
-                            <text x="24" y="-5" class="level-label">Poziom terenu / Podjazd (Y=0..21415)</text>
+                            <text x="24" y="-5" class="level-label">Poziom terenu / Podjazd (Y=-270..21170)</text>
                         </g>
 
                         <!-- RIGHT MARGIN LEVEL ANNOTATIONS (South Side, matching attached drawing) -->
@@ -1056,22 +1092,22 @@
                             <text x="80" y="4" class="level-text" text-anchor="start">+6,13</text>
                         </g>
                         <g transform="translate(2210, -343)">
-                            <line x1="-58.5" y1="0" x2="70" y2="0" class="level-marker" stroke="#d97706" stroke-dasharray="3 2" />
+                            <line x1="-83" y1="0" x2="70" y2="0" class="level-marker" stroke="#d97706" stroke-dasharray="3 2" />
                             <polygon points="70,0 54,-6 54,6" fill="#d97706" />
                             <text x="80" y="4" class="level-text" font-weight="700" fill="#d97706" text-anchor="start">+3,43</text>
                         </g>
                         <g transform="translate(2210, -280)">
-                            <line x1="-58.5" y1="0" x2="70" y2="0" class="level-marker" stroke="#d97706" stroke-dasharray="3 2" />
+                            <line x1="-83" y1="0" x2="70" y2="0" class="level-marker" stroke="#d97706" stroke-dasharray="3 2" />
                             <polygon points="70,0 54,-6 54,6" fill="#d97706" />
                             <text x="80" y="4" class="level-text" font-weight="700" fill="#d97706" text-anchor="start">+2,80</text>
                         </g>
                         <g transform="translate(2210, -206)">
-                            <line x1="-106.5" y1="0" x2="70" y2="0" class="level-marker" stroke="#f59e0b" stroke-dasharray="2 2" />
+                            <line x1="-131" y1="0" x2="70" y2="0" class="level-marker" stroke="#f59e0b" stroke-dasharray="2 2" />
                             <polygon points="70,0 54,-6 54,6" fill="#f59e0b" />
                             <text x="80" y="4" class="level-text" fill="#b45309" text-anchor="start">+2,06 (hp O8a–O8c)</text>
                         </g>
                         <g transform="translate(2210, 2)">
-                            <line x1="-68.5" y1="0" x2="70" y2="0" class="level-marker" stroke-dasharray="3 2" />
+                            <line x1="-93" y1="0" x2="70" y2="0" class="level-marker" stroke-dasharray="3 2" />
                             <polygon points="70,0 54,-6 54,6" fill="var(--level-color)" />
                             <text x="80" y="4" class="level-text" text-anchor="start">-0,02</text>
                         </g>
@@ -1122,43 +1158,43 @@
                     <div class="photo-wrapper">
                         <img src="west_facade_drawing.png" alt="West Facade Architectural Elevation Drawing">
 
-                        <!-- Hotspot 1: O13b Upper North-West Corner Window -->
-                        <div class="hotspot" style="top: 43%; left: 26.8%;" onclick="showElementDetails('O13b')">
+                        <!-- Hotspot 1: O13b (O13b_1) Upper North-West Corner Window -->
+                        <div class="hotspot" style="top: 43%; left: 26.8%;" onclick="showElementDetails('O13b_1')">
                             1
                             <div class="hotspot-tooltip">
-                                <strong>1. Corner Window O13b (1.01 Master Bedroom)</strong><br>
+                                <strong>1. Corner Window O13b [O13b_1] (1.01 Master Bedroom)</strong><br>
                                 Y = 3,180..5,580 mm | Width: 2,400 mm | Height: 1,950 mm<br>
-                                Meets North Facade O13a at NW upper corner (X=20590, Y=3100)
+                                Meets North Facade O13a at NW upper corner (X=20505, Y=3100)
                             </div>
                         </div>
 
-                        <!-- Hotspot 2: WO2 Upper South-West Bedroom Window -->
-                        <div class="hotspot" style="top: 43%; left: 48.2%;" onclick="showElementDetails('WO2')">
+                        <!-- Hotspot 2: O13b (O13b_2) Upper South-West Bedroom Window -->
+                        <div class="hotspot" style="top: 43%; left: 48.2%;" onclick="showElementDetails('O13b_2')">
                             2
                             <div class="hotspot-tooltip">
-                                <strong>2. Window WO2 (1.05 South-West Bedroom)</strong><br>
+                                <strong>2. Window O13b [O13b_2] (1.05 South-West Bedroom)</strong><br>
                                 Y = 9,400..11,800 mm | Width: 2,400 mm | Height: 1,950 mm<br>
                                 2-sash window (left fixed, right tilt-and-turn), hp = 850 mm
                             </div>
                         </div>
 
-                        <!-- Hotspot 3: GD1 Garage Sectional Door -->
-                        <div class="hotspot" style="top: 73%; left: 23.2%;" onclick="showElementDetails('GD1')">
+                        <!-- Hotspot 3: Z2 Garage Sectional Door -->
+                        <div class="hotspot" style="top: 73%; left: 23.2%;" onclick="showElementDetails('Z2')">
                             3
                             <div class="hotspot-tooltip">
-                                <strong>3. Garage Sectional Door GD1 (0.01 Garaż)</strong><br>
-                                Y = 1,000..6,150 mm | Width: 5,150 mm | Height: 2,250 mm<br>
-                                Double-car sectional garage door, threshold at ±0.00 m
+                                <strong>3. Garage Sectional Door Z2 (0.01 Garaż)</strong><br>
+                                Y = 690..5,890 mm | Width: 5,200 mm | Height: 2,200 mm<br>
+                                690 mm from Axis A (Point 0), threshold at ±0.00 m
                             </div>
                         </div>
 
-                        <!-- Hotspot 4: D_EXT Main Entrance Door + Sidelight -->
-                        <div class="hotspot" style="top: 73%; left: 47.7%;" onclick="showElementDetails('D_EXT')">
+                        <!-- Hotspot 4: Z1 Main Entrance Door + Sidelight -->
+                        <div class="hotspot" style="top: 73%; left: 47.7%;" onclick="showElementDetails('Z1')">
                             4
                             <div class="hotspot-tooltip">
-                                <strong>4. Main Entrance Door D_EXT (0.04 Wiatrołap)</strong><br>
-                                Y = 9,260..10,830 mm | Width: 1,570 mm | Height: 2,250 mm<br>
-                                Recessed entry door leaf + right glazed sidelight
+                                <strong>4. Main Entrance Door Z1 (0.04 Wiatrołap)</strong><br>
+                                Y = 8,960..10,660 mm | Width: 1,700 mm | Height: 2,250 mm<br>
+                                Centered in 2,500 mm nook (400 wall + 1,700 Z1 + 400 wall)
                             </div>
                         </div>
 
@@ -1167,7 +1203,7 @@
                             5
                             <div class="hotspot-tooltip">
                                 <strong>5. Clerestory Window O8c (0.12 Jadalnia)</strong><br>
-                                <span id="hotspot-o8c-dims">Y = 11,930..13,370 mm | Width: 1,440 mm | Height: 740 mm</span><br>
+                                <span id="hotspot-o8c-dims">Y = 11,690..13,130 mm | Width: 1,440 mm | Height: 740 mm</span><br>
                                 Fixed window (630 mm right of entry nook)
                             </div>
                         </div>
@@ -1177,7 +1213,7 @@
                             6
                             <div class="hotspot-tooltip">
                                 <strong>6. Clerestory Window O8b (0.12 Jadalnia)</strong><br>
-                                <span id="hotspot-o8b-dims">Y = 13,650..15,270 mm | Width: 1,620 mm | Height: 740 mm</span><br>
+                                <span id="hotspot-o8b-dims">Y = 13,410..15,030 mm | Width: 1,620 mm | Height: 740 mm</span><br>
                                 <span id="hotspot-o8b-desc">Fixed window flanked by 280 mm clinker brick piers</span>
                             </div>
                         </div>
@@ -1187,7 +1223,7 @@
                             7
                             <div class="hotspot-tooltip">
                                 <strong>7. 3-Pane Clerestory Window O8a (0.11 Salon)</strong><br>
-                                Y = 15,550..21,035 mm | Width: 5,485 mm | Height: 740 mm<br>
+                                Y = 15,290..20,790 mm | Width: 5,500 mm | Height: 740 mm<br>
                                 3 equal windows, 380 mm from South-West corner
                             </div>
                         </div>
@@ -1201,7 +1237,7 @@
         <!-- ========================================== -->
         <div id="Tab2DCoords" class="tab-content">
             <div class="diagram-box">
-                <h3 style="margin: 0 0 8px 0; font-size: 18px; color: #0f172a;">2D Building Coordinate System: Origin <code>(0, 0)</code> at North-East Corner</h3>
+                <h3 style="margin: 0 0 8px 0; font-size: 18px; color: #0f172a;">2D Building Coordinate System: Point 0 / Axis 6 (North) &amp; Point 0 / Axis A (West)</h3>
                 <p style="margin: 0 0 20px 0; font-size: 14px; color: #64748b;">
                     The architectural coordinate service transforms 2D building coordinates <code>(x, y)</code> into local 1D horizontal screen coordinates for any exterior or interior wall elevation:
                 </p>
@@ -1210,9 +1246,9 @@
                     <div class="info-card">
                         <h4>📐 1. Global 2D Plan Axes <code>(x, y)</code></h4>
                         <p>
-                            • <strong>Origin <code>(0, 0)</code>:</strong> North-East Corner of the building.<br>
-                            • <strong><code>x</code> Axis (<code>&lt;east - west&gt;</code>):</strong> <code>0 mm</code> at East edge, increasing Westward to <code>20,590 / 21,000 mm</code>.<br>
-                            • <strong><code>y</code> Axis (<code>&lt;north - south&gt;</code>):</strong> <code>0 mm</code> at North edge, increasing Southward to <code>21,415 mm</code>.
+                            • <strong>Origin <code>(0, 0)</code>:</strong> Intersection of <strong>Axis 6</strong> (<code>X = 0 mm</code>) and <strong>Axis A</strong> (<code>Y = 0 mm</code>).<br>
+                            • <strong><code>x</code> Axis (<code>&lt;east - west&gt;</code>):</strong> <code>0 mm</code> at Axis 6 (<code>270 mm</code> right of lower-level wall start at <code>X = -270 mm</code>), increasing Westward to <code>20,505 mm</code>.<br>
+                            • <strong><code>y</code> Axis (<code>&lt;north - south&gt;</code>):</strong> <code>0 mm</code> at Axis A (<code>270 mm</code> right of lower-level wall start at <code>Y = -270 mm</code>), increasing Southward to <code>21,170 mm</code> (total lower-level wall = <code>21,440 mm</code>).
                         </p>
                     </div>
                     <div class="info-card">
@@ -1225,10 +1261,10 @@
                         </p>
                     </div>
                     <div class="info-card">
-                        <h4>🔗 3. NW Corner Window <code>O13a</code> / <code>O13b</code></h4>
+                        <h4>🔗 3. Two Distinct <code>O13b</code> Windows on First Floor</h4>
                         <p>
-                            • On the <strong>North Facade</strong> (<code>direction: "west"</code>), <code>O13a</code> sits at the West end of the upper floor (<code>X = 18,990..20,590 mm, Y = 3,100 mm</code>).<br>
-                            • On the <strong>West Facade</strong> (<code>direction: "south"</code>), <code>O13b</code> wraps around the exact same corner at <code>X = 20,590 mm, Y = 3,180..5,580 mm</code> after the <code>80 mm</code> corner mullion.
+                            • <strong><code>O13b_1</code> (Symbol <code>O13b</code>):</strong> North-West corner window (<code>X = 20,505 mm, Y = 3,180..5,580 mm</code>) meeting North Facade <code>O13a</code>.<br>
+                            • <strong><code>O13b_2</code> (Symbol <code>O13b</code>):</strong> South-West bedroom window (<code>X = 20,505 mm, Y = 9,400..11,800 mm</code>), stored as a separate distinct object.
                         </p>
                     </div>
                 </div>
@@ -1242,16 +1278,16 @@
             <div class="diagram-box">
                 <h3 style="margin: 0 0 8px 0; font-size: 18px; color: #0f172a;">West Facade Openings Schedule (Zestawienie Stolarki Elewacji Zachodniej)</h3>
                 <p style="margin: 0 0 20px 0; font-size: 14px; color: #64748b;">
-                    Complete schedule of all 7 openings (windows, garage door, entrance door) on the West Facade (<code>21,415 mm</code> overall length, <code>direction: "south"</code>). Values synchronize in real time with the 2D Architecture Database.
+                    Complete schedule of all 7 openings (two distinct <code>O13b</code> windows on the first floor, garage door <code>Z2</code>, entrance door <code>Z1</code>, and clerestory windows <code>O8c</code>, <code>O8b</code>, <code>O8a</code>) on the West Facade (<code>21,170 mm</code> from Point 0 / Axis A, <code>21,440 mm</code> total lower-level wall length).
                 </p>
 
                 <div class="table-responsive">
                     <table class="schedule-table">
                         <thead>
                             <tr>
-                                <th>Symbol</th>
+                                <th>Symbol (Object ID)</th>
                                 <th>Floor / Room</th>
-                                <th>Screen Offset (North → South)</th>
+                                <th>Screen Offset from Axis A (Y=0)</th>
                                 <th>2D Plan Coords (X, Y)</th>
                                 <th>Width (mm)</th>
                                 <th>Height (mm)</th>
@@ -1305,88 +1341,88 @@
         }
 
         const elementData = {
-            'O13b': {
-                title: 'Corner Window O13b — Master Bedroom West Face (1.01 Sypialnia)',
-                subtitle: 'West-Facing Pane of North-West Corner Window Assembly',
-                dims: 'Width: 2,400 mm | Height: 1,950 mm | Sill: hp = 850 mm (+4.18 m) | Plan (X, Y): (20,590, 3,180 mm) | Span Y: 3,180 to 5,580 mm',
+            'O13b_1': {
+                title: 'Corner Window O13b [Object: O13b_1] — Master Bedroom West Face (1.01 Sypialnia)',
+                subtitle: 'West-Facing Pane of North-West Corner Window Assembly (Distinct Object #1)',
+                dims: 'Width: 2,400 mm | Height: 1,950 mm | Sill: hp = 850 mm (+4.18 m) | Plan (X, Y): (20,505, 3,180 mm) | Span Y: 3,180 to 5,580 mm',
                 room: 'First Floor, North-West Master Bedroom (1.01). Joins North Facade window O13a at the North-West upper corner (Y = 3,100 mm) via an 80 mm corner mullion.',
                 specs: 'Frameless glass-to-glass / slim mullion corner joinery, triple solar-control glazing, matte anthracite aluminum profile.'
             },
-            'WO2': {
-                title: 'Window WO2 — Upper Floor South-West Bedroom (1.05 Sypialnia)',
-                subtitle: 'Two-Sash Window (Left Fixed, Right Tilt-and-Turn)',
-                dims: 'Width: 2,400 mm | Height: 1,950 mm | Sill: hp = 850 mm (+4.18 m) | Plan (X, Y): (20,590, 9,400 mm) | Span Y: 9,400 to 11,800 mm',
+            'O13b_2': {
+                title: 'Window O13b [Object: O13b_2] — Upper Floor South-West Bedroom (1.05 Sypialnia)',
+                subtitle: 'Two-Sash Window (Left Fixed, Right Tilt-and-Turn — Distinct Object #2)',
+                dims: 'Width: 2,400 mm | Height: 1,950 mm | Sill: hp = 850 mm (+4.18 m) | Plan (X, Y): (20,505, 9,400 mm) | Span Y: 9,400 to 11,800 mm',
                 room: 'First Floor, South-West Bedroom (1.05). Positioned 100 mm north of the southern end of the upper floor volume (Y = 11,900 mm).',
                 specs: '2 equal sashes (1,200 mm each): left fixed pane, right tilt-and-turn casement; anthracite aluminum frame set in vertical timber cladding.'
             },
-            'GD1': {
-                title: 'Garage Sectional Door GD1 — Double Garage (0.01 Garaż)',
-                subtitle: 'Insulated Automatic Sectional Overhead Garage Door',
-                dims: 'Width: 5,150 mm | Height: 2,250 mm | Threshold: hp = 0 mm (±0.00 m) | Plan (X, Y): (20,590, 1,000 mm) | Span Y: 1,000 to 6,150 mm',
-                room: 'Ground Floor, Double Garage (0.01). Starts 1,000 mm South of the North-West building corner (Y = 0 mm).',
-                specs: 'Smooth matte anthracite flush sectional panels (RAL 7016), thermal break perimeter seals, recessed in clinker brick masonry reveal.'
+            'Z2': {
+                title: 'Garage Sectional Door Z2 — Double Garage (0.01 Garaż)',
+                subtitle: 'Insulated Automatic Sectional Overhead Garage Door (5,200 × 2,200 mm)',
+                dims: 'Width: 5,200 mm | Height: 2,200 mm | Threshold: hp = 0 mm (±0.00 m) | Plan (X, Y): (20,505, 690 mm) | Span Y: 690 to 5,890 mm',
+                room: 'Ground Floor, Double Garage (0.01). Starts 690 mm South of Point 0 / Axis A (Y = 0 mm), i.e. 960 mm from the lower-level wall start (Y = -270 mm).',
+                specs: 'Smooth matte anthracite flush sectional panels (RAL 7016), 5,200 mm wide × 2,200 mm tall, thermal break perimeter seals.'
             },
-            'D_EXT': {
-                title: 'Main Entrance Door D_EXT — Vestibule (0.04 Wiatrołap)',
-                subtitle: 'Recessed Exterior Entrance Door Leaf with Right Glazed Sidelight',
-                dims: 'Width: 1,570 mm (940 mm door + 630 mm sidelight) | Height: 2,250 mm | Threshold: hp = 0 mm | Plan (X, Y): (19,800, 9,260 mm) | Span Y: 9,260 to 10,830 mm',
-                room: 'Ground Floor, Main Entrance Vestibule (0.04). Set inside the sheltered entrance alcove (Y = 8,600 to 11,300 mm) under the intermediate cornice.',
+            'Z1': {
+                title: 'Main Entrance Door Z1 — Vestibule (0.04 Wiatrołap)',
+                subtitle: 'Recessed Exterior Entrance Door Leaf with Right Glazed Sidelight (1,700 × 2,250 mm)',
+                dims: 'Width: 1,700 mm | Height: 2,250 mm | Threshold: hp = 0 mm | Plan (X, Y): (19,800, 8,960 mm) | Span Y: 8,960 to 10,660 mm',
+                room: 'Ground Floor, Main Entrance Vestibule (0.04). Centered inside the 2,500 mm entrance nook (Y = 8,560 to 11,060 mm), flanked by 400 mm walls on both sides.',
                 specs: 'High-insulation aluminum entrance door (Ud=0.75 W/m²K) with full-height vertical stainless steel pull bar and triple safety glass sidelight.'
             },
             'O8c': {
                 title: 'Clerestory Window O8c — Dining & Living Room (0.12 Jadalnia)',
                 subtitle: 'Single-Pane High-Level Fixed Clerestory Window',
-                dims: 'Width: 1,440 mm | Height: 740 mm | Sill: hp = 2,060 mm (+2.06 m to +2.80 m) | Plan (X, Y): (20,590, 11,930 mm) | Span Y: 11,930 to 13,370 mm',
-                room: 'Ground Floor, Western Wall of Dining Area (0.12). Positioned 630 mm south of the entrance nook (Y = 11,300 mm) and 280 mm north of O8b.',
+                dims: 'Width: 1,440 mm | Height: 740 mm | Sill: hp = 2,060 mm (+2.06 m to +2.80 m) | Plan (X, Y): (20,505, 11,690 mm) | Span Y: 11,690 to 13,130 mm',
+                room: 'Ground Floor, Western Wall of Dining Area (0.12). Positioned 630 mm south of the entrance nook (Y = 11,060 mm) and 280 mm north of O8b.',
                 specs: 'Single fixed triple-glazed pane (1,440 × 740 mm) in matte anthracite aluminum frame; head flush with intermediate cornice at +2.80 m.'
             },
             'O8b': {
                 title: 'Clerestory Window O8b — Dining & Living Room (0.12 Jadalnia)',
                 subtitle: 'Single-Pane High-Level Fixed Clerestory Window',
-                dims: 'Width: 1,620 mm | Height: 740 mm | Sill: hp = 2,060 mm (+2.06 m to +2.80 m) | Plan (X, Y): (20,590, 13,650 mm) | Span Y: 13,650 to 15,270 mm',
+                dims: 'Width: 1,620 mm | Height: 740 mm | Sill: hp = 2,060 mm (+2.06 m to +2.80 m) | Plan (X, Y): (20,505, 13,410 mm) | Span Y: 13,410 to 15,030 mm',
                 room: 'Ground Floor, Western Wall of Dining / Living Area (0.12). Flanked by 280 mm clinker brick masonry piers on both sides (between O8c and O8a).',
                 specs: 'Single fixed triple-glazed pane (1,620 × 740 mm) in matte anthracite aluminum frame; head flush with intermediate cornice at +2.80 m.'
             },
             'O8a': {
                 title: 'Clerestory Ribbon Window O8a — Living Room (0.11 Salon)',
                 subtitle: 'Three-Pane Equal-Split High-Level Clerestory Window',
-                dims: 'Width: 5,485 mm (3 equal panes) | Height: 740 mm | Sill: hp = 2,060 mm (+2.06 m to +2.80 m) | Plan (X, Y): (20,590, 15,550 mm) | Span Y: 15,550 to 21,035 mm',
-                room: 'Ground Floor, Western Wall of Living Area (0.11). Positioned 280 mm south of O8b and ending 380 mm from the South-West corner (21,415 mm).',
-                specs: '3 equal horizontal fixed windows (cumulative length 5,485 mm, ~1,828 mm each); head flush with intermediate cornice at +2.80 m.'
+                dims: 'Width: 5,500 mm (3 equal panes) | Height: 740 mm | Sill: hp = 2,060 mm (+2.06 m to +2.80 m) | Plan (X, Y): (20,505, 15,290 mm) | Span Y: 15,290 to 20,790 mm',
+                room: 'Ground Floor, Western Wall of Living Area (0.11). Positioned 4,230 mm south of the entrance nook (in default layout without O8b & O8c) and ending 380 mm from the South-West corner (21,170 mm).',
+                specs: '3 equal horizontal fixed windows (cumulative length 5,500 mm, ~1,833 mm each); head flush with intermediate cornice at +2.80 m.'
             },
             'ENTRANCE_NICHE': {
-                title: 'Recessed Main Entrance Alcove (Wnęka Wejściowa)',
-                subtitle: 'Sheltered Clinker Brick Entryway Niche under Intermediate Cornice',
-                dims: 'Span Y: 8,600 mm to 11,300 mm (Width: 2,700 mm) | Height: 2,800 mm (±0.00 m to +2.80 m) | 630 mm normal wall to O8c',
-                room: 'Shelters main entrance door D_EXT (0.04 Wiatrołap) from wind and precipitation while creating an architectural shadow line.',
+                title: 'Recessed Main Entrance Alcove (Wnęka Wejściowa — 2,500 mm)',
+                subtitle: 'Sheltered Clinker Brick Entryway Niche (400 mm Wall + 1,700 mm Z1 + 400 mm Wall)',
+                dims: 'Span Y: 8,560 mm to 11,060 mm (Width: 2,500 mm = 400 + 1,700 + 400 mm) | Distance from Z2: 2,670 mm | 4,230 mm wall to O8a (default)',
+                room: 'Shelters main entrance door Z1 (0.04 Wiatrołap) from wind and precipitation while creating an architectural shadow line.',
                 specs: 'Recessed clinker brick return walls with integrated soffit lighting under the +2.80 m intermediate cornice.'
             },
             'CORNICE': {
                 title: 'Intermediate Cornice (Gzyms Pośredni)',
                 subtitle: 'Continuous Horizontal Band (+2.80 m to +3.43 m)',
-                dims: 'Height: 630 mm | Levels: +2.80 m to +3.43 m | Wall Span Y: 0 to 21,415 mm (+100 mm overhangs at North & South ends)',
-                room: 'Unifies the full 21,415 mm ground floor massing (garage protrusion, central core, and single-story southern living wing).',
+                dims: 'Height: 630 mm | Levels: +2.80 m to +3.43 m | Wall Span Y: -270 to 21,170 mm (21,440 mm total + 100 mm overhangs)',
+                room: 'Unifies the full 21,440 mm ground floor massing (garage protrusion, central core, and single-story southern living wing).',
                 specs: 'Anthracite architectural aluminum composite cassette panels with modular vertical joint reveals.'
             },
             'ROOF': {
                 title: 'Main Roof Attica Overhang & Chimney (+6.13 m to +6.88 m / +7.26 m)',
                 subtitle: 'Cantilevered Flat Roof Fascia over Upper Floor & Chimney Shaft',
                 dims: 'Upper Floor Span Y: 3,100 to 11,900 mm (8,800 mm) | Roof Overhangs: 300 mm North (Y=2,800) & South (Y=12,200) | Chimney: Y=6,450..7,400 mm (+7.26 m)',
-                room: 'Crowns the 8,800 mm upper-floor timber volume; stepped back 3,100 mm from the North garage wall and 9,515 mm from the South garden facade.',
+                room: 'Crowns the 8,800 mm upper-floor timber volume; stepped back 3,100 mm from Axis A (Y = 0 mm) and 9,270 mm from the South garden facade (Y = 21,170 mm).',
                 specs: 'Modular cassette fascia panels (750 mm height) with 300 mm perimeter cantilever; chimney shaft rising to +7.26 m.'
             },
             'BRICK_WALL': {
                 title: 'Ground Floor Clinker Brick Facade (Parter)',
                 subtitle: 'Load-Bearing Exterior Wall with Clinker Brick Cladding (-0.02 m to +2.80 m)',
-                dims: 'Total Length Y: 21,415 mm (North Y=0 to South Y=21,415 mm) | Height: 2,820 mm',
-                room: 'Ground floor western exterior wall housing Garage Door GD1, Recessed Entrance D_EXT, and Living Room Clerestory Windows O8c, O8b, and O8a.',
+                dims: 'Length from Point 0 / Axis A: 21,170 mm (Y = 0 to 21,170 mm) | Total Wall Length: 21,440 mm (Y = -270 to 21,170 mm) | Height: 2,820 mm',
+                room: 'Ground floor western exterior wall housing Garage Door Z2, Recessed Entrance Z1, and Living Room Clerestory Windows O8c, O8b, and O8a.',
                 specs: 'Dark graphite hand-formed clinker brick slips over insulated masonry wall.'
             },
             'TIMBER_WALL': {
                 title: 'Upper Floor Vertical Timber Cladding (Piętro)',
                 subtitle: 'Stepped-Back First Floor Volume (+3.43 m to +6.13 m)',
-                dims: 'Span Y: 3,100 mm to 11,900 mm (Length: 8,800 mm) | North Setback: 3,100 mm | South Setback: 9,515 mm',
-                room: 'First floor western exterior wall framing Master Bedroom corner window O13b and South-West Bedroom window WO2.',
+                dims: 'Span Y: 3,100 mm to 11,900 mm (Length: 8,800 mm) | North Setback from Axis A: 3,100 mm | South Setback: 9,270 mm',
+                room: 'First floor western exterior wall framing the two distinct O13b windows (O13b_1 in Master Bedroom 1.01 and O13b_2 in South-West Bedroom 1.05).',
                 specs: 'Vertical thermo-ash / larch timber slat boarding on ventilated sub-frame.'
             }
         };
@@ -1398,7 +1434,7 @@
                 const coords = CoordinateService.transform(win, 'west_facade');
                 const startMm = Math.round(coords.localX_mm);
                 const endMm = Math.round(coords.localX_mm + win.width);
-                elementData[key].dims = `Width: ${win.width.toLocaleString()} mm | Height: ${win.height.toLocaleString()} mm | Sill: hp = ${win.sill} mm | Screen Y (North→South): ${startMm.toLocaleString()} to ${endMm.toLocaleString()} mm | 2D Plan (X, Y): (${(win.x || 0).toLocaleString()}, ${(win.y || 0).toLocaleString()} mm)`;
+                elementData[key].dims = `Width: ${win.width.toLocaleString()} mm | Height: ${win.height.toLocaleString()} mm | Sill: hp = ${win.sill} mm | Screen Y from Axis A (0): ${startMm.toLocaleString()} to ${endMm.toLocaleString()} mm | 2D Plan (X, Y): (${(win.x || 0).toLocaleString()}, ${(win.y || 0).toLocaleString()} mm)`;
             }
 
             const data = elementData[key];
@@ -1419,9 +1455,9 @@
             if (typeof WindowStore === 'undefined' || !WindowStore.update) return;
 
             if (optionKey === 'extended') {
-                // Option 2: extend O8c 60 to the right (1440 -> 1500 mm, y = 11930), and O8b 60 to the left (1620 -> 1680 mm, y = 13590)
+                // Option 2: extend O8c 60 to the right (1440 -> 1500 mm, y = 11690), and O8b 60 to the left (1620 -> 1680 mm, y = 13350)
                 WindowStore.update('O8c', {
-                    y: 11930,
+                    y: 11690,
                     width: 1500,
                     height: 740,
                     sill: 2060,
@@ -1429,25 +1465,25 @@
                     description: 'Single-pane high clerestory fixed window (1500×740 mm, hp=2060 mm, extended 60 mm right), 630 mm south of the entrance nook'
                 });
                 WindowStore.update('O8b', {
-                    y: 13590,
+                    y: 13350,
                     width: 1680,
                     height: 740,
                     sill: 2060,
                     views: ['west_facade'],
-                    description: 'Single-pane high clerestory fixed window (1680×740 mm, hp=2060 mm, extended 60 mm left), 160 mm south of O8c and 280 mm north of O8a'
+                    description: 'Single-pane high clerestory fixed window (1680×740 mm, hp=2060 mm, extended 60 mm left), 160 mm south of O8c and 260 mm north of O8a'
                 });
             } else if (optionKey === 'no_o8b') {
-                // Option 3: extend O8c 60 to the right (1440 -> 1500 mm, y = 11930) and remove O8b at all
+                // Option 3: extend O8c 60 to the right (1440 -> 1500 mm, y = 11690) and remove O8b at all
                 WindowStore.update('O8c', {
-                    y: 11930,
+                    y: 11690,
                     width: 1500,
                     height: 740,
                     sill: 2060,
                     views: ['west_facade'],
-                    description: 'Single-pane high clerestory fixed window (1500×740 mm, hp=2060 mm, extended 60 mm right), 630 mm south of the entrance nook and 2120 mm north of O8a'
+                    description: 'Single-pane high clerestory fixed window (1500×740 mm, hp=2060 mm, extended 60 mm right), 630 mm south of the entrance nook and 2100 mm north of O8a'
                 });
                 WindowStore.update('O8b', {
-                    y: 13650,
+                    y: 13410,
                     width: 1620,
                     height: 740,
                     sill: 2060,
@@ -1459,14 +1495,14 @@
             } else if (optionKey === 'no_o8b_o8c') {
                 // Option 4: remove both O8b and O8c at all (only O8a remains)
                 WindowStore.update('O8c', {
-                    y: 11930,
+                    y: 11690,
                     width: 1440,
                     height: 740,
                     sill: 2060,
                     views: []
                 });
                 WindowStore.update('O8b', {
-                    y: 13650,
+                    y: 13410,
                     width: 1620,
                     height: 740,
                     sill: 2060,
@@ -1476,9 +1512,9 @@
                     showElementDetails('O8a');
                 }
             } else {
-                // Option 1 (default): O8c = 1440 mm (y = 11930), O8b = 1620 mm (y = 13650)
+                // Option 1 (default): O8c = 1440 mm (y = 11690), O8b = 1620 mm (y = 13410)
                 WindowStore.update('O8c', {
-                    y: 11930,
+                    y: 11690,
                     width: 1440,
                     height: 740,
                     sill: 2060,
@@ -1486,12 +1522,12 @@
                     description: 'Single-pane high clerestory fixed window (1440×740 mm, hp=2060 mm) beneath the intermediate cornice, 630 mm south of the entrance nook'
                 });
                 WindowStore.update('O8b', {
-                    y: 13650,
+                    y: 13410,
                     width: 1620,
                     height: 740,
                     sill: 2060,
                     views: ['west_facade'],
-                    description: 'Single-pane high clerestory fixed window (1620×740 mm, hp=2060 mm) flanked by 280 mm clinker masonry piers'
+                    description: 'Single-pane high clerestory fixed window (1620×740 mm, hp=2060 mm) flanked by 280 mm and 260 mm clinker masonry piers'
                 });
             }
 
@@ -1499,13 +1535,15 @@
         }
 
         /**
-         * Build an SVG dimension chain group along the 21,415 mm West Facade (North Y=0 to South Y=21415)
+         * Build an SVG dimension chain group along the West Facade
          */
-        function buildDimensionChainSVG(windowIds, witnessDropY, isUpper, extraBreaksMm) {
+        function buildDimensionChainSVG(windowIds, witnessDropY, isUpper, extraBreaksMm, startOffsetMm) {
             const view = CoordinateService.getView('west_facade');
-            const totalLenMm = (view && view.length) ? view.length : 21415;
+            const totalLenMm = (view && view.length) ? view.length : 21170;
             const scale = (view && view.scale) ? view.scale : 0.1;
             const totalSvg = totalLenMm * scale;
+            const startMmInit = (typeof startOffsetMm === 'number') ? startOffsetMm : 0;
+            const startSvgInit = startMmInit * scale;
 
             const items = [];
             windowIds.forEach(id => {
@@ -1526,8 +1564,8 @@
             items.sort((a, b) => a.startSvg - b.startSvg);
 
             const rawSegments = [];
-            let cursorMm = 0;
-            let cursorSvg = 0;
+            let cursorMm = startMmInit;
+            let cursorSvg = startSvgInit;
 
             items.forEach(item => {
                 const pierMm = item.startMm - cursorMm;
@@ -1566,7 +1604,7 @@
                 });
             }
 
-            // Split pier segments at any architectural break points (e.g. entrance nook edge at 11,300 mm)
+            // Split pier segments at any architectural break points (e.g. Point 0 at 0 mm, entrance nook edges at 8,560 & 11,060 mm)
             const breaks = Array.isArray(extraBreaksMm) ? extraBreaksMm.slice().sort((a, b) => a - b) : [];
             const segments = [];
             rawSegments.forEach(seg => {
@@ -1598,9 +1636,9 @@
                 });
             });
 
-            let svgStr = `<line x1="0" y1="0" x2="${totalSvg}" y2="0" class="dim-solid" />`;
+            let svgStr = `<line x1="${startSvgInit}" y1="0" x2="${totalSvg}" y2="0" class="dim-solid" />`;
 
-            const boundaryPoints = [0];
+            const boundaryPoints = [startSvgInit];
             segments.forEach(seg => boundaryPoints.push(seg.endSvg));
 
             boundaryPoints.forEach(pt => {
@@ -1615,7 +1653,7 @@
                 const labelText = isWin
                     ? `${seg.lenMm.toLocaleString()} (${seg.name})`
                     : `${seg.lenMm.toLocaleString()}`;
-                const boxW = isWin ? Math.max(82, Math.min(spanSvg - 4, 125)) : Math.max(26, Math.min(spanSvg - 2, 58));
+                const boxW = isWin ? Math.max(82, Math.min(spanSvg - 4, 125)) : Math.max(24, Math.min(spanSvg - 2, 58));
                 const strokeAttr = isWin
                     ? (isUpper ? 'stroke="#7c3aed" stroke-width="0.8"' : 'stroke="#f59e0b" stroke-width="0.8"')
                     : '';
@@ -1636,7 +1674,7 @@
             const tbody = document.getElementById('wf-schedule-tbody');
             if (!tbody) return;
 
-            const order = ['O13b', 'WO2', 'GD1', 'D_EXT', 'O8c', 'O8b', 'O8a'];
+            const order = ['O13b_1', 'O13b_2', 'Z2', 'Z1', 'O8c', 'O8b', 'O8a'];
             tbody.replaceChildren();
 
             order.forEach(id => {
@@ -1658,6 +1696,15 @@
                 badge.className = 'badge-tag ' + (isFirst ? 'badge-purple' : 'badge-amber');
                 badge.textContent = win.name;
                 tdSym.appendChild(badge);
+                if (win.id !== win.name) {
+                    const subId = document.createElement('span');
+                    subId.style.fontSize = '11px';
+                    subId.style.color = '#64748b';
+                    subId.style.marginLeft = '6px';
+                    subId.style.fontFamily = "'JetBrains Mono', monospace";
+                    subId.textContent = `[${win.id}]`;
+                    tdSym.appendChild(subId);
+                }
 
                 const tdRoom = document.createElement('td');
                 tdRoom.textContent = `${isFirst ? 'First Floor' : 'Ground Floor'}: ${win.room}`;
@@ -1693,22 +1740,25 @@
 
         function updateWestFacadeDimensions() {
             const view = CoordinateService.getView('west_facade');
-            const totalLenMm = (view && view.length) ? view.length : 21415;
+            const totalLenMm = (view && view.length) ? view.length : 21170;
             const scale = (view && view.scale) ? view.scale : 0.1;
             const o8c = WindowStore.get('O8c');
             const o8b = WindowStore.get('O8b');
             const hasO8c = Boolean(o8c && (!Array.isArray(o8c.views) || o8c.views.includes('west_facade')));
             const hasO8b = Boolean(o8b && (!Array.isArray(o8b.views) || o8b.views.includes('west_facade')));
-            const nookRightMm = (o8c && typeof o8c.y === 'number') ? (o8c.y - 630) : 11300;
+            const nookLeftMm = 8560;
+            const nookLeftSvg = nookLeftMm * scale;
+            const nookRightMm = (o8c && typeof o8c.y === 'number') ? (o8c.y - 630) : 11060;
             const nookRightSvg = nookRightMm * scale;
+            const o8aStartMm = 15290;
 
             // Sync O8c / O8b option buttons, badge, and hotspots
             const o8cW = o8c ? Number(o8c.width) : 1440;
             const o8bW = o8b ? Number(o8b.width) : 1620;
-            const o8bY = o8b ? Number(o8b.y) : 13650;
+            const o8bY = o8b ? Number(o8b.y) : 13410;
 
-            const isDefaultOpt = hasO8c && hasO8b && o8cW === 1440 && o8bW === 1620 && o8bY === 13650;
-            const isExtendedOpt = hasO8c && hasO8b && o8cW === 1500 && o8bW === 1680 && o8bY === 13590;
+            const isDefaultOpt = hasO8c && hasO8b && o8cW === 1440 && o8bW === 1620 && o8bY === 13410;
+            const isExtendedOpt = hasO8c && hasO8b && o8cW === 1500 && o8bW === 1680 && o8bY === 13350;
             const isNoO8bOpt = hasO8c && !hasO8b && o8cW === 1500;
             const isNoO8bO8cOpt = !hasO8c && !hasO8b;
 
@@ -1724,10 +1774,10 @@
             const optBadge = document.getElementById('o8-window-opt-badge');
             if (optBadge && o8c) {
                 if (!hasO8c && !hasO8b) {
-                    const pierNookToO8a = 15550 - nookRightMm;
+                    const pierNookToO8a = o8aStartMm - nookRightMm;
                     optBadge.textContent = `O8c & O8b: removed | Pier to O8a: ${pierNookToO8a} mm`;
                 } else if (!hasO8b) {
-                    const pierToO8a = 15550 - (o8c.y + o8c.width);
+                    const pierToO8a = o8aStartMm - (o8c.y + o8c.width);
                     optBadge.textContent = `O8c: ${o8c.width} mm | Pier: ${pierToO8a} mm | O8b: removed`;
                 } else {
                     const pierBetween = o8b.y - (o8c.y + o8c.width);
@@ -1753,7 +1803,15 @@
             }
 
             const nookRect = document.getElementById('wf-entrance-nook-rect');
-            if (nookRect) nookRect.setAttribute('width', nookRightSvg - 860);
+            if (nookRect) {
+                nookRect.setAttribute('x', nookLeftSvg);
+                nookRect.setAttribute('width', nookRightSvg - nookLeftSvg);
+            }
+            const nookLLine = document.getElementById('wf-entrance-nook-lline');
+            if (nookLLine) {
+                nookLLine.setAttribute('x1', nookLeftSvg);
+                nookLLine.setAttribute('x2', nookLeftSvg);
+            }
             const nookRLine = document.getElementById('wf-entrance-nook-rline');
             if (nookRLine) {
                 nookRLine.setAttribute('x1', nookRightSvg);
@@ -1761,12 +1819,12 @@
             }
             const nookShadow = document.getElementById('wf-entrance-nook-shadow');
             if (nookShadow) {
-                nookShadow.setAttribute('points', `860,-280 ${nookRightSvg},-280 ${nookRightSvg},-225 975,-225 860,-140`);
+                nookShadow.setAttribute('points', `${nookLeftSvg},-280 ${nookRightSvg},-280 ${nookRightSvg},-225 ${nookLeftSvg + 115},-225 ${nookLeftSvg},-140`);
             }
 
             const upperGroup = document.getElementById('wf-upper-dims-group');
             if (upperGroup) {
-                const upperSvg = `<svg xmlns="http://www.w3.org/2000/svg"><g>${buildDimensionChainSVG(['O13b', 'WO2'], 152, true, [])}</g></svg>`;
+                const upperSvg = `<svg xmlns="http://www.w3.org/2000/svg"><g>${buildDimensionChainSVG(['O13b_1', 'O13b_2'], 152, true, [], 0)}</g></svg>`;
                 const doc = new DOMParser().parseFromString(upperSvg, 'image/svg+xml');
                 const g = doc.documentElement.firstElementChild;
                 if (g) {
@@ -1776,7 +1834,7 @@
 
             const groundGroup = document.getElementById('wf-ground-dims-group');
             if (groundGroup) {
-                const groundSvg = `<svg xmlns="http://www.w3.org/2000/svg"><g>${buildDimensionChainSVG(['GD1', 'D_EXT', 'O8c', 'O8b', 'O8a'], -113, false, [8600, nookRightMm])}</g></svg>`;
+                const groundSvg = `<svg xmlns="http://www.w3.org/2000/svg"><g>${buildDimensionChainSVG(['Z2', 'Z1', 'O8c', 'O8b', 'O8a'], -113, false, [0, nookLeftMm, nookRightMm], -270)}</g></svg>`;
                 const doc = new DOMParser().parseFromString(groundSvg, 'image/svg+xml');
                 const g = doc.documentElement.firstElementChild;
                 if (g) {
@@ -1786,14 +1844,27 @@
 
             const southWingGroup = document.getElementById('wf-south-wing-dims-group');
             if (southWingGroup) {
-                const startMm = nookRightMm; // Start of 630 mm normal wall (right edge of entrance nook)
-                const endMm = totalLenMm; // Right edge of building (after 380 mm pier)
+                const nookSpanMm = nookRightMm - nookLeftMm;
+                const nookMidSvg = (nookLeftSvg + nookRightSvg) / 2;
+
+                const startMm = nookRightMm; // Right edge of entrance nook (Y = 11,060 mm)
+                const endMm = totalLenMm; // Right edge of building (Y = 21,170 mm)
                 const spanMm = endMm - startMm;
                 const startSvg = startMm * scale;
                 const endSvg = endMm * scale;
                 const midSvg = (startSvg + endSvg) / 2;
 
                 const subScaleSvg = `<svg xmlns="http://www.w3.org/2000/svg"><g>
+                    <!-- Entrance Nook Sub-Total (2,500 mm) -->
+                    <line x1="${nookLeftSvg}" y1="0" x2="${nookLeftSvg}" y2="-70" stroke="#d97706" stroke-width="0.8" stroke-dasharray="3 3" opacity="0.6" />
+                    <line x1="${nookRightSvg}" y1="0" x2="${nookRightSvg}" y2="-70" stroke="#d97706" stroke-width="0.8" stroke-dasharray="3 3" opacity="0.6" />
+                    <line x1="${nookLeftSvg}" y1="0" x2="${nookRightSvg}" y2="0" class="dim-solid" />
+                    <line x1="${nookLeftSvg}" y1="-9" x2="${nookLeftSvg}" y2="9" class="tick" />
+                    <line x1="${nookRightSvg}" y1="-9" x2="${nookRightSvg}" y2="9" class="tick" />
+                    <rect x="${nookMidSvg - 35}" y="-13" width="70" height="20" fill="#ffffff" stroke="#fde68a" rx="4" />
+                    <text x="${nookMidSvg}" y="2" class="dim-text" font-size="13" font-weight="700">${nookSpanMm.toLocaleString()}</text>
+
+                    <!-- Right Wing Sub-Total (10,110 mm) -->
                     <line x1="${startSvg}" y1="0" x2="${startSvg}" y2="-70" stroke="#d97706" stroke-width="0.8" stroke-dasharray="3 3" opacity="0.6" />
                     <line x1="${endSvg}" y1="0" x2="${endSvg}" y2="-70" stroke="#d97706" stroke-width="0.8" stroke-dasharray="3 3" opacity="0.6" />
                     <line x1="${startSvg}" y1="0" x2="${endSvg}" y2="0" class="dim-solid" />
@@ -1826,6 +1897,11 @@
                     WindowStore.update(id, { height: 740, sill: 2060 });
                 }
             });
+            const o8a = WindowStore.get('O8a');
+            if (o8a && (o8a.y !== 15290 || o8a.width !== 5500)) {
+                WindowStore.update('O8a', { y: 15290, width: 5500 });
+            }
+            setClerestoryO8Option('no_o8b_o8c');
             WindowComponent.autoMountAll();
             updateWestFacadeDimensions();
 

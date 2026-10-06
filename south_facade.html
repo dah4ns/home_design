@@ -673,6 +673,18 @@
         <div id="TabElevation" class="tab-content active">
             <!-- Controls Bar -->
             <div class="controls-bar">
+                <div class="layer-toggles" style="border-right: 1px solid #cbd5e1; padding-right: 16px;">
+                    <span style="font-size: 13px; font-weight: 700; color: #0f172a;">Window Version:</span>
+                    <button id="btn-sf-smaller" class="toggle-btn active" onclick="setSouthFacadeWindowOption('smaller')" style="font-weight: 600;">
+                        <span>🪟</span> Smaller windows (default)
+                    </button>
+                    <button id="btn-sf-bigger" class="toggle-btn" onclick="setSouthFacadeWindowOption('bigger')" style="font-weight: 600;">
+                        <span>↔️</span> Bigger windows
+                    </button>
+                    <span id="sf-window-opt-badge" class="badge accent" style="font-size: 11.5px; padding: 4px 10px;">
+                        Active: Smaller windows (O12: 3-part, O10/O5/O4: 4-part, O7: 320×200 hp=80)
+                    </span>
+                </div>
                 <div class="layer-toggles">
                     <span style="font-size: 13px; font-weight: 600; color: #334155;">Display Layers:</span>
                     <button id="toggleDims" class="toggle-btn active amber" onclick="toggleLayer('layer-dims', this)">
@@ -680,9 +692,6 @@
                     </button>
                     <button id="toggleLevels" class="toggle-btn active" onclick="toggleLayer('layer-levels', this)">
                         <span>📐</span> Elevation Levels (Rzędne)
-                    </button>
-                    <button id="toggleAlignments" class="toggle-btn active emerald" onclick="toggleLayer('layer-alignments', this)">
-                        <span>🎯</span> Vertical Alignment Axes
                     </button>
                     <button id="toggleShadows" class="toggle-btn active" onclick="toggleLayer('layer-shadows', this)">
                         <span>⛅</span> 3D Depth Shadows
@@ -695,7 +704,7 @@
 
             <!-- SVG Container -->
             <div class="elevation-wrapper">
-                <svg class="elevation-svg" width="100%" height="760" viewBox="-360 -960 2760 1240" xmlns="http://www.w3.org/2000/svg">
+                <svg class="elevation-svg" width="100%" height="760" viewBox="-360 -980 2760 1260" xmlns="http://www.w3.org/2000/svg">
                     <defs>
                         <!-- Dark Graphite Clinker Brick Pattern (Ground Floor) -->
                         <pattern id="brick-pattern" width="25" height="12" patternUnits="userSpaceOnUse">
@@ -742,14 +751,14 @@
 
                         <!-- Soft Drop Shadow Filter -->
                         <filter id="shadow" x="-5%" y="-5%" width="110%" height="120%">
-                            <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#000000" flood-opacity="0.35" />
+                            <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#000000" flood-opacity="0.4" />
                         </filter>
                     </defs>
 
                     <!-- ==================================== -->
                     <!-- ENVIRONMENT & BACKGROUND SILHOUETTE -->
                     <!-- ==================================== -->
-                    <rect x="-360" y="-960" width="2760" height="1240" fill="#f8fafc" />
+                    <rect x="-360" y="-980" width="2760" height="1260" fill="#f8fafc" />
 
                     <!-- Pine Trees Silhouette (Izabelin Forest) -->
                     <g id="pine-trees" opacity="0.14" fill="#1e293b">
@@ -775,19 +784,29 @@
                     <!-- GROUND FLOOR ELEVATION (PARTER) -->
                     <!-- Wall height from -0.02m (Y=2) to +2.80m (Y=-280) -->
                     <!-- Overall length: 21,000 mm (X = 0 to 2100) -->
+                    <!-- Left part (X = 0 to 600, ending at O7 right edge) projects forward in front of the rest (X = 600 to 2100) -->
                     <!-- ==================================== -->
                     <g id="ground-floor-facade">
-                        <!-- Main Clinker Brick Wall Body (X = 0 to 2100, Y = -280 to 2) -->
-                        <rect x="0" y="-280" width="2100" height="282" fill="url(#brick-pattern)" stroke="#1e222a" stroke-width="1.8" onclick="showElementDetails('BRICK_WALL')" class="interactive-element" />
+                        <!-- 1. Recessed Eastern / Central Ground Floor Wall (X = 600 to 2100, width 1500 [15,000 mm], Y = -280 to 2) -->
+                        <g id="ground-recessed-facade">
+                            <rect x="600" y="-280" width="1500" height="282" fill="url(#brick-pattern)" stroke="#1e222a" stroke-width="1.5" onclick="showElementDetails('BRICK_WALL')" class="interactive-element" />
 
-                        <!-- Dynamic Window Component: SO5 (3-sash ground floor window, 3200×2000 mm, hp=800 mm) -->
-                        <g data-window-component="SO5" data-view-id="south_facade" data-window-style="exterior" id="facade-window-SO5"></g>
+                            <!-- Dynamic Window Component: O5 (formerly SO6, HST sliding terrace glazing, 6350×2800 mm, hp=0 mm) -->
+                            <g data-window-component="O5" data-view-id="south_facade" data-window-style="exterior" id="facade-window-O5"></g>
 
-                        <!-- Dynamic Window Component: SO6 (4-panel HST sliding terrace glazing, 6350×2800 mm, hp=0 mm) -->
-                        <g data-window-component="SO6" data-view-id="south_facade" data-window-style="exterior" id="facade-window-SO6"></g>
+                            <!-- Dynamic Window Component: O4 (formerly SO7, HST sliding terrace glazing, 6300×2800 mm, hp=0 mm) -->
+                            <g data-window-component="O4" data-view-id="south_facade" data-window-style="exterior" id="facade-window-O4"></g>
+                        </g>
 
-                        <!-- Dynamic Window Component: SO7 (4-panel HST sliding terrace glazing, 6300×2800 mm, hp=0 mm) -->
-                        <g data-window-component="SO7" data-view-id="south_facade" data-window-style="exterior" id="facade-window-SO7"></g>
+                        <!-- 2. Projecting Western Ground Floor Volume (X = 0 to 600, width 600 [6,000 mm], ending at O7 right edge) -->
+                        <g id="ground-front-volume">
+                            <rect x="0" y="-280" width="600" height="282" fill="url(#brick-pattern)" stroke="#1e222a" stroke-width="2" filter="url(#shadow)" onclick="showElementDetails('BRICK_WALL')" class="interactive-element" />
+                            <!-- Vertical step / corner line at X = 600 (right edge of O7) -->
+                            <line x1="600" y1="-280" x2="600" y2="2" stroke="#0f172a" stroke-width="2" />
+
+                            <!-- Dynamic Window Component: O7 (formerly SO5, 3200×2000 mm hp=800 in Smaller; 2000×2800 mm hp=0 fixed in Bigger) -->
+                            <g data-window-component="O7" data-view-id="south_facade" data-window-style="exterior" id="facade-window-O7"></g>
+                        </g>
                     </g>
 
                     <!-- ==================================== -->
@@ -810,6 +829,7 @@
                         <line x1="400" y1="-343" x2="400" y2="-280" stroke="#2d3748" stroke-width="1" />
                         <line x1="480" y1="-343" x2="480" y2="-280" stroke="#2d3748" stroke-width="1" />
                         <line x1="560" y1="-343" x2="560" y2="-280" stroke="#2d3748" stroke-width="1" />
+                        <line x1="600" y1="-343" x2="600" y2="-280" stroke="#0a0c10" stroke-width="2" />
                         <line x1="640" y1="-343" x2="640" y2="-280" stroke="#2d3748" stroke-width="1" />
                         <line x1="720" y1="-343" x2="720" y2="-280" stroke="#2d3748" stroke-width="1" />
                         <line x1="800" y1="-343" x2="800" y2="-280" stroke="#2d3748" stroke-width="1" />
@@ -840,17 +860,17 @@
                         <!-- Timber Wall Body -->
                         <rect x="0" y="-613" width="2100" height="270" fill="url(#wood-slats-pattern)" stroke="#8a7356" stroke-width="1.5" onclick="showElementDetails('TIMBER_WALL')" class="interactive-element" />
 
-                        <!-- Dynamic Window Component: SO1 (2-sash bedroom window, 2400×1950 mm, hp=850 mm) -->
-                        <g data-window-component="SO1" data-view-id="south_facade" data-window-style="exterior" id="facade-window-SO1"></g>
+                        <!-- Dynamic Window Component: O13a (formerly SO1, 2-sash bedroom window, 2400×1950 mm, hp=850 mm) -->
+                        <g data-window-component="O13a_2" data-view-id="south_facade" data-window-style="exterior" id="facade-window-O13a_2"></g>
 
-                        <!-- Dynamic Window Component: SO2 (3-panel full-height window, 4000×2700 mm, hp=0 mm) -->
-                        <g data-window-component="SO2" data-view-id="south_facade" data-window-style="exterior" id="facade-window-SO2"></g>
+                        <!-- Dynamic Window Component: O12 (formerly SO2, full-height window, 4000×2700 mm, hp=0 mm) -->
+                        <g data-window-component="O12" data-view-id="south_facade" data-window-style="exterior" id="facade-window-O12"></g>
 
                         <!-- Dynamic Window Component: SO3 (1-sash tilt-and-turn window, 1000×1950 mm, hp=850 mm) -->
                         <g data-window-component="SO3" data-view-id="south_facade" data-window-style="exterior" id="facade-window-SO3"></g>
 
-                        <!-- Dynamic Window Component: SO4 (4-panel full-height window, 6300×2700 mm, hp=0 mm) -->
-                        <g data-window-component="SO4" data-view-id="south_facade" data-window-style="exterior" id="facade-window-SO4"></g>
+                        <!-- Dynamic Window Component: O10 (formerly SO4, full-height window, 6300×2700 mm, hp=0 mm) -->
+                        <g data-window-component="O10" data-view-id="south_facade" data-window-style="exterior" id="facade-window-O10"></g>
                     </g>
 
                     <!-- ==================================== -->
@@ -899,34 +919,49 @@
 
                     <!-- Depth Shadows Layer -->
                     <g id="layer-shadows" pointer-events="none">
+                        <!-- Depth Shadow cast by Projecting Left Ground-Floor Volume (X = 0..600) onto Recessed Brick Pier (X = 600..656) -->
+                        <polygon points="600,-280 600,2 656,2 656,-280" fill="#000000" opacity="0.28" />
                         <!-- Roof overhang soffit shadow -->
                         <rect x="0" y="-613" width="2100" height="24" fill="#000000" opacity="0.35" />
                         <!-- Intermediate cornice shadow on ground floor wall -->
-                        <rect x="0" y="-280" width="2100" height="16" fill="#000000" opacity="0.32" />
-                    </g>
-
-                    <!-- ==================================== -->
-                    <!-- LAYER: VERTICAL ALIGNMENT AXES -->
-                    <!-- ==================================== -->
-                    <g id="layer-alignments" pointer-events="none">
-                        <!-- Alignment 1: Screen X = 600 (6,000 mm from West edge) — SO5 Right Edge aligns with SO2 Left Edge -->
-                        <line x1="600" y1="-635" x2="600" y2="25" stroke="#10b981" stroke-width="1.3" stroke-dasharray="6 4" opacity="0.85" />
-                        <rect x="530" y="-322" width="140" height="18" rx="3" fill="#065f46" opacity="0.9" />
-                        <text x="600" y="-310" font-family="'JetBrains Mono', monospace" font-size="9.5" fill="#ecfdf5" font-weight="700" text-anchor="middle">ALIGN: 6 000 mm</text>
-
-                        <!-- Alignment 2: Screen X = 1450 (14,500 mm from West edge) — SO7 Left Edge aligns with SO4 Left Edge -->
-                        <line x1="1450" y1="-635" x2="1450" y2="25" stroke="#10b981" stroke-width="1.3" stroke-dasharray="6 4" opacity="0.85" />
-                        <rect x="1378" y="-322" width="144" height="18" rx="3" fill="#065f46" opacity="0.9" />
-                        <text x="1450" y="-310" font-family="'JetBrains Mono', monospace" font-size="9.5" fill="#ecfdf5" font-weight="700" text-anchor="middle">ALIGN: 14 500 mm</text>
-
-                        <!-- Alignment 3: Screen X = 2080 (20,800 mm from West edge) — SO7 Right Edge aligns with SO4 Right Edge -->
-                        <line x1="2080" y1="-635" x2="2080" y2="25" stroke="#10b981" stroke-width="1.3" stroke-dasharray="6 4" opacity="0.85" />
+                        <rect x="0" y="-280" width="600" height="16" fill="#000000" opacity="0.28" />
+                        <rect x="600" y="-280" width="1500" height="16" fill="#000000" opacity="0.35" />
                     </g>
 
                     <!-- ==================================== -->
                     <!-- LAYER: DIMENSIONS (WYMIARY) -->
                     <!-- ==================================== -->
                     <g id="layer-dims">
+                        <!-- VERTICAL REFERENCE LINE FOR POINT 0 / AXIS 6 (290 mm from Right Edge: Screen X = 20,710 mm / SVG x = 2071) -->
+                        <g id="point-zero-reference">
+                            <line x1="2071" y1="-895" x2="2071" y2="235" stroke="#ef4444" stroke-width="1.8" stroke-dasharray="6 3" opacity="0.9" />
+
+                            <!-- Top Architectural Axis 6 Bubble (Oś 6 / Axis 6 = Point 0) -->
+                            <circle cx="2071" cy="-912" r="16" fill="#ef4444" stroke="#ffffff" stroke-width="2" />
+                            <text x="2071" y="-912" font-family="'JetBrains Mono', monospace" font-size="12" font-weight="800" fill="#ffffff" text-anchor="middle" dominant-baseline="central">6</text>
+                            <rect x="1891" y="-923" width="160" height="22" rx="4" fill="#fef2f2" stroke="#ef4444" stroke-width="1.2" />
+                            <text x="1971" y="-908" font-family="'JetBrains Mono', monospace" font-size="10.5" font-weight="800" fill="#b91c1c" text-anchor="middle">Oś 6 / Axis 6 (Punkt 0)</text>
+
+                            <!-- Upper Level Point 0 / Axis 6 Marker -->
+                            <circle cx="2071" cy="-650" r="11" fill="#ef4444" stroke="#ffffff" stroke-width="1.5" />
+                            <text x="2071" y="-650" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="800" fill="#ffffff" text-anchor="middle" dominant-baseline="central">0</text>
+                            <rect x="1852" y="-660" width="204" height="20" rx="4" fill="#fef2f2" stroke="#ef4444" stroke-width="1" />
+                            <text x="1954" y="-646" font-family="'JetBrains Mono', monospace" font-size="9.5" font-weight="700" fill="#b91c1c" text-anchor="middle">0 = Axis 6 / Oś 6 (-290 mm od krawędzi)</text>
+
+                            <!-- Lower Level Point 0 / Axis 6 Marker (290 mm from right edge at X = 2100) -->
+                            <line x1="2100" y1="2" x2="2100" y2="66" stroke="#ef4444" stroke-width="1" stroke-dasharray="2 2" opacity="0.85" />
+                            <line x1="2071" y1="52" x2="2100" y2="52" stroke="#ef4444" stroke-width="1.8" />
+                            <line x1="2071" y1="45" x2="2071" y2="59" stroke="#ef4444" stroke-width="1.8" />
+                            <line x1="2100" y1="45" x2="2100" y2="59" stroke="#ef4444" stroke-width="1.8" />
+                            <rect x="2067" y="27" width="37" height="17" rx="3" fill="#fef2f2" stroke="#ef4444" stroke-width="1" />
+                            <text x="2085.5" y="39" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="800" fill="#b91c1c" text-anchor="middle">290</text>
+
+                            <circle cx="2071" cy="52" r="11" fill="#ef4444" stroke="#ffffff" stroke-width="1.5" />
+                            <text x="2071" y="52" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="800" fill="#ffffff" text-anchor="middle" dominant-baseline="central">0</text>
+                            <rect x="1824" y="42" width="232" height="20" rx="4" fill="#fef2f2" stroke="#ef4444" stroke-width="1" />
+                            <text x="1940" y="56" font-family="'JetBrains Mono', monospace" font-size="9.5" font-weight="700" fill="#b91c1c" text-anchor="middle">0 = Axis 6 / Oś 6 (290 mm od prawej krawędzi)</text>
+                        </g>
+
                         <!-- TIER 1 (TOP): TOTAL SOUTH FACADE WIDTH (21,000 mm) at Y = -840 -->
                         <g transform="translate(0, -840)">
                             <line x1="0" y1="0" x2="0" y2="152" stroke="#d97706" stroke-width="0.8" stroke-dasharray="3 3" opacity="0.6" />
@@ -978,12 +1013,12 @@
                             <text x="24" y="-5" class="level-label">Nadproże okien piętra / Spód gzymsu</text>
                         </g>
 
-                        <!-- +4.18m Upper Window Sill hp=85cm (SO1 & SO3) -->
+                        <!-- +4.18m Upper Window Sill hp=85cm (O13a & SO3) -->
                         <g transform="translate(-210, -418)">
                             <line x1="0" y1="0" x2="210" y2="0" class="level-marker" stroke-dasharray="2 2" opacity="0.75" />
                             <polygon points="0,0 14,-6 14,6" fill="var(--level-color)" />
                             <text x="-10" y="4" class="level-text" text-anchor="end">+4,18</text>
-                            <text x="24" y="-5" class="level-label">Parapet okien SO1 i SO3 (hp=85)</text>
+                            <text x="24" y="-5" class="level-label">Parapet okien O13a i SO3 (hp=85)</text>
                         </g>
 
                         <!-- +3.43m Top of Intermediate Cornice / Full-Height Window Sill -->
@@ -991,7 +1026,7 @@
                             <line x1="0" y1="0" x2="200" y2="0" class="level-marker" stroke="#d97706" stroke-width="1.4" stroke-dasharray="3 2" />
                             <polygon points="0,0 16,-7 16,7" fill="#d97706" />
                             <text x="-10" y="4" class="level-text" font-weight="700" fill="#d97706" text-anchor="end">+3,43</text>
-                            <text x="24" y="-5" class="level-label" font-weight="600" fill="#b45309">Gzyms pośredni (Wierzch / Próg SO2, SO4)</text>
+                            <text x="24" y="-5" class="level-label" font-weight="600" fill="#b45309">Gzyms pośredni (Wierzch / Próg O12, O10)</text>
                         </g>
 
                         <!-- +2.80m Bottom of Intermediate Cornice / Ground Floor Lintel -->
@@ -1002,12 +1037,12 @@
                             <text x="24" y="-5" class="level-label" font-weight="600" fill="#b45309">Gzyms pośredni (Spód / Nadproże parteru)</text>
                         </g>
 
-                        <!-- +0.80m Window SO5 Sill (hp=80cm) -->
-                        <g transform="translate(-210, -80)">
+                        <!-- +0.80m Window O7 Sill (hp=80cm in Smaller windows) -->
+                        <g id="level-o7-sill" transform="translate(-210, -80)">
                             <line x1="0" y1="0" x2="210" y2="0" class="level-marker" stroke="#f59e0b" stroke-dasharray="2 2" opacity="0.8" />
                             <polygon points="0,0 14,-6 14,6" fill="#f59e0b" />
                             <text x="-10" y="4" class="level-text" fill="#b45309" text-anchor="end">+0,80</text>
-                            <text x="24" y="-5" class="level-label" fill="#92400e">Parapet okna SO5 (hp=80 cm)</text>
+                            <text x="24" y="-5" class="level-label" fill="#92400e">Parapet okna O7 (hp=80 cm)</text>
                         </g>
 
                         <!-- -0.02m Exterior Ground / Terrace Level -->
@@ -1091,23 +1126,23 @@
                     <div class="photo-wrapper">
                         <img src="south_facade_drawing.png" alt="South Facade Architectural Elevation Drawing">
 
-                        <!-- Hotspot 1: SO1 Upper Left 2-Sash Window -->
-                        <div class="hotspot" style="top: 42%; left: 22.1%;" onclick="showElementDetails('SO1')">
+                        <!-- Hotspot 1: O13a (formerly SO1) Upper Left 2-Sash Window -->
+                        <div class="hotspot" style="top: 42%; left: 22.1%;" onclick="showElementDetails('O13a_2')">
                             1
                             <div class="hotspot-tooltip">
-                                <strong>1. Window SO1 (Upper West Bedroom)</strong><br>
+                                <strong>1. Window O13a (Upper West Bedroom)</strong><br>
                                 Width: 2,400 mm | Height: 1,950 mm (hp = 850 mm)<br>
                                 2 sashes: left fixed, right tilt-and-turn
                             </div>
                         </div>
 
-                        <!-- Hotspot 2: SO2 Upper Middle 3-Sash Full-Height Window -->
-                        <div class="hotspot" style="top: 45%; left: 42.4%;" onclick="showElementDetails('SO2')">
+                        <!-- Hotspot 2: O12 (formerly SO2) Upper Middle Full-Height Window -->
+                        <div class="hotspot" style="top: 45%; left: 42.4%;" onclick="showElementDetails('O12')">
                             2
                             <div class="hotspot-tooltip">
-                                <strong>2. Window SO2 (Upper Middle Bedroom)</strong><br>
+                                <strong>2. Window O12 (Upper Middle Bedroom)</strong><br>
                                 Width: 4,000 mm | Height: 2,700 mm (hp = 0 mm)<br>
-                                3-panel floor-to-ceiling glazing (+3.43 m to +6.13 m)
+                                Floor-to-ceiling glazing (3 parts in Smaller / 2 parts in Bigger)
                             </div>
                         </div>
 
@@ -1121,43 +1156,43 @@
                             </div>
                         </div>
 
-                        <!-- Hotspot 4: SO4 Upper Right 4-Sash Full-Height Window -->
-                        <div class="hotspot" style="top: 45%; left: 71.7%;" onclick="showElementDetails('SO4')">
+                        <!-- Hotspot 4: O10 (formerly SO4) Upper Right Full-Height Window -->
+                        <div class="hotspot" style="top: 45%; left: 71.7%;" onclick="showElementDetails('O10')">
                             4
                             <div class="hotspot-tooltip">
-                                <strong>4. Window SO4 (Upper East Bedroom)</strong><br>
+                                <strong>4. Window O10 (Upper East Bedroom)</strong><br>
                                 Width: 6,300 mm | Height: 2,700 mm (hp = 0 mm)<br>
-                                4-panel floor-to-ceiling panoramic glazing
+                                Floor-to-ceiling panoramic glazing (4 parts in Smaller / 3 parts in Bigger)
                             </div>
                         </div>
 
-                        <!-- Hotspot 5: SO5 Ground Left 3-Sash Window -->
-                        <div class="hotspot" style="top: 69%; left: 31.3%;" onclick="showElementDetails('SO5')">
+                        <!-- Hotspot 5: O7 (formerly SO5) Ground Left Window -->
+                        <div class="hotspot" style="top: 69%; left: 31.3%;" onclick="showElementDetails('O7')">
                             5
                             <div class="hotspot-tooltip">
-                                <strong>5. Window SO5 (Ground Floor West Room)</strong><br>
-                                Width: 3,200 mm | Height: 2,000 mm (hp = 800 mm)<br>
-                                3 sashes (2 tilt-and-turn + 1 fixed) over clinker brick parapet
+                                <strong>5. Window O7 (Ground Floor West Room)</strong><br>
+                                Smaller: 3,200×2,000 mm (hp = 800 mm, 3 sashes)<br>
+                                Bigger: 2,000×2,800 mm (hp = 0 mm, 1 fix window)
                             </div>
                         </div>
 
-                        <!-- Hotspot 6: SO6 Ground Middle 4-Panel HST Sliding Door -->
-                        <div class="hotspot" style="top: 72%; left: 48.9%;" onclick="showElementDetails('SO6')">
+                        <!-- Hotspot 6: O5 (formerly SO6) Ground Middle HST Sliding Door -->
+                        <div class="hotspot" style="top: 72%; left: 48.9%;" onclick="showElementDetails('O5')">
                             6
                             <div class="hotspot-tooltip">
-                                <strong>6. Terrace Glazing SO6 (Dining / Living HST)</strong><br>
+                                <strong>6. Terrace Glazing O5 (Dining / Living HST)</strong><br>
                                 Width: 6,350 mm | Height: 2,800 mm (hp = 0 mm)<br>
-                                4-panel HST lift-and-slide terrace doors (← →)
+                                HST terrace glazing (4 parts in Smaller / 3 parts in Bigger)
                             </div>
                         </div>
 
-                        <!-- Hotspot 7: SO7 Ground Right 4-Panel HST Sliding Door -->
-                        <div class="hotspot" style="top: 72%; left: 71.7%;" onclick="showElementDetails('SO7')">
+                        <!-- Hotspot 7: O4 (formerly SO7) Ground Right HST Sliding Door -->
+                        <div class="hotspot" style="top: 72%; left: 71.7%;" onclick="showElementDetails('O4')">
                             7
                             <div class="hotspot-tooltip">
-                                <strong>7. Terrace Glazing SO7 (Living Room East HST)</strong><br>
+                                <strong>7. Terrace Glazing O4 (Living Room East HST)</strong><br>
                                 Width: 6,300 mm | Height: 2,800 mm (hp = 0 mm)<br>
-                                4-panel HST lift-and-slide terrace doors (← →)
+                                HST terrace glazing (4 parts in Smaller / 3 parts in Bigger)
                             </div>
                         </div>
 
@@ -1180,7 +1215,7 @@
         <!-- ========================================== -->
         <div id="TabOrientation" class="tab-content">
             <div class="diagram-box">
-                <h3 style="margin: 0 0 8px 0; font-size: 18px; color: #0f172a;">Eastward Coordinate Transformation &amp; Vertical Alignments</h3>
+                <h3 style="margin: 0 0 8px 0; font-size: 18px; color: #0f172a;">Eastward Coordinate Transformation &amp; Axis 6 Reference</h3>
                 <p style="margin: 0 0 20px 0; font-size: 14px; color: #64748b;">
                     Unlike the North Facade (which looks South and has <code>direction: "west"</code>), the South Facade looks <strong>North</strong> from the garden and has <code>direction: "east"</code>.
                 </p>
@@ -1192,6 +1227,7 @@
                             • <strong>Position on Map (Left Edge):</strong> <code>21,000 mm</code> (West Corner)<br>
                             • <strong>Direction:</strong> <code>"east"</code> (Left-to-right moves West → East)<br>
                             • <strong>Overall Length:</strong> <code>21,000 mm</code> (East Corner at <code>0 mm</code>)<br>
+                            • <strong>Point 0 / Axis 6 (Oś 6):</strong> Located <code>290 mm</code> from the right edge (at Screen X = <code>20,710 mm</code>)<br>
                             • <strong>Screen Formula:</strong> <code>localX = 21,000 - (win.x + win.width)</code>
                         </p>
                     </div>
@@ -1203,11 +1239,10 @@
                         </p>
                     </div>
                     <div class="info-card">
-                        <h4>🎯 3. Vertical Architectural Alignments</h4>
+                        <h4>🎯 3. Ground Floor Massing &amp; Alignments</h4>
                         <p>
-                            • <strong>At 6,000 mm from West edge:</strong> Right edge of ground window <code>SO5</code> aligns with left edge of upper window <code>SO2</code>.<br>
-                            • <strong>At 14,500 mm from West edge:</strong> Left edge of ground HST door <code>SO7</code> aligns with left edge of upper window <code>SO4</code>.<br>
-                            • <strong>At 20,800 mm from West edge:</strong> Right edges of <code>SO7</code> and <code>SO4</code> share a <code>200 mm</code> East corner pier.
+                            • <strong>Projecting Left Ground Floor (0 to 6,000 mm):</strong> Ends at the right edge of <code>O7</code> (aligned with upper window <code>O12</code> left edge) and casts a depth shadow onto the recessed <code>1,000 mm</code> brick pier.<br>
+                            • <strong>At 14,500 to 20,800 mm:</strong> Ground HST door <code>O4</code> aligns vertically with upper window <code>O10</code>.
                         </p>
                     </div>
                 </div>
@@ -1221,7 +1256,7 @@
             <div class="diagram-box">
                 <h3 style="margin: 0 0 8px 0; font-size: 18px; color: #0f172a;">South Facade Openings Schedule (Zestawienie Stolarki Elewacji Południowej)</h3>
                 <p style="margin: 0 0 20px 0; font-size: 14px; color: #64748b;">
-                    Complete schedule of all 7 window and terrace glazing openings on the South Facade (`21,000 mm` overall length). Values synchronize automatically with the live Architecture Database.
+                    Complete schedule of all 7 window and terrace glazing openings on the South Facade (`21,000 mm` overall length). Values synchronize automatically with the active window version and live Architecture Database.
                 </p>
 
                 <div class="table-responsive">
@@ -1255,6 +1290,7 @@
     <script src="js/window-editor-modal.js"></script>
     <script>
         let currentSelectedKey = null;
+        let currentSouthWindowMode = 'smaller';
 
         function openTab(evt, tabName) {
             const tabcontent = document.getElementsByClassName("tab-content");
@@ -1284,54 +1320,54 @@
         }
 
         const elementData = {
-            'SO1': {
-                title: 'Window SO1 — Upper Floor West Bedroom (1.01 Sypialnia)',
+            'O13a_2': {
+                title: 'Window O13a — Upper Floor West Bedroom (1.01 Sypialnia)',
                 subtitle: 'Two-Sash Window (Left Fixed, Right Tilt-and-Turn)',
                 dims: 'Width: 2,400 mm | Height: 1,950 mm | Sill: hp = 850 mm (+4.18 m) | Head: +6.13 m | Screen X: 160 to 2,560 mm | Global X: 18,440 mm',
                 room: 'First Floor, Western Bedroom (1.01). Positioned 160 mm from the West building corner.',
                 specs: 'Triple-pane insulated glass unit (Ug=0.5 W/m²K), matte anthracite aluminum frame (RAL 7016), exterior aluminum sill at +4.18 m.'
             },
-            'SO2': {
-                title: 'Window SO2 — Upper Floor Middle Bedroom (1.05 Sypialnia)',
-                subtitle: 'Three-Panel Full-Height Floor-to-Ceiling Glazing',
+            'O12': {
+                title: 'Window O12 — Upper Floor Middle Bedroom (1.05 Sypialnia)',
+                subtitle: 'Three-Panel Full-Height Floor-to-Ceiling Glazing (3 Equal Parts)',
                 dims: 'Width: 4,000 mm | Height: 2,700 mm | Sill: hp = 0 mm (+3.43 m) | Head: +6.13 m | Screen X: 6,000 to 10,000 mm | Global X: 11,000 mm',
-                room: 'First Floor, Southern Bedroom (1.05). Left edge at 6,000 mm aligns vertically with the right edge of ground floor window SO5.',
-                specs: 'Full-height safety tempered & laminated glazing (VSG/ESG), 3 equal vertical panels, flush sill threshold on intermediate cornice (+3.43 m).'
+                room: 'First Floor, Southern Bedroom (1.05). Left edge at 6,000 mm aligns vertically with the right edge of ground floor window O7.',
+                specs: 'Full-height safety tempered & laminated glazing (VSG/ESG), 3 equal vertical panels in Smaller windows (2 equal panels in Bigger windows), flush sill threshold on intermediate cornice (+3.43 m).'
             },
             'SO3': {
                 title: 'Window SO3 — Upper Floor Bathroom / Wardrobe (1.06)',
                 subtitle: 'Single-Sash Vertical Tilt-and-Turn Window',
                 dims: 'Width: 1,000 mm | Height: 1,950 mm | Sill: hp = 850 mm (+4.18 m) | Head: +6.13 m | Screen X: 12,500 to 13,500 mm | Global X: 7,500 mm',
-                room: 'First Floor, Room 1.06 (Łazienka / Garderoba). Positioned between full-height bedroom windows SO2 and SO4.',
+                room: 'First Floor, Room 1.06 (Łazienka / Garderoba). Positioned between full-height bedroom windows O12 and O10.',
                 specs: 'Acoustic & privacy laminated glass, tilt-and-turn anthracite aluminum profile, exterior sill at +4.18 m.'
             },
-            'SO4': {
-                title: 'Window SO4 — Upper Floor East Bedroom (1.04 Sypialnia)',
-                subtitle: 'Four-Panel Full-Height Panoramic Glazing',
+            'O10': {
+                title: 'Window O10 — Upper Floor East Bedroom (1.04 Sypialnia)',
+                subtitle: 'Four-Panel Full-Height Panoramic Glazing (4 Equal Parts)',
                 dims: 'Width: 6,300 mm | Height: 2,700 mm | Sill: hp = 0 mm (+3.43 m) | Head: +6.13 m | Screen X: 14,500 to 20,800 mm | Global X: 200 mm',
-                room: 'First Floor, Eastern Bedroom (1.04). Vertically aligned with Ground Floor HST terrace glazing SO7 (14,500 to 20,800 mm).',
-                specs: 'Four equal floor-to-ceiling safety glass panels (VSG/ESG), slimline aluminum mullions, flush threshold at +3.43 m.'
+                room: 'First Floor, Eastern Bedroom (1.04). Vertically aligned with Ground Floor HST terrace glazing O4 (14,500 to 20,800 mm).',
+                specs: 'Floor-to-ceiling safety glass panels (VSG/ESG), 4 equal parts in Smaller windows (3 equal parts in Bigger windows), flush threshold at +3.43 m.'
             },
-            'SO5': {
-                title: 'Window SO5 — Ground Floor West Room (0.09)',
-                subtitle: 'Three-Sash Window over Clinker Brick Parapet',
+            'O7': {
+                title: 'Window O7 — Ground Floor West Room (0.09)',
+                subtitle: 'Three-Sash Window over Clinker Brick Parapet (3,200 × 2,000 mm, hp=800 mm)',
                 dims: 'Width: 3,200 mm | Height: 2,000 mm | Sill: hp = 800 mm (+0.80 m) | Head: +2.80 m | Screen X: 2,800 to 6,000 mm | Global X: 15,000 mm',
-                room: 'Ground Floor, Western Room (0.09). Starts after 2,800 mm clinker brick wall; right edge at 6,000 mm aligns with upper window SO2.',
-                specs: '3 equal sashes (two left tilt-and-turn casements, one right fixed pane), clinker brick parapet below (+0.80 m), lintel flush with intermediate cornice (+2.80 m).'
+                room: 'Ground Floor, Western Room (0.09) on the projecting front volume. Right edge at 6,000 mm aligns with the step-back corner and upper window O12.',
+                specs: 'Smaller windows: 3 equal sashes (3200×2000 mm, hp=800 mm). Bigger windows: 1 fixed full-height window (2000×2800 mm, hp=0 mm).'
             },
-            'SO6': {
-                title: 'Terrace Glazing SO6 — Dining & Living Room HST (0.12 Jadalnia / Salon)',
-                subtitle: 'Four-Panel Full-Height HST Lift-and-Slide Terrace Door (← →)',
+            'O5': {
+                title: 'Terrace Glazing O5 — Dining & Living Room HST (0.12 Jadalnia / Salon)',
+                subtitle: 'Four-Panel Full-Height HST Lift-and-Slide Terrace Door (4 Equal Parts)',
                 dims: 'Width: 6,350 mm | Height: 2,800 mm | Sill: hp = 0 mm (±0.00 m) | Head: +2.80 m | Screen X: 7,000 to 13,350 mm | Global X: 7,650 mm',
-                room: 'Ground Floor, Dining & Central Living Area (0.12). Separated from SO5 by a 1,000 mm clinker brick pier and from SO7 by a 1,150 mm clinker brick pier.',
-                specs: 'Heavy-duty 4-panel aluminum HST lift-and-slide system with central bi-parting sliding leaves (← →), zero-threshold flush transition to southern garden terrace.'
+                room: 'Ground Floor, Dining & Central Living Area (0.12). Separated from O7 by a 1,000 mm recessed clinker brick pier and from O4 by a 1,150 mm clinker brick pier.',
+                specs: 'Heavy-duty aluminum HST lift-and-slide system (4 equal parts in Smaller windows; 3 equal parts in Bigger windows), zero-threshold flush transition to southern garden terrace.'
             },
-            'SO7': {
-                title: 'Terrace Glazing SO7 — Eastern Living Room HST (0.11 Salon)',
-                subtitle: 'Four-Panel Full-Height HST Lift-and-Slide Terrace Door (← →)',
+            'O4': {
+                title: 'Terrace Glazing O4 — Eastern Living Room HST (0.11 Salon)',
+                subtitle: 'Four-Panel Full-Height HST Lift-and-Slide Terrace Door (4 Equal Parts)',
                 dims: 'Width: 6,300 mm | Height: 2,800 mm | Sill: hp = 0 mm (±0.00 m) | Head: +2.80 m | Screen X: 14,500 to 20,800 mm | Global X: 200 mm',
-                room: 'Ground Floor, Eastern Living Room (0.11). Directly aligned under First Floor 4-panel window SO4, with a 200 mm clinker brick pier at the East corner.',
-                specs: 'Heavy-duty 4-panel aluminum HST lift-and-slide system with central bi-parting sliding leaves (← →), triple solar-control safety glazing.'
+                room: 'Ground Floor, Eastern Living Room (0.11). Directly aligned under First Floor window O10, with a 200 mm clinker brick pier at the East corner.',
+                specs: 'Heavy-duty aluminum HST lift-and-slide system (4 equal parts in Smaller windows; 3 equal parts in Bigger windows), triple solar-control safety glazing.'
             },
             'CORNICE': {
                 title: 'Intermediate Cornice (Gzyms Pośredni)',
@@ -1349,19 +1385,123 @@
             },
             'BRICK_WALL': {
                 title: 'Ground Floor Clinker Brick Facade (Parter)',
-                subtitle: 'Load-Bearing Exterior Wall with Clinker Brick Cladding (-0.02 m to +2.80 m)',
-                dims: 'Total Length: 21,000 mm | Height: 2,820 mm | Piers: 2,800 mm (West), 1,000 mm (mid-left), 1,150 mm (mid-right), 200 mm (East)',
-                room: 'Ground floor southern exterior wall framing window SO5 and HST sliding doors SO6 and SO7.',
+                subtitle: 'Projecting West Wing (0–6,000 mm) & Recessed Garden Wall (6,000–21,000 mm)',
+                dims: 'Total Length: 21,000 mm | Height: 2,820 mm | Step-back at 6,000 mm (right edge of O7)',
+                room: 'Ground floor southern exterior wall framing window O7 (in projecting left block) and HST sliding doors O5 and O4 (in recessed wall).',
                 specs: 'Dark graphite / charcoal hand-formed clinker brick slips over three-layer insulated masonry wall.'
             },
             'TIMBER_WALL': {
                 title: 'Upper Floor Vertical Timber Cladding (Piętro)',
                 subtitle: 'Ventilated Natural Wood Slat Facade (+3.43 m to +6.13 m)',
                 dims: 'Total Length: 21,000 mm | Height: 2,700 mm | Piers: 160 mm, 3,440 mm, 2,500 mm, 1,000 mm, 200 mm',
-                room: 'First floor southern exterior wall framing bedroom and bathroom windows SO1, SO2, SO3, and SO4.',
+                room: 'First floor southern exterior wall framing bedroom and bathroom windows O13a, O12, SO3, and O10.',
                 specs: 'Vertical thermo-ash / larch timber profile boarding on ventilated sub-frame.'
             }
         };
+
+        function setSouthFacadeWindowOption(mode) {
+            currentSouthWindowMode = (mode === 'bigger') ? 'bigger' : 'smaller';
+            const btnSmaller = document.getElementById('btn-sf-smaller');
+            const btnBigger = document.getElementById('btn-sf-bigger');
+            const badge = document.getElementById('sf-window-opt-badge');
+            const levelO7Sill = document.getElementById('level-o7-sill');
+
+            if (currentSouthWindowMode === 'bigger') {
+                if (btnSmaller) btnSmaller.classList.remove('active');
+                if (btnBigger) btnBigger.classList.add('active');
+                if (badge) {
+                    badge.textContent = 'Active: Bigger windows (O12: 2-part, O10/O5/O4: 3-part, O7: 200×280 fix hp=0)';
+                }
+                if (levelO7Sill) levelO7Sill.style.display = 'none';
+
+                WindowStore.update('O12', {
+                    sashes: 2,
+                    hasMullion: true,
+                    description: 'Two-panel full-height floor-to-ceiling bedroom glazing on the South Facade (split into 2 equal parts)'
+                });
+                WindowStore.update('O10', {
+                    sashes: 3,
+                    hasMullion: true,
+                    description: 'Three-panel full-height floor-to-ceiling panoramic glazing on the East side of the first floor (split into 3 equal parts)'
+                });
+                WindowStore.update('O7', {
+                    x: 15000,
+                    width: 2000,
+                    height: 2800,
+                    sill: 0,
+                    sashes: 1,
+                    hasMullion: false,
+                    tiltTurnSashes: [],
+                    description: 'Single-pane full-height fixed window (2000×2800 mm, hp=0 mm, 1 fix window)'
+                });
+                WindowStore.update('O5', {
+                    sashes: 3,
+                    hasMullion: true,
+                    slidingArrows: false,
+                    description: 'Three-panel full-height HST terrace glazing (split into 3 equal parts) in dining/living area'
+                });
+                WindowStore.update('O4', {
+                    sashes: 3,
+                    hasMullion: true,
+                    slidingArrows: false,
+                    description: 'Three-panel full-height HST terrace glazing (split into 3 equal parts) in eastern living room'
+                });
+
+                elementData['O12'].subtitle = 'Two-Panel Full-Height Floor-to-Ceiling Glazing (2 Equal Parts)';
+                elementData['O10'].subtitle = 'Three-Panel Full-Height Panoramic Glazing (3 Equal Parts)';
+                elementData['O7'].subtitle = 'Single Fixed Full-Height Window (2,000 × 2,800 mm, hp=0 mm)';
+                elementData['O5'].subtitle = 'Three-Panel Full-Height HST Terrace Glazing (3 Equal Parts)';
+                elementData['O4'].subtitle = 'Three-Panel Full-Height HST Terrace Glazing (3 Equal Parts)';
+            } else {
+                if (btnSmaller) btnSmaller.classList.add('active');
+                if (btnBigger) btnBigger.classList.remove('active');
+                if (badge) {
+                    badge.textContent = 'Active: Smaller windows (O12: 3-part, O10/O5/O4: 4-part, O7: 320×200 hp=80)';
+                }
+                if (levelO7Sill) levelO7Sill.style.display = 'inline';
+
+                WindowStore.update('O12', {
+                    sashes: 3,
+                    hasMullion: true,
+                    description: 'Three-panel full-height floor-to-ceiling bedroom glazing on the South Facade (3 equal parts)'
+                });
+                WindowStore.update('O10', {
+                    sashes: 4,
+                    hasMullion: true,
+                    description: 'Four-panel full-height floor-to-ceiling panoramic glazing on the East side of the first floor (4 equal parts)'
+                });
+                WindowStore.update('O7', {
+                    x: 15000,
+                    width: 3200,
+                    height: 2000,
+                    sill: 800,
+                    sashes: 3,
+                    hasMullion: true,
+                    tiltTurnSashes: [1, 2],
+                    description: 'Three-sash ground floor window (3200×2000 mm, hp=800 mm, two tilt-and-turn sashes on left, one fixed sash on right) with clinker brick parapet'
+                });
+                WindowStore.update('O5', {
+                    sashes: 4,
+                    hasMullion: true,
+                    slidingArrows: true,
+                    description: 'Four-panel full-height HST lift-and-slide terrace glazing (4 equal parts, central bi-parting doors ← →) in dining/living area'
+                });
+                WindowStore.update('O4', {
+                    sashes: 4,
+                    hasMullion: true,
+                    slidingArrows: true,
+                    description: 'Four-panel full-height HST lift-and-slide terrace glazing (4 equal parts, central bi-parting doors ← →) in eastern living room'
+                });
+
+                elementData['O12'].subtitle = 'Three-Panel Full-Height Floor-to-Ceiling Glazing (3 Equal Parts)';
+                elementData['O10'].subtitle = 'Four-Panel Full-Height Panoramic Glazing (4 Equal Parts)';
+                elementData['O7'].subtitle = 'Three-Sash Window over Clinker Brick Parapet (3,200 × 2,000 mm, hp=800 mm)';
+                elementData['O5'].subtitle = 'Four-Panel Full-Height HST Lift-and-Slide Terrace Door (4 Equal Parts)';
+                elementData['O4'].subtitle = 'Four-Panel Full-Height HST Lift-and-Slide Terrace Door (4 Equal Parts)';
+            }
+
+            updateSouthFacadeDimensions();
+        }
 
         function showElementDetails(key) {
             currentSelectedKey = key;
@@ -1370,7 +1510,7 @@
                 const coords = CoordinateService.transform(win, 'south_facade');
                 const startMm = Math.round(coords.localX_mm);
                 const endMm = Math.round(coords.localX_mm + win.width);
-                elementData[key].dims = `Width: ${win.width.toLocaleString()} mm | Height: ${win.height.toLocaleString()} mm | Sill: hp = ${win.sill} mm | Screen X (West→East): ${startMm.toLocaleString()} to ${endMm.toLocaleString()} mm | Global X: ${win.x.toLocaleString()} mm`;
+                elementData[key].dims = `Width: ${win.width.toLocaleString()} mm | Height: ${win.height.toLocaleString()} mm | Sill: hp = ${win.sill} mm | Sashes: ${win.sashes} | Screen X (West→East): ${startMm.toLocaleString()} to ${endMm.toLocaleString()} mm | Global X: ${win.x.toLocaleString()} mm`;
             }
 
             const data = elementData[key];
@@ -1490,7 +1630,7 @@
             const tbody = document.getElementById('sf-schedule-tbody');
             if (!tbody) return;
 
-            const order = ['SO1', 'SO2', 'SO3', 'SO4', 'SO5', 'SO6', 'SO7'];
+            const order = ['O13a_2', 'O12', 'SO3', 'O10', 'O7', 'O5', 'O4'];
             tbody.replaceChildren();
 
             order.forEach(id => {
@@ -1548,7 +1688,7 @@
         function updateSouthFacadeDimensions() {
             const upperGroup = document.getElementById('sf-upper-dims-group');
             if (upperGroup) {
-                const upperSvg = `<svg xmlns="http://www.w3.org/2000/svg"><g>${buildDimensionChainSVG(['SO1', 'SO2', 'SO3', 'SO4'], 77, true)}</g></svg>`;
+                const upperSvg = `<svg xmlns="http://www.w3.org/2000/svg"><g>${buildDimensionChainSVG(['O13a_2', 'O12', 'SO3', 'O10'], 77, true)}</g></svg>`;
                 const doc = new DOMParser().parseFromString(upperSvg, 'image/svg+xml');
                 const g = doc.documentElement.firstElementChild;
                 if (g) {
@@ -1558,7 +1698,7 @@
 
             const groundGroup = document.getElementById('sf-ground-dims-group');
             if (groundGroup) {
-                const groundSvg = `<svg xmlns="http://www.w3.org/2000/svg"><g>${buildDimensionChainSVG(['SO5', 'SO6', 'SO7'], -113, false)}</g></svg>`;
+                const groundSvg = `<svg xmlns="http://www.w3.org/2000/svg"><g>${buildDimensionChainSVG(['O7', 'O5', 'O4'], -113, false)}</g></svg>`;
                 const doc = new DOMParser().parseFromString(groundSvg, 'image/svg+xml');
                 const g = doc.documentElement.firstElementChild;
                 if (g) {
@@ -1578,7 +1718,7 @@
 
         window.addEventListener('DOMContentLoaded', function () {
             WindowComponent.autoMountAll();
-            updateSouthFacadeDimensions();
+            setSouthFacadeWindowOption('smaller');
 
             WindowStore.subscribe(function () {
                 updateSouthFacadeDimensions();

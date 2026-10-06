@@ -121,16 +121,30 @@
         },
 
         _renderExteriorNorthFacade: function (win, x, y, w, h) {
-            const isCorner = win.id === 'O13a' || win.id === 'O13b';
+            const isCorner = win.id === 'O13a' || win.id === 'O13b' || win.id === 'O13b_1';
             const isFullHeight = win.id === '14a'
                 || (win.floor === 'first' && win.sill <= 3430)
                 || (win.floor === 'ground' && win.sill <= 0);
             const isCompactRibbon = h <= 75;
             const midX = x + w / 2;
             const numSashes = Math.max(1, Number(win.sashes) || 1);
+            const customSashWidths = (Array.isArray(win.sashWidths) && win.sashWidths.length >= 2)
+                ? win.sashWidths
+                : ((win.id === 'O1' && Math.round(win.width) === 2500) ? [900, 1600] : null);
 
             let sashesSvg = '';
-            if (numSashes >= 2 && win.hasMullion) {
+            if (customSashWidths && win.hasMullion) {
+                const totalSplitMm = customSashWidths.reduce((acc, val) => acc + Number(val || 0), 0) || win.width;
+                let accumMm = 0;
+                for (let i = 0; i < customSashWidths.length; i++) {
+                    const partMm = Number(customSashWidths[i] || 0);
+                    accumMm += partMm;
+                    if (i < customSashWidths.length - 1) {
+                        const mullionX = x + (w * accumMm) / totalSplitMm;
+                        sashesSvg += `<line x1="${mullionX}" y1="${y + 4}" x2="${mullionX}" y2="${y + h - 4}" stroke="#0f172a" stroke-width="3" />`;
+                    }
+                }
+            } else if (numSashes >= 2 && win.hasMullion) {
                 for (let i = 1; i < numSashes; i++) {
                     const mullionX = x + (w * i) / numSashes;
                     sashesSvg += `<line x1="${mullionX}" y1="${y + 4}" x2="${mullionX}" y2="${y + h - 4}" stroke="#0f172a" stroke-width="3" />`;
@@ -221,7 +235,13 @@
         },
 
         _renderInteriorKitchen: function (win, x, y, w, h, styleType) {
-            const midX = x + w / 2;
+            const customSashWidths = (Array.isArray(win.sashWidths) && win.sashWidths.length >= 2)
+                ? win.sashWidths
+                : ((win.id === 'O1' && Math.round(win.width) === 2500) ? [900, 1600] : null);
+            // Note: kitchen_north_wall looks North (direction: 'east'), so exterior left/right is mirrored horizontally inside the kitchen
+            const mullionX = customSashWidths
+                ? (x + w * (Number(customSashWidths[1] || 1600) / (Number(customSashWidths[0] || 900) + Number(customSashWidths[1] || 1600))))
+                : (x + w / 2);
             const innerMargin = 10;
             const innerX = x + innerMargin;
             const innerY = y + innerMargin;
@@ -244,10 +264,10 @@
                     <!-- Inner Sash Frame -->
                     <rect x="${innerX}" y="${innerY}" width="${innerW}" height="${innerH}" fill="none" stroke="${strokeColor}" stroke-width="1" />
                     <!-- Vertical Split Mullion -->
-                    <line x1="${midX}" y1="${innerY}" x2="${midX}" y2="${innerY + innerH}" stroke="${strokeColor}" stroke-width="1.5" />
+                    <line x1="${mullionX}" y1="${innerY}" x2="${mullionX}" y2="${innerY + innerH}" stroke="${strokeColor}" stroke-width="1.5" />
                     <!-- Architectural Window Handle -->
-                    <rect x="${midX - 2.5}" y="${y + h * 0.45}" width="5" height="10" fill="#555" stroke="${strokeColor}" stroke-width="0.5" />
-                    <line x1="${midX - 2.5}" y1="${y + h * 0.45 + 5}" x2="${midX - 12.5}" y2="${y + h * 0.45 + 5}" stroke="#555" stroke-width="2" />
+                    <rect x="${mullionX - 2.5}" y="${y + h * 0.45}" width="5" height="10" fill="#555" stroke="${strokeColor}" stroke-width="0.5" />
+                    <line x1="${mullionX - 2.5}" y1="${y + h * 0.45 + 5}" x2="${mullionX - 12.5}" y2="${y + h * 0.45 + 5}" stroke="#555" stroke-width="2" />
                     <!-- Technical ID Label -->
                     <text x="${x + 12}" y="${y + 22}" font-family="'JetBrains Mono', monospace" font-size="9" fill="#0284c7" font-weight="700">
                         ${win.name} (${win.width}×${win.height})
