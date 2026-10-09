@@ -134,36 +134,63 @@
                 ? (win.sill <= 3430 ? 0 : Math.round((win.sill - 3330) / 10))
                 : Math.round(win.sill / 10);
 
-            // Tall windows with 90 mm inner window pillars/mullions (part of the window itself)
+            // Windows with inner window pillars/mullions (e.g. 90 mm or 100 mm, part of the window itself)
             if (pillarMm > 0 && numSashes >= 2) {
                 const scale = w / (win.width || 1);
                 const pillarSvg = pillarMm * scale;
-                const paneWidthMm = (win.width - (numSashes - 1) * pillarMm) / numSashes;
+                const customPanes = (Array.isArray(win.sashWidths) && win.sashWidths.length === numSashes)
+                    ? win.sashWidths.map(Number)
+                    : null;
+
+                let paneWidthsMm;
+                if (customPanes) {
+                    const sumCustom = customPanes.reduce((a, b) => a + b, 0);
+                    const totalPillarMm = (numSashes - 1) * pillarMm;
+                    if (Math.abs(sumCustom + totalPillarMm - win.width) < 1) {
+                        paneWidthsMm = customPanes;
+                    } else if (Math.abs(sumCustom - win.width) < 1) {
+                        // Keep right-hand pane(s) intact, deduct pillar width from left-hand pane
+                        paneWidthsMm = customPanes.slice();
+                        paneWidthsMm[0] = Math.max(0, paneWidthsMm[0] - totalPillarMm);
+                    } else {
+                        paneWidthsMm = customPanes;
+                    }
+                } else {
+                    const eqPaneMm = (win.width - (numSashes - 1) * pillarMm) / numSashes;
+                    paneWidthsMm = Array(numSashes).fill(eqPaneMm);
+                }
+
                 const paneW = (w - (numSashes - 1) * pillarSvg) / numSashes;
-                const paneMmLabel = (Math.abs(paneWidthMm - Math.round(paneWidthMm)) < 0.05)
-                    ? Math.round(paneWidthMm)
-                    : Number(paneWidthMm.toFixed(1));
 
                 let pillarsSvg = '';
                 let splitLabelsSvg = '';
+                let cursorSvg = x;
 
                 for (let i = 0; i < numSashes; i++) {
-                    const px = x + i * (paneW + pillarSvg);
-                    const paneMidX = px + paneW / 2;
+                    const thisPaneMm = paneWidthsMm[i];
+                    const thisPaneW = thisPaneMm * scale;
+                    const px = cursorSvg;
+                    const paneMidX = px + thisPaneW / 2;
+                    const paneMmLabel = (Math.abs(thisPaneMm - Math.round(thisPaneMm)) < 0.05)
+                        ? Math.round(thisPaneMm)
+                        : Number(thisPaneMm.toFixed(1));
 
-                    // Subtle symmetric pane width indicator near bottom of each pane
+                    // Subtle pane width indicator near bottom of each pane
                     splitLabelsSvg += `
                         <text x="${paneMidX}" y="${y + h - 12}" font-family="'JetBrains Mono', monospace" font-size="8" fill="#cbd5e1" font-weight="600" text-anchor="middle" opacity="0.9">
                             ${paneMmLabel}
                         </text>
                     `;
 
+                    cursorSvg += thisPaneW;
+
                     if (i < numSashes - 1) {
-                        const pilX = px + paneW;
+                        const pilX = cursorSvg;
                         pillarsSvg += `
                             <!-- Inner window pillar ${i + 1} (${pillarMm} mm wide, solid flat fill) -->
                             <rect x="${pilX}" y="${y + 4}" width="${pillarSvg}" height="${h - 8}" fill="#0f172a" />
                         `;
+                        cursorSvg += pillarSvg;
                     }
                 }
 
@@ -204,11 +231,11 @@
                         <!-- Continuous glass pane with glare -->
                         <rect x="${x + 4}" y="${y + 4}" width="${w - 8}" height="${h - 8}" fill="url(#glass-glare)" />
                         <rect x="${x + 4}" y="${y + 4}" width="${w - 8}" height="${h - 8}" fill="none" stroke="#0f172a" stroke-width="3" />
-                        <!-- 90 mm inner window pillars (solid flat fill, part of window) -->
+                        <!-- Inner window pillars (${pillarMm} mm, solid flat fill, part of window) -->
                         ${pillarsSvg}
                         ${slidingSvg}
                         ${sillSvg}
-                        <!-- Internal symmetric pane widths -->
+                        <!-- Internal pane widths -->
                         ${splitLabelsSvg}
                         <!-- Main Window Dimension Badge -->
                         <text x="${midX}" y="${y + h / 2 - 5}" font-family="'JetBrains Mono', monospace" font-size="11" fill="#ffffff" font-weight="700" text-anchor="middle" filter="drop-shadow(0 1px 2px black)">
@@ -231,9 +258,19 @@
                 let accumMm = 0;
                 for (let i = 0; i < customSashWidths.length; i++) {
                     const partMm = Number(customSashWidths[i] || 0);
+                    const startSvg = x + (w * accumMm) / totalSplitMm;
                     accumMm += partMm;
+                    const endSvg = x + (w * accumMm) / totalSplitMm;
+                    const partMidX = (startSvg + endSvg) / 2;
+                    if (h >= 100) {
+                        sashesSvg += `
+                            <text x="${partMidX}" y="${y + h - 10}" font-family="'JetBrains Mono', monospace" font-size="8" fill="#cbd5e1" font-weight="600" text-anchor="middle" opacity="0.9">
+                                ${Math.round(partMm)}
+                            </text>
+                        `;
+                    }
                     if (i < customSashWidths.length - 1) {
-                        const mullionX = x + (w * accumMm) / totalSplitMm;
+                        const mullionX = endSvg;
                         sashesSvg += `<line x1="${mullionX}" y1="${y + 4}" x2="${mullionX}" y2="${y + h - 4}" stroke="#0f172a" stroke-width="3" />`;
                     }
                 }
@@ -336,9 +373,16 @@
             const customSashWidths = (Array.isArray(win.sashWidths) && win.sashWidths.length >= 2)
                 ? win.sashWidths
                 : ((win.id === 'O1' && Math.round(win.width) === 2500) ? [900, 1600] : null);
+            const pillarMm = Number(win.pillarWidth) || 0;
+            const totalMm = Number(win.width) || 2500;
+            const scale = w / totalMm;
             // Note: kitchen_north_wall looks North (direction: 'east'), so exterior left/right is mirrored horizontally inside the kitchen
+            const rightPartMm = customSashWidths ? Number(customSashWidths[1] || 1600) : (totalMm / 2);
+            const leftPartMm = customSashWidths ? Number(customSashWidths[0] || 900) : (totalMm / 2);
             const mullionX = customSashWidths
-                ? (x + w * (Number(customSashWidths[1] || 1600) / (Number(customSashWidths[0] || 900) + Number(customSashWidths[1] || 1600))))
+                ? (pillarMm > 0
+                    ? (x + rightPartMm * scale + (pillarMm * scale) / 2)
+                    : (x + w * (rightPartMm / (leftPartMm + rightPartMm))))
                 : (x + w / 2);
             const innerMargin = 10;
             const innerX = x + innerMargin;
@@ -355,14 +399,18 @@
                 strokeColor = '#333333';
             }
 
+            const mullionSvg = (pillarMm > 0)
+                ? `<rect x="${x + rightPartMm * scale}" y="${innerY}" width="${pillarMm * scale}" height="${innerH}" fill="${strokeColor}" />`
+                : `<line x1="${mullionX}" y1="${innerY}" x2="${mullionX}" y2="${innerY + innerH}" stroke="${strokeColor}" stroke-width="1.5" />`;
+
             return `
                 <g class="window-component kitchen-window" data-window-id="${win.id}">
                     <!-- Outer Window Frame -->
                     <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${glassFill}" stroke="${strokeColor}" stroke-width="${strokeWidth}" />
                     <!-- Inner Sash Frame -->
                     <rect x="${innerX}" y="${innerY}" width="${innerW}" height="${innerH}" fill="none" stroke="${strokeColor}" stroke-width="1" />
-                    <!-- Vertical Split Mullion -->
-                    <line x1="${mullionX}" y1="${innerY}" x2="${mullionX}" y2="${innerY + innerH}" stroke="${strokeColor}" stroke-width="1.5" />
+                    <!-- Vertical Split Mullion / Inner Pillar -->
+                    ${mullionSvg}
                     <!-- Architectural Window Handle -->
                     <rect x="${mullionX - 2.5}" y="${y + h * 0.45}" width="5" height="10" fill="#555" stroke="${strokeColor}" stroke-width="0.5" />
                     <line x1="${mullionX - 2.5}" y1="${y + h * 0.45 + 5}" x2="${mullionX - 12.5}" y2="${y + h * 0.45 + 5}" stroke="#555" stroke-width="2" />

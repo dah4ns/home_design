@@ -666,8 +666,11 @@
             <div class="controls-bar">
                 <div class="layer-toggles" style="border-right: 1px solid #cbd5e1; padding-right: 16px;">
                     <span style="font-size: 13px; font-weight: 700; color: #0f172a;">Kitchen Window (O1):</span>
-                    <button id="btn-o1-2500" class="toggle-btn active" onclick="setKitchenWindowO1Option(2500)" style="font-weight: 600;">
+                    <button id="btn-o1-2500" class="toggle-btn active" onclick="setKitchenWindowO1Option(2500, [900, 1600])" style="font-weight: 600;">
                         <span>🪟</span> 250 × 140 (90 + 160, default)
+                    </button>
+                    <button id="btn-o1-2500-190-60" class="toggle-btn" onclick="setKitchenWindowO1Option(2500, [1800, 600], 100)" style="font-weight: 600;">
+                        <span>🪟</span> 250 × 140 (180 + 10 pillar + 60, right 60)
                     </button>
                     <button id="btn-o1-2350" class="toggle-btn" onclick="setKitchenWindowO1Option(2350)" style="font-weight: 600;">
                         <span>↔️</span> 235 × 140
@@ -679,7 +682,7 @@
                         <span>↔️</span> 190 × 140
                     </button>
                     <span id="o1-window-opt-badge" class="badge accent" style="font-size: 11.5px; padding: 4px 10px;">
-                        O1: 2500×1400 mm [split: 90 + 160 cm] (X = 8480..10980 mm)
+                        O1: 2500×1400 mm [split: 90 + 160 cm at X=9380 mm] (X = 8480..10980 mm)
                     </span>
                 </div>
                 <div class="layer-toggles" style="border-right: 1px solid #cbd5e1; padding-right: 16px;">
@@ -689,6 +692,9 @@
                     </button>
                     <button id="btn-opt-bigger" class="toggle-btn" onclick="setMasterBedroomWindowOption('bigger')" style="font-weight: 600;">
                         <span>↔️</span> 2) bigger windows (O15: 2095 mm wide, aligned with O1, to floor)
+                    </button>
+                    <button id="btn-opt-o15-1900" class="toggle-btn" onclick="setMasterBedroomWindowOption('o15-1900')" style="font-weight: 600;">
+                        <span>↔️</span> 3) O15: 190 × 270 cm (aligned with O1, to floor)
                     </button>
                     <span id="master-window-opt-badge" class="badge accent" style="font-size: 11.5px; padding: 4px 10px;">
                         Active: current windows (O11: 1000×1950 mm, hp=850 mm)
@@ -1875,35 +1881,45 @@
         };
 
         let activeMasterWindowId = 'O11_1';
+        let activeMasterOption = 'current';
 
         function setMasterBedroomWindowOption(option) {
-            const isBigger = (option === 'bigger');
-            activeMasterWindowId = isBigger ? 'O15' : 'O11_1';
+            activeMasterOption = option || 'current';
+            const isO15 = (activeMasterOption === 'bigger' || activeMasterOption === 'o15-1900');
+            const isO15_1900 = (activeMasterOption === 'o15-1900');
+            const o15Width = isO15_1900 ? 1900 : 2095;
+            activeMasterWindowId = isO15 ? 'O15' : 'O11_1';
 
             // 1. Toggle active state on option buttons and badge
             const btnCurrent = document.getElementById('btn-opt-current');
             const btnBigger = document.getElementById('btn-opt-bigger');
+            const btnO15_1900 = document.getElementById('btn-opt-o15-1900');
             const badge = document.getElementById('master-window-opt-badge');
 
-            if (btnCurrent) btnCurrent.classList.toggle('active', !isBigger);
-            if (btnBigger) btnBigger.classList.toggle('active', isBigger);
+            if (btnCurrent) btnCurrent.classList.toggle('active', activeMasterOption === 'current');
+            if (btnBigger) btnBigger.classList.toggle('active', activeMasterOption === 'bigger');
+            if (btnO15_1900) btnO15_1900.classList.toggle('active', isO15_1900);
             if (badge) {
-                badge.textContent = isBigger
-                    ? 'Active: bigger windows (O15: 2095×2700 mm, X=8480 aligned with O1, hp=0 mm)'
-                    : 'Active: current windows (O11: 1000×1950 mm, hp=850 mm)';
+                if (isO15_1900) {
+                    badge.textContent = 'Active: O15 190×270 cm (1900×2700 mm, X=8480..10380 aligned with O1 & 190+60 split, hp=0 mm)';
+                } else if (isO15) {
+                    badge.textContent = 'Active: bigger windows (O15: 2095×2700 mm, X=8480..10575 aligned with O1, hp=0 mm)';
+                } else {
+                    badge.textContent = 'Active: current windows (O11: 1000×1950 mm, hp=850 mm)';
+                }
             }
 
             // 2. Replace one window object with the other in WindowStore views & mount in SVG
             if (typeof WindowStore !== 'undefined' && WindowStore.update) {
                 WindowStore.update('O11_1', {
-                    views: isBigger ? [] : ['north_facade']
+                    views: isO15 ? [] : ['north_facade']
                 });
                 WindowStore.update('O15', {
                     x: 8480,
-                    width: 2095,
+                    width: o15Width,
                     height: 2700,
                     sill: 3430,
-                    views: isBigger ? ['north_facade'] : []
+                    views: isO15 ? ['north_facade'] : []
                 });
             }
 
@@ -1925,16 +1941,16 @@
             const schedSpecs = document.getElementById('sched-o11-1-specs');
 
             if (schedSymbol) {
-                schedSymbol.textContent = isBigger ? 'O15' : 'O11';
-                schedSymbol.className = isBigger ? 'badge-tag badge-emerald' : 'badge-tag badge-amber';
+                schedSymbol.textContent = isO15 ? 'O15' : 'O11';
+                schedSymbol.className = isO15 ? 'badge-tag badge-emerald' : 'badge-tag badge-amber';
             }
-            if (schedWidth) schedWidth.textContent = isBigger ? '2 095' : '1 000';
-            if (schedHeight) schedHeight.textContent = isBigger ? '2 700' : '1 950';
-            if (schedSill) schedSill.textContent = isBigger ? 'hp = 0 mm (+3.43 m)' : 'hp = 850 mm (+4.18 m)';
-            if (schedType) schedType.textContent = isBigger
-                ? 'Full-height floor-to-ceiling window (2,095 mm wide, left edge aligned with O1 — bigger windows)'
+            if (schedWidth) schedWidth.textContent = isO15 ? (isO15_1900 ? '1 900' : '2 095') : '1 000';
+            if (schedHeight) schedHeight.textContent = isO15 ? '2 700' : '1 950';
+            if (schedSill) schedSill.textContent = isO15 ? 'hp = 0 mm (+3.43 m)' : 'hp = 850 mm (+4.18 m)';
+            if (schedType) schedType.textContent = isO15
+                ? `Full-height floor-to-ceiling window (${o15Width.toLocaleString()} mm wide, left edge aligned with O1)`
                 : 'Vertical slot window (tilt & turn — current windows)';
-            if (schedSpecs) schedSpecs.textContent = isBigger
+            if (schedSpecs) schedSpecs.textContent = isO15
                 ? 'Safety tempered & laminated floor-to-ceiling glazing (VSG/ESG), flush floor threshold'
                 : 'Acoustic & privacy laminated glass, concealed hinges';
 
@@ -1944,16 +1960,25 @@
             }
         }
 
-        function setKitchenWindowO1Option(widthMm) {
+        function setKitchenWindowO1Option(widthMm, customSashWidths, customPillarWidth) {
             const targetWidth = Number(widthMm) || 2500;
             const is250 = (targetWidth === 2500);
+            let sashWidths = is250
+                ? (Array.isArray(customSashWidths) && customSashWidths.length === 2 ? customSashWidths.map(Number) : [900, 1600])
+                : null;
+            let pillarWidth = (is250 && customPillarWidth !== undefined) ? Number(customPillarWidth) : 0;
+            if (is250 && sashWidths && sashWidths[1] === 600 && (sashWidths[0] === 1900 || sashWidths[0] === 1800)) {
+                pillarWidth = customPillarWidth !== undefined ? Number(customPillarWidth) : 100;
+                sashWidths = [targetWidth - pillarWidth - 600, 600]; // [1800, 600]
+            }
             // Fixed left edge on North Facade (X = 8480 mm from Point 0 / Axis 6); resizing extends/shortens only in the West direction
             if (typeof WindowStore !== 'undefined' && WindowStore.update) {
                 WindowStore.update('O1', {
                     x: 8480,
                     width: targetWidth,
                     height: 1400,
-                    sashWidths: is250 ? [900, 1600] : null
+                    sashWidths: sashWidths,
+                    pillarWidth: pillarWidth
                 });
             }
             if (typeof updateNorthFacadeDimensions === 'function') {
@@ -1968,8 +1993,25 @@
             currentSelectedKey = key;
             const win = (typeof WindowStore !== 'undefined') ? WindowStore.get(key) : null;
             if (win && elementData[key]) {
-                const splitNote = (win.id === 'O1' && Number(win.width) === 2500) ? ' (Split: 900 mm left + 1,600 mm right)' : '';
+                let splitNote = '';
+                if (win.id === 'O1' && Array.isArray(win.sashWidths) && win.sashWidths.length === 2) {
+                    const sLeft = Number(win.sashWidths[0]);
+                    const sRight = Number(win.sashWidths[1]);
+                    const pWidth = Number(win.pillarWidth) || 0;
+                    if (pWidth > 0) {
+                        splitNote = ` (Split: ${sLeft.toLocaleString()} mm left + ${pWidth} mm inner pillar + ${sRight.toLocaleString()} mm right, pillar at X = ${(win.x + sLeft).toLocaleString()}..${(win.x + sLeft + pWidth).toLocaleString()} mm)`;
+                    } else {
+                        splitNote = ` (Split: ${sLeft.toLocaleString()} mm left + ${sRight.toLocaleString()} mm right, split at X = ${(win.x + sLeft).toLocaleString()} mm)`;
+                    }
+                } else if (win.id === 'O1' && Number(win.width) === 2500) {
+                    splitNote = ' (Split: 900 mm left + 1,600 mm right)';
+                }
                 elementData[key].dims = `Width: ${win.width.toLocaleString()} mm${splitNote} | Height: ${win.height.toLocaleString()} mm | Sill: hp = ${win.sill} mm | Start X (from Point 0 / Axis 6): ${win.x.toLocaleString()} mm | End X: ${(win.x + win.width).toLocaleString()} mm`;
+                if (win.id === 'O15') {
+                    const remPier = 11375 - (win.x + win.width);
+                    elementData[key].subtitle = `Full-Height Floor-to-Ceiling Architectural Window (${win.width.toLocaleString()} mm Wide, Left Edge Aligned with O1 & Extended to Floor)`;
+                    elementData[key].room = `First Floor, 1.04 Sypialnia Master. Left edge aligned with Kitchen Window O1 (X = 8,480 mm) and right edge at X = ${(win.x + win.width).toLocaleString()} mm. Distance from Window 14a: 975 mm. Remaining pier to O11_2 (X=11,375 mm): ${remPier} mm.`;
+                }
             }
             const data = elementData[key];
             if (!data) return;
@@ -2029,9 +2071,23 @@
                 o1X = coords.x;
                 o1W = coords.width;
                 const is250 = (Number(o1.width) === 2500);
+                const sashArr = (Array.isArray(o1.sashWidths) && o1.sashWidths.length === 2)
+                    ? o1.sashWidths.map(Number)
+                    : (is250 ? [900, 1600] : null);
+                const pillarMm = Number(o1.pillarWidth) || 0;
+                const isSplit190_60 = is250 && sashArr && (sashArr[0] === 1800 || sashArr[0] === 1900) && sashArr[1] === 600;
+                const isSplit90_160 = is250 && !isSplit190_60;
 
                 // Sync O1 option buttons & badge
-                [2500, 2350, 2700, 1900].forEach(presetW => {
+                const btn2500Default = document.getElementById('btn-o1-2500');
+                if (btn2500Default) {
+                    btn2500Default.classList.toggle('active', isSplit90_160 && Number(o1.height) === 1400);
+                }
+                const btn2500Split60 = document.getElementById('btn-o1-2500-190-60');
+                if (btn2500Split60) {
+                    btn2500Split60.classList.toggle('active', isSplit190_60 && Number(o1.height) === 1400);
+                }
+                [2350, 2700, 1900].forEach(presetW => {
                     const btn = document.getElementById('btn-o1-' + presetW);
                     if (btn) {
                         btn.classList.toggle('active', Number(o1.width) === presetW && Number(o1.height) === 1400);
@@ -2039,14 +2095,29 @@
                 });
                 const o1Badge = document.getElementById('o1-window-opt-badge');
                 if (o1Badge) {
-                    const splitInfo = is250 ? ' [split: 90 + 160 cm]' : '';
+                    let splitInfo = '';
+                    if (sashArr) {
+                        if (pillarMm > 0) {
+                            splitInfo = ` [split: ${sashArr[0]} + ${pillarMm} pillar + ${sashArr[1]} mm, pillar X=${o1.x + sashArr[0]}..${o1.x + sashArr[0] + pillarMm} mm]`;
+                        } else {
+                            splitInfo = ` [split: ${Math.round(sashArr[0] / 10)} + ${Math.round(sashArr[1] / 10)} cm at X=${o1.x + sashArr[0]} mm]`;
+                        }
+                    }
                     o1Badge.textContent = `O1: ${o1.width}×${o1.height} mm${splitInfo} (X = ${o1.x}..${o1.x + o1.width} mm)`;
                 }
 
                 // Sync O1 Schedule Table row
                 const schedO1W = document.getElementById('sched-o1-width');
                 const schedO1H = document.getElementById('sched-o1-height');
-                if (schedO1W) schedO1W.textContent = is250 ? '2 500 (900 + 1 600)' : o1.width.toLocaleString();
+                if (schedO1W) {
+                    if (sashArr) {
+                        schedO1W.textContent = pillarMm > 0
+                            ? `${o1.width.toLocaleString()} (${sashArr[0].toLocaleString()} + ${pillarMm} pillar + ${sashArr[1].toLocaleString()})`
+                            : `${o1.width.toLocaleString()} (${sashArr[0].toLocaleString()} + ${sashArr[1].toLocaleString()})`;
+                    } else {
+                        schedO1W.textContent = o1.width.toLocaleString();
+                    }
+                }
                 if (schedO1H) schedO1H.textContent = o1.height.toLocaleString();
 
                 const lWitness = document.getElementById('nf-dim-o1-lwitness');
@@ -2173,8 +2244,8 @@
                     o11Text.textContent = isO15 ? `${masterWin.width.toLocaleString()} (${masterWin.name})` : masterWin.width.toLocaleString();
                 }
                 if (pierBox2) {
-                    pierBox2.setAttribute('x', isO15 ? (pierMidSvg - 16) : (pierMidSvg - 20));
-                    pierBox2.setAttribute('width', isO15 ? 32 : 40);
+                    pierBox2.setAttribute('x', isO15 ? (pierMidSvg - 18) : (pierMidSvg - 20));
+                    pierBox2.setAttribute('width', isO15 ? 36 : 40);
                 }
                 if (pierText2) {
                     pierText2.setAttribute('x', pierMidSvg);
@@ -2185,11 +2256,8 @@
         const updateNorthFacadeO1Dimensions = updateNorthFacadeDimensions;
 
         window.addEventListener('DOMContentLoaded', function() {
-            const o15 = WindowStore.get('O15');
-            if (o15 && (o15.x !== 8480 || o15.width !== 2095)) {
-                WindowStore.update('O15', { x: 8480, width: 2095, height: 2700, sill: 3430 });
-            }
-            setKitchenWindowO1Option(2500);
+            setMasterBedroomWindowOption('current');
+            setKitchenWindowO1Option(2500, [900, 1600]);
             WindowComponent.autoMountAll();
             updateNorthFacadeDimensions();
 
