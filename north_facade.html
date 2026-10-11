@@ -666,8 +666,11 @@
             <div class="controls-bar">
                 <div class="layer-toggles" style="border-right: 1px solid #cbd5e1; padding-right: 16px;">
                     <span style="font-size: 13px; font-weight: 700; color: #0f172a;">Kitchen Window (O1):</span>
-                    <button id="btn-o1-2500" class="toggle-btn active" onclick="setKitchenWindowO1Option(2500, [900, 1600])" style="font-weight: 600;">
-                        <span>🪟</span> 250 × 140 (90 + 160, default)
+                    <button id="btn-o1-2100" class="toggle-btn active" onclick="setKitchenWindowO1Option(2100, [1050, 1050])" style="font-weight: 600;">
+                        <span>🪟</span> 210 × 140 (105 + 105, default)
+                    </button>
+                    <button id="btn-o1-2500" class="toggle-btn" onclick="setKitchenWindowO1Option(2500, [900, 1600])" style="font-weight: 600;">
+                        <span>🪟</span> 250 × 140 (90 + 160)
                     </button>
                     <button id="btn-o1-2500-190-60" class="toggle-btn" onclick="setKitchenWindowO1Option(2500, [1800, 600], 100)" style="font-weight: 600;">
                         <span>🪟</span> 250 × 140 (180 + 10 pillar + 60, right 60)
@@ -682,22 +685,22 @@
                         <span>↔️</span> 190 × 140
                     </button>
                     <span id="o1-window-opt-badge" class="badge accent" style="font-size: 11.5px; padding: 4px 10px;">
-                        O1: 2500×1400 mm [split: 90 + 160 cm at X=9380 mm] (X = 8480..10980 mm)
+                        O1: 2100×1400 mm [split: 105 + 105 cm at X=9530 mm] (X = 8480..10580 mm)
                     </span>
                 </div>
                 <div class="layer-toggles" style="border-right: 1px solid #cbd5e1; padding-right: 16px;">
                     <span style="font-size: 13px; font-weight: 700; color: #0f172a;">Master Bedroom Windows:</span>
-                    <button id="btn-opt-current" class="toggle-btn active" onclick="setMasterBedroomWindowOption('current')" style="font-weight: 600;">
+                    <button id="btn-opt-current" class="toggle-btn" onclick="setMasterBedroomWindowOption('current')" style="font-weight: 600;">
                         <span>🪟</span> 1) current windows
                     </button>
-                    <button id="btn-opt-bigger" class="toggle-btn" onclick="setMasterBedroomWindowOption('bigger')" style="font-weight: 600;">
-                        <span>↔️</span> 2) bigger windows (O15: 2095 mm wide, aligned with O1, to floor)
+                    <button id="btn-opt-bigger" class="toggle-btn active" onclick="setMasterBedroomWindowOption('bigger')" style="font-weight: 600;">
+                        <span>↔️</span> 2) O15: 210 × 270 cm (aligned with O1, to floor, default)
                     </button>
                     <button id="btn-opt-o15-1900" class="toggle-btn" onclick="setMasterBedroomWindowOption('o15-1900')" style="font-weight: 600;">
                         <span>↔️</span> 3) O15: 190 × 270 cm (aligned with O1, to floor)
                     </button>
                     <span id="master-window-opt-badge" class="badge accent" style="font-size: 11.5px; padding: 4px 10px;">
-                        Active: current windows (O11: 1000×1950 mm, hp=850 mm)
+                        Active: O15 210×270 cm (2100×2700 mm, X=8480..10580 aligned with O1, hp=0 mm)
                     </span>
                 </div>
                 <div class="layer-toggles">
@@ -719,6 +722,9 @@
                     Scale: 1:100 | Units: mm / cm
                 </div>
             </div>
+
+            <!-- Dynamic Facade Material Area Summary -->
+            <div id="facade-area-summary" data-facade-area-summary="north_facade"></div>
 
             <!-- SVG Container -->
             <div class="elevation-wrapper">
@@ -951,7 +957,7 @@
                         <rect x="750.5" y="-613" width="1300" height="270" fill="url(#wood-slats-pattern)" stroke="#8a7356" stroke-width="1.5" />
 
                         <!-- Dynamic Reusable Window Component: Master Bedroom Slot (Swaps between O11_1 ['O11'] and O15 ['O15']) -->
-                        <g data-window-component="O11_1" data-view-id="north_facade" data-window-style="exterior" id="facade-window-master-slot"></g>
+                        <g data-window-component="O15" data-view-id="north_facade" data-window-style="exterior" id="facade-window-master-slot"></g>
 
                         <!-- Window O11_2 - Bathroom 1.02 (1000mm wide x 1950mm high, hp=850mm) -->
                         <!-- Located at X = 1137.5 to 1237.5, Y = -613 to -418 -->
@@ -1797,8 +1803,8 @@
             'O1': {
                 title: 'Window O1 — Kitchen (Kuchnia 0.13)',
                 subtitle: 'Horizontal Ribbon Window over Countertop / Sink',
-                dims: 'Width: 2,500 mm (Split: 900 mm left + 1,600 mm right) | Height: 1,400 mm | Sill Height: hp = 1,100 mm (+1.10 m) | Top Lintel: +2.50 m | Start: X = 8,480 mm (Distance from O2: 5,800 mm)',
-                room: 'Ground Floor, Room 0.13 Kuchnia (Area: 44.27 m²). Positioned 5,800 mm west of Window O2. Perfectly shares the +2.50 m lintel line with O2.',
+                dims: 'Width: 2,100 mm (Split: 1,050 mm left + 1,050 mm right) | Height: 1,400 mm | Sill Height: hp = 1,100 mm (+1.10 m) | Top Lintel: +2.50 m | Start: X = 8,480 mm (Distance from O2: 5,800 mm)',
+                room: 'Ground Floor, Room 0.13 Kuchnia (Area: 44.27 m²). Positioned 5,800 mm west of Window O2 and vertically aligned with O15 above. Perfectly shares the +2.50 m lintel line with O2.',
                 specs: 'Triple-pane insulated glass unit (Ug=0.5 W/m²K), matte anthracite aluminum frame (RAL 7016), exterior sheet metal sill at +1.10 m.'
             },
             'O2': {
@@ -1837,10 +1843,10 @@
                 specs: 'Matte acoustic glazing, micro-ventilation fitting, concealed hardware.'
             },
             'O15': {
-                title: 'Window O15 — Master Bedroom Full-Height Glazing (bigger windows)',
-                subtitle: 'Full-Height Floor-to-Ceiling Architectural Window (2,095 mm Wide, Left Edge Aligned with O1 & Extended to Floor)',
-                dims: 'Width: 2,095 mm | Height: 2,700 mm | Sill Height: hp = 0 mm (+3.43 m) | Top Lintel: +6.13 m | Start: X = 8,480 mm (aligned with O1) | End: X = 10,575 mm',
-                room: 'First Floor, 1.04 Sypialnia Master. Left edge aligned with Kitchen Window O1 (X = 8,480 mm). Distance from Window 14a: 975 mm. Remaining pier to O11_2 (X=11,375 mm): 800 mm.',
+                title: 'Window O15 — Master Bedroom Full-Height Glazing (210×270 cm, default)',
+                subtitle: 'Full-Height Floor-to-Ceiling Architectural Window (2,100 mm Wide, Vertically Aligned with O1 & Extended to Floor)',
+                dims: 'Width: 2,100 mm | Height: 2,700 mm | Sill Height: hp = 0 mm (+3.43 m) | Top Lintel: +6.13 m | Start: X = 8,480 mm (aligned with O1) | End: X = 10,580 mm',
+                room: 'First Floor, 1.04 Sypialnia Master. Left and right edges vertically aligned with Kitchen Window O1 (X = 8,480..10,580 mm). Distance from Window 14a: 975 mm. Remaining pier to O11_2 (X=11,375 mm): 795 mm.',
                 specs: 'Safety tempered and laminated glass (VSG/ESG), concealed slimline aluminum frame (RAL 7016), flush floor threshold at +3.43 m.'
             },
             'O11_2': {
@@ -1880,14 +1886,14 @@
             }
         };
 
-        let activeMasterWindowId = 'O11_1';
-        let activeMasterOption = 'current';
+        let activeMasterWindowId = 'O15';
+        let activeMasterOption = 'bigger';
 
         function setMasterBedroomWindowOption(option) {
-            activeMasterOption = option || 'current';
+            activeMasterOption = option || 'bigger';
             const isO15 = (activeMasterOption === 'bigger' || activeMasterOption === 'o15-1900');
             const isO15_1900 = (activeMasterOption === 'o15-1900');
-            const o15Width = isO15_1900 ? 1900 : 2095;
+            const o15Width = isO15_1900 ? 1900 : 2100;
             activeMasterWindowId = isO15 ? 'O15' : 'O11_1';
 
             // 1. Toggle active state on option buttons and badge
@@ -1903,7 +1909,7 @@
                 if (isO15_1900) {
                     badge.textContent = 'Active: O15 190×270 cm (1900×2700 mm, X=8480..10380 aligned with O1 & 190+60 split, hp=0 mm)';
                 } else if (isO15) {
-                    badge.textContent = 'Active: bigger windows (O15: 2095×2700 mm, X=8480..10575 aligned with O1, hp=0 mm)';
+                    badge.textContent = 'Active: O15 210×270 cm (2100×2700 mm, X=8480..10580 aligned with O1, hp=0 mm)';
                 } else {
                     badge.textContent = 'Active: current windows (O11: 1000×1950 mm, hp=850 mm)';
                 }
@@ -1944,11 +1950,11 @@
                 schedSymbol.textContent = isO15 ? 'O15' : 'O11';
                 schedSymbol.className = isO15 ? 'badge-tag badge-emerald' : 'badge-tag badge-amber';
             }
-            if (schedWidth) schedWidth.textContent = isO15 ? (isO15_1900 ? '1 900' : '2 095') : '1 000';
+            if (schedWidth) schedWidth.textContent = isO15 ? (isO15_1900 ? '1 900' : '2 100') : '1 000';
             if (schedHeight) schedHeight.textContent = isO15 ? '2 700' : '1 950';
             if (schedSill) schedSill.textContent = isO15 ? 'hp = 0 mm (+3.43 m)' : 'hp = 850 mm (+4.18 m)';
             if (schedType) schedType.textContent = isO15
-                ? `Full-height floor-to-ceiling window (${o15Width.toLocaleString()} mm wide, left edge aligned with O1)`
+                ? `Full-height floor-to-ceiling window (${o15Width.toLocaleString()} mm wide, vertically aligned with O1)`
                 : 'Vertical slot window (tilt & turn — current windows)';
             if (schedSpecs) schedSpecs.textContent = isO15
                 ? 'Safety tempered & laminated floor-to-ceiling glazing (VSG/ESG), flush floor threshold'
@@ -1961,11 +1967,17 @@
         }
 
         function setKitchenWindowO1Option(widthMm, customSashWidths, customPillarWidth) {
-            const targetWidth = Number(widthMm) || 2500;
+            const targetWidth = Number(widthMm) || 2100;
             const is250 = (targetWidth === 2500);
-            let sashWidths = is250
-                ? (Array.isArray(customSashWidths) && customSashWidths.length === 2 ? customSashWidths.map(Number) : [900, 1600])
-                : null;
+            const is210 = (targetWidth === 2100);
+            let sashWidths = null;
+            if (Array.isArray(customSashWidths) && customSashWidths.length === 2) {
+                sashWidths = customSashWidths.map(Number);
+            } else if (is210) {
+                sashWidths = [1050, 1050];
+            } else if (is250) {
+                sashWidths = [900, 1600];
+            }
             let pillarWidth = (is250 && customPillarWidth !== undefined) ? Number(customPillarWidth) : 0;
             if (is250 && sashWidths && sashWidths[1] === 600 && (sashWidths[0] === 1900 || sashWidths[0] === 1800)) {
                 pillarWidth = customPillarWidth !== undefined ? Number(customPillarWidth) : 100;
@@ -2003,13 +2015,15 @@
                     } else {
                         splitNote = ` (Split: ${sLeft.toLocaleString()} mm left + ${sRight.toLocaleString()} mm right, split at X = ${(win.x + sLeft).toLocaleString()} mm)`;
                     }
+                } else if (win.id === 'O1' && Number(win.width) === 2100) {
+                    splitNote = ' (Split: 1,050 mm left + 1,050 mm right)';
                 } else if (win.id === 'O1' && Number(win.width) === 2500) {
                     splitNote = ' (Split: 900 mm left + 1,600 mm right)';
                 }
                 elementData[key].dims = `Width: ${win.width.toLocaleString()} mm${splitNote} | Height: ${win.height.toLocaleString()} mm | Sill: hp = ${win.sill} mm | Start X (from Point 0 / Axis 6): ${win.x.toLocaleString()} mm | End X: ${(win.x + win.width).toLocaleString()} mm`;
                 if (win.id === 'O15') {
                     const remPier = 11375 - (win.x + win.width);
-                    elementData[key].subtitle = `Full-Height Floor-to-Ceiling Architectural Window (${win.width.toLocaleString()} mm Wide, Left Edge Aligned with O1 & Extended to Floor)`;
+                    elementData[key].subtitle = `Full-Height Floor-to-Ceiling Architectural Window (${win.width.toLocaleString()} mm Wide, Vertically Aligned with O1 & Extended to Floor)`;
                     elementData[key].room = `First Floor, 1.04 Sypialnia Master. Left edge aligned with Kitchen Window O1 (X = 8,480 mm) and right edge at X = ${(win.x + win.width).toLocaleString()} mm. Distance from Window 14a: 975 mm. Remaining pier to O11_2 (X=11,375 mm): ${remPier} mm.`;
                 }
             }
@@ -2065,20 +2079,25 @@
             }
 
             let o1X = 848;
-            let o1W = 250;
+            let o1W = 210;
             if (o1) {
                 const coords = CoordinateService.transform(o1, 'north_facade');
                 o1X = coords.x;
                 o1W = coords.width;
                 const is250 = (Number(o1.width) === 2500);
+                const is210 = (Number(o1.width) === 2100);
                 const sashArr = (Array.isArray(o1.sashWidths) && o1.sashWidths.length === 2)
                     ? o1.sashWidths.map(Number)
-                    : (is250 ? [900, 1600] : null);
+                    : (is210 ? [1050, 1050] : (is250 ? [900, 1600] : null));
                 const pillarMm = Number(o1.pillarWidth) || 0;
                 const isSplit190_60 = is250 && sashArr && (sashArr[0] === 1800 || sashArr[0] === 1900) && sashArr[1] === 600;
                 const isSplit90_160 = is250 && !isSplit190_60;
 
                 // Sync O1 option buttons & badge
+                const btn2100Default = document.getElementById('btn-o1-2100');
+                if (btn2100Default) {
+                    btn2100Default.classList.toggle('active', is210 && Number(o1.height) === 1400);
+                }
                 const btn2500Default = document.getElementById('btn-o1-2500');
                 if (btn2500Default) {
                     btn2500Default.classList.toggle('active', isSplit90_160 && Number(o1.height) === 1400);
@@ -2256,8 +2275,8 @@
         const updateNorthFacadeO1Dimensions = updateNorthFacadeDimensions;
 
         window.addEventListener('DOMContentLoaded', function() {
-            setMasterBedroomWindowOption('current');
-            setKitchenWindowO1Option(2500, [900, 1600]);
+            setMasterBedroomWindowOption('bigger');
+            setKitchenWindowO1Option(2100, [1050, 1050]);
             WindowComponent.autoMountAll();
             updateNorthFacadeDimensions();
 

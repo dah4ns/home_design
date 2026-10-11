@@ -250,7 +250,7 @@
 
             const customSashWidths = (Array.isArray(win.sashWidths) && win.sashWidths.length >= 2)
                 ? win.sashWidths
-                : ((win.id === 'O1' && Math.round(win.width) === 2500) ? [900, 1600] : null);
+                : ((win.id === 'O1' && Math.round(win.width) === 2100) ? [1050, 1050] : ((win.id === 'O1' && Math.round(win.width) === 2500) ? [900, 1600] : null));
 
             let sashesSvg = '';
             if (customSashWidths && win.hasMullion) {
@@ -372,7 +372,7 @@
         _renderInteriorKitchen: function (win, x, y, w, h, styleType) {
             const customSashWidths = (Array.isArray(win.sashWidths) && win.sashWidths.length >= 2)
                 ? win.sashWidths
-                : ((win.id === 'O1' && Math.round(win.width) === 2500) ? [900, 1600] : null);
+                : ((win.id === 'O1' && Math.round(win.width) === 2100) ? [1050, 1050] : ((win.id === 'O1' && Math.round(win.width) === 2500) ? [900, 1600] : null));
             const pillarMm = Number(win.pillarWidth) || 0;
             const totalMm = Number(win.width) || 2500;
             const scale = w / totalMm;
@@ -518,6 +518,350 @@
             return unsubscribe;
         },
 
+        FACADE_WALL_SPECS: {
+            north_facade: {
+                lowerLengthMm: 20590,
+                lowerBottomMm: 0,
+                lowerTopMm: 2800,
+                lowerMaterial: 'Clinker Brick (12,010 + 8,580 mm)',
+                upperLengthMm: 20505,
+                upperBottomMm: 3430,
+                upperTopMm: 6130,
+                upperMaterial: 'Vertical Timber Slats (20,505 mm)'
+            },
+            south_facade: {
+                lowerLengthMm: 20990,
+                lowerBottomMm: 0,
+                lowerTopMm: 2800,
+                lowerMaterial: 'Clinker Brick (6,010 + 14,980 mm)',
+                upperLengthMm: 20990,
+                upperBottomMm: 3430,
+                upperTopMm: 6130,
+                upperMaterial: 'Vertical Timber Slats (20,990 mm)'
+            },
+            west_facade: {
+                lowerLengthMm: 21440,
+                lowerBottomMm: 0,
+                lowerTopMm: 2800,
+                lowerMaterial: 'Clinker Brick (21,440 mm)',
+                upperLengthMm: 8800,
+                upperBottomMm: 3430,
+                upperTopMm: 6130,
+                upperMaterial: 'Vertical Timber Slats (8,800 mm)'
+            },
+            east_facade: {
+                lowerLengthMm: 21415,
+                lowerBottomMm: 0,
+                lowerTopMm: 2800,
+                lowerMaterial: 'Clinker Brick (9,525 + 8,790 + 3,100 mm)',
+                upperLengthMm: 8790,
+                upperBottomMm: 3430,
+                upperTopMm: 6130,
+                upperMaterial: 'Vertical Timber Slats (8,790 mm)'
+            }
+        },
+
+        /**
+         * Dynamically calculate net facade material areas (excluding windows/doors)
+         * and decompose into segments with vertical height > 185 cm (1850 mm) vs <= 185 cm.
+         * @param {string} viewId - 'north_facade' | 'south_facade' | 'west_facade' | 'east_facade'
+         */
+        calculateFacadeAreas: function (viewId) {
+            const spec = this.FACADE_WALL_SPECS[viewId];
+            if (!spec) return null;
+
+            const thresholdMm = 1850; // 185 cm
+            const activeWindows = WindowStore.getByView(viewId) || [];
+
+            function computeFloorStats(floorKey, wallLengthMm, floorBotMm, floorTopMm, materialLabel) {
+                const floorHeightMm = floorTopMm - floorBotMm;
+                const floorWins = activeWindows.filter(w => w.floor === floorKey);
+
+                let winSpanSumMm = 0;
+                let fullHeightWinSpanMm = 0;
+                let winAreaM2 = 0;
+                let areaGt185M2 = 0;
+                let areaLe185M2 = 0;
+                let lengthGt185Mm = 0;
+                let lengthLe185Mm = 0;
+                const gt185Parts = [];
+                const le185Parts = [];
+
+                floorWins.forEach(w => {
+                    const wWidth = Math.max(0, Number(w.width) || 0);
+                    if (wWidth <= 0) return;
+
+                    const rawSill = Number(w.sill) || 0;
+                    const rawHeight = Math.max(0, Number(w.height) || 0);
+                    const wBot = Math.max(floorBotMm, Math.min(floorTopMm, rawSill));
+                    const wTop = Math.max(floorBotMm, Math.min(floorTopMm, rawSill + rawHeight));
+                    const effectiveWinH = Math.max(0, wTop - wBot);
+
+                    winSpanSumMm += wWidth;
+                    winAreaM2 += (wWidth * effectiveWinH) / 1e6;
+
+                    const hBelow = Math.max(0, wBot - floorBotMm);
+                    const hAbove = Math.max(0, floorTopMm - wTop);
+
+                    // Horizontal length along the facade: counted ONCE per X-span even if there is material both above and below the window
+                    if (hBelow > 0 || hAbove > 0) {
+                        if (hBelow > thresholdMm || hAbove > thresholdMm) {
+                            lengthGt185Mm += wWidth;
+                        } else {
+                            lengthLe185Mm += wWidth;
+                        }
+                    } else {
+                        fullHeightWinSpanMm += wWidth;
+                    }
+
+                    if (hBelow > 0 && hAbove > 0 && hBelow <= thresholdMm && hAbove <= thresholdMm) {
+                        // Both above and below are <= 185 cm: combine label so it clearly shows the single X-span width
+                        areaLe185M2 += (wWidth * (hBelow + hAbove)) / 1e6;
+                        le185Parts.push(`${w.name} [len ${Math.round(wWidth).toLocaleString()} mm: ${Math.round(hBelow / 10)} cm below + ${Math.round(hAbove / 10)} cm above]`);
+                    } else {
+                        if (hBelow > 0) {
+                            const partM2 = (wWidth * hBelow) / 1e6;
+                            const label = `under ${w.name} [len ${Math.round(wWidth).toLocaleString()} mm × ${Math.round(hBelow / 10)} cm]`;
+                            if (hBelow > thresholdMm) {
+                                areaGt185M2 += partM2;
+                                gt185Parts.push(label);
+                            } else {
+                                areaLe185M2 += partM2;
+                                le185Parts.push(label);
+                            }
+                        }
+
+                        if (hAbove > 0) {
+                            const partM2 = (wWidth * hAbove) / 1e6;
+                            const label = `above ${w.name} [len ${Math.round(wWidth).toLocaleString()} mm × ${Math.round(hAbove / 10)} cm]`;
+                            if (hAbove > thresholdMm) {
+                                areaGt185M2 += partM2;
+                                gt185Parts.push(label);
+                            } else {
+                                areaLe185M2 += partM2;
+                                le185Parts.push(label);
+                            }
+                        }
+                    }
+                });
+
+                const pierWidthMm = Math.max(0, wallLengthMm - winSpanSumMm);
+                const pierAreaM2 = (pierWidthMm * floorHeightMm) / 1e6;
+                if (pierWidthMm > 0) {
+                    const pierLabel = `full-height piers [len ${Math.round(pierWidthMm).toLocaleString()} mm × ${Math.round(floorHeightMm / 10)} cm]`;
+                    if (floorHeightMm > thresholdMm) {
+                        areaGt185M2 += pierAreaM2;
+                        lengthGt185Mm += pierWidthMm;
+                        gt185Parts.unshift(pierLabel);
+                    } else {
+                        areaLe185M2 += pierAreaM2;
+                        lengthLe185Mm += pierWidthMm;
+                        le185Parts.unshift(pierLabel);
+                    }
+                }
+
+                const round2 = (v) => Math.round((v + Number.EPSILON) * 100) / 100;
+                const exactTotalM2 = areaGt185M2 + areaLe185M2;
+                const grossAreaM2 = round2((wallLengthMm * floorHeightMm) / 1e6);
+                const totalAreaM2 = round2(exactTotalM2);
+                const roundedWinAreaM2 = round2(grossAreaM2 - totalAreaM2);
+                const roundedLe185M2 = round2(areaLe185M2);
+                const roundedGt185M2 = round2(totalAreaM2 - roundedLe185M2);
+
+                const roundedLengthGt185Mm = Math.round(lengthGt185Mm);
+                const roundedLengthLe185Mm = Math.round(lengthLe185Mm);
+                const totalLengthMm = roundedLengthGt185Mm + roundedLengthLe185Mm;
+                const lengthLe185M = round2(roundedLengthLe185Mm / 1000);
+                const totalLengthM = round2(totalLengthMm / 1000);
+                const lengthGt185M = round2(totalLengthM - lengthLe185M);
+
+                return {
+                    wallLengthMm,
+                    fullHeightWinSpanMm: Math.round(fullHeightWinSpanMm),
+                    floorHeightMm,
+                    materialLabel,
+                    grossAreaM2,
+                    winAreaM2: roundedWinAreaM2,
+                    totalAreaM2,
+                    areaGt185M2: roundedGt185M2,
+                    areaLe185M2: roundedLe185M2,
+                    totalLengthMm,
+                    lengthGt185Mm: roundedLengthGt185Mm,
+                    lengthLe185Mm: roundedLengthLe185Mm,
+                    totalLengthM,
+                    lengthGt185M,
+                    lengthLe185M,
+                    gt185Note: gt185Parts.length > 0 ? gt185Parts.join(' + ') : 'None',
+                    le185Note: le185Parts.length > 0 ? le185Parts.join(' + ') : 'None (all openings full-height or >185 cm)'
+                };
+            }
+
+            const lower = computeFloorStats('ground', spec.lowerLengthMm, spec.lowerBottomMm, spec.lowerTopMm, spec.lowerMaterial);
+            const upper = computeFloorStats('first', spec.upperLengthMm, spec.upperBottomMm, spec.upperTopMm, spec.upperMaterial);
+            const round2 = (v) => Math.round((v + Number.EPSILON) * 100) / 100;
+
+            return {
+                viewId,
+                thresholdCm: 185,
+                lower, // (1) = lower.totalAreaM2 / totalLengthMm, (3) = lower.areaGt185M2 / lengthGt185Mm, (5) = lower.areaLe185M2 / lengthLe185Mm
+                upper, // (2) = upper.totalAreaM2 / totalLengthMm, (4) = upper.areaGt185M2 / lengthGt185Mm, (6) = upper.areaLe185M2 / lengthLe185Mm
+                combinedTotalM2: round2(lower.totalAreaM2 + upper.totalAreaM2),
+                combinedGt185M2: round2(lower.areaGt185M2 + upper.areaGt185M2),
+                combinedLe185M2: round2(lower.areaLe185M2 + upper.areaLe185M2),
+                combinedTotalLengthMm: lower.totalLengthMm + upper.totalLengthMm,
+                combinedTotalLengthM: round2(lower.totalLengthM + upper.totalLengthM)
+            };
+        },
+
+        /**
+         * Render HTML markup for the 6-metric Facade Material Area & Length Summary panel
+         * @param {string} viewId
+         */
+        renderFacadeAreaSummaryHTML: function (viewId) {
+            const stats = this.calculateFacadeAreas(viewId);
+            if (!stats) return '';
+
+            const fmt = (val) => val.toFixed(2);
+            const fmtMm = (val) => Math.round(val).toLocaleString();
+            const L = stats.lower;
+            const U = stats.upper;
+            const lPctGt = L.totalAreaM2 > 0 ? Math.round((L.areaGt185M2 / L.totalAreaM2) * 100) : 0;
+            const lPctLe = 100 - lPctGt;
+            const uPctGt = U.totalAreaM2 > 0 ? Math.round((U.areaGt185M2 / U.totalAreaM2) * 100) : 0;
+            const uPctLe = 100 - uPctGt;
+
+            return `
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 18px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid #e2e8f0;">
+                        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                            <span style="font-size: 14px; font-weight: 700; color: #0f172a;">🧱 Dynamic Facade Material Area &amp; Length Summary (Net Wall Cladding, Excluding Windows)</span>
+                            <span style="font-size: 11.5px; font-family: 'JetBrains Mono', monospace; background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 12px; font-weight: 600;">
+                                Cutoff: h &gt; 185 cm vs h &le; 185 cm
+                            </span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px; font-family: 'JetBrains Mono', monospace; font-size: 12px;">
+                            <span style="background: #0f172a; color: #f8fafc; padding: 4px 10px; border-radius: 6px; font-weight: 600;">
+                                Total (1)+(2): <strong>${fmt(stats.combinedTotalM2)} m&sup2;</strong> &bull; Len: <strong>${fmtMm(stats.combinedTotalLengthMm)} mm (${fmt(stats.combinedTotalLengthM)} m)</strong>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 14px;">
+                        <!-- LOWER FLOOR CARD: Metrics (1), (3), (5) -->
+                        <div style="background: #ffffff; border: 1px solid #cbd5e1; border-left: 4px solid #334155; border-radius: 8px; padding: 12px 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+                            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+                                <div>
+                                    <span style="font-size: 13px; font-weight: 700; color: #0f172a;">Lower Floor (Parter &bull; H = ${Math.round(L.floorHeightMm / 10)} cm)</span>
+                                    <span style="font-size: 11px; color: #64748b; margin-left: 6px;">${L.materialLabel}</span>
+                                </div>
+                                <span style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: #047857; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 1px 6px; border-radius: 4px; font-weight: 600;">
+                                    (1) = (3) + (5) &check;
+                                </span>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 8px;">
+                                <div style="background: #f1f5f9; padding: 8px 10px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                                    <div style="font-size: 10.5px; font-weight: 700; color: #475569; text-transform: uppercase;">1) Total Lower Floor</div>
+                                    <div style="font-size: 16px; font-weight: 800; color: #0f172a; font-family: 'JetBrains Mono', monospace; margin-top: 2px;">${fmt(L.totalAreaM2)} m&sup2;</div>
+                                    <div style="font-size: 11.5px; font-weight: 700; color: #334155; font-family: 'JetBrains Mono', monospace; margin-top: 2px;">Len: ${fmtMm(L.totalLengthMm)} mm (${fmt(L.totalLengthM)} m)</div>
+                                    <div style="font-size: 10px; color: #64748b; font-family: 'JetBrains Mono', monospace; margin-top: 2px;">Gross ${fmt(L.grossAreaM2)} &minus; Win ${fmt(L.winAreaM2)} m&sup2;</div>
+                                </div>
+                                <div style="background: #eff6ff; padding: 8px 10px; border-radius: 6px; border: 1px solid #bfdbfe;">
+                                    <div style="font-size: 10.5px; font-weight: 700; color: #1d4ed8; text-transform: uppercase;">3) Height &gt; 185 cm</div>
+                                    <div style="font-size: 16px; font-weight: 800; color: #1e40af; font-family: 'JetBrains Mono', monospace; margin-top: 2px;">${fmt(L.areaGt185M2)} m&sup2;</div>
+                                    <div style="font-size: 11.5px; font-weight: 700; color: #1d4ed8; font-family: 'JetBrains Mono', monospace; margin-top: 2px;">Len: ${fmtMm(L.lengthGt185Mm)} mm (${fmt(L.lengthGt185M)} m)</div>
+                                    <div style="font-size: 10px; color: #3b82f6; font-family: 'JetBrains Mono', monospace; margin-top: 2px;">${lPctGt}% of lower area</div>
+                                </div>
+                                <div style="background: #fffbeb; padding: 8px 10px; border-radius: 6px; border: 1px solid #fde68a;">
+                                    <div style="font-size: 10.5px; font-weight: 700; color: #b45309; text-transform: uppercase;">5) Height &le; 185 cm</div>
+                                    <div style="font-size: 16px; font-weight: 800; color: #92400e; font-family: 'JetBrains Mono', monospace; margin-top: 2px;">${fmt(L.areaLe185M2)} m&sup2;</div>
+                                    <div style="font-size: 11.5px; font-weight: 700; color: #b45309; font-family: 'JetBrains Mono', monospace; margin-top: 2px;">Len: ${fmtMm(L.lengthLe185Mm)} mm (${fmt(L.lengthLe185M)} m)</div>
+                                    <div style="font-size: 10px; color: #d97706; font-family: 'JetBrains Mono', monospace; margin-top: 2px;">${lPctLe}% (under/above win)</div>
+                                </div>
+                            </div>
+
+                            <!-- Proportional Split Bar -->
+                            <div style="height: 6px; width: 100%; background: #fde68a; border-radius: 3px; overflow: hidden; display: flex; margin-bottom: 6px;">
+                                <div style="width: ${lPctGt}%; background: #2563eb; height: 100%;"></div>
+                            </div>
+                            <div style="font-size: 11px; color: #64748b; line-height: 1.35; font-family: 'JetBrains Mono', monospace;">
+                                <div><strong style="color: #1e40af;">&gt;185cm:</strong> ${L.gt185Note}</div>
+                                <div><strong style="color: #92400e;">&le;185cm:</strong> ${L.le185Note}</div>
+                            </div>
+                        </div>
+
+                        <!-- UPPER FLOOR CARD: Metrics (2), (4), (6) -->
+                        <div style="background: #ffffff; border: 1px solid #cbd5e1; border-left: 4px solid #b45309; border-radius: 8px; padding: 12px 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+                            <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px;">
+                                <div>
+                                    <span style="font-size: 13px; font-weight: 700; color: #0f172a;">Upper Floor (Pi&#281;tro &bull; H = ${Math.round(U.floorHeightMm / 10)} cm)</span>
+                                    <span style="font-size: 11px; color: #64748b; margin-left: 6px;">${U.materialLabel}</span>
+                                </div>
+                                <span style="font-size: 11px; font-family: 'JetBrains Mono', monospace; color: #047857; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 1px 6px; border-radius: 4px; font-weight: 600;">
+                                    (2) = (4) + (6) &check;
+                                </span>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 8px;">
+                                <div style="background: #f1f5f9; padding: 8px 10px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                                    <div style="font-size: 10.5px; font-weight: 700; color: #475569; text-transform: uppercase;">2) Total Upper Floor</div>
+                                    <div style="font-size: 16px; font-weight: 800; color: #0f172a; font-family: 'JetBrains Mono', monospace; margin-top: 2px;">${fmt(U.totalAreaM2)} m&sup2;</div>
+                                    <div style="font-size: 11.5px; font-weight: 700; color: #334155; font-family: 'JetBrains Mono', monospace; margin-top: 2px;">Len: ${fmtMm(U.totalLengthMm)} mm (${fmt(U.totalLengthM)} m)</div>
+                                    <div style="font-size: 10px; color: #64748b; font-family: 'JetBrains Mono', monospace; margin-top: 2px;">Gross ${fmt(U.grossAreaM2)} &minus; Win ${fmt(U.winAreaM2)} m&sup2;</div>
+                                </div>
+                                <div style="background: #eff6ff; padding: 8px 10px; border-radius: 6px; border: 1px solid #bfdbfe;">
+                                    <div style="font-size: 10.5px; font-weight: 700; color: #1d4ed8; text-transform: uppercase;">4) Height &gt; 185 cm</div>
+                                    <div style="font-size: 16px; font-weight: 800; color: #1e40af; font-family: 'JetBrains Mono', monospace; margin-top: 2px;">${fmt(U.areaGt185M2)} m&sup2;</div>
+                                    <div style="font-size: 11.5px; font-weight: 700; color: #1d4ed8; font-family: 'JetBrains Mono', monospace; margin-top: 2px;">Len: ${fmtMm(U.lengthGt185Mm)} mm (${fmt(U.lengthGt185M)} m)</div>
+                                    <div style="font-size: 10px; color: #3b82f6; font-family: 'JetBrains Mono', monospace; margin-top: 2px;">${uPctGt}% of upper area</div>
+                                </div>
+                                <div style="background: #fffbeb; padding: 8px 10px; border-radius: 6px; border: 1px solid #fde68a;">
+                                    <div style="font-size: 10.5px; font-weight: 700; color: #b45309; text-transform: uppercase;">6) Height &le; 185 cm</div>
+                                    <div style="font-size: 16px; font-weight: 800; color: #92400e; font-family: 'JetBrains Mono', monospace; margin-top: 2px;">${fmt(U.areaLe185M2)} m&sup2;</div>
+                                    <div style="font-size: 11.5px; font-weight: 700; color: #b45309; font-family: 'JetBrains Mono', monospace; margin-top: 2px;">Len: ${fmtMm(U.lengthLe185Mm)} mm (${fmt(U.lengthLe185M)} m)</div>
+                                    <div style="font-size: 10px; color: #d97706; font-family: 'JetBrains Mono', monospace; margin-top: 2px;">${uPctLe}% (under/above win)</div>
+                                </div>
+                            </div>
+
+                            <!-- Proportional Split Bar -->
+                            <div style="height: 6px; width: 100%; background: #fde68a; border-radius: 3px; overflow: hidden; display: flex; margin-bottom: 6px;">
+                                <div style="width: ${uPctGt}%; background: #2563eb; height: 100%;"></div>
+                            </div>
+                            <div style="font-size: 11px; color: #64748b; line-height: 1.35; font-family: 'JetBrains Mono', monospace;">
+                                <div><strong style="color: #1e40af;">&gt;185cm:</strong> ${U.gt185Note}</div>
+                                <div><strong style="color: #92400e;">&le;185cm:</strong> ${U.le185Note}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        },
+
+        /**
+         * Mount and bind a reactive Facade Material Area Summary panel
+         * @param {string|Element} container
+         * @param {string} viewId
+         */
+        mountFacadeAreaSummary: function (container, viewId) {
+            const el = typeof container === 'string' ? document.getElementById(container) : container;
+            if (!el) return () => {};
+
+            if (typeof el._unmountFacadeAreaSummary === 'function') {
+                el._unmountFacadeAreaSummary();
+            }
+
+            const render = () => {
+                el.innerHTML = this.renderFacadeAreaSummaryHTML(viewId);
+            };
+
+            render();
+            const unsubscribe = WindowStore.subscribe(() => {
+                render();
+            });
+            el._unmountFacadeAreaSummary = unsubscribe;
+            return unsubscribe;
+        },
+
         /**
          * Mount all windows belonging to a view into their designated containers
          * Elements should have `data-window-component="windowId"` and `data-view-id="viewId"`
@@ -530,6 +874,13 @@
                 const viewId = node.getAttribute('data-view-id') || 'north_facade';
                 const styleType = node.getAttribute('data-window-style') || 'exterior';
                 this.mount(node, winId, viewId, styleType);
+            });
+            const summaryNodes = document.querySelectorAll('[data-facade-area-summary]');
+            summaryNodes.forEach(node => {
+                const viewId = node.getAttribute('data-facade-area-summary');
+                if (viewId) {
+                    this.mountFacadeAreaSummary(node, viewId);
+                }
             });
         }
     };
