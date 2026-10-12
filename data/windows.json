@@ -1,852 +1,984 @@
 {
-  "$schema": "./windows.schema.json",
-  "version": "2.0.0",
-  "description": "Canonical 2D (X, Y) database of building views and window openings with multi-view spatial orientation",
-  "coordinateSystem": {
-    "origin": "Intersection of Axis 6 (X = 0 mm) and Axis A (Y = 0 mm) near the North-East corner",
-    "xAxis": "East-West axis (<east - west>): X = 0 mm at Axis 6 (270 mm right of lower-level wall start at X = -270 mm), increasing Westward (0 to 20,505 / 21,000 mm)",
-    "yAxis": "North-South axis (<north - south>): Y = 0 mm at Axis A (270 mm right of lower-level wall start at Y = -270 mm), increasing Southward (0 to 21,170 mm; total lower-level wall = 21,440 mm)",
-    "verticalAxis": "Positive sill / elevation extends upward from finished ground floor datum (+0.00 m = 0 mm)",
-    "units": "millimeters (mm)"
-  },
-  "views": {
-    "north_facade": {
-      "id": "north_facade",
-      "name": "North Facade Elevation",
-      "axis": "x",
-      "origin": {
-        "x": 0,
-        "y": 0
-      },
-      "positionOnMap": 0,
-      "leftEdge": 0,
-      "floor": "all",
-      "direction": "west",
-      "length": 20505,
-      "scale": 0.1,
-      "wall": "north",
-      "side": "exterior",
-      "description": "Exterior architectural elevation looking South from the garden. Origin (0,0) is Point 0 / Axis 6 (beginning of upper balcony; 270 mm right of the ground-floor wall start at X = -270 mm); X grows Westward (left to right)."
+    "metadata": {
+        "version": "2.0.0",
+        "description": "Canonical 2D (X, Y) database of building views and window openings with multi-view spatial orientation",
+        "coordinateSystem": {
+            "origin": "Intersection of Axis 6 (X = 0 mm) and Axis A (Y = 0 mm) near the North-East corner",
+            "xAxis": "East-West axis (<east - west>): X = 0 mm at Axis 6 (270 mm right of lower-level wall start at X = -270 mm), increasing Westward (0 to 20,505 / 21,000 mm)",
+            "yAxis": "North-South axis (<north - south>): Y = 0 mm at Axis A (270 mm right of lower-level wall start at Y = -270 mm), increasing Southward (0 to 21,170 mm; total lower-level wall = 21,440 mm)",
+            "verticalAxis": "Positive sill / elevation extends upward from finished ground floor datum (+0.00 m = 0 mm)",
+            "units": "millimeters (mm)"
+        }
     },
-    "kitchen_north_wall": {
-      "id": "kitchen_north_wall",
-      "name": "Kitchen North Wall Elevation",
-      "axis": "x",
-      "origin": {
-        "x": 11880,
-        "y": 0
-      },
-      "positionOnMap": 11880,
-      "leftEdge": 11880,
-      "floor": "ground",
-      "direction": "east",
-      "length": 5400,
-      "scale": 0.1,
-      "wall": "north",
-      "side": "interior",
-      "description": "Interior kitchen back wall elevation looking North. Left edge is at X = 11,880 mm (12,150 mm from ground-floor wall start); X decreases Eastward (left to right)."
+    "views": {
+        "north_facade": {
+            "id": "north_facade",
+            "name": "North Facade Elevation",
+            "axis": "x",
+            "origin": {
+                "x": 0,
+                "y": 0
+            },
+            "positionOnMap": 0,
+            "leftEdge": 0,
+            "floor": "all",
+            "direction": "west",
+            "length": 20505,
+            "scale": 0.1,
+            "wall": "north",
+            "side": "exterior",
+            "description": "Exterior architectural elevation looking South from the garden. Origin (0,0) is Point 0 / Axis 6 (beginning of upper balcony; 270 mm right of the ground-floor wall start at X = -270 mm); X grows Westward (left to right)."
+        },
+        "kitchen_north_wall": {
+            "id": "kitchen_north_wall",
+            "name": "Kitchen North Wall Elevation",
+            "axis": "x",
+            "origin": {
+                "x": 11880,
+                "y": 0
+            },
+            "positionOnMap": 11880,
+            "leftEdge": 11880,
+            "floor": "ground",
+            "direction": "east",
+            "length": 5400,
+            "scale": 0.1,
+            "wall": "north",
+            "side": "interior",
+            "description": "Interior kitchen back wall elevation looking North. Left edge is at X = 11,880 mm (12,150 mm from ground-floor wall start); X decreases Eastward (left to right)."
+        },
+        "stairs_north_wall": {
+            "id": "stairs_north_wall",
+            "name": "Stairs North Wall Elevation",
+            "axis": "x",
+            "origin": {
+                "x": 18910,
+                "y": 0
+            },
+            "positionOnMap": 18910,
+            "leftEdge": 18910,
+            "floor": "all",
+            "direction": "east",
+            "length": 9000,
+            "scale": 0.1,
+            "wall": "north",
+            "side": "interior",
+            "floorY": 640,
+            "description": "Interior staircase cross-section looking North towards the North wall. Left edge is at X = 18,910 mm; X decreases Eastward (left to right)."
+        },
+        "south_facade": {
+            "id": "south_facade",
+            "name": "South Facade Elevation",
+            "axis": "x",
+            "origin": {
+                "x": 20990,
+                "y": 21170
+            },
+            "positionOnMap": 20990,
+            "leftEdge": 20990,
+            "floor": "all",
+            "direction": "east",
+            "length": 20990,
+            "scale": 0.1,
+            "wall": "south",
+            "side": "exterior",
+            "description": "Exterior architectural elevation looking North from the southern garden. Left edge is the South-West corner (X = 20,990 mm, Y = 21,170 mm); X decreases Eastward (left to right)."
+        },
+        "west_facade": {
+            "id": "west_facade",
+            "name": "West Facade Elevation",
+            "axis": "y",
+            "origin": {
+                "x": 20505,
+                "y": 0
+            },
+            "positionOnMap": 0,
+            "leftEdge": 0,
+            "floor": "all",
+            "direction": "south",
+            "length": 21170,
+            "scale": 0.1,
+            "wall": "west",
+            "side": "exterior",
+            "description": "Exterior architectural elevation looking East towards the West facade. Point 0 / Axis A (Y = 0 mm) is 270 mm to the right of the lower-level wall start (Y = -270 mm); Y grows Southward (left to right) to 21,170 mm (total lower-level wall length = 21,440 mm)."
+        },
+        "east_facade": {
+            "id": "east_facade",
+            "name": "East Facade Elevation",
+            "axis": "y",
+            "origin": {
+                "x": 0,
+                "y": 21125
+            },
+            "positionOnMap": 21125,
+            "leftEdge": 21125,
+            "floor": "all",
+            "direction": "north",
+            "length": 21415,
+            "scale": 0.1,
+            "wall": "east",
+            "side": "exterior",
+            "description": "Exterior architectural elevation looking West towards the East facade. View direction is South to North (left to right). Point 0 / Axis A (Y = 0 mm) is 290 mm from the right edge of the wall (at Screen X = 21,125 mm; total wall length = 21,415 mm)."
+        }
     },
-    "stairs_north_wall": {
-      "id": "stairs_north_wall",
-      "name": "Stairs North Wall Elevation",
-      "axis": "x",
-      "origin": {
-        "x": 18910,
-        "y": 0
-      },
-      "positionOnMap": 18910,
-      "leftEdge": 18910,
-      "floor": "all",
-      "direction": "east",
-      "length": 9000,
-      "scale": 0.1,
-      "wall": "north",
-      "side": "interior",
-      "floorY": 640,
-      "description": "Interior staircase cross-section looking North towards the North wall. Left edge is at X = 18,910 mm; X decreases Eastward (left to right)."
+    "windows": {
+        "O1": {
+            "id": "O1",
+            "name": "O1",
+            "x": 8480,
+            "y": 0,
+            "sill": 1100,
+            "width": 2100,
+            "height": 1400,
+            "room": "0.13 Kuchnia",
+            "floor": "ground",
+            "wall": "north",
+            "views": [
+                "north_facade",
+                "kitchen_north_wall"
+            ],
+            "jambs": [
+                "left",
+                "right",
+                "top"
+            ],
+            "jambDepth": 200,
+            "sashes": 2,
+            "sashWidths": [
+                1050,
+                1050
+            ],
+            "hasMullion": true,
+            "handlePosition": "center-left",
+            "description": "Ribbon kitchen window over countertop / sink (2100×1400 mm, split in the middle 1050 + 1050 mm, vertically aligned with O15)",
+            "specs": {
+                "glazing": "Triple-pane insulated glass unit (Ug=0.5 W/m²K)",
+                "frame": "Matte anthracite aluminum profile (RAL 7021)",
+                "sillExterior": "Sheet metal sill with anti-drumming tape at +1.10 m",
+                "sillInterior": "Granite / composite countertop integrated sill at 1100 mm"
+            }
+        },
+        "O2": {
+            "id": "O2",
+            "name": "O2",
+            "x": 880,
+            "y": 0,
+            "sill": 800,
+            "width": 1800,
+            "height": 1700,
+            "room": "0.15 Gabinet",
+            "floor": "ground",
+            "wall": "north",
+            "views": [
+                "north_facade"
+            ],
+            "jambs": [
+                "left",
+                "right",
+                "top"
+            ],
+            "jambDepth": 200,
+            "sashes": 2,
+            "hasMullion": true,
+            "handlePosition": "center",
+            "description": "Study / office north window with (77+38) = 1,150 mm offset from ground-floor wall start (X = 880 mm from Point 0 / Axis 6)",
+            "specs": {
+                "glazing": "Triple-pane insulated glass unit",
+                "frame": "Matte anthracite aluminum profile (RAL 7021)",
+                "sillExterior": "Aluminum exterior sill at hp=800 mm",
+                "sillInterior": "Internal window board at 800 mm"
+            }
+        },
+        "14a": {
+            "id": "14a",
+            "name": "14a",
+            "x": 6315,
+            "y": 0,
+            "sill": 3430,
+            "width": 1190,
+            "height": 2700,
+            "room": "1.04 Sypialnia",
+            "floor": "first",
+            "wall": "north",
+            "views": [
+                "north_facade"
+            ],
+            "jambs": [
+                "right"
+            ],
+            "jambDepth": 200,
+            "sashes": 1,
+            "hasMullion": false,
+            "handlePosition": "left",
+            "description": "Full-height floor-to-ceiling architectural window starting immediately after 6,315mm balcony",
+            "specs": {
+                "glazing": "Safety tempered and laminated glass (VSG/ESG)",
+                "frame": "Concealed slimline aluminum frame",
+                "sillExterior": "Flush threshold on intermediate cornice (+3.43 m)",
+                "sillInterior": "Flush floor threshold"
+            }
+        },
+        "O11_1": {
+            "id": "O11_1",
+            "name": "O11",
+            "x": 8675,
+            "y": 0,
+            "sill": 4180,
+            "width": 1000,
+            "height": 1950,
+            "room": "1.03 Łazienka",
+            "floor": "first",
+            "wall": "north",
+            "views": [],
+            "jambs": [
+                "left",
+                "right"
+            ],
+            "jambDepth": 200,
+            "sashes": 1,
+            "hasMullion": false,
+            "handlePosition": "right",
+            "description": "Vertical slot bathroom window (Option 1: current windows)",
+            "specs": {
+                "glazing": "Acoustic and privacy matte laminated glass",
+                "frame": "Anthracite aluminum tilt-and-turn profile",
+                "sillExterior": "Exterior sill at +4.18 m",
+                "sillInterior": "Tile-integrated sill at hp=850 mm"
+            }
+        },
+        "O15": {
+            "id": "O15",
+            "name": "O15",
+            "x": 8480,
+            "y": 0,
+            "sill": 3430,
+            "width": 2100,
+            "height": 2700,
+            "room": "1.04 Sypialnia Master",
+            "floor": "first",
+            "wall": "north",
+            "views": [
+                "north_facade"
+            ],
+            "jambs": [
+                "left",
+                "right"
+            ],
+            "jambDepth": 200,
+            "sashes": 1,
+            "hasMullion": false,
+            "handlePosition": "left",
+            "description": "Full-height floor-to-ceiling Master Bedroom window extended to the floor, fully vertically aligned with O1 (2100×2700 mm, X = 8,480..10,580 mm, default option)",
+            "specs": {
+                "glazing": "Safety tempered and laminated glass (VSG/ESG)",
+                "frame": "Concealed slimline aluminum frame (RAL 7021)",
+                "sillExterior": "Flush threshold on intermediate cornice (+3.43 m)",
+                "sillInterior": "Flush floor threshold (hp=0 mm)"
+            }
+        },
+        "O11_2": {
+            "id": "O11_2",
+            "name": "O11",
+            "x": 11375,
+            "y": 0,
+            "sill": 4180,
+            "width": 1000,
+            "height": 1950,
+            "room": "1.02 Łazienka",
+            "floor": "first",
+            "wall": "north",
+            "views": [
+                "north_facade"
+            ],
+            "jambs": [
+                "left",
+                "right"
+            ],
+            "jambDepth": 200,
+            "sashes": 1,
+            "hasMullion": false,
+            "handlePosition": "right",
+            "description": "Vertical slot master bathroom window",
+            "specs": {
+                "glazing": "Acoustic and privacy matte laminated glass",
+                "frame": "Anthracite aluminum tilt-and-turn profile",
+                "sillExterior": "Exterior sill at +4.18 m",
+                "sillInterior": "Tile-integrated sill at hp=850 mm"
+            }
+        },
+        "O11_3": {
+            "id": "O11_3",
+            "name": "O11",
+            "x": 14015,
+            "y": 0,
+            "sill": 4180,
+            "width": 1000,
+            "height": 1950,
+            "room": "1.07 Komunikacja",
+            "floor": "first",
+            "wall": "north",
+            "views": [
+                "north_facade"
+            ],
+            "jambs": [
+                "left",
+                "right"
+            ],
+            "jambDepth": 200,
+            "sashes": 1,
+            "hasMullion": false,
+            "handlePosition": "right",
+            "description": "Vertical slot corridor daylight window",
+            "specs": {
+                "glazing": "High light transmission triple-glazed glass",
+                "frame": "Anthracite aluminum tilt-and-turn profile",
+                "sillExterior": "Exterior sill at +4.18 m",
+                "sillInterior": "Internal window board at hp=850 mm"
+            }
+        },
+        "O13a": {
+            "id": "O13a",
+            "name": "O13a",
+            "x": 18125,
+            "y": 3100,
+            "sill": 4180,
+            "width": 2380,
+            "height": 1950,
+            "room": "1.01 Sypialnia Master",
+            "floor": "first",
+            "wall": "north",
+            "views": [
+                "north_facade"
+            ],
+            "jambs": [
+                "left"
+            ],
+            "jambDepth": 200,
+            "sashes": 1,
+            "hasMullion": false,
+            "handlePosition": "none",
+            "description": "Frameless panoramic corner window (North face; right edge is corner)",
+            "specs": {
+                "glazing": "Structural silicone butt-glazed safety glass (szkło na styk)",
+                "frame": "Concealed head and sill perimeter framing",
+                "sillExterior": "Continuous corner sheet metal sill at +4.18 m",
+                "sillInterior": "Deep panoramic window bench"
+            }
+        },
+        "O13a_2": {
+            "id": "O13a_2",
+            "name": "O13a",
+            "x": 18410,
+            "y": 21170,
+            "sill": 4180,
+            "width": 2380,
+            "height": 1950,
+            "room": "1.01 Sypialnia Master",
+            "floor": "first",
+            "wall": "south",
+            "views": [
+                "south_facade"
+            ],
+            "jambs": [
+                "right"
+            ],
+            "jambDepth": 200,
+            "sashes": 2,
+            "hasMullion": true,
+            "tiltTurnSashes": [
+                2
+            ],
+            "handlePosition": "center",
+            "description": "Two-sash bedroom window on the West side of the South Facade (2380×1950 mm, 200 mm from West edge, left fixed, right tilt-and-turn)",
+            "specs": {
+                "glazing": "Triple-pane insulated glass unit (Ug=0.5 W/m²K)",
+                "frame": "Matte anthracite aluminum profile (RAL 7021)",
+                "sillExterior": "Aluminum exterior sill at +4.18 m (hp=850 mm)",
+                "sillInterior": "Internal window board at hp=850 mm"
+            }
+        },
+        "O12": {
+            "id": "O12",
+            "name": "O12",
+            "x": 10980,
+            "y": 21170,
+            "sill": 3430,
+            "width": 4000,
+            "height": 2700,
+            "room": "1.05 Sypialnia",
+            "floor": "first",
+            "wall": "south",
+            "views": [
+                "south_facade"
+            ],
+            "jambs": [
+                "left",
+                "right"
+            ],
+            "jambDepth": 200,
+            "sashes": 3,
+            "pillarWidth": 90,
+            "hasMullion": true,
+            "handlePosition": "center",
+            "description": "Full-height bedroom glazing on the South Facade with 90 mm inner pillars (Smaller: 3×1273.3 mm + 2×90 mm = 4000 mm; Bigger: 2×1955 mm + 1×90 mm = 4000 mm)",
+            "specs": {
+                "glazing": "Safety tempered and laminated glass (VSG/ESG)",
+                "frame": "Slimline aluminum multi-panel frame with 90 mm inner pillars (RAL 7021)",
+                "sillExterior": "Flush threshold on intermediate cornice (+3.43 m)",
+                "sillInterior": "Flush floor threshold (hp=0 mm)"
+            }
+        },
+        "SO3": {
+            "id": "SO3",
+            "name": "SO3",
+            "x": 7500,
+            "y": 21170,
+            "sill": 4180,
+            "width": 1000,
+            "height": 1950,
+            "room": "1.06 Łazienka / Garderoba",
+            "floor": "first",
+            "wall": "south",
+            "views": [
+                "south_facade"
+            ],
+            "jambs": [
+                "left",
+                "right"
+            ],
+            "jambDepth": 200,
+            "sashes": 1,
+            "hasMullion": false,
+            "tiltTurnSashes": [
+                1
+            ],
+            "handlePosition": "left",
+            "description": "Single-sash vertical tilt-and-turn window on the South Facade",
+            "specs": {
+                "glazing": "Acoustic and privacy matte laminated glass",
+                "frame": "Anthracite aluminum tilt-and-turn profile",
+                "sillExterior": "Exterior sill at +4.18 m (hp=850 mm)",
+                "sillInterior": "Internal window sill at hp=850 mm"
+            }
+        },
+        "O10": {
+            "id": "O10",
+            "name": "O10",
+            "x": 200,
+            "y": 21170,
+            "sill": 3430,
+            "width": 6300,
+            "height": 2700,
+            "room": "1.04 Sypialnia Wschodnia",
+            "floor": "first",
+            "wall": "south",
+            "views": [
+                "south_facade"
+            ],
+            "jambs": [
+                "left"
+            ],
+            "jambDepth": 200,
+            "sashes": 4,
+            "pillarWidth": 90,
+            "hasMullion": true,
+            "handlePosition": "center",
+            "description": "Full-height panoramic glazing on the East side of the first floor with 90 mm inner pillars (Smaller: 4×1507.5 mm + 3×90 mm = 6300 mm; Bigger: 3×2040 mm + 2×90 mm = 6300 mm)",
+            "specs": {
+                "glazing": "Safety tempered and laminated glass (VSG/ESG)",
+                "frame": "Concealed slimline multi-panel aluminum frame with 90 mm inner pillars (RAL 7021)",
+                "sillExterior": "Flush threshold on intermediate cornice (+3.43 m)",
+                "sillInterior": "Flush floor threshold (hp=0 mm)"
+            }
+        },
+        "O7": {
+            "id": "O7",
+            "name": "O7",
+            "x": 15180,
+            "y": 21170,
+            "sill": 800,
+            "width": 3000,
+            "height": 2000,
+            "room": "0.09 Pokój / Pomieszczenie",
+            "floor": "ground",
+            "wall": "south",
+            "views": [
+                "south_facade"
+            ],
+            "jambs": [
+                "left"
+            ],
+            "jambDepth": 200,
+            "sashes": 3,
+            "hasMullion": true,
+            "tiltTurnSashes": [
+                1,
+                2
+            ],
+            "handlePosition": "center",
+            "description": "Three-sash ground floor window (3000×2000 mm, hp=800 mm, 200 mm brick pier on right) in Smaller windows; single fixed window (2000×2800 mm, hp=0 mm) in Bigger windows",
+            "specs": {
+                "glazing": "Triple-pane insulated glass unit (Ug=0.5 W/m²K)",
+                "frame": "Matte anthracite aluminum profile (RAL 7021)",
+                "sillExterior": "Sheet metal sill at +0.80 m over clinker brick parapet (or flush at ±0.00 m in Bigger windows)",
+                "sillInterior": "Internal window board at hp=800 mm (or flush floor threshold hp=0 mm)"
+            }
+        },
+        "O5": {
+            "id": "O5",
+            "name": "O5",
+            "x": 7500,
+            "y": 21170,
+            "sill": 0,
+            "width": 6480,
+            "height": 2800,
+            "room": "0.12 Jadalnia / Salon",
+            "floor": "ground",
+            "wall": "south",
+            "views": [
+                "south_facade"
+            ],
+            "jambs": [
+                "left",
+                "right"
+            ],
+            "jambDepth": 200,
+            "sashes": 4,
+            "pillarWidth": 90,
+            "hasMullion": true,
+            "slidingArrows": true,
+            "handlePosition": "center",
+            "description": "Full-height HST terrace glazing in dining/living area with 90 mm inner pillars (Smaller: 4×1552.5 mm + 3×90 mm = 6480 mm; Bigger: 3×2100 mm + 2×90 mm = 6480 mm)",
+            "specs": {
+                "glazing": "Triple-pane safety solar-control glass (VSG/ESG)",
+                "frame": "Heavy-duty HST lift-and-slide aluminum system with 90 mm inner pillars (RAL 7021)",
+                "sillExterior": "Zero-barrier flush terrace threshold (-0.02 m / ±0.00 m)",
+                "sillInterior": "Trench heater integrated flush floor track"
+            }
+        },
+        "O4": {
+            "id": "O4",
+            "name": "O4",
+            "x": 200,
+            "y": 21170,
+            "sill": 0,
+            "width": 6300,
+            "height": 2800,
+            "room": "0.11 Salon (Część Wschodnia)",
+            "floor": "ground",
+            "wall": "south",
+            "views": [
+                "south_facade"
+            ],
+            "jambs": [
+                "left"
+            ],
+            "jambDepth": 200,
+            "sashes": 4,
+            "pillarWidth": 90,
+            "hasMullion": true,
+            "slidingArrows": true,
+            "handlePosition": "center",
+            "description": "Full-height HST terrace glazing in eastern living room with 90 mm inner pillars (Smaller: 4×1507.5 mm + 3×90 mm = 6300 mm; Bigger: 3×2040 mm + 2×90 mm = 6300 mm)",
+            "specs": {
+                "glazing": "Triple-pane safety solar-control glass (VSG/ESG)",
+                "frame": "Heavy-duty HST lift-and-slide aluminum system with 90 mm inner pillars (RAL 7021)",
+                "sillExterior": "Zero-barrier flush terrace threshold (-0.02 m / ±0.00 m)",
+                "sillInterior": "Trench heater integrated flush floor track"
+            }
+        },
+        "O13b_1": {
+            "id": "O13b_1",
+            "name": "O13b",
+            "x": 20505,
+            "y": 3180,
+            "sill": 4180,
+            "width": 2400,
+            "height": 1950,
+            "room": "1.01 Sypialnia Master",
+            "floor": "first",
+            "wall": "west",
+            "views": [
+                "west_facade"
+            ],
+            "jambs": [
+                "right"
+            ],
+            "jambDepth": 200,
+            "sashes": 1,
+            "hasMullion": false,
+            "handlePosition": "none",
+            "description": "Frameless panoramic corner window (West face of Master Bedroom 1.01, meeting O13a at North-West upper corner)",
+            "specs": {
+                "glazing": "Structural silicone butt-glazed safety glass (szkło na styk)",
+                "frame": "Concealed head and sill perimeter framing (RAL 7021)",
+                "sillExterior": "Continuous corner sheet metal sill at +4.18 m (hp=850 mm)",
+                "sillInterior": "Deep panoramic window bench"
+            }
+        },
+        "O13b_2": {
+            "id": "O13b_2",
+            "name": "O13b",
+            "x": 20505,
+            "y": 9400,
+            "sill": 4180,
+            "width": 2400,
+            "height": 1950,
+            "room": "1.05 Sypialnia Zachodnia",
+            "floor": "first",
+            "wall": "west",
+            "views": [
+                "west_facade"
+            ],
+            "jambs": [
+                "left"
+            ],
+            "jambDepth": 200,
+            "sashes": 1,
+            "hasMullion": false,
+            "handlePosition": "right",
+            "description": "Large picture bedroom window on the South-West side of the upper floor (second distinct O13b window object)",
+            "specs": {
+                "glazing": "Triple-pane insulated glass unit (Ug=0.5 W/m²K)",
+                "frame": "Matte anthracite aluminum profile (RAL 7021)",
+                "sillExterior": "Aluminum exterior sill at +4.18 m (hp=850 mm)",
+                "sillInterior": "Internal window board at hp=850 mm"
+            }
+        },
+        "Z2": {
+            "id": "Z2",
+            "name": "Z2",
+            "x": 20505,
+            "y": 690,
+            "sill": 0,
+            "width": 5200,
+            "height": 2200,
+            "room": "0.01 Garaż Dwustanowiskowy",
+            "floor": "ground",
+            "wall": "west",
+            "views": [
+                "west_facade"
+            ],
+            "jambs": [
+                "left",
+                "right",
+                "top"
+            ],
+            "jambDepth": 200,
+            "sashes": 1,
+            "hasMullion": false,
+            "openingType": "garage_door",
+            "handlePosition": "none",
+            "description": "Wide double-car insulated sectional garage door Z2 (5200×2200 mm), positioned 690 mm south of Point 0 / Axis A (960 mm from lower-level wall start)",
+            "specs": {
+                "glazing": "Insulated sandwich steel/aluminum panels (U=0.9 W/m²K)",
+                "frame": "Anthracite concealed reveal frame (RAL 7021)",
+                "sillExterior": "Heated driveway threshold at ±0.00 m / -0.02 m",
+                "sillInterior": "Epoxy/gres garage floor slab with linear drainage"
+            }
+        },
+        "Z1": {
+            "id": "Z1",
+            "name": "Z1",
+            "x": 20505,
+            "y": 8960,
+            "sill": 0,
+            "width": 1700,
+            "height": 2250,
+            "room": "0.04 Wiatrołap (Wejście Główne)",
+            "floor": "ground",
+            "wall": "west",
+            "views": [
+                "west_facade"
+            ],
+            "jambs": [],
+            "jambDepth": 200,
+            "sashes": 2,
+            "hasMullion": true,
+            "openingType": "entrance_door",
+            "handlePosition": "center",
+            "description": "Main architectural entrance door Z1 (1700×2250 mm) centered in the 2500 mm recessed entry nook (400 mm wall + 1700 mm door + 400 mm wall)",
+            "specs": {
+                "glazing": "Laminated anti-burglary P4A sidelight glazing",
+                "frame": "Flush aluminum panel door with vertical stainless/black pull bar",
+                "sillExterior": "Heated granite entry step threshold",
+                "sillInterior": "Flush vestibule gres floor transition"
+            }
+        },
+        "O8c": {
+            "id": "O8c",
+            "name": "O8c",
+            "x": 20505,
+            "y": 11690,
+            "sill": 2060,
+            "width": 1440,
+            "height": 740,
+            "room": "0.12 Jadalnia / Salon",
+            "floor": "ground",
+            "wall": "west",
+            "views": [],
+            "jambs": [
+                "left",
+                "right"
+            ],
+            "jambDepth": 200,
+            "sashes": 1,
+            "hasMullion": false,
+            "handlePosition": "none",
+            "description": "Single-pane high clerestory fixed window (1440×740 mm, hp=2060 mm) beneath the intermediate cornice, 630 mm south of the entrance nook (optional; removed by default)",
+            "specs": {
+                "glazing": "Triple-pane solar and acoustic control glass (Ug=0.5 W/m²K)",
+                "frame": "Slimline aluminum clerestory fixed frame (RAL 7021)",
+                "sillExterior": "Aluminum sill at +2.06 m (hp=2060 mm) over clinker wall",
+                "sillInterior": "High clerestory reveal providing western afternoon daylight"
+            }
+        },
+        "O8b": {
+            "id": "O8b",
+            "name": "O8b",
+            "x": 20505,
+            "y": 13410,
+            "sill": 2060,
+            "width": 1620,
+            "height": 740,
+            "room": "0.12 Jadalnia / Salon",
+            "floor": "ground",
+            "wall": "west",
+            "views": [],
+            "jambs": [
+                "left",
+                "right"
+            ],
+            "jambDepth": 200,
+            "sashes": 1,
+            "hasMullion": false,
+            "handlePosition": "none",
+            "description": "Single-pane high clerestory fixed window (1620×740 mm, hp=2060 mm) flanked by 280 mm clinker masonry piers (optional; removed by default)",
+            "specs": {
+                "glazing": "Triple-pane solar and acoustic control glass (Ug=0.5 W/m²K)",
+                "frame": "Slimline aluminum clerestory fixed frame (RAL 7021)",
+                "sillExterior": "Aluminum sill at +2.06 m (hp=2060 mm) over clinker wall",
+                "sillInterior": "High clerestory reveal providing western afternoon daylight"
+            }
+        },
+        "O8a": {
+            "id": "O8a",
+            "name": "O8a",
+            "x": 20505,
+            "y": 15290,
+            "sill": 2060,
+            "width": 5500,
+            "height": 740,
+            "room": "0.11 Salon",
+            "floor": "ground",
+            "wall": "west",
+            "views": [
+                "west_facade"
+            ],
+            "jambs": [
+                "left",
+                "right"
+            ],
+            "jambDepth": 200,
+            "sashes": 3,
+            "hasMullion": true,
+            "handlePosition": "none",
+            "description": "Three-pane equal-split high clerestory ribbon window (5500×740 mm, 3 equal windows, hp=2060 mm), ending 380 mm from the South-West corner",
+            "specs": {
+                "glazing": "Triple-pane solar and acoustic control glass (Ug=0.5 W/m²K)",
+                "frame": "Slimline 3-bay equal-split aluminum clerestory frame (RAL 7021)",
+                "sillExterior": "Continuous aluminum sill at +2.06 m (hp=2060 mm) over clinker wall",
+                "sillInterior": "High clerestory reveal providing western afternoon daylight while preserving privacy"
+            }
+        },
+        "O6b": {
+            "id": "O6b",
+            "name": "O6b",
+            "x": 14980,
+            "y": 15285,
+            "sill": 0,
+            "width": 5640,
+            "height": 2800,
+            "room": "0.10 Siłownia",
+            "floor": "ground",
+            "wall": "east",
+            "views": [
+                "east_facade"
+            ],
+            "jambs": [
+                "right"
+            ],
+            "jambDepth": 200,
+            "sashes": 3,
+            "pillarWidth": 90,
+            "hasMullion": true,
+            "slidingArrows": true,
+            "handlePosition": "center",
+            "description": "Full-height 3-pane HST terrace glazing in the recessed South-West gym wing with 90 mm inner pillars (3 × 1,820 mm + 2 × 90 mm = 5,640 mm, 200 mm left pier, middle sash sliding left ←)",
+            "specs": {
+                "glazing": "Triple-pane safety solar-control glass (VSG/ESG)",
+                "frame": "Heavy-duty HST lift-and-slide aluminum system with 90 mm inner pillars (RAL 7021)",
+                "sillExterior": "Zero-barrier flush terrace threshold (-0.02 m / ±0.00 m)",
+                "sillInterior": "Trench heater integrated flush floor track"
+            }
+        },
+        "O6a": {
+            "id": "O6a",
+            "name": "O6a",
+            "x": 14980,
+            "y": 13275,
+            "sill": 2060,
+            "width": 1760,
+            "height": 740,
+            "room": "0.12 Komunikacja",
+            "floor": "ground",
+            "wall": "east",
+            "views": [
+                "east_facade"
+            ],
+            "jambs": [
+                "left",
+                "right"
+            ],
+            "jambDepth": 200,
+            "sashes": 1,
+            "hasMullion": false,
+            "handlePosition": "none",
+            "description": "Single-pane high clerestory fixed ribbon window in the recessed ground-floor wing (1,760 × 740 mm, hp=2,060 mm, 250 mm right of O6b)",
+            "specs": {
+                "glazing": "Triple-pane solar and acoustic control glass (Ug=0.5 W/m²K)",
+                "frame": "Slimline aluminum clerestory fixed frame (RAL 7021)",
+                "sillExterior": "Aluminum sill at +2.06 m (hp=2060 mm) over recessed clinker wall",
+                "sillInterior": "High clerestory reveal providing eastern morning daylight to hall/corridor"
+            }
+        },
+        "O3": {
+            "id": "O3",
+            "name": "O3",
+            "x": 0,
+            "y": 6310,
+            "sill": 0,
+            "width": 5090,
+            "height": 2800,
+            "room": "0.11 Salon",
+            "floor": "ground",
+            "wall": "east",
+            "views": [
+                "east_facade"
+            ],
+            "jambs": [
+                "right"
+            ],
+            "jambDepth": 200,
+            "sashes": 2,
+            "pillarWidth": 90,
+            "hasMullion": true,
+            "handlePosition": "center",
+            "description": "Full-height panoramic living room glazing on the projecting central East Facade with 90 mm inner pillars (Bigger default: 2 × 2,500 mm + 1 × 90 mm = 5,090 mm; Smaller: 3 × 1,636.7 mm + 2 × 90 mm = 5,090 mm)",
+            "specs": {
+                "glazing": "Triple-pane safety solar-control glass (VSG/ESG)",
+                "frame": "Slimline multi-panel aluminum system with 90 mm inner pillars (RAL 7021)",
+                "sillExterior": "Flush threshold at ±0.00 m (-0.02 m)",
+                "sillInterior": "Trench heater integrated flush floor track"
+            }
+        },
+        "O9": {
+            "id": "O9",
+            "name": "O9",
+            "x": 0,
+            "y": 6310,
+            "sill": 3430,
+            "width": 5090,
+            "height": 2700,
+            "room": "1.04 Sypialnia Wschodnia",
+            "floor": "first",
+            "wall": "east",
+            "views": [
+                "east_facade"
+            ],
+            "jambs": [
+                "right"
+            ],
+            "jambDepth": 200,
+            "sashes": 2,
+            "pillarWidth": 90,
+            "hasMullion": true,
+            "handlePosition": "center",
+            "description": "Full-height panoramic bedroom glazing on the projecting central East Facade with 90 mm inner pillars, vertically aligned with O3 (Bigger default: 2 × 2,500 mm + 1 × 90 mm = 5,090 mm; Smaller: 3 × 1,636.7 mm + 2 × 90 mm = 5,090 mm)",
+            "specs": {
+                "glazing": "Safety tempered and laminated glass (VSG/ESG)",
+                "frame": "Slimline multi-panel aluminum frame with 90 mm inner pillars (RAL 7021)",
+                "sillExterior": "Flush threshold on intermediate cornice (+3.43 m)",
+                "sillInterior": "Flush floor threshold (hp=0 mm)"
+            }
+        },
+        "O14b": {
+            "id": "O14b",
+            "name": "O14b",
+            "x": 6315,
+            "y": 3015,
+            "sill": 3430,
+            "width": 2810,
+            "height": 2700,
+            "room": "1.04 Sypialnia / Taras (D1 + O14b)",
+            "floor": "first",
+            "wall": "east",
+            "views": [
+                "east_facade"
+            ],
+            "jambs": [
+                "left"
+            ],
+            "jambDepth": 200,
+            "sashes": 2,
+            "pillarWidth": 90,
+            "sashWidths": [
+                900,
+                1820
+            ],
+            "tiltTurnSashes": [
+                1
+            ],
+            "hasMullion": true,
+            "handlePosition": "left",
+            "description": "Upper floor covered terrace glazing & balcony door assembly (2,810 × 2,700 mm: 900 mm left tilt-and-turn terrace door D1 + 90 mm inner pillar + 1,820 mm right fixed window O14b behind 900 mm glass balustrade)",
+            "specs": {
+                "glazing": "Safety tempered and laminated glass (VSG/ESG) with 900 mm exterior glass balustrade",
+                "frame": "Black-grey aluminum tilt-and-turn terrace door + 90 mm inner pillar + fixed panoramic frame (RAL 7021)",
+                "sillExterior": "Covered upper terrace gres deck (+3.31 m / +3.43 m)",
+                "sillInterior": "Bedroom threshold at +3.33 m"
+            }
+        }
     },
-    "south_facade": {
-      "id": "south_facade",
-      "name": "South Facade Elevation",
-      "axis": "x",
-      "origin": {
-        "x": 20990,
-        "y": 21170
-      },
-      "positionOnMap": 20990,
-      "leftEdge": 20990,
-      "floor": "all",
-      "direction": "east",
-      "length": 20990,
-      "scale": 0.1,
-      "wall": "south",
-      "side": "exterior",
-      "description": "Exterior architectural elevation looking North from the southern garden. Left edge is the South-West corner (X = 20,990 mm, Y = 21,170 mm); X decreases Eastward (left to right)."
-    },
-    "west_facade": {
-      "id": "west_facade",
-      "name": "West Facade Elevation",
-      "axis": "y",
-      "origin": {
-        "x": 20505,
-        "y": 0
-      },
-      "positionOnMap": 0,
-      "leftEdge": 0,
-      "floor": "all",
-      "direction": "south",
-      "length": 21170,
-      "scale": 0.1,
-      "wall": "west",
-      "side": "exterior",
-      "description": "Exterior architectural elevation looking East towards the West facade. Point 0 / Axis A (Y = 0 mm) is 270 mm to the right of the lower-level wall start (Y = -270 mm); Y grows Southward (left to right) to 21,170 mm (total lower-level wall length = 21,440 mm)."
-    },
-    "east_facade": {
-      "id": "east_facade",
-      "name": "East Facade Elevation",
-      "axis": "y",
-      "origin": {
-        "x": 0,
-        "y": 21125
-      },
-      "positionOnMap": 21125,
-      "leftEdge": 21125,
-      "floor": "all",
-      "direction": "north",
-      "length": 21415,
-      "scale": 0.1,
-      "wall": "east",
-      "side": "exterior",
-      "description": "Exterior architectural elevation looking West towards the East facade. View direction is South to North (left to right). Point 0 / Axis A (Y = 0 mm) is 290 mm from the right edge of the wall (at Screen X = 21,125 mm; total wall length = 21,415 mm)."
+    "stairs": {
+        "main_staircase": {
+            "id": "main_staircase",
+            "name": "Main Staircase (Schody)",
+            "room": "1.07 Komunikacja / Korytarz",
+            "viewId": "stairs_north_wall",
+            "flooring_height": 0,
+            "width": 1000,
+            "step_height": 175,
+            "step_length": 260,
+            "plank_height": 40,
+            "stair_slab": 193,
+            "x": 2549,
+            "global_x": 16361,
+            "total_risers": 19,
+            "turn_steps_count": 4,
+            "straight_risers_count": 15,
+            "straight_treads_count": 14,
+            "horizontal_gain": 3640,
+            "elevation_gain": 2625,
+            "step5_to_d3_distance": 2174,
+            "straight_flight_run": 3640,
+            "end_x": 7189,
+            "total_rise": 3325,
+            "top_floor_elevation": 3330,
+            "balustrade_height": 900,
+            "show_planks": true,
+            "line_thickness": 1,
+            "description": "Two-flight interior staircase with 4-step winder entry turn (1 straight + 3 winder) in 1000×1000 mm corner, followed by a 3,640 mm straight flight of 14 treads (260 mm) × 15 risers (175 mm) along the North Wall to finished +3,33 m."
+        }
     }
-  },
-  "windows": {
-    "O1": {
-      "id": "O1",
-      "name": "O1",
-      "x": 8480,
-      "y": 0,
-      "sill": 1100,
-      "width": 2100,
-      "height": 1400,
-      "room": "0.13 Kuchnia",
-      "floor": "ground",
-      "wall": "north",
-      "views": [
-        "north_facade",
-        "kitchen_north_wall"
-      ],
-      "sashes": 2,
-      "sashWidths": [
-        1050,
-        1050
-      ],
-      "hasMullion": true,
-      "handlePosition": "center-left",
-      "description": "Ribbon kitchen window over countertop / sink (2100×1400 mm, split in the middle 1050 + 1050 mm, vertically aligned with O15)",
-      "specs": {
-        "glazing": "Triple-pane insulated glass unit (Ug=0.5 W/m²K)",
-        "frame": "Matte anthracite aluminum profile (RAL 7016)",
-        "sillExterior": "Sheet metal sill with anti-drumming tape at +1.10 m",
-        "sillInterior": "Granite / composite countertop integrated sill at 1100 mm"
-      }
-    },
-    "O2": {
-      "id": "O2",
-      "name": "O2",
-      "x": 880,
-      "y": 0,
-      "sill": 800,
-      "width": 1800,
-      "height": 1700,
-      "room": "0.15 Gabinet",
-      "floor": "ground",
-      "wall": "north",
-      "views": [
-        "north_facade"
-      ],
-      "sashes": 2,
-      "hasMullion": true,
-      "handlePosition": "center",
-      "description": "Study / office north window with (77+38) = 1,150 mm offset from ground-floor wall start (X = 880 mm from Point 0 / Axis 6)",
-      "specs": {
-        "glazing": "Triple-pane insulated glass unit",
-        "frame": "Matte anthracite aluminum profile (RAL 7016)",
-        "sillExterior": "Aluminum exterior sill at hp=800 mm",
-        "sillInterior": "Internal window board at 800 mm"
-      }
-    },
-    "14a": {
-      "id": "14a",
-      "name": "14a",
-      "x": 6315,
-      "y": 0,
-      "sill": 3430,
-      "width": 1190,
-      "height": 2700,
-      "room": "1.04 Sypialnia",
-      "floor": "first",
-      "wall": "north",
-      "views": [
-        "north_facade"
-      ],
-      "sashes": 1,
-      "hasMullion": false,
-      "handlePosition": "left",
-      "description": "Full-height floor-to-ceiling architectural window starting immediately after 6,315mm balcony",
-      "specs": {
-        "glazing": "Safety tempered and laminated glass (VSG/ESG)",
-        "frame": "Concealed slimline aluminum frame",
-        "sillExterior": "Flush threshold on intermediate cornice (+3.43 m)",
-        "sillInterior": "Flush floor threshold"
-      }
-    },
-    "O11_1": {
-      "id": "O11_1",
-      "name": "O11",
-      "x": 8675,
-      "y": 0,
-      "sill": 4180,
-      "width": 1000,
-      "height": 1950,
-      "room": "1.03 Łazienka",
-      "floor": "first",
-      "wall": "north",
-      "views": [],
-      "sashes": 1,
-      "hasMullion": false,
-      "handlePosition": "right",
-      "description": "Vertical slot bathroom window (Option 1: current windows)",
-      "specs": {
-        "glazing": "Acoustic and privacy matte laminated glass",
-        "frame": "Anthracite aluminum tilt-and-turn profile",
-        "sillExterior": "Exterior sill at +4.18 m",
-        "sillInterior": "Tile-integrated sill at hp=850 mm"
-      }
-    },
-    "O15": {
-      "id": "O15",
-      "name": "O15",
-      "x": 8480,
-      "y": 0,
-      "sill": 3430,
-      "width": 2100,
-      "height": 2700,
-      "room": "1.04 Sypialnia Master",
-      "floor": "first",
-      "wall": "north",
-      "views": [
-        "north_facade"
-      ],
-      "sashes": 1,
-      "hasMullion": false,
-      "handlePosition": "left",
-      "description": "Full-height floor-to-ceiling Master Bedroom window extended to the floor, fully vertically aligned with O1 (2100×2700 mm, X = 8,480..10,580 mm, default option)",
-      "specs": {
-        "glazing": "Safety tempered and laminated glass (VSG/ESG)",
-        "frame": "Concealed slimline aluminum frame (RAL 7016)",
-        "sillExterior": "Flush threshold on intermediate cornice (+3.43 m)",
-        "sillInterior": "Flush floor threshold (hp=0 mm)"
-      }
-    },
-    "O11_2": {
-      "id": "O11_2",
-      "name": "O11",
-      "x": 11375,
-      "y": 0,
-      "sill": 4180,
-      "width": 1000,
-      "height": 1950,
-      "room": "1.02 Łazienka",
-      "floor": "first",
-      "wall": "north",
-      "views": [
-        "north_facade"
-      ],
-      "sashes": 1,
-      "hasMullion": false,
-      "handlePosition": "right",
-      "description": "Vertical slot master bathroom window",
-      "specs": {
-        "glazing": "Acoustic and privacy matte laminated glass",
-        "frame": "Anthracite aluminum tilt-and-turn profile",
-        "sillExterior": "Exterior sill at +4.18 m",
-        "sillInterior": "Tile-integrated sill at hp=850 mm"
-      }
-    },
-    "O11_3": {
-      "id": "O11_3",
-      "name": "O11",
-      "x": 14015,
-      "y": 0,
-      "sill": 4180,
-      "width": 1000,
-      "height": 1950,
-      "room": "1.07 Komunikacja",
-      "floor": "first",
-      "wall": "north",
-      "views": [
-        "north_facade"
-      ],
-      "sashes": 1,
-      "hasMullion": false,
-      "handlePosition": "right",
-      "description": "Vertical slot corridor daylight window",
-      "specs": {
-        "glazing": "High light transmission triple-glazed glass",
-        "frame": "Anthracite aluminum tilt-and-turn profile",
-        "sillExterior": "Exterior sill at +4.18 m",
-        "sillInterior": "Internal window board at hp=850 mm"
-      }
-    },
-    "O13a": {
-      "id": "O13a",
-      "name": "O13a",
-      "x": 18125,
-      "y": 3100,
-      "sill": 4180,
-      "width": 2380,
-      "height": 1950,
-      "room": "1.01 Sypialnia Master",
-      "floor": "first",
-      "wall": "north",
-      "views": [
-        "north_facade"
-      ],
-      "sashes": 1,
-      "hasMullion": false,
-      "handlePosition": "none",
-      "description": "Frameless panoramic corner window (North face)",
-      "specs": {
-        "glazing": "Structural silicone butt-glazed safety glass (szkło na styk)",
-        "frame": "Concealed head and sill perimeter framing",
-        "sillExterior": "Continuous corner sheet metal sill at +4.18 m",
-        "sillInterior": "Deep panoramic window bench"
-      }
-    },
-    "O13a_2": {
-      "id": "O13a_2",
-      "name": "O13a",
-      "x": 18410,
-      "y": 21170,
-      "sill": 4180,
-      "width": 2380,
-      "height": 1950,
-      "room": "1.01 Sypialnia Master",
-      "floor": "first",
-      "wall": "south",
-      "views": [
-        "south_facade"
-      ],
-      "sashes": 2,
-      "hasMullion": true,
-      "tiltTurnSashes": [2],
-      "handlePosition": "center",
-      "description": "Two-sash bedroom window on the West side of the South Facade (2380×1950 mm, 200 mm from West edge, left fixed, right tilt-and-turn)",
-      "specs": {
-        "glazing": "Triple-pane insulated glass unit (Ug=0.5 W/m²K)",
-        "frame": "Matte anthracite aluminum profile (RAL 7016)",
-        "sillExterior": "Aluminum exterior sill at +4.18 m (hp=850 mm)",
-        "sillInterior": "Internal window board at hp=850 mm"
-      }
-    },
-    "O12": {
-      "id": "O12",
-      "name": "O12",
-      "x": 10980,
-      "y": 21170,
-      "sill": 3430,
-      "width": 4000,
-      "height": 2700,
-      "room": "1.05 Sypialnia",
-      "floor": "first",
-      "wall": "south",
-      "views": [
-        "south_facade"
-      ],
-      "sashes": 3,
-      "pillarWidth": 90,
-      "hasMullion": true,
-      "handlePosition": "center",
-      "description": "Full-height bedroom glazing on the South Facade with 90 mm inner pillars (Smaller: 3×1273.3 mm + 2×90 mm = 4000 mm; Bigger: 2×1955 mm + 1×90 mm = 4000 mm)",
-      "specs": {
-        "glazing": "Safety tempered and laminated glass (VSG/ESG)",
-        "frame": "Slimline aluminum multi-panel frame with 90 mm inner pillars (RAL 7016)",
-        "sillExterior": "Flush threshold on intermediate cornice (+3.43 m)",
-        "sillInterior": "Flush floor threshold (hp=0 mm)"
-      }
-    },
-    "SO3": {
-      "id": "SO3",
-      "name": "SO3",
-      "x": 7500,
-      "y": 21170,
-      "sill": 4180,
-      "width": 1000,
-      "height": 1950,
-      "room": "1.06 Łazienka / Garderoba",
-      "floor": "first",
-      "wall": "south",
-      "views": [
-        "south_facade"
-      ],
-      "sashes": 1,
-      "hasMullion": false,
-      "tiltTurnSashes": [1],
-      "handlePosition": "left",
-      "description": "Single-sash vertical tilt-and-turn window on the South Facade",
-      "specs": {
-        "glazing": "Acoustic and privacy matte laminated glass",
-        "frame": "Anthracite aluminum tilt-and-turn profile",
-        "sillExterior": "Exterior sill at +4.18 m (hp=850 mm)",
-        "sillInterior": "Internal window sill at hp=850 mm"
-      }
-    },
-    "O10": {
-      "id": "O10",
-      "name": "O10",
-      "x": 200,
-      "y": 21170,
-      "sill": 3430,
-      "width": 6300,
-      "height": 2700,
-      "room": "1.04 Sypialnia Wschodnia",
-      "floor": "first",
-      "wall": "south",
-      "views": [
-        "south_facade"
-      ],
-      "sashes": 4,
-      "pillarWidth": 90,
-      "hasMullion": true,
-      "handlePosition": "center",
-      "description": "Full-height panoramic glazing on the East side of the first floor with 90 mm inner pillars (Smaller: 4×1507.5 mm + 3×90 mm = 6300 mm; Bigger: 3×2040 mm + 2×90 mm = 6300 mm)",
-      "specs": {
-        "glazing": "Safety tempered and laminated glass (VSG/ESG)",
-        "frame": "Concealed slimline multi-panel aluminum frame with 90 mm inner pillars (RAL 7016)",
-        "sillExterior": "Flush threshold on intermediate cornice (+3.43 m)",
-        "sillInterior": "Flush floor threshold (hp=0 mm)"
-      }
-    },
-    "O7": {
-      "id": "O7",
-      "name": "O7",
-      "x": 15180,
-      "y": 21170,
-      "sill": 800,
-      "width": 3000,
-      "height": 2000,
-      "room": "0.09 Pokój / Pomieszczenie",
-      "floor": "ground",
-      "wall": "south",
-      "views": [
-        "south_facade"
-      ],
-      "sashes": 3,
-      "hasMullion": true,
-      "tiltTurnSashes": [1, 2],
-      "handlePosition": "center",
-      "description": "Three-sash ground floor window (3000×2000 mm, hp=800 mm, 200 mm brick pier on right) in Smaller windows; single fixed window (2000×2800 mm, hp=0 mm) in Bigger windows",
-      "specs": {
-        "glazing": "Triple-pane insulated glass unit (Ug=0.5 W/m²K)",
-        "frame": "Matte anthracite aluminum profile (RAL 7016)",
-        "sillExterior": "Sheet metal sill at +0.80 m over clinker brick parapet (or flush at ±0.00 m in Bigger windows)",
-        "sillInterior": "Internal window board at hp=800 mm (or flush floor threshold hp=0 mm)"
-      }
-    },
-    "O5": {
-      "id": "O5",
-      "name": "O5",
-      "x": 7500,
-      "y": 21170,
-      "sill": 0,
-      "width": 6480,
-      "height": 2800,
-      "room": "0.12 Jadalnia / Salon",
-      "floor": "ground",
-      "wall": "south",
-      "views": [
-        "south_facade"
-      ],
-      "sashes": 4,
-      "pillarWidth": 90,
-      "hasMullion": true,
-      "slidingArrows": true,
-      "handlePosition": "center",
-      "description": "Full-height HST terrace glazing in dining/living area with 90 mm inner pillars (Smaller: 4×1552.5 mm + 3×90 mm = 6480 mm; Bigger: 3×2100 mm + 2×90 mm = 6480 mm)",
-      "specs": {
-        "glazing": "Triple-pane safety solar-control glass (VSG/ESG)",
-        "frame": "Heavy-duty HST lift-and-slide aluminum system with 90 mm inner pillars (RAL 7016)",
-        "sillExterior": "Zero-barrier flush terrace threshold (-0.02 m / ±0.00 m)",
-        "sillInterior": "Trench heater integrated flush floor track"
-      }
-    },
-    "O4": {
-      "id": "O4",
-      "name": "O4",
-      "x": 200,
-      "y": 21170,
-      "sill": 0,
-      "width": 6300,
-      "height": 2800,
-      "room": "0.11 Salon (Część Wschodnia)",
-      "floor": "ground",
-      "wall": "south",
-      "views": [
-        "south_facade"
-      ],
-      "sashes": 4,
-      "pillarWidth": 90,
-      "hasMullion": true,
-      "slidingArrows": true,
-      "handlePosition": "center",
-      "description": "Full-height HST terrace glazing in eastern living room with 90 mm inner pillars (Smaller: 4×1507.5 mm + 3×90 mm = 6300 mm; Bigger: 3×2040 mm + 2×90 mm = 6300 mm)",
-      "specs": {
-        "glazing": "Triple-pane safety solar-control glass (VSG/ESG)",
-        "frame": "Heavy-duty HST lift-and-slide aluminum system (RAL 7016)",
-        "sillExterior": "Zero-barrier flush terrace threshold (-0.02 m / ±0.00 m)",
-        "sillInterior": "Trench heater integrated flush floor track"
-      }
-    },
-    "O13b_1": {
-      "id": "O13b_1",
-      "name": "O13b",
-      "x": 20505,
-      "y": 3180,
-      "sill": 4180,
-      "width": 2400,
-      "height": 1950,
-      "room": "1.01 Sypialnia Master",
-      "floor": "first",
-      "wall": "west",
-      "views": [
-        "west_facade"
-      ],
-      "sashes": 1,
-      "hasMullion": false,
-      "handlePosition": "none",
-      "description": "Frameless panoramic corner window (West face of Master Bedroom 1.01, meeting O13a at North-West upper corner)",
-      "specs": {
-        "glazing": "Structural silicone butt-glazed safety glass (szkło na styk)",
-        "frame": "Concealed head and sill perimeter framing (RAL 7016)",
-        "sillExterior": "Continuous corner sheet metal sill at +4.18 m (hp=850 mm)",
-        "sillInterior": "Deep panoramic window bench"
-      }
-    },
-    "O13b_2": {
-      "id": "O13b_2",
-      "name": "O13b",
-      "x": 20505,
-      "y": 9400,
-      "sill": 4180,
-      "width": 2400,
-      "height": 1950,
-      "room": "1.05 Sypialnia Zachodnia",
-      "floor": "first",
-      "wall": "west",
-      "views": [
-        "west_facade"
-      ],
-      "sashes": 1,
-      "hasMullion": false,
-      "handlePosition": "right",
-      "description": "Large picture bedroom window on the South-West side of the upper floor (second distinct O13b window object)",
-      "specs": {
-        "glazing": "Triple-pane insulated glass unit (Ug=0.5 W/m²K)",
-        "frame": "Matte anthracite aluminum profile (RAL 7016)",
-        "sillExterior": "Aluminum exterior sill at +4.18 m (hp=850 mm)",
-        "sillInterior": "Internal window board at hp=850 mm"
-      }
-    },
-    "Z2": {
-      "id": "Z2",
-      "name": "Z2",
-      "x": 20505,
-      "y": 690,
-      "sill": 0,
-      "width": 5200,
-      "height": 2200,
-      "room": "0.01 Garaż Dwustanowiskowy",
-      "floor": "ground",
-      "wall": "west",
-      "views": [
-        "west_facade"
-      ],
-      "sashes": 1,
-      "hasMullion": false,
-      "openingType": "garage_door",
-      "handlePosition": "none",
-      "description": "Wide double-car insulated sectional garage door Z2 (5200×2200 mm), positioned 690 mm south of Point 0 / Axis A (960 mm from lower-level wall start)",
-      "specs": {
-        "glazing": "Insulated sandwich steel/aluminum panels (U=0.9 W/m²K)",
-        "frame": "Anthracite concealed reveal frame (RAL 7016)",
-        "sillExterior": "Heated driveway threshold at ±0.00 m / -0.02 m",
-        "sillInterior": "Epoxy/gres garage floor slab with linear drainage"
-      }
-    },
-    "Z1": {
-      "id": "Z1",
-      "name": "Z1",
-      "x": 20505,
-      "y": 8960,
-      "sill": 0,
-      "width": 1700,
-      "height": 2250,
-      "room": "0.04 Wiatrołap (Wejście Główne)",
-      "floor": "ground",
-      "wall": "west",
-      "views": [
-        "west_facade"
-      ],
-      "sashes": 2,
-      "hasMullion": true,
-      "openingType": "entrance_door",
-      "handlePosition": "center",
-      "description": "Main architectural entrance door Z1 (1700×2250 mm) centered in the 2500 mm recessed entry nook (400 mm wall + 1700 mm door + 400 mm wall)",
-      "specs": {
-        "glazing": "Laminated anti-burglary P4A sidelight glazing",
-        "frame": "Flush aluminum panel door with vertical stainless/black pull bar",
-        "sillExterior": "Heated granite entry step threshold",
-        "sillInterior": "Flush vestibule gres floor transition"
-      }
-    },
-    "O8c": {
-      "id": "O8c",
-      "name": "O8c",
-      "x": 20505,
-      "y": 11690,
-      "sill": 2060,
-      "width": 1440,
-      "height": 740,
-      "room": "0.12 Jadalnia / Salon",
-      "floor": "ground",
-      "wall": "west",
-      "views": [],
-      "sashes": 1,
-      "hasMullion": false,
-      "handlePosition": "none",
-      "description": "Single-pane high clerestory fixed window (1440×740 mm, hp=2060 mm) beneath the intermediate cornice, 630 mm south of the entrance nook (optional; removed by default)",
-      "specs": {
-        "glazing": "Triple-pane solar and acoustic control glass (Ug=0.5 W/m²K)",
-        "frame": "Slimline aluminum clerestory fixed frame (RAL 7016)",
-        "sillExterior": "Aluminum sill at +2.06 m (hp=2060 mm) over clinker wall",
-        "sillInterior": "High clerestory reveal providing western afternoon daylight"
-      }
-    },
-    "O8b": {
-      "id": "O8b",
-      "name": "O8b",
-      "x": 20505,
-      "y": 13410,
-      "sill": 2060,
-      "width": 1620,
-      "height": 740,
-      "room": "0.12 Jadalnia / Salon",
-      "floor": "ground",
-      "wall": "west",
-      "views": [],
-      "sashes": 1,
-      "hasMullion": false,
-      "handlePosition": "none",
-      "description": "Single-pane high clerestory fixed window (1620×740 mm, hp=2060 mm) flanked by 280 mm clinker masonry piers (optional; removed by default)",
-      "specs": {
-        "glazing": "Triple-pane solar and acoustic control glass (Ug=0.5 W/m²K)",
-        "frame": "Slimline aluminum clerestory fixed frame (RAL 7016)",
-        "sillExterior": "Aluminum sill at +2.06 m (hp=2060 mm) over clinker wall",
-        "sillInterior": "High clerestory reveal providing western afternoon daylight"
-      }
-    },
-    "O8a": {
-      "id": "O8a",
-      "name": "O8a",
-      "x": 20505,
-      "y": 15290,
-      "sill": 2060,
-      "width": 5500,
-      "height": 740,
-      "room": "0.11 Salon",
-      "floor": "ground",
-      "wall": "west",
-      "views": [
-        "west_facade"
-      ],
-      "sashes": 3,
-      "hasMullion": true,
-      "handlePosition": "none",
-      "description": "Three-pane equal-split high clerestory ribbon window (5500×740 mm, 3 equal windows, hp=2060 mm), ending 380 mm from the South-West corner",
-      "specs": {
-        "glazing": "Triple-pane solar and acoustic control glass (Ug=0.5 W/m²K)",
-        "frame": "Slimline 3-bay equal-split aluminum clerestory frame (RAL 7016)",
-        "sillExterior": "Continuous aluminum sill at +2.06 m (hp=2060 mm) over clinker wall",
-        "sillInterior": "High clerestory reveal providing western afternoon daylight while preserving privacy"
-      }
-    },
-    "O6b": {
-      "id": "O6b",
-      "name": "O6b",
-      "x": 14980,
-      "y": 15285,
-      "sill": 0,
-      "width": 5640,
-      "height": 2800,
-      "room": "0.10 Siłownia",
-      "floor": "ground",
-      "wall": "east",
-      "views": [
-        "east_facade"
-      ],
-      "sashes": 3,
-      "pillarWidth": 90,
-      "hasMullion": true,
-      "slidingArrows": true,
-      "handlePosition": "center",
-      "description": "Full-height 3-pane HST terrace glazing in the recessed South-West gym wing with 90 mm inner pillars (3 × 1,820 mm + 2 × 90 mm = 5,640 mm, 200 mm left pier, middle sash sliding left ←)",
-      "specs": {
-        "glazing": "Triple-pane safety solar-control glass (VSG/ESG)",
-        "frame": "Heavy-duty HST lift-and-slide aluminum system with 90 mm inner pillars (RAL 7016)",
-        "sillExterior": "Zero-barrier flush terrace threshold (-0.02 m / ±0.00 m)",
-        "sillInterior": "Trench heater integrated flush floor track"
-      }
-    },
-    "O6a": {
-      "id": "O6a",
-      "name": "O6a",
-      "x": 14980,
-      "y": 13275,
-      "sill": 2060,
-      "width": 1760,
-      "height": 740,
-      "room": "0.12 Komunikacja",
-      "floor": "ground",
-      "wall": "east",
-      "views": [
-        "east_facade"
-      ],
-      "sashes": 1,
-      "hasMullion": false,
-      "handlePosition": "none",
-      "description": "Single-pane high clerestory fixed ribbon window in the recessed ground-floor wing (1,760 × 740 mm, hp=2,060 mm, 250 mm right of O6b)",
-      "specs": {
-        "glazing": "Triple-pane solar and acoustic control glass (Ug=0.5 W/m²K)",
-        "frame": "Slimline aluminum clerestory fixed frame (RAL 7016)",
-        "sillExterior": "Aluminum sill at +2.06 m (hp=2060 mm) over recessed clinker wall",
-        "sillInterior": "High clerestory reveal providing eastern morning daylight to hall/corridor"
-      }
-    },
-    "O3": {
-      "id": "O3",
-      "name": "O3",
-      "x": 0,
-      "y": 6310,
-      "sill": 0,
-      "width": 5090,
-      "height": 2800,
-      "room": "0.11 Salon",
-      "floor": "ground",
-      "wall": "east",
-      "views": [
-        "east_facade"
-      ],
-      "sashes": 3,
-      "pillarWidth": 90,
-      "hasMullion": true,
-      "handlePosition": "center",
-      "description": "Full-height panoramic living room glazing on the projecting central East Facade with 90 mm inner pillars (Smaller: 3 × 1,636.7 mm + 2 × 90 mm = 5,090 mm; Bigger: 2 × 2,500 mm + 1 × 90 mm = 5,090 mm)",
-      "specs": {
-        "glazing": "Triple-pane safety solar-control glass (VSG/ESG)",
-        "frame": "Slimline multi-panel aluminum system with 90 mm inner pillars (RAL 7016)",
-        "sillExterior": "Flush threshold at ±0.00 m (-0.02 m)",
-        "sillInterior": "Trench heater integrated flush floor track"
-      }
-    },
-    "O9": {
-      "id": "O9",
-      "name": "O9",
-      "x": 0,
-      "y": 6310,
-      "sill": 3430,
-      "width": 5090,
-      "height": 2700,
-      "room": "1.04 Sypialnia Wschodnia",
-      "floor": "first",
-      "wall": "east",
-      "views": [
-        "east_facade"
-      ],
-      "sashes": 3,
-      "pillarWidth": 90,
-      "hasMullion": true,
-      "handlePosition": "center",
-      "description": "Full-height panoramic bedroom glazing on the projecting central East Facade with 90 mm inner pillars, vertically aligned with O3 (Smaller: 3 × 1,636.7 mm + 2 × 90 mm = 5,090 mm; Bigger: 2 × 2,500 mm + 1 × 90 mm = 5,090 mm)",
-      "specs": {
-        "glazing": "Safety tempered and laminated glass (VSG/ESG)",
-        "frame": "Slimline multi-panel aluminum frame with 90 mm inner pillars (RAL 7016)",
-        "sillExterior": "Flush threshold on intermediate cornice (+3.43 m)",
-        "sillInterior": "Flush floor threshold (hp=0 mm)"
-      }
-    },
-    "O14b": {
-      "id": "O14b",
-      "name": "O14b",
-      "x": 6315,
-      "y": 3190,
-      "sill": 3430,
-      "width": 2635,
-      "height": 2700,
-      "room": "1.04 Sypialnia / Taras (D1 + O14b)",
-      "floor": "first",
-      "wall": "east",
-      "views": [
-        "east_facade"
-      ],
-      "sashes": 2,
-      "sashWidths": [
-        900,
-        1735
-      ],
-      "tiltTurnSashes": [
-        1
-      ],
-      "hasMullion": true,
-      "handlePosition": "left",
-      "description": "Upper floor covered terrace glazing & balcony door assembly (2,635 × 2,700 mm: 900 mm left tilt-and-turn terrace door D1 + 1,735 mm right fixed window O14b behind 900 mm glass balustrade)",
-      "specs": {
-        "glazing": "Safety tempered and laminated glass (VSG/ESG) with 900 mm exterior glass balustrade",
-        "frame": "Anthracite aluminum tilt-and-turn terrace door + fixed panoramic frame (RAL 7016)",
-        "sillExterior": "Covered upper terrace gres deck (+3.31 m / +3.43 m)",
-        "sillInterior": "Bedroom threshold at +3.33 m"
-      }
-    }
-  },
-  "stairs": {
-    "main_staircase": {
-      "id": "main_staircase",
-      "name": "Main Staircase (Schody)",
-      "room": "1.07 Komunikacja / Korytarz",
-      "viewId": "stairs_north_wall",
-      "flooring_height": 0,
-      "width": 1000,
-      "step_height": 175,
-      "step_length": 260,
-      "plank_height": 40,
-      "stair_slab": 193,
-      "x": 2549,
-      "global_x": 16361,
-      "total_risers": 19,
-      "turn_steps_count": 4,
-      "straight_risers_count": 15,
-      "straight_treads_count": 14,
-      "horizontal_gain": 3640,
-      "elevation_gain": 2625,
-      "step5_to_d3_distance": 2174,
-      "straight_flight_run": 3640,
-      "end_x": 7189,
-      "total_rise": 3325,
-      "top_floor_elevation": 3330,
-      "balustrade_height": 900,
-      "show_planks": true,
-      "line_thickness": 1.0,
-      "description": "Two-flight interior staircase with 4-step winder entry turn (1 straight + 3 winder) in 1000×1000 mm corner, followed by a 3,640 mm straight flight of 14 treads (260 mm) × 15 risers (175 mm) along the North Wall to finished +3,33 m."
-    }
-  }
 }

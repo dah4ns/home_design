@@ -688,6 +688,18 @@
                         Active: Smaller windows (90 mm inner pillars | O12: 3×1,273.3, O10/O4: 4×1,507.5, O5: 4×1,552.5, O7: 300×200)
                     </span>
                 </div>
+                <div class="layer-toggles" style="border-right: 1px solid #cbd5e1; padding-right: 16px;">
+                    <span style="font-size: 13px; font-weight: 700; color: #0f172a;">Window Jambs (Ościeża):</span>
+                    <button id="btn-jamb-floor" class="toggle-btn" onclick="setWindowJambOption('floor')" style="font-weight: 600;">
+                        <span>🧱</span> Option 1: Floor Material (Brick / Wood)
+                    </button>
+                    <button id="btn-jamb-ral7021" class="toggle-btn active" onclick="setWindowJambOption('ral7021')" style="font-weight: 600;">
+                        <span>⬛</span> Option 2: RAL 7021 (default)
+                    </button>
+                    <span id="jamb-material-opt-badge" class="badge accent" style="font-size: 11.5px; padding: 4px 10px;">
+                        Jambs: Option 2 — RAL 7021 (#1f2421)
+                    </span>
+                </div>
                 <div class="layer-toggles">
                     <span style="font-size: 13px; font-weight: 600; color: #334155;">Display Layers:</span>
                     <button id="toggleDims" class="toggle-btn active amber" onclick="toggleLayer('layer-dims', this)">
@@ -798,6 +810,9 @@
                         <g id="ground-recessed-facade">
                             <rect x="601" y="-280" width="1498" height="282" fill="url(#brick-pattern)" stroke="#1e222a" stroke-width="1.5" onclick="showElementDetails('BRICK_WALL')" class="interactive-element" />
 
+                            <!-- 200 mm right of O4: Window Jamb (20,790..20,990 mm) -->
+                            <rect x="2079" y="-280" width="20" height="282" fill="url(#brick-pattern)" data-jamb-strip="south-lower-o4-right-200" data-floor-fill="url(#brick-pattern)" pointer-events="none" />
+
                             <!-- Dynamic Window Component: O5 (formerly SO6, HST sliding terrace glazing, 6480×2800 mm, hp=0 mm) -->
                             <g data-window-component="O5" data-view-id="south_facade" data-window-style="exterior" id="facade-window-O5"></g>
 
@@ -808,6 +823,10 @@
                         <!-- 2. Projecting Western Ground Floor Volume (X = 0 to 601, width 601 [6,010 mm], with 200 mm brick on right of O7) -->
                         <g id="ground-front-volume">
                             <rect x="0" y="-280" width="601" height="282" fill="url(#brick-pattern)" stroke="#1e222a" stroke-width="2" filter="url(#shadow)" onclick="showElementDetails('BRICK_WALL')" class="interactive-element" />
+
+                            <!-- 200 mm right of O7: Window Jamb (5,810..6,010 mm) -->
+                            <rect x="581" y="-280" width="20" height="282" fill="url(#brick-pattern)" data-jamb-strip="south-lower-o7-right-200" data-floor-fill="url(#brick-pattern)" pointer-events="none" />
+
                             <!-- Vertical step / corner line at X = 601 (200 mm to the right of O7, 1,000 mm to the left of O5) -->
                             <line x1="601" y1="-280" x2="601" y2="2" stroke="#0f172a" stroke-width="2" />
 
@@ -866,6 +885,12 @@
                     <g id="upper-timber-facade">
                         <!-- Timber Wall Body -->
                         <rect x="0" y="-613" width="2099" height="270" fill="url(#wood-slats-pattern)" stroke="#8a7356" stroke-width="1.5" onclick="showElementDetails('TIMBER_WALL')" class="interactive-element" />
+
+                        <!-- 200 mm left of O13a_2: Window Jamb (0..200 mm) -->
+                        <rect x="0" y="-613" width="20" height="195" fill="url(#wood-slats-pattern)" data-jamb-strip="south-upper-o13a-left-200" data-floor-fill="url(#wood-slats-pattern)" pointer-events="none" />
+
+                        <!-- 200 mm right of O10: Window Jamb (20,790..20,990 mm) -->
+                        <rect x="2079" y="-613" width="20" height="270" fill="url(#wood-slats-pattern)" data-jamb-strip="south-upper-o10-right-200" data-floor-fill="url(#wood-slats-pattern)" pointer-events="none" />
 
                         <!-- Dynamic Window Component: O13a (formerly SO1, 2-sash bedroom window, 2380×1950 mm, hp=850 mm) -->
                         <g data-window-component="O13a_2" data-view-id="south_facade" data-window-style="exterior" id="facade-window-O13a_2"></g>

@@ -703,6 +703,18 @@
                         Active: O15 210×270 cm (2100×2700 mm, X=8480..10580 aligned with O1, hp=0 mm)
                     </span>
                 </div>
+                <div class="layer-toggles" style="border-right: 1px solid #cbd5e1; padding-right: 16px;">
+                    <span style="font-size: 13px; font-weight: 700; color: #0f172a;">Window Jambs (Ościeża):</span>
+                    <button id="btn-jamb-floor" class="toggle-btn" onclick="setWindowJambOption('floor')" style="font-weight: 600;">
+                        <span>🧱</span> Option 1: Floor Material (Brick / Wood)
+                    </button>
+                    <button id="btn-jamb-ral7021" class="toggle-btn active" onclick="setWindowJambOption('ral7021')" style="font-weight: 600;">
+                        <span>⬛</span> Option 2: RAL 7021 (default)
+                    </button>
+                    <span id="jamb-material-opt-badge" class="badge accent" style="font-size: 11.5px; padding: 4px 10px;">
+                        Jambs: Option 2 — RAL 7021 (#1f2421)
+                    </span>
+                </div>
                 <div class="layer-toggles">
                     <span style="font-size: 13px; font-weight: 600; color: #334155;">Display Layers:</span>
                     <button id="toggleDims" class="toggle-btn active amber" onclick="toggleLayer('layer-dims', this)">
