@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- TODO(security): Enforce strict Content-Security-Policy and X-Frame-Options headers at the web server level when deployed -->
+    <title>Facade Areas &amp; Window Jambs Summary — All 4 Sides</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --border-color: #e2e8f0;
+            --accent-blue: #0284c7;
+            --accent-amber: #d97706;
+            --accent-emerald: #059669;
+            --accent-purple: #6d28d9;
+            --ral-7021: #1f2421;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 28px 20px 60px 20px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1640px;
+            margin: 0 auto;
+        }
+
+        .header-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 24px 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+        }
+
+        .nav-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        h1 {
+            font-size: 26px;
+            font-weight: 800;
+            margin: 0 0 6px 0;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .defaults-banner {
+            margin-top: 16px;
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            padding: 12px 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px 18px;
+            align-items: center;
+            font-size: 12.5px;
+            color: #334155;
+        }
+
+        .defaults-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11.5px;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        /* KPI Grand Totals Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .kpi-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 18px 20px;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .kpi-card.grand-total {
+            border-left: 5px solid #0f172a;
+        }
+
+        .kpi-card.lower-brick {
+            border-left: 5px solid #334155;
+        }
+
+        .kpi-card.upper-timber {
+            border-left: 5px solid #b45309;
+        }
+
+        .kpi-card.window-jambs {
+            border-left: 5px solid #1f2421;
+        }
+
+        .kpi-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .kpi-title {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            color: #475569;
+        }
+
+        .kpi-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        .kpi-main-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 28px;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1.15;
+            margin-bottom: 4px;
+        }
+
+        .kpi-sub-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 12px;
+        }
+
+        .kpi-split-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        .kpi-split-box {
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .kpi-split-box.gt185 {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+        }
+
+        .kpi-split-box.le185 {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            color: #92400e;
+        }
+
+        .kpi-split-box.jamb-sub {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            color: #0f172a;
+        }
+
+        .split-bar {
+            height: 7px;
+            width: 100%;
+            background: #fde68a;
+            border-radius: 4px;
+            overflow: hidden;
+            display: flex;
+            margin: 10px 0 4px 0;
+        }
+
+        .split-bar-fill {
+            background: #2563eb;
+            height: 100%;
+        }
+
+        /* Section Cards & Tables */
+        .section-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 22px 26px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin: 0 0 6px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin: 0 0 18px 0;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table.summary-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        table.summary-table th,
+        table.summary-table td {
+            padding: 10px 12px;
+            text-align: right;
+            border-bottom: 1px solid #e2e8f0;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        table.summary-table th:first-child,
+        table.summary-table td:first-child {
+            text-align: left;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            min-width: 240px;
+        }
+
+        table.summary-table thead th {
+            background: #f1f5f9;
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 12.5px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            border-top: 1px solid #cbd5e1;
+            border-bottom: 2px solid #cbd5e1;
+        }
+
+        table.summary-table tr.group-header td {
+            background: #f8fafc;
+            color: #334155;
+            font-family: 'Inter', sans-serif;
+            font-weight: 800;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding-top: 12px;
+            padding-bottom: 8px;
+            border-top: 1px solid #cbd5e1;
+        }
+
+        table.summary-table tr.highlight-row td {
+            background: #f8fafc;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        table.summary-table tr.gt185-row td {
+            background: #f8fbff;
+            color: #1e40af;
+        }
+
+        table.summary-table tr.le185-row td {
+            background: #fffdf5;
+            color: #92400e;
+        }
+
+        table.summary-table tr.grand-row td {
+            background: #0f172a;
+            color: #f8fafc;
+            font-weight: 800;
+            font-size: 13.5px;
+        }
+
+        table.summary-table td.total-col,
+        table.summary-table th.total-col {
+            background-color: rgba(15, 23, 42, 0.035);
+            font-weight: 800;
+            border-left: 2px solid #cbd5e1;
+        }
+
+        table.summary-table tr.grand-row td.total-col {
+            background-color: #1e293b;
+            color: #fde68a;
+        }
+
+        .cell-sub {
+            display: block;
+            font-size: 10.5px;
+            font-weight: 500;
+            opacity: 0.78;
+            margin-top: 2px;
+        }
+
+        .facade-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .facade-title-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .facade-tag {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .facade-block {
+            margin-bottom: 28px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- HEADER & NAVIGATION -->
+        <div class="header-card">
+            <div class="nav-bar">
+                <a href="index.html" class="nav-btn" style="background-color: #f1f5f9; color: #334155; border-color: #cbd5e1;">
+                    <span>🏠</span> Dashboard
+                </a>
+                <a href="north_facade.html" class="nav-btn" style="background-color: #e0f2fe; color: #0369a1; border-color: #bae6fd;">
+                    <span>🧭</span> North Facade
+                </a>
+                <a href="south_facade.html" class="nav-btn" style="background-color: #fef3c7; color: #b45309; border-color: #fde68a;">
+                    <span>☀️</span> South Facade
+                </a>
+                <a href="west_facade.html" class="nav-btn" style="background-color: #f3e8ff; color: #6d28d9; border-color: #ddd6fe;">
+                    <span>🚪</span> West Facade
+                </a>
+                <a href="east_facade.html" class="nav-btn" style="background-color: #dcfce7; color: #166534; border-color: #bbf7d0;">
+                    <span>🌅</span> East Facade
+                </a>
+                <a href="facade_summary.html" class="nav-btn" style="background-color: #0f172a; color: #ffffff; border-color: #0f172a;">
+                    <span>📊</span> All Facades Summary
+                </a>
+            </div>
+
+            <div class="header-top">
+                <div>
+                    <h1>All Facades Material Area &amp; Window Jambs Summary</h1>
+                    <p class="subtitle">
+                        Building-wide summary across North, South, West, and East elevations (net clinker brick, vertical timber slats, height cutoff h &gt; 185 cm vs h &le; 185 cm, and 20 cm window jambs).
+                    </p>
+                </div>
+            </div>
+
+            <div class="defaults-banner">
+                <strong style="color: #0f172a;">Active Default Configuration Across All 4 Sides:</strong>
+                <span class="defaults-pill">🧭 North: O15 (210×270) &bull; O1 (210×140) &bull; Jamb right of O13a excluded</span>
+                <span class="defaults-pill">☀️ South: Bigger windows (O12: 2×1,955, O10/O4: 3×2,040, O5: 3×2,100, O7: 200×280)</span>
+                <span class="defaults-pill">🚪 West: O8a only (no O8b/O8c) &bull; 2×200 mm upper jambs above sill excluded</span>
+                <span class="defaults-pill">🌅 East: Bigger windows (O9/O3: 2×2,500) &bull; 400 mm lower &amp; 400 mm upper jambs excluded</span>
+                <span class="defaults-pill" style="background: #1f2421; color: #fde68a; border-color: #1f2421;">⬛ Window Jambs: RAL 7021 (#1f2421, Depth = 200 mm)</span>
+            </div>
+        </div>
+
+        <!-- BUILDING-WIDE GRAND TOTAL KPI CARDS -->
+        <div id="building-kpi-grid" class="kpi-grid"></div>
+
+        <!-- SIDE-BY-SIDE COMPARISON TABLE ACROSS ALL 4 FACADES -->
+        <div class="section-card">
+            <h2 class="section-title">📊 Side-by-Side Comparison Table (North, South, West, East &amp; Total)</h2>
+            <p class="section-desc">
+                Complete breakdown of Lower Floor Clinker Brick (Parter, H = 280 cm), Upper Floor Vertical Timber Slats (Piętro, H = 270 cm), height threshold split (&gt; 185 cm vs &le; 185 cm), and Window Jambs (20 cm depth).
+            </p>
+            <div class="table-wrapper">
+                <table class="summary-table" id="all-facades-comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Metric / Floor &amp; Material Breakdown</th>
+                            <th>🧭 North Facade</th>
+                            <th>☀️ South Facade</th>
+                            <th>🚪 West Facade</th>
+                            <th>🌅 East Facade</th>
+                            <th class="total-col">🏛️ Building Total (All 4 Sides)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="comparison-table-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- DETAILED PER-FACADE BREAKDOWN PANELS -->
+        <div class="section-card">
+            <h2 class="section-title">🧱 Detailed Breakdown by Facade (Metrics 1–6 &amp; Window Jambs)</h2>
+            <p class="section-desc">
+                Individual facade breakdowns showing exact pier spans, under/above window strips, excluded corner jamb strips, and window-by-window jamb dimensions.
+            </p>
+
+            <!-- North Facade -->
+            <div class="facade-block">
+                <div class="facade-section-header">
+                    <div class="facade-title-group">
+                        <span class="facade-tag" style="background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd;">🧭 NORTH FACADE</span>
+                        <span style="font-size: 14px; font-weight: 700; color: #0f172a;">Lower: 20,590 mm Clinker Brick &bull; Upper: 20,505 mm Vertical Timber Slats (jamb right of O13a excluded)</span>
+                    </div>
+                    <a href="north_facade.html" class="nav-btn" style="background: #f8fafc; color: #0369a1; border-color: #bae6fd;">Open North Facade &rarr;</a>
+                </div>
+                <div id="summary-card-north"></div>
+            </div>
+
+            <!-- South Facade -->
+            <div class="facade-block">
+                <div class="facade-section-header">
+                    <div class="facade-title-group">
+                        <span class="facade-tag" style="background: #fef3c7; color: #b45309; border: 1px solid #fde68a;">☀️ SOUTH FACADE</span>
+                        <span style="font-size: 14px; font-weight: 700; color: #0f172a;">Lower: 20,990 mm Clinker Brick &bull; Upper: 20,990 mm Vertical Timber Slats (Bigger Windows Default)</span>
+                    </div>
+                    <a href="south_facade.html" class="nav-btn" style="background: #f8fafc; color: #b45309; border-color: #fde68a;">Open South Facade &rarr;</a>
+                </div>
+                <div id="summary-card-south"></div>
+            </div>
+
+            <!-- West Facade -->
+            <div class="facade-block">
+                <div class="facade-section-header">
+                    <div class="facade-title-group">
+                        <span class="facade-tag" style="background: #f3e8ff; color: #6d28d9; border: 1px solid #ddd6fe;">🚪 WEST FACADE</span>
+                        <span style="font-size: 14px; font-weight: 700; color: #0f172a;">Lower: 21,420 mm Clinker Brick &bull; Upper: 8,790 mm Gross / 8,390 mm Net Timber Slats (2×200 mm jambs above sill excluded)</span>
+                    </div>
+                    <a href="west_facade.html" class="nav-btn" style="background: #f8fafc; color: #6d28d9; border-color: #ddd6fe;">Open West Facade &rarr;</a>
+                </div>
+                <div id="summary-card-west"></div>
+            </div>
+
+            <!-- East Facade -->
+            <div class="facade-block" style="margin-bottom: 0;">
+                <div class="facade-section-header">
+                    <div class="facade-title-group">
+                        <span class="facade-tag" style="background: #dcfce7; color: #166534; border: 1px solid #bbf7d0;">🌅 EAST FACADE</span>
+                        <span style="font-size: 14px; font-weight: 700; color: #0f172a;">Lower: 21,415 mm Gross / 21,015 mm Net Brick &bull; Upper: 8,785 mm Gross / 8,385 mm Net Timber (2×200 mm jambs excluded)</span>
+                    </div>
+                    <a href="east_facade.html" class="nav-btn" style="background: #f8fafc; color: #166534; border-color: #bbf7d0;">Open East Facade &rarr;</a>
+                </div>
+                <div id="summary-card-east"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Canonical Window & Facade Calculation Scripts -->
+    <script src="data/windows.js"></script>
+    <script src="js/window-store.js"></script>
+    <script src="js/coordinate-service.js"></script>
+    <script src="js/window-component.js"></script>
+    <script>
+        /**
+         * Ensure default window options are active across all 4 facades
+         * regardless of any prior localStorage toggles in other tabs.
+         */
+        function applyAllFacadeDefaults() {
+            // 1. North Facade defaults: Master Bedroom O15 (2100×2700, bigger), Kitchen O1 (2100×1400)
+            WindowStore.update('O15', {
+                x: 8480,
+                width: 2100,
+                height: 2700,
+                sill: 3430,
+                views: ['north_facade']
+            });
+            WindowStore.update('O11_1', {
+                views: []
+            });
+            WindowStore.update('O1', {
+                x: 8480,
+                width: 2100,
+                height: 1400,
+                sill: 1100,
+                sashWidths: [1050, 1050],
+                views: ['north_facade', 'kitchen_north_wall']
+            });
+
+            // 2. South Facade defaults: Bigger windows
+            WindowStore.update('O13a_2', {
+                x: 18410,
+                width: 2380,
+                height: 1950,
+                sill: 4180,
+                views: ['south_facade']
+            });
+            WindowStore.update('O12', {
+                sashes: 2,
+                pillarWidth: 90,
+                hasMullion: true,
+                width: 4000,
+                height: 2700,
+                sill: 3430,
+                views: ['south_facade']
+            });
+            WindowStore.update('O10', {
+                sashes: 3,
+                pillarWidth: 90,
+                hasMullion: true,
+                width: 6300,
+                height: 2700,
+                sill: 3430,
+                views: ['south_facade']
+            });
+            WindowStore.update('O7', {
+                x: 15180,
+                width: 2000,
+                height: 2800,
+                sill: 0,
+                sashes: 1,
+                hasMullion: false,
+                tiltTurnSashes: [],
+                views: ['south_facade']
+            });
+            WindowStore.update('O5', {
+                sashes: 3,
+                pillarWidth: 90,
+                hasMullion: true,
+                slidingArrows: false,
+                width: 6480,
+                height: 2800,
+                sill: 0,
+                views: ['south_facade']
+            });
+            WindowStore.update('O4', {
+                sashes: 3,
+                pillarWidth: 90,
+                hasMullion: true,
+                slidingArrows: false,
+                width: 6300,
+                height: 2800,
+                sill: 0,
+                views: ['south_facade']
+            });
+
+            // 3. West Facade defaults: Clerestory O8a only (no O8b / O8c), O13b_1 & O13b_2 (2370×1950)
+            WindowStore.update('O8c', { views: [] });
+            WindowStore.update('O8b', { views: [] });
+            WindowStore.update('O8a', {
+                y: 15250,
+                width: 5500,
+                height: 740,
+                sill: 2060,
+                views: ['west_facade']
+            });
+            WindowStore.update('O13b_1', {
+                y: 2990,
+                width: 2370,
+                height: 1950,
+                sill: 4180,
+                views: ['west_facade']
+            });
+            WindowStore.update('O13b_2', {
+                y: 9010,
+                width: 2370,
+                height: 1950,
+                sill: 4180,
+                views: ['west_facade']
+            });
+
+            // 4. East Facade defaults: Bigger windows (O9 & O3: 2 sashes of 2500 mm)
+            WindowStore.update('O9', {
+                sashes: 2,
+                pillarWidth: 90,
+                hasMullion: true,
+                width: 5090,
+                height: 2700,
+                sill: 3430,
+                views: ['east_facade']
+            });
+            WindowStore.update('O3', {
+                sashes: 2,
+                pillarWidth: 90,
+                hasMullion: true,
+                width: 5090,
+                height: 2800,
+                sill: 0,
+                views: ['east_facade']
+            });
+
+            WindowComponent.jambMaterialMode = 'ral7021';
+        }
+
+        function round2(v) {
+            return Math.round((v + Number.EPSILON) * 100) / 100;
+        }
+
+        function fmtArea(v) {
+            return Number(v).toFixed(2) + ' m²';
+        }
+
+        function fmtLen(mm) {
+            const m = round2(mm / 1000).toFixed(2);
+            return Math.round(mm).toLocaleString() + ' mm (' + m + ' m)';
+        }
+
+        function parseStaticFragment(htmlString) {
+            const doc = new DOMParser().parseFromString(htmlString, 'text/html');
+            return Array.from(doc.body.childNodes);
+        }
+
+        function renderBuildingKpiCards(facadeStatsList, totals) {
+            const grid = document.getElementById('building-kpi-grid');
+            if (!grid) return;
+
+            const combinedPctGt = totals.combinedTotalM2 > 0
+                ? Math.round((totals.combinedGt185M2 / totals.combinedTotalM2) * 100)
+                : 0;
+            const combinedPctLe = 100 - combinedPctGt;
+
+            const lowerPctGt = totals.lowerTotalM2 > 0
+                ? Math.round((totals.lowerGt185M2 / totals.lowerTotalM2) * 100)
+                : 0;
+            const lowerPctLe = 100 - lowerPctGt;
+
+            const upperPctGt = totals.upperTotalM2 > 0
+                ? Math.round((totals.upperGt185M2 / totals.upperTotalM2) * 100)
+                : 0;
+            const upperPctLe = 100 - upperPctGt;
+
+            const html = `
+                <!-- Card 1: Grand Total Net Facade Area -->
+                <div class="kpi-card grand-total">
+                    <div>
+                        <div class="kpi-header">
+                            <span class="kpi-title">🏛️ Total Net Facade Area (All 4 Sides)</span>
+                            <span class="kpi-badge" style="background: #0f172a; color: #f8fafc;">(1) + (2) Combined</span>
+                        </div>
+                        <div class="kpi-main-value">${totals.combinedTotalM2.toFixed(2)} m&sup2;</div>
+                        <div class="kpi-sub-value">Total Net Length: ${fmtLen(totals.combinedTotalLengthMm)} &bull; Gross ${totals.combinedGrossM2.toFixed(2)} &minus; Win ${totals.combinedWinM2.toFixed(2)} m&sup2;</div>
+                        <div class="split-bar">
+                            <div class="split-bar-fill" style="width: ${combinedPctGt}%;"></div>
+                        </div>
+                    </div>
+                    <div class="kpi-split-row">
+                        <div class="kpi-split-box gt185">
+                            <div style="font-size: 10.5px; font-weight: 700;">HEIGHT &gt; 185 CM (${combinedPctGt}%)</div>
+                            <div style="font-size: 16px; font-weight: 800; margin-top: 2px;">${totals.combinedGt185M2.toFixed(2)} m&sup2;</div>
+                            <div style="font-size: 11px; margin-top: 2px;">Len: ${fmtLen(totals.combinedLenGt185Mm)}</div>
+                        </div>
+                        <div class="kpi-split-box le185">
+                            <div style="font-size: 10.5px; font-weight: 700;">HEIGHT &le; 185 CM (${combinedPctLe}%)</div>
+                            <div style="font-size: 16px; font-weight: 800; margin-top: 2px;">${totals.combinedLe185M2.toFixed(2)} m&sup2;</div>
+                            <div style="font-size: 11px; margin-top: 2px;">Len: ${fmtLen(totals.combinedLenLe185Mm)}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Total Lower Floor (Clinker Brick) -->
+                <div class="kpi-card lower-brick">
+                    <div>
+                        <div class="kpi-header">
+                            <span class="kpi-title">🧱 1) Lower Floor — Clinker Brick (Parter)</span>
+                            <span class="kpi-badge" style="background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1;">H = 280 cm</span>
+                        </div>
+                        <div class="kpi-main-value">${totals.lowerTotalM2.toFixed(2)} m&sup2;</div>
+                        <div class="kpi-sub-value">Net Length: ${fmtLen(totals.lowerLenMm)} &bull; Gross ${totals.lowerGrossM2.toFixed(2)} &minus; Win ${totals.lowerWinM2.toFixed(2)} m&sup2;</div>
+                        <div class="split-bar">
+                            <div class="split-bar-fill" style="width: ${lowerPctGt}%;"></div>
+                        </div>
+                    </div>
+                    <div class="kpi-split-row">
+                        <div class="kpi-split-box gt185">
+                            <div style="font-size: 10.5px; font-weight: 700;">3) LOWER &gt; 185 CM (${lowerPctGt}%)</div>
+                            <div style="font-size: 16px; font-weight: 800; margin-top: 2px;">${totals.lowerGt185M2.toFixed(2)} m&sup2;</div>
+                            <div style="font-size: 11px; margin-top: 2px;">Len: ${fmtLen(totals.lowerLenGt185Mm)}</div>
+                        </div>
+                        <div class="kpi-split-box le185">
+                            <div style="font-size: 10.5px; font-weight: 700;">5) LOWER &le; 185 CM (${lowerPctLe}%)</div>
+                            <div style="font-size: 16px; font-weight: 800; margin-top: 2px;">${totals.lowerLe185M2.toFixed(2)} m&sup2;</div>
+                            <div style="font-size: 11px; margin-top: 2px;">Len: ${fmtLen(totals.lowerLenLe185Mm)}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Total Upper Floor (Vertical Timber Slats) -->
+                <div class="kpi-card upper-timber">
+                    <div>
+                        <div class="kpi-header">
+                            <span class="kpi-title">🌲 2) Upper Floor — Timber Slats (Pi&#281;tro)</span>
+                            <span class="kpi-badge" style="background: #fffbeb; color: #b45309; border: 1px solid #fde68a;">H = 270 cm</span>
+                        </div>
+                        <div class="kpi-main-value">${totals.upperTotalM2.toFixed(2)} m&sup2;</div>
+                        <div class="kpi-sub-value">Net Length: ${fmtLen(totals.upperLenMm)} &bull; Gross ${totals.upperGrossM2.toFixed(2)} &minus; Win ${totals.upperWinM2.toFixed(2)} m&sup2;</div>
+                        <div class="split-bar">
+                            <div class="split-bar-fill" style="width: ${upperPctGt}%;"></div>
+                        </div>
+                    </div>
+                    <div class="kpi-split-row">
+                        <div class="kpi-split-box gt185">
+                            <div style="font-size: 10.5px; font-weight: 700;">4) UPPER &gt; 185 CM (${upperPctGt}%)</div>
+                            <div style="font-size: 16px; font-weight: 800; margin-top: 2px;">${totals.upperGt185M2.toFixed(2)} m&sup2;</div>
+                            <div style="font-size: 11px; margin-top: 2px;">Len: ${fmtLen(totals.upperLenGt185Mm)}</div>
+                        </div>
+                        <div class="kpi-split-box le185">
+                            <div style="font-size: 10.5px; font-weight: 700;">6) UPPER &le; 185 CM (${upperPctLe}%)</div>
+                            <div style="font-size: 16px; font-weight: 800; margin-top: 2px;">${totals.upperLe185M2.toFixed(2)} m&sup2;</div>
+                            <div style="font-size: 11px; margin-top: 2px;">Len: ${fmtLen(totals.upperLenLe185Mm)}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4: Total Window Jambs (Ościeża Okienne) -->
+                <div class="kpi-card window-jambs">
+                    <div>
+                        <div class="kpi-header">
+                            <span class="kpi-title">🪟 Total Window Jambs (O&#347;cie&#380;a &bull; 20 cm)</span>
+                            <span class="kpi-badge" style="background: #1f2421; color: #fde68a;">RAL 7021 Default</span>
+                        </div>
+                        <div class="kpi-main-value">${totals.jambsTotalM2.toFixed(2)} m&sup2;</div>
+                        <div class="kpi-sub-value">Total Linear Jamb Run: ${fmtLen(totals.jambsTotalLenMm)} &times; 200 mm depth</div>
+                        <div style="font-size: 11.5px; color: #64748b; margin-bottom: 6px;">Excluded from net facade surface area and calculated separately.</div>
+                    </div>
+                    <div class="kpi-split-row">
+                        <div class="kpi-split-box jamb-sub">
+                            <div style="font-size: 10.5px; font-weight: 700; color: #475569;">LOWER FLOOR JAMBS</div>
+                            <div style="font-size: 16px; font-weight: 800; margin-top: 2px;">${totals.jambsLowerM2.toFixed(2)} m&sup2;</div>
+                            <div style="font-size: 11px; color: #475569; margin-top: 2px;">Len: ${fmtLen(totals.jambsLowerLenMm)}</div>
+                        </div>
+                        <div class="kpi-split-box jamb-sub">
+                            <div style="font-size: 10.5px; font-weight: 700; color: #475569;">UPPER FLOOR JAMBS</div>
+                            <div style="font-size: 16px; font-weight: 800; margin-top: 2px;">${totals.jambsUpperM2.toFixed(2)} m&sup2;</div>
+                            <div style="font-size: 11px; color: #475569; margin-top: 2px;">Len: ${fmtLen(totals.jambsUpperLenMm)}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            grid.replaceChildren(...parseStaticFragment(html));
+        }
+
+        function renderComparisonTable(byView, totals) {
+            const tbody = document.getElementById('comparison-table-tbody');
+            if (!tbody) return;
+
+            const views = ['north_facade', 'south_facade', 'west_facade', 'east_facade'];
+
+            function makeRow(label, rowClass, cellFn, totalText, totalSub) {
+                const tr = document.createElement('tr');
+                if (rowClass) tr.className = rowClass;
+
+                const tdLabel = document.createElement('td');
+                tdLabel.textContent = label;
+                tr.appendChild(tdLabel);
+
+                views.forEach(v => {
+                    const td = document.createElement('td');
+                    const res = cellFn(byView[v]);
+                    if (typeof res === 'object' && res !== null) {
+                        td.textContent = res.main;
+                        if (res.sub) {
+                            const span = document.createElement('span');
+                            span.className = 'cell-sub';
+                            span.textContent = res.sub;
+                            td.appendChild(span);
+                        }
+                    } else {
+                        td.textContent = String(res);
+                    }
+                    tr.appendChild(td);
+                });
+
+                const tdTot = document.createElement('td');
+                tdTot.className = 'total-col';
+                tdTot.textContent = totalText;
+                if (totalSub) {
+                    const span = document.createElement('span');
+                    span.className = 'cell-sub';
+                    span.textContent = totalSub;
+                    tdTot.appendChild(span);
+                }
+                tr.appendChild(tdTot);
+
+                return tr;
+            }
+
+            function makeGroupHeader(title) {
+                const tr = document.createElement('tr');
+                tr.className = 'group-header';
+                const td = document.createElement('td');
+                td.colSpan = 6;
+                td.textContent = title;
+                tr.appendChild(td);
+                return tr;
+            }
+
+            const rows = [];
+
+            // LOWER FLOOR SECTION
+            rows.push(makeGroupHeader('LOWER FLOOR (PARTER • CLINKER BRICK • H = 280 CM)'));
+            rows.push(makeRow(
+                'Lower Wall Span (Net / Excluded Jambs)',
+                '',
+                s => ({
+                    main: s.lower.wallLengthMm.toLocaleString() + ' mm',
+                    sub: s.lower.excludedMm > 0 ? 'Excl. ' + s.lower.excludedMm + ' mm jambs (-' + s.lower.excludedAreaM2.toFixed(2) + ' m²)' : 'No excluded corner jambs'
+                }),
+                totals.lowerWallSpanMm.toLocaleString() + ' mm',
+                'Excl. ' + totals.lowerExcludedMm + ' mm (-' + totals.lowerExcludedM2.toFixed(2) + ' m²)'
+            ));
+            rows.push(makeRow(
+                'Lower Gross Wall Area & Openings Deducted',
+                '',
+                s => ({
+                    main: 'Gross: ' + s.lower.grossAreaM2.toFixed(2) + ' m²',
+                    sub: 'Windows/Doors: -' + s.lower.winAreaM2.toFixed(2) + ' m²'
+                }),
+                'Gross: ' + totals.lowerGrossM2.toFixed(2) + ' m²',
+                'Windows/Doors: -' + totals.lowerWinM2.toFixed(2) + ' m²'
+            ));
+            rows.push(makeRow(
+                '1) Total Lower Floor Net Clinker Brick',
+                'highlight-row',
+                s => ({
+                    main: fmtArea(s.lower.totalAreaM2),
+                    sub: 'Len: ' + fmtLen(s.lower.totalLengthMm)
+                }),
+                fmtArea(totals.lowerTotalM2),
+                'Len: ' + fmtLen(totals.lowerLenMm)
+            ));
+            rows.push(makeRow(
+                '3) Lower Floor Height > 185 cm',
+                'gt185-row',
+                s => ({
+                    main: fmtArea(s.lower.areaGt185M2),
+                    sub: 'Len: ' + fmtLen(s.lower.lengthGt185Mm)
+                }),
+                fmtArea(totals.lowerGt185M2),
+                'Len: ' + fmtLen(totals.lowerLenGt185Mm)
+            ));
+            rows.push(makeRow(
+                '5) Lower Floor Height ≤ 185 cm (under/above win)',
+                'le185-row',
+                s => ({
+                    main: fmtArea(s.lower.areaLe185M2),
+                    sub: 'Len: ' + fmtLen(s.lower.lengthLe185Mm)
+                }),
+                fmtArea(totals.lowerLe185M2),
+                'Len: ' + fmtLen(totals.lowerLenLe185Mm)
+            ));
+
+            // UPPER FLOOR SECTION
+            rows.push(makeGroupHeader('UPPER FLOOR (PIĘTRO • VERTICAL TIMBER SLATS • H = 270 CM)'));
+            rows.push(makeRow(
+                'Upper Wall Span (Net / Excluded Jambs)',
+                '',
+                s => ({
+                    main: s.upper.wallLengthMm.toLocaleString() + ' mm',
+                    sub: s.upper.excludedMm > 0 ? 'Excl. ' + s.upper.excludedMm + ' mm jambs (-' + s.upper.excludedAreaM2.toFixed(2) + ' m²)' : 'Jamb right of O13a excluded'
+                }),
+                totals.upperWallSpanMm.toLocaleString() + ' mm',
+                'Excl. ' + totals.upperExcludedMm + ' mm (-' + totals.upperExcludedM2.toFixed(2) + ' m²)'
+            ));
+            rows.push(makeRow(
+                'Upper Gross Wall Area & Openings Deducted',
+                '',
+                s => ({
+                    main: 'Gross: ' + s.upper.grossAreaM2.toFixed(2) + ' m²',
+                    sub: 'Windows: -' + s.upper.winAreaM2.toFixed(2) + ' m²'
+                }),
+                'Gross: ' + totals.upperGrossM2.toFixed(2) + ' m²',
+                'Windows: -' + totals.upperWinM2.toFixed(2) + ' m²'
+            ));
+            rows.push(makeRow(
+                '2) Total Upper Floor Net Timber Slats',
+                'highlight-row',
+                s => ({
+                    main: fmtArea(s.upper.totalAreaM2),
+                    sub: 'Len: ' + fmtLen(s.upper.totalLengthMm)
+                }),
+                fmtArea(totals.upperTotalM2),
+                'Len: ' + fmtLen(totals.upperLenMm)
+            ));
+            rows.push(makeRow(
+                '4) Upper Floor Height > 185 cm',
+                'gt185-row',
+                s => ({
+                    main: fmtArea(s.upper.areaGt185M2),
+                    sub: 'Len: ' + fmtLen(s.upper.lengthGt185Mm)
+                }),
+                fmtArea(totals.upperGt185M2),
+                'Len: ' + fmtLen(totals.upperLenGt185Mm)
+            ));
+            rows.push(makeRow(
+                '6) Upper Floor Height ≤ 185 cm (under/above win)',
+                'le185-row',
+                s => ({
+                    main: fmtArea(s.upper.areaLe185M2),
+                    sub: 'Len: ' + fmtLen(s.upper.lengthLe185Mm)
+                }),
+                fmtArea(totals.upperLe185M2),
+                'Len: ' + fmtLen(totals.upperLenLe185Mm)
+            ));
+
+            // COMBINED FACADE SECTION
+            rows.push(makeGroupHeader('COMBINED FACADE TOTALS (LOWER + UPPER FLOORS)'));
+            rows.push(makeRow(
+                'Combined Height > 185 cm [(3) + (4)]',
+                'gt185-row',
+                s => ({
+                    main: fmtArea(s.combinedGt185M2),
+                    sub: 'Len: ' + fmtLen(s.lower.lengthGt185Mm + s.upper.lengthGt185Mm)
+                }),
+                fmtArea(totals.combinedGt185M2),
+                'Len: ' + fmtLen(totals.combinedLenGt185Mm)
+            ));
+            rows.push(makeRow(
+                'Combined Height ≤ 185 cm [(5) + (6)]',
+                'le185-row',
+                s => ({
+                    main: fmtArea(s.combinedLe185M2),
+                    sub: 'Len: ' + fmtLen(s.lower.lengthLe185Mm + s.upper.lengthLe185Mm)
+                }),
+                fmtArea(totals.combinedLe185M2),
+                'Len: ' + fmtLen(totals.combinedLenLe185Mm)
+            ));
+            rows.push(makeRow(
+                'TOTAL NET FACADE AREA [(1) + (2)]',
+                'grand-row',
+                s => ({
+                    main: fmtArea(s.combinedTotalM2),
+                    sub: 'Len: ' + fmtLen(s.combinedTotalLengthMm)
+                }),
+                fmtArea(totals.combinedTotalM2),
+                'Len: ' + fmtLen(totals.combinedTotalLengthMm)
+            ));
+
+            // WINDOW JAMBS SECTION
+            rows.push(makeGroupHeader('WINDOW JAMBS (OŚCIEŻA OKIENNE • DEPTH = 20 CM / 200 MM • RAL 7021)'));
+            rows.push(makeRow(
+                'Lower Floor Window Jambs (200 mm depth)',
+                '',
+                s => ({
+                    main: fmtArea(s.jambs.lower.areaM2),
+                    sub: 'Len: ' + fmtLen(s.jambs.lower.lengthMm)
+                }),
+                fmtArea(totals.jambsLowerM2),
+                'Len: ' + fmtLen(totals.jambsLowerLenMm)
+            ));
+            rows.push(makeRow(
+                'Upper Floor Window Jambs (200 mm depth)',
+                '',
+                s => ({
+                    main: fmtArea(s.jambs.upper.areaM2),
+                    sub: 'Len: ' + fmtLen(s.jambs.upper.lengthMm)
+                }),
+                fmtArea(totals.jambsUpperM2),
+                'Len: ' + fmtLen(totals.jambsUpperLenMm)
+            ));
+            rows.push(makeRow(
+                'Total Window Jambs on Facade',
+                'highlight-row',
+                s => ({
+                    main: fmtArea(s.jambs.totalAreaM2),
+                    sub: 'Len: ' + fmtLen(s.jambs.totalLengthMm)
+                }),
+                fmtArea(totals.jambsTotalM2),
+                'Len: ' + fmtLen(totals.jambsTotalLenMm)
+            ));
+
+            tbody.replaceChildren(...rows);
+        }
+
+        window.addEventListener('DOMContentLoaded', function () {
+            applyAllFacadeDefaults();
+
+            const viewIds = ['north_facade', 'south_facade', 'west_facade', 'east_facade'];
+            const byView = {};
+            const list = [];
+
+            viewIds.forEach(viewId => {
+                const stats = WindowComponent.calculateFacadeAreas(viewId);
+                byView[viewId] = stats;
+                list.push(stats);
+            });
+
+            const sum = (fn) => round2(list.reduce((acc, item) => acc + fn(item), 0));
+
+            const totals = {
+                lowerWallSpanMm: list.reduce((a, b) => a + b.lower.wallLengthMm, 0),
+                lowerExcludedMm: list.reduce((a, b) => a + b.lower.excludedMm, 0),
+                lowerExcludedM2: sum(s => s.lower.excludedAreaM2),
+                lowerGrossM2: sum(s => s.lower.grossAreaM2),
+                lowerWinM2: sum(s => s.lower.winAreaM2),
+                lowerTotalM2: sum(s => s.lower.totalAreaM2),
+                lowerGt185M2: sum(s => s.lower.areaGt185M2),
+                lowerLe185M2: sum(s => s.lower.areaLe185M2),
+                lowerLenMm: list.reduce((a, b) => a + b.lower.totalLengthMm, 0),
+                lowerLenGt185Mm: list.reduce((a, b) => a + b.lower.lengthGt185Mm, 0),
+                lowerLenLe185Mm: list.reduce((a, b) => a + b.lower.lengthLe185Mm, 0),
+
+                upperWallSpanMm: list.reduce((a, b) => a + b.upper.wallLengthMm, 0),
+                upperExcludedMm: list.reduce((a, b) => a + b.upper.excludedMm, 0),
+                upperExcludedM2: sum(s => s.upper.excludedAreaM2),
+                upperGrossM2: sum(s => s.upper.grossAreaM2),
+                upperWinM2: sum(s => s.upper.winAreaM2),
+                upperTotalM2: sum(s => s.upper.totalAreaM2),
+                upperGt185M2: sum(s => s.upper.areaGt185M2),
+                upperLe185M2: sum(s => s.upper.areaLe185M2),
+                upperLenMm: list.reduce((a, b) => a + b.upper.totalLengthMm, 0),
+                upperLenGt185Mm: list.reduce((a, b) => a + b.upper.lengthGt185Mm, 0),
+                upperLenLe185Mm: list.reduce((a, b) => a + b.upper.lengthLe185Mm, 0),
+
+                combinedGrossM2: sum(s => s.lower.grossAreaM2 + s.upper.grossAreaM2),
+                combinedWinM2: sum(s => s.lower.winAreaM2 + s.upper.winAreaM2),
+                combinedTotalM2: sum(s => s.combinedTotalM2),
+                combinedGt185M2: sum(s => s.combinedGt185M2),
+                combinedLe185M2: sum(s => s.combinedLe185M2),
+                combinedTotalLengthMm: list.reduce((a, b) => a + b.combinedTotalLengthMm, 0),
+                combinedLenGt185Mm: list.reduce((a, b) => a + b.lower.lengthGt185Mm + b.upper.lengthGt185Mm, 0),
+                combinedLenLe185Mm: list.reduce((a, b) => a + b.lower.lengthLe185Mm + b.upper.lengthLe185Mm, 0),
+
+                jambsLowerM2: sum(s => s.jambs.lower.areaM2),
+                jambsLowerLenMm: list.reduce((a, b) => a + b.jambs.lower.lengthMm, 0),
+                jambsUpperM2: sum(s => s.jambs.upper.areaM2),
+                jambsUpperLenMm: list.reduce((a, b) => a + b.jambs.upper.lengthMm, 0),
+                jambsTotalM2: sum(s => s.jambs.totalAreaM2),
+                jambsTotalLenMm: list.reduce((a, b) => a + b.jambs.totalLengthMm, 0)
+            };
+
+            renderBuildingKpiCards(list, totals);
+            renderComparisonTable(byView, totals);
+
+            // Render individual facade summary cards
+            WindowComponent.mountFacadeAreaSummary('summary-card-north', 'north_facade');
+            WindowComponent.mountFacadeAreaSummary('summary-card-south', 'south_facade');
+            WindowComponent.mountFacadeAreaSummary('summary-card-west', 'west_facade');
+            WindowComponent.mountFacadeAreaSummary('summary-card-east', 'east_facade');
+        });
+    </script>
+</body>
+
+</html>
