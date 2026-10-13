@@ -84,7 +84,7 @@
                 if (isRal) {
                     strip.setAttribute('fill', '#1f2421');
                     strip.setAttribute('stroke', '#141816');
-                    strip.setAttribute('stroke-width', '1.2');
+                    strip.setAttribute('stroke-width', '2');
                     strip.setAttribute('opacity', '1');
                 } else {
                     strip.setAttribute('fill', floorFill);
@@ -230,7 +230,7 @@
         },
 
         _renderExteriorNorthFacade: function (win, x, y, w, h) {
-            const isCorner = win.id === 'O13a' || win.id === 'O13b' || win.id === 'O13b_1';
+            const isCorner = win.id === 'O13a' || win.id === 'O13a_2' || win.id === 'O13b' || win.id === 'O13b_1' || win.id === 'O13b_2';
             const isFullHeight = win.id === '14a'
                 || (win.floor === 'first' && win.sill <= 3430)
                 || (win.floor === 'ground' && win.sill <= 0);
@@ -664,7 +664,7 @@
                 upperExcludedNote: '',
                 upperBottomMm: 3430,
                 upperTopMm: 6130,
-                upperMaterial: 'Vertical Timber Slats (20,505 mm)'
+                upperMaterial: 'Vertical Timber Slats (20,505 mm; jamb right of O13a excluded)'
             },
             south_facade: {
                 lowerLengthMm: 20990,
@@ -681,18 +681,20 @@
                 upperMaterial: 'Vertical Timber Slats (20,990 mm)'
             },
             west_facade: {
-                lowerLengthMm: 21440,
+                lowerLengthMm: 21420,
                 lowerExcludedMm: 0,
                 lowerExcludedNote: '',
                 lowerBottomMm: 0,
                 lowerTopMm: 2800,
-                lowerMaterial: 'Clinker Brick (21,440 mm)',
-                upperLengthMm: 8800,
-                upperExcludedMm: 0,
-                upperExcludedNote: '',
+                lowerMaterial: 'Clinker Brick (21,420 mm)',
+                grossUpperLengthMm: 8790,
+                upperExcludedMm: 400, // 200 mm left of O13b_1 + 200 mm right of O13b_2 (height 1,950 mm from sill +4.18m to +6.13m)
+                upperExcludedHeightMm: 1950,
+                upperExcludedNote: 'Excl. 400×1,950 mm jambs (200 left of O13b + 200 right of O13b; wood 0–85 below included)',
+                upperLengthMm: 8390,
                 upperBottomMm: 3430,
                 upperTopMm: 6130,
-                upperMaterial: 'Vertical Timber Slats (8,800 mm)'
+                upperMaterial: 'Vertical Timber Slats (8,790 mm; 2×200 mm jambs above sill)'
             },
             east_facade: {
                 grossLowerLengthMm: 21415,
@@ -727,9 +729,13 @@
             const activeWindows = WindowStore.getByView(viewId) || [];
             const round2 = (v) => Math.round((v + Number.EPSILON) * 100) / 100;
 
-            function computeFloorStats(floorKey, wallLengthMm, floorBotMm, floorTopMm, materialLabel, excludedMm, excludedNote) {
+            function computeFloorStats(floorKey, wallLengthMm, floorBotMm, floorTopMm, materialLabel, excludedMm, excludedNote, excludedHeightMm) {
                 const floorHeightMm = floorTopMm - floorBotMm;
                 const floorWins = activeWindows.filter(w => w.floor === floorKey);
+                const exclMm = Number(excludedMm) || 0;
+                const exclHeightMm = (typeof excludedHeightMm === 'number' && excludedHeightMm > 0)
+                    ? Math.min(floorHeightMm, excludedHeightMm)
+                    : floorHeightMm;
 
                 let winSpanSumMm = 0;
                 let fullHeightWinSpanMm = 0;
@@ -834,6 +840,23 @@
                     }
                 });
 
+                // If excluded jamb strips start at window sill height (exclHeightMm < floorHeightMm),
+                // the wall material below those jamb strips (floorHeightMm - exclHeightMm) is still part of the facade!
+                const hBelowJamb = Math.max(0, floorHeightMm - exclHeightMm);
+                if (exclMm > 0 && hBelowJamb > 0) {
+                    const jambUnderM2 = (exclMm * hBelowJamb) / 1e6;
+                    const jambUnderLabel = `under jambs [len ${Math.round(exclMm).toLocaleString()} mm × ${Math.round(hBelowJamb / 10)} cm]`;
+                    if (hBelowJamb > thresholdMm) {
+                        areaGt185M2 += jambUnderM2;
+                        lengthGt185Mm += exclMm;
+                        gt185Parts.push(jambUnderLabel);
+                    } else {
+                        areaLe185M2 += jambUnderM2;
+                        lengthLe185Mm += exclMm;
+                        le185Parts.push(jambUnderLabel);
+                    }
+                }
+
                 const pierWidthMm = Math.max(0, wallLengthMm - winSpanSumMm);
                 const pierAreaM2 = (pierWidthMm * floorHeightMm) / 1e6;
                 if (pierWidthMm > 0) {
@@ -853,9 +876,9 @@
                 }
 
                 const exactTotalM2 = areaGt185M2 + areaLe185M2;
-                const grossAreaM2 = round2((wallLengthMm * floorHeightMm) / 1e6);
+                const grossAreaM2 = round2(((wallLengthMm + (hBelowJamb > 0 ? exclMm : 0)) * floorHeightMm) / 1e6);
                 const totalAreaM2 = round2(exactTotalM2);
-                const roundedWinAreaM2 = round2(grossAreaM2 - totalAreaM2);
+                const roundedWinAreaM2 = round2(winAreaM2);
                 const roundedLe185M2 = round2(areaLe185M2);
                 const roundedGt185M2 = round2(totalAreaM2 - roundedLe185M2);
 
@@ -866,11 +889,11 @@
                 const totalLengthM = round2(totalLengthMm / 1000);
                 const lengthGt185M = round2(totalLengthM - lengthLe185M);
 
-                const excludedAreaM2 = round2(((Number(excludedMm) || 0) * floorHeightMm) / 1e6);
+                const excludedAreaM2 = round2((exclMm * exclHeightMm) / 1e6);
 
                 return {
                     wallLengthMm,
-                    excludedMm: Number(excludedMm) || 0,
+                    excludedMm: exclMm,
                     excludedAreaM2,
                     excludedNote: excludedNote || '',
                     fullHeightWinSpanMm: Math.round(fullHeightWinSpanMm),
@@ -906,7 +929,8 @@
                 spec.lowerTopMm,
                 spec.lowerMaterial,
                 spec.lowerExcludedMm,
-                spec.lowerExcludedNote
+                spec.lowerExcludedNote,
+                spec.lowerExcludedHeightMm
             );
             const upper = computeFloorStats(
                 'first',
@@ -915,7 +939,8 @@
                 spec.upperTopMm,
                 spec.upperMaterial,
                 spec.upperExcludedMm,
-                spec.upperExcludedNote
+                spec.upperExcludedNote,
+                spec.upperExcludedHeightMm
             );
 
             const totalJambsAreaM2 = round2(lower.jambs.areaM2 + upper.jambs.areaM2);
