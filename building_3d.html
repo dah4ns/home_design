@@ -258,6 +258,47 @@
             text-align: right;
         }
 
+        .mat-select-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-top: 7px;
+        }
+
+        .mat-select-group:first-of-type {
+            margin-top: 2px;
+        }
+
+        .mat-select-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #cbd5e1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .mat-select {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.92);
+            color: #f8fafc;
+            border: 1px solid rgba(148, 163, 184, 0.32);
+            border-radius: 7px;
+            padding: 6px 9px;
+            font-family: 'Inter', sans-serif;
+            font-size: 11.5px;
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .mat-select:hover,
+        .mat-select:focus {
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.25);
+        }
+
         /* On-Screen Navigation Pad (Bottom Center) */
         .nav-hud-bar {
             position: absolute;
@@ -502,6 +543,32 @@
                     </div>
                 </div>
 
+                <!-- Facade Finishing Materials -->
+                <div class="dock-section">
+                    <div class="dock-title">
+                        <span>🧱 Facade Finishing Materials</span>
+                    </div>
+                    <div class="mat-select-group">
+                        <label class="mat-select-label" for="lower-mat-select">
+                            <span>Lower Floor (Parter)</span>
+                        </label>
+                        <select class="mat-select" id="lower-mat-select" onchange="onLowerMaterialChange(this.value)">
+                            <option value="default">Default (Graphite Clinker)</option>
+                            <option value="gloom_long">Gloom Long (380×40 mm)</option>
+                            <option value="moso_bamboo_rhombos">MOSO Bamboo Rhombos (double)</option>
+                        </select>
+                    </div>
+                    <div class="mat-select-group">
+                        <label class="mat-select-label" for="upper-mat-select">
+                            <span>Upper Floor (Piętro)</span>
+                        </label>
+                        <select class="mat-select" id="upper-mat-select" onchange="onUpperMaterialChange(this.value)">
+                            <option value="default">Default (Vertical Timber Slats)</option>
+                            <option value="moso_bamboo_rhombos">MOSO Bamboo Rhombos (double)</option>
+                        </select>
+                    </div>
+                </div>
+
                 <!-- Display Layers -->
                 <div class="dock-section">
                     <div class="dock-title">
@@ -509,8 +576,8 @@
                     </div>
                     <div class="preset-grid">
                         <button class="ctrl-btn active" id="toggle-labels" onclick="toggle3DLayer('labels', this)">🏷️ Window Tags</button>
-                        <button class="ctrl-btn active" id="toggle-dims" onclick="toggle3DLayer('dims', this)">📏 3D Dimensions</button>
-                        <button class="ctrl-btn active" id="toggle-levels" onclick="toggle3DLayer('levels', this)">📐 Height Levels</button>
+                        <button class="ctrl-btn" id="toggle-dims" onclick="toggle3DLayer('dims', this)">📏 3D Dimensions</button>
+                        <button class="ctrl-btn" id="toggle-levels" onclick="toggle3DLayer('levels', this)">📐 Height Levels</button>
                         <button class="ctrl-btn active" id="toggle-edges" onclick="toggle3DLayer('edges', this)">✏️ CAD Outlines</button>
                         <button class="ctrl-btn active" id="toggle-trees" onclick="toggle3DLayer('trees', this)">🌲 Pine Trees</button>
                         <button class="ctrl-btn active" id="toggle-jambs" onclick="toggleJambMaterial(this)">⬛ Jambs: RAL 7021</button>
@@ -543,16 +610,16 @@
                         <span>🧱 Materials &amp; Active Defaults</span>
                     </div>
                     <div class="legend-item">
-                        <span class="swatch" style="background: #383d47;"></span>
-                        <span><strong>Parter (+0.00 to +2.80m):</strong> Graphite Clinker Brick (137.18 m² net, 6 corners)</span>
+                        <span class="swatch" id="legend-lower-swatch" style="background: #383d47;"></span>
+                        <span><strong>Parter (+0.00 to +2.80m):</strong> <span id="legend-lower-desc">Graphite Clinker Brick (137.18 m² net, 6 corners)</span></span>
                     </div>
                     <div class="legend-item">
-                        <span class="swatch" style="background: #cbb497;"></span>
-                        <span><strong>Piętro (+3.43 to +6.13m):</strong> Vertical Thermo-Timber Slats (75.23 m² net)</span>
+                        <span class="swatch" id="legend-upper-swatch" style="background: #cbb497;"></span>
+                        <span><strong>Piętro (+3.43 to +6.13m):</strong> <span id="legend-upper-desc">Vertical Thermo-Timber Slats (75.23 m² net)</span></span>
                     </div>
                     <div class="legend-item">
-                        <span class="swatch" style="background: #181b22;"></span>
-                        <span><strong>Cornices (+2.80..+3.43m &amp; +6.13..+6.88m):</strong> Anthracite Metal Cassettes</span>
+                        <span class="swatch" style="background: #1f2421;"></span>
+                        <span><strong>Cornices / Gzyms (+2.80..+3.43m &amp; +6.13..+6.88m):</strong> RAL 7021 (#1f2421) Metal Cassettes</span>
                     </div>
                     <div class="legend-item">
                         <span class="swatch" style="background: #1f2421;"></span>
@@ -587,6 +654,7 @@
 
     <!-- Canonical Window & Coordinate Scripts -->
     <script src="data/windows.js"></script>
+    <script src="data/textures.js"></script>
     <script src="js/window-store.js"></script>
     <script src="js/coordinate-service.js"></script>
 
@@ -672,18 +740,66 @@
             target: { x: BUILDING_CENTER.x, y: 2.6, z: BUILDING_CENTER.z },
             projection: 'perspective',     // 'perspective' | 'orthographic'
             floorMode: 'all',              // 'all' | 'explode' | 'ground' | 'upper'
+            lowerMaterial: 'default',      // 'default' | 'gloom_long'
+            upperMaterial: 'default',      // 'default'
             jambMaterial: 'ral7021',       // 'ral7021' | 'floor'
             sunAzimuthDeg: 135,
             layers: {
                 labels: true,
-                dims: true,
-                levels: true,
+                dims: false,
+                levels: false,
                 edges: true,
                 trees: true
             },
             selectedOpeningId: 'O3',
             hoveredOpeningId: null,
             projectedLabels: []
+        };
+
+        const LOWER_FLOOR_MATERIALS = {
+            default: {
+                id: 'default',
+                label: 'Default (Graphite Clinker)',
+                textureKey: 'brick',
+                uvScale: 0.8,
+                swatchStyle: 'background: #383d47;',
+                legendDesc: 'Graphite Clinker Brick (137.18 m² net, 6 corners)'
+            },
+            gloom_long: {
+                id: 'gloom_long',
+                label: 'Gloom Long (380×40 mm)',
+                textureKey: 'brickGloomLong',
+                uvScale: 1.28, // ~0.78m per tile repeat -> 56 courses in 2,800 mm height
+                swatchStyle: 'background: #cfc8c0; background-image: url("textures/gloom_long.jpg"); background-size: cover;',
+                legendDesc: 'Gloom Long 380×40 mm Brick (137.18 m² net, 56 courses, 6 corners)'
+            },
+            moso_bamboo_rhombos: {
+                id: 'moso_bamboo_rhombos',
+                label: 'MOSO Bamboo Rhombos (double)',
+                textureKey: 'mosoBambooRhombos',
+                uvScale: { u: 1 / 0.72, v: 1 / 2.80 }, // 720 mm width (12 × 60 mm strips) × 2,800 mm full-floor single-plank height
+                swatchStyle: 'background: #674a34; background-image: url("textures/moso_bamboo_rhombos.png"); background-size: cover;',
+                legendDesc: 'MOSO Bamboo Rhombos (double) — 50 mm strip + 10 mm gap (137.18 m² net)'
+            }
+        };
+
+        const UPPER_FLOOR_MATERIALS = {
+            default: {
+                id: 'default',
+                label: 'Default (Vertical Timber Slats)',
+                textureKey: 'wood',
+                uvScale: 0.9,
+                swatchStyle: 'background: #cbb497;',
+                legendDesc: 'Vertical Thermo-Timber Slats (75.23 m² net)'
+            },
+            moso_bamboo_rhombos: {
+                id: 'moso_bamboo_rhombos',
+                label: 'MOSO Bamboo Rhombos (double)',
+                textureKey: 'mosoBambooRhombos',
+                uvScale: { u: 1 / 0.72, v: 1 / 2.80 }, // 720 mm width (12 × 60 mm strips) × 2,800 mm full-floor single-plank height
+                swatchStyle: 'background: #674a34; background-image: url("textures/moso_bamboo_rhombos.png"); background-size: cover;',
+                legendDesc: 'MOSO Bamboo Rhombos (double) — 50 mm strip + 10 mm gap (75.23 m² net)'
+            }
         };
 
         // Canonical 3D Opening Definitions (19 default openings across all 4 facades)
@@ -1067,6 +1183,53 @@
                 }
             }, 256, 256);
 
+            // 1b. Gloom Long (380×40 mm) Clinker Brick Texture (512x512 POT photo + procedural fallback)
+            textures.brickGloomLong = createCanvasTexture(glCtx, (ctx, w, h) => {
+                ctx.fillStyle = '#b4ada5'; // Warm light-grey mortar joint
+                ctx.fillRect(0, 0, w, h);
+                const rows = 16; // 16 courses × 50 mm pitch ≈ 800 mm
+                const cols = 2;  // 2 bricks × 390 mm pitch ≈ 780 mm
+                const rowH = h / rows;
+                const colW = w / cols;
+                const shades = ['#d3cdc6', '#ccc5bd', '#d7d1ca', '#c7bfb7', '#cfc8c0'];
+                for (let r = 0; r < rows; r++) {
+                    const offset = (r % 2 === 1) ? colW * 0.42 : (r % 3 === 0 ? colW * 0.18 : 0);
+                    for (let c = -1; c <= cols; c++) {
+                        const bx = c * colW + offset;
+                        const by = r * rowH;
+                        ctx.fillStyle = shades[(r * 5 + c * 3 + 100) % shades.length];
+                        ctx.fillRect(bx + 3, by + 3, colW - 6, rowH - 6);
+                        ctx.fillStyle = 'rgba(70, 65, 60, 0.18)';
+                        ctx.fillRect(bx + 3, by + rowH - 4.5, colW - 6, 1.5);
+                    }
+                }
+            }, 512, 512);
+
+            // Load the actual Gloom Long (380×40) photo texture into textures.brickGloomLong
+            const gloomImg = new Image();
+            gloomImg.onload = () => {
+                const c = document.createElement('canvas');
+                c.width = 512;
+                c.height = 512;
+                const ctx = c.getContext('2d');
+                // Flip vertically so WebGL V=0 (bottom of wall) maps to bottom of image
+                ctx.translate(0, 512);
+                ctx.scale(1, -1);
+                ctx.drawImage(gloomImg, 0, 0, 512, 512);
+
+                glCtx.bindTexture(glCtx.TEXTURE_2D, textures.brickGloomLong);
+                glCtx.texImage2D(glCtx.TEXTURE_2D, 0, glCtx.RGBA, glCtx.RGBA, glCtx.UNSIGNED_BYTE, c);
+                glCtx.generateMipmap(glCtx.TEXTURE_2D);
+                glCtx.texParameteri(glCtx.TEXTURE_2D, glCtx.TEXTURE_MIN_FILTER, glCtx.LINEAR_MIPMAP_LINEAR);
+                glCtx.texParameteri(glCtx.TEXTURE_2D, glCtx.TEXTURE_MAG_FILTER, glCtx.LINEAR);
+                glCtx.texParameteri(glCtx.TEXTURE_2D, glCtx.TEXTURE_WRAP_S, glCtx.REPEAT);
+                glCtx.texParameteri(glCtx.TEXTURE_2D, glCtx.TEXTURE_WRAP_T, glCtx.REPEAT);
+                renderFrame();
+            };
+            gloomImg.src = (window.FACADE_TEXTURES && window.FACADE_TEXTURES.gloom_long)
+                ? window.FACADE_TEXTURES.gloom_long
+                : 'textures/gloom_long.jpg';
+
             // 2. Vertical Natural Thermo-Timber Slats Texture (tile repeat: 1m x 1m)
             textures.wood = createCanvasTexture(glCtx, (ctx, w, h) => {
                 ctx.fillStyle = '#5d4c38';
@@ -1083,23 +1246,212 @@
                 }
             }, 256, 256);
 
-            // 3. Anthracite Metal Cassette Fascia Texture (tile repeat: 0.9m width)
+            // 2b. MOSO Bamboo Rhombos (double) — 50 mm vertical strip + 10 mm shadow gap
+            // Generated as full-height single planks (512 x 1024) spanning from floor bottom to top with zero horizontal cuts
+            const paintContinuousBambooPlanks = (ctx, w, h, srcImg) => {
+                const strips = 12;
+                const pitchPx = w / strips;
+                const stripPx = pitchPx * (50 / 60); // 50 mm strip out of 60 mm pitch
+
+                // Optional: sample clean interior band of user's graphic (avoiding top/bottom photo cut edges)
+                let srcData = null;
+                const sampleW = w;
+                const sampleH = 256;
+                if (srcImg) {
+                    const sc = document.createElement('canvas');
+                    sc.width = sampleW;
+                    sc.height = sampleH;
+                    const sctx = sc.getContext('2d');
+                    sctx.fillStyle = '#18100b';
+                    sctx.fillRect(0, 0, sampleW, sampleH);
+                    // Crop clean middle 70% vertically (12%..82%) so the bottom cut edge of the photo is completely excluded
+                    const sy = Math.floor(srcImg.height * 0.12);
+                    const sh = Math.floor(srcImg.height * 0.70);
+                    sctx.drawImage(srcImg, 0, sy, srcImg.width, sh, 0, 0, Math.round(w * (710 / 720)), sampleH);
+                    srcData = sctx.getImageData(0, 0, sampleW, sampleH).data;
+                }
+
+                const outImg = ctx.createImageData(w, h);
+                const dst = outImg.data;
+                const fallbackTones = [
+                    [108, 77, 55], [99, 70, 49], [114, 82, 59], [94, 66, 46],
+                    [105, 75, 53], [111, 79, 57], [97, 68, 48], [109, 78, 56],
+                    [102, 72, 51], [113, 81, 58], [96, 67, 47], [106, 76, 54]
+                ];
+
+                // Precompute per-column base color & vertical grain profile from the user's graphic
+                const colBaseR = new Float32Array(w);
+                const colBaseG = new Float32Array(w);
+                const colBaseB = new Float32Array(w);
+                const isGapCol = new Uint8Array(w);
+
+                for (let x = 0; x < w; x++) {
+                    const stripIdx = Math.min(strips - 1, Math.floor(x / pitchPx));
+                    const localX = x - stripIdx * pitchPx;
+                    const uStrip = localX / stripPx; // 0..1 across the 50 mm strip, >1 in the 10 mm gap
+
+                    if (srcData) {
+                        let sumR = 0, sumG = 0, sumB = 0;
+                        for (let sy = 0; sy < sampleH; sy++) {
+                            const idx = (sy * sampleW + x) * 4;
+                            sumR += srcData[idx];
+                            sumG += srcData[idx + 1];
+                            sumB += srcData[idx + 2];
+                        }
+                        colBaseR[x] = sumR / sampleH;
+                        colBaseG[x] = sumG / sampleH;
+                        colBaseB[x] = sumB / sampleH;
+                        const lum = 0.299 * colBaseR[x] + 0.587 * colBaseG[x] + 0.114 * colBaseB[x];
+                        if (uStrip >= 1.0 || lum < 38) {
+                            isGapCol[x] = 1;
+                        }
+                    } else {
+                        if (uStrip >= 1.0) {
+                            isGapCol[x] = 1;
+                            colBaseR[x] = 24;
+                            colBaseG[x] = 16;
+                            colBaseB[x] = 11;
+                        } else {
+                            const base = fallbackTones[stripIdx % fallbackTones.length];
+                            // Rhombus 3D profile shading across the 50 mm strip
+                            const bevel = (uStrip < 0.09)
+                                ? 1.10
+                                : (uStrip > 0.88 ? 0.72 : (1.03 - uStrip * 0.08));
+                            // Fine continuous bamboo vascular fiber lines along X
+                            const fiber = Math.sin(x * 1.9 + stripIdx * 2.3) * 4.5 + Math.cos(x * 4.7) * 2.5;
+                            colBaseR[x] = base[0] * bevel + fiber;
+                            colBaseG[x] = base[1] * bevel + fiber * 0.75;
+                            colBaseB[x] = base[2] * bevel + fiber * 0.55;
+                        }
+                    }
+                }
+
+                // Synthesize full-height (h = 1024 px = 2,800 mm) single unbroken planks from bottom to top
+                for (let x = 0; x < w; x++) {
+                    const stripIdx = Math.min(strips - 1, Math.floor(x / pitchPx));
+                    const localX = x - stripIdx * pitchPx;
+                    const uStrip = localX / stripPx;
+
+                    // Deterministic per-strip & per-fiber seeds so each plank has unique continuous full-length grain
+                    const stripSeed = (stripIdx * 73 + 19) % 97;
+                    const fiberPhase1 = x * 0.85 + stripSeed * 1.7;
+                    const fiberPhase2 = x * 2.35 + stripSeed * 3.1;
+                    // Subtle natural bamboo culm node positions (2 staggered nodes along a 2.8m single plank)
+                    const nodeY1 = ((stripIdx * 293 + 140) % 420) + 110;
+                    const nodeY2 = ((stripIdx * 389 + 560) % 380) + 560;
+
+                    for (let y = 0; y < h; y++) {
+                        const outIdx = (y * w + x) * 4;
+                        if (isGapCol[x]) {
+                            // Deep 10 mm shadow groove between 50 mm strips
+                            dst[outIdx] = 23;
+                            dst[outIdx + 1] = 15;
+                            dst[outIdx + 2] = 11;
+                            dst[outIdx + 3] = 255;
+                            continue;
+                        }
+
+                        let r = colBaseR[x];
+                        let g = colBaseG[x];
+                        let b = colBaseB[x];
+
+                        if (srcData) {
+                            // Sample grain residuals from the user's graphic using two smooth mirror-wrapped vertical waves
+                            // so the grain flows continuously from bottom (y=0) to top (y=h) with zero horizontal cuts
+                            const t1 = (y / h) * 2.0; // 0..2 (one full mirror cycle over the full floor height)
+                            const m1 = t1 <= 1.0 ? t1 : (2.0 - t1);
+                            const sy1 = Math.min(sampleH - 1, Math.max(0, Math.floor(m1 * (sampleH - 1))));
+
+                            const t2 = ((y / h) * 4.0 + (stripIdx * 0.23)) % 2.0;
+                            const m2 = t2 <= 1.0 ? t2 : (2.0 - t2);
+                            const sy2 = Math.min(sampleH - 1, Math.max(0, Math.floor(m2 * (sampleH - 1))));
+
+                            const idx1 = (sy1 * sampleW + x) * 4;
+                            const idx2 = (sy2 * sampleW + x) * 4;
+
+                            const dR = (srcData[idx1] - r) * 0.65 + (srcData[idx2] - r) * 0.35;
+                            const dG = (srcData[idx1 + 1] - g) * 0.65 + (srcData[idx2 + 1] - g) * 0.35;
+                            const dB = (srcData[idx1 + 2] - b) * 0.65 + (srcData[idx2 + 2] - b) * 0.35;
+
+                            r += dR;
+                            g += dG;
+                            b += dB;
+                        }
+
+                        // Continuous full-height vertical bamboo fiber striations (periodic over h so wrap is 100% seamless)
+                        const wy = (y / h) * Math.PI * 2;
+                        const longWave = Math.sin(wy + stripSeed * 0.5) * 2.8
+                            + Math.sin(wy * 3 + fiberPhase1) * 2.2
+                            + Math.cos(wy * 9 + fiberPhase2) * 1.6;
+
+                        // Subtle bamboo culm node ring (characteristic of real full-length thermo-bamboo planks)
+                        const distN1 = (y - nodeY1) + Math.sin(uStrip * Math.PI) * 3.0;
+                        const distN2 = (y - nodeY2) + Math.sin(uStrip * Math.PI) * 3.0;
+                        let nodeDelta = 0;
+                        if (Math.abs(distN1) < 9) {
+                            nodeDelta = -Math.exp(-(distN1 * distN1) / 14) * 9.5 + Math.exp(-((distN1 - 3) * (distN1 - 3)) / 10) * 4.5;
+                        } else if (Math.abs(distN2) < 9) {
+                            nodeDelta = -Math.exp(-(distN2 * distN2) / 14) * 9.5 + Math.exp(-((distN2 - 3) * (distN2 - 3)) / 10) * 4.5;
+                        }
+
+                        // Subtle rhombus chamfer highlight on left edge and shadow on right edge of each 50 mm strip
+                        let edgeMod = 0;
+                        if (uStrip < 0.06) edgeMod = 6.0 * (1 - uStrip / 0.06);
+                        else if (uStrip > 0.90 && uStrip < 1.0) edgeMod = -14.0 * ((uStrip - 0.90) / 0.10);
+
+                        const delta = longWave + nodeDelta + edgeMod;
+                        dst[outIdx] = Math.max(0, Math.min(255, Math.round(r + delta)));
+                        dst[outIdx + 1] = Math.max(0, Math.min(255, Math.round(g + delta * 0.78)));
+                        dst[outIdx + 2] = Math.max(0, Math.min(255, Math.round(b + delta * 0.58)));
+                        dst[outIdx + 3] = 255;
+                    }
+                }
+                ctx.putImageData(outImg, 0, 0);
+            };
+
+            textures.mosoBambooRhombos = createCanvasTexture(glCtx, (ctx, w, h) => {
+                paintContinuousBambooPlanks(ctx, w, h, null);
+            }, 512, 1024);
+
+            // Synthesize the full-height single-plank texture from the user's MOSO Bamboo Rhombos graphic
+            const mosoImg = new Image();
+            mosoImg.onload = () => {
+                const c = document.createElement('canvas');
+                c.width = 512;
+                c.height = 1024;
+                const ctx = c.getContext('2d');
+                paintContinuousBambooPlanks(ctx, 512, 1024, mosoImg);
+
+                glCtx.bindTexture(glCtx.TEXTURE_2D, textures.mosoBambooRhombos);
+                glCtx.texImage2D(glCtx.TEXTURE_2D, 0, glCtx.RGBA, glCtx.RGBA, glCtx.UNSIGNED_BYTE, c);
+                glCtx.generateMipmap(glCtx.TEXTURE_2D);
+                glCtx.texParameteri(glCtx.TEXTURE_2D, glCtx.TEXTURE_MIN_FILTER, glCtx.LINEAR_MIPMAP_LINEAR);
+                glCtx.texParameteri(glCtx.TEXTURE_2D, glCtx.TEXTURE_MAG_FILTER, glCtx.LINEAR);
+                glCtx.texParameteri(glCtx.TEXTURE_2D, glCtx.TEXTURE_WRAP_S, glCtx.REPEAT);
+                glCtx.texParameteri(glCtx.TEXTURE_2D, glCtx.TEXTURE_WRAP_T, glCtx.REPEAT);
+                renderFrame();
+            };
+            mosoImg.src = (window.FACADE_TEXTURES && window.FACADE_TEXTURES.moso_bamboo_rhombos)
+                ? window.FACADE_TEXTURES.moso_bamboo_rhombos
+                : 'textures/moso_bamboo_rhombos.png';
+
+            // 3. RAL 7021 (#1f2421) Metal Cassette Fascia / Gzyms Texture (tile repeat: 0.9m width)
             textures.fascia = createCanvasTexture(glCtx, (ctx, w, h) => {
                 const grad = ctx.createLinearGradient(0, 0, 0, h);
-                grad.addColorStop(0, '#252b37');
-                grad.addColorStop(0.5, '#1b2029');
-                grad.addColorStop(1, '#12151c');
+                grad.addColorStop(0, '#242a27');
+                grad.addColorStop(0.5, '#1f2421');
+                grad.addColorStop(1, '#161a18');
                 ctx.fillStyle = grad;
                 ctx.fillRect(0, 0, w, h);
                 // Vertical cassette panel reveal seam
-                ctx.fillStyle = '#090b0f';
+                ctx.fillStyle = '#0e1110';
                 ctx.fillRect(0, 0, 5, h);
-                ctx.fillStyle = 'rgba(255,255,255,0.08)';
+                ctx.fillStyle = 'rgba(255,255,255,0.07)';
                 ctx.fillRect(5, 0, 2, h);
                 // Top & bottom drip edge highlights
-                ctx.fillStyle = 'rgba(255,255,255,0.12)';
+                ctx.fillStyle = 'rgba(255,255,255,0.10)';
                 ctx.fillRect(0, 0, w, 4);
-                ctx.fillStyle = '#07090c';
+                ctx.fillStyle = '#0b0e0d';
                 ctx.fillRect(0, h - 5, w, 5);
             }, 256, 256);
 
@@ -1188,44 +1540,56 @@
             addBoxMm(x1, y1, z1, x2, y2, z2, color, uvScale = 1.0, yOffsetMeters = 0) {
                 const X1 = Math.min(x1, x2) / 1000;
                 const X2 = Math.max(x1, x2) / 1000;
-                const Y1 = Math.min(y1, y2) / 1000 + yOffsetMeters;
-                const Y2 = Math.max(y1, y2) / 1000 + yOffsetMeters;
+                const rawY1 = Math.min(y1, y2) / 1000;
+                const rawY2 = Math.max(y1, y2) / 1000;
+                const Y1 = rawY1 + yOffsetMeters;
+                const Y2 = rawY2 + yOffsetMeters;
                 const Z1 = Math.min(z1, z2) / 1000;
                 const Z2 = Math.max(z1, z2) / 1000;
 
-                const dx = (X2 - X1) * uvScale;
-                const dy = (Y2 - Y1) * uvScale;
-                const dz = (Z2 - Z1) * uvScale;
+                const isObjUv = (typeof uvScale === 'object' && uvScale !== null);
+                const uScale = isObjUv ? uvScale.u : uvScale;
+                const vScale = isObjUv ? uvScale.v : uvScale;
+
+                // World-aligned horizontal UVs & floor-base-aligned vertical UVs so planks and brick courses
+                // run continuously from floor bottom to floor top across piers, sills, and lintels
+                const floorBaseY = (rawY1 >= 3.40) ? 3.43 : 0.0;
+                const ux1 = X1 * uScale;
+                const ux2 = X2 * uScale;
+                const uz1 = Z1 * uScale;
+                const uz2 = Z2 * uScale;
+                const vy1 = (rawY1 - floorBaseY) * vScale;
+                const vy2 = (rawY2 - floorBaseY) * vScale;
 
                 // Front (+Z, South)
                 this.addQuad(
                     [X1, Y1, Z2], [X2, Y1, Z2], [X2, Y2, Z2], [X1, Y2, Z2],
-                    [0, 0, 1], [0, 0], [dx, 0], [dx, dy], [0, dy], color
+                    [0, 0, 1], [ux1, vy1], [ux2, vy1], [ux2, vy2], [ux1, vy2], color
                 );
                 // Back (-Z, North)
                 this.addQuad(
                     [X2, Y1, Z1], [X1, Y1, Z1], [X1, Y2, Z1], [X2, Y2, Z1],
-                    [0, 0, -1], [0, 0], [dx, 0], [dx, dy], [0, dy], color
+                    [0, 0, -1], [ux2, vy1], [ux1, vy1], [ux1, vy2], [ux2, vy2], color
                 );
                 // Right (+X, West)
                 this.addQuad(
                     [X2, Y1, Z2], [X2, Y1, Z1], [X2, Y2, Z1], [X2, Y2, Z2],
-                    [1, 0, 0], [0, 0], [dz, 0], [dz, dy], [0, dy], color
+                    [1, 0, 0], [uz2, vy1], [uz1, vy1], [uz1, vy2], [uz2, vy2], color
                 );
                 // Left (-X, East)
                 this.addQuad(
                     [X1, Y1, Z1], [X1, Y1, Z2], [X1, Y2, Z2], [X1, Y2, Z1],
-                    [-1, 0, 0], [0, 0], [dz, 0], [dz, dy], [0, dy], color
+                    [-1, 0, 0], [uz1, vy1], [uz2, vy1], [uz2, vy2], [uz1, vy2], color
                 );
                 // Top (+Y)
                 this.addQuad(
                     [X1, Y2, Z2], [X2, Y2, Z2], [X2, Y2, Z1], [X1, Y2, Z1],
-                    [0, 1, 0], [0, 0], [dx, 0], [dx, dz], [0, dz], color
+                    [0, 1, 0], [ux1, uz2], [ux2, uz2], [ux2, uz1], [ux1, uz1], color
                 );
                 // Bottom (-Y)
                 this.addQuad(
                     [X1, Y1, Z1], [X2, Y1, Z1], [X2, Y1, Z2], [X1, Y1, Z2],
-                    [0, -1, 0], [0, 0], [dx, 0], [dx, dz], [0, dz], color
+                    [0, -1, 0], [ux1, uz1], [ux2, uz1], [ux2, uz2], [ux1, uz2], color
                 );
             }
 
@@ -1483,6 +1847,11 @@
             const showUpper = (state.floorMode !== 'ground');
             const upperOffsetM = (state.floorMode === 'explode') ? 2.4 : 0.0;
 
+            const lowerMat = LOWER_FLOOR_MATERIALS[state.lowerMaterial] || LOWER_FLOOR_MATERIALS.default;
+            const upperMat = UPPER_FLOOR_MATERIALS[state.upperMaterial] || UPPER_FLOOR_MATERIALS.default;
+            const brickUv = lowerMat.uvScale;
+            const woodUv = upperMat.uvScale;
+
             const ralCol = [0.12, 0.14, 0.13]; // RAL 7021 (#1f2421)
 
             // ====================================================================
@@ -1531,7 +1900,7 @@
                     axis: 'x', fixedCoord: 2790, inwardSign: 1,
                     spanStart: -285, spanEnd: 11740, yBottom: 0, yTop: 2800, thickness: 240,
                     openings: groundOpenings.filter(o => o.facade === 'North Facade'),
-                    wallBuilder: brickBuilder, wallColor: [1, 1, 1], uvScale: 0.8,
+                    wallBuilder: brickBuilder, wallColor: [1, 1, 1], uvScale: brickUv,
                     jambBuilder, glassBuilder, garageBuilder, edges, yOffset: 0
                 });
                 addEdgeBoxMm(edges, -285, 0, 2790, 11740, 2800, 2790, [0.12, 0.15, 0.20], 0);
@@ -1541,7 +1910,7 @@
                     axis: 'z', fixedCoord: 11740, inwardSign: 1,
                     spanStart: -290, spanEnd: 2790, yBottom: 0, yTop: 2800, thickness: 240,
                     openings: [],
-                    wallBuilder: brickBuilder, wallColor: [0.92, 0.92, 0.94], uvScale: 0.8,
+                    wallBuilder: brickBuilder, wallColor: [0.92, 0.92, 0.94], uvScale: brickUv,
                     jambBuilder, glassBuilder, garageBuilder, edges, yOffset: 0
                 });
                 // Technical vent box on Garage East wall (matching east_facade.html)
@@ -1553,7 +1922,7 @@
                     axis: 'x', fixedCoord: -290, inwardSign: 1,
                     spanStart: 11740, spanEnd: 20705, yBottom: 0, yTop: 2800, thickness: 240,
                     openings: [],
-                    wallBuilder: brickBuilder, wallColor: [1, 1, 1], uvScale: 0.8,
+                    wallBuilder: brickBuilder, wallColor: [1, 1, 1], uvScale: brickUv,
                     jambBuilder, glassBuilder, garageBuilder, edges, yOffset: 0
                 });
                 addEdgeBoxMm(edges, 11740, 0, -290, 20705, 2800, -290, [0.12, 0.15, 0.20], 0);
@@ -1563,21 +1932,21 @@
                     axis: 'z', fixedCoord: 20705, inwardSign: -1,
                     spanStart: -290, spanEnd: 8560, yBottom: 0, yTop: 2800, thickness: 240,
                     openings: groundOpenings.filter(o => o.id === 'Z2'),
-                    wallBuilder: brickBuilder, wallColor: [1, 1, 1], uvScale: 0.8,
+                    wallBuilder: brickBuilder, wallColor: [1, 1, 1], uvScale: brickUv,
                     jambBuilder, glassBuilder, garageBuilder, edges, yOffset: 0
                 });
 
                 // 5. West Recessed Entrance Alcove (Wnęka Wejściowa Z1: Z = 8560..11020, recessed to X = 19555)
                 // North return wall of alcove (Z = 8560, X = 19555..20705)
-                brickBuilder.addBoxMm(19555, 0, 8560, 20705, 2800, 8760, [0.82, 0.82, 0.86], 0.8, 0);
+                brickBuilder.addBoxMm(19555, 0, 8560, 20705, 2800, 8760, [0.82, 0.82, 0.86], brickUv, 0);
                 // South return wall of alcove (Z = 11020, X = 19555..20705)
-                brickBuilder.addBoxMm(19555, 0, 10820, 20705, 2800, 11020, [0.82, 0.82, 0.86], 0.8, 0);
+                brickBuilder.addBoxMm(19555, 0, 10820, 20705, 2800, 11020, [0.82, 0.82, 0.86], brickUv, 0);
                 // Back wall of alcove with Entrance Door Z1 (X = 19555, Z = 8560..11020)
                 buildWallWithOpenings({
                     axis: 'z', fixedCoord: 19555, inwardSign: -1,
                     spanStart: 8560, spanEnd: 11020, yBottom: 0, yTop: 2800, thickness: 240,
                     openings: groundOpenings.filter(o => o.id === 'Z1'),
-                    wallBuilder: brickBuilder, wallColor: [0.86, 0.86, 0.90], uvScale: 0.8,
+                    wallBuilder: brickBuilder, wallColor: [0.86, 0.86, 0.90], uvScale: brickUv,
                     jambBuilder, glassBuilder, garageBuilder, edges, yOffset: 0
                 });
                 addEdgeBoxMm(edges, 19555, 0, 8560, 20705, 2800, 11020, [0.10, 0.12, 0.16], 0);
@@ -1587,7 +1956,7 @@
                     axis: 'z', fixedCoord: 20705, inwardSign: -1,
                     spanStart: 11020, spanEnd: 21130, yBottom: 0, yTop: 2800, thickness: 240,
                     openings: groundOpenings.filter(o => o.id === 'O8a'),
-                    wallBuilder: brickBuilder, wallColor: [1, 1, 1], uvScale: 0.8,
+                    wallBuilder: brickBuilder, wallColor: [1, 1, 1], uvScale: brickUv,
                     jambBuilder, glassBuilder, garageBuilder, edges, yOffset: 0
                 });
                 addEdgeBoxMm(edges, 20705, 0, -290, 20705, 2800, 21130, [0.12, 0.15, 0.20], 0);
@@ -1597,7 +1966,7 @@
                     axis: 'x', fixedCoord: 21130, inwardSign: -1,
                     spanStart: 14895, spanEnd: 20705, yBottom: 0, yTop: 2800, thickness: 200,
                     openings: groundOpenings.filter(o => o.id === 'O7'),
-                    wallBuilder: brickBuilder, wallColor: [1, 1, 1], uvScale: 0.8,
+                    wallBuilder: brickBuilder, wallColor: [1, 1, 1], uvScale: brickUv,
                     jambBuilder, glassBuilder, garageBuilder, edges, yOffset: 0
                 });
                 addEdgeBoxMm(edges, 16895, 0, 21130, 20705, 2800, 21130, [0.12, 0.15, 0.20], 0);
@@ -1607,7 +1976,7 @@
                     axis: 'z', fixedCoord: 14695, inwardSign: 1,
                     spanStart: 11580, spanEnd: 20930, yBottom: 0, yTop: 2800, thickness: 200,
                     openings: groundOpenings.filter(o => o.id === 'O6b' || o.id === 'O6a'),
-                    wallBuilder: brickBuilder, wallColor: [0.94, 0.94, 0.96], uvScale: 0.8,
+                    wallBuilder: brickBuilder, wallColor: [0.94, 0.94, 0.96], uvScale: brickUv,
                     jambBuilder, glassBuilder, garageBuilder, edges, yOffset: 0
                 });
                 // 200 × 200 mm bottom sill/plinth & top soffit cap at the recessed O7+O6b corner (X = 14695..14895, Z = 20930..21130)
@@ -1620,7 +1989,7 @@
                     axis: 'x', fixedCoord: 11580, inwardSign: -1,
                     spanStart: -85, spanEnd: 14695, yBottom: 0, yTop: 2800, thickness: 200,
                     openings: groundOpenings.filter(o => o.id === 'O5' || o.id === 'O4'),
-                    wallBuilder: brickBuilder, wallColor: [1, 1, 1], uvScale: 0.8,
+                    wallBuilder: brickBuilder, wallColor: [1, 1, 1], uvScale: brickUv,
                     jambBuilder, glassBuilder, garageBuilder, edges, yOffset: 0
                 });
                 addEdgeBoxMm(edges, 6215, 0, 11580, 14695, 2800, 11580, [0.12, 0.15, 0.20], 0);
@@ -1630,7 +1999,7 @@
                     axis: 'z', fixedCoord: -285, inwardSign: 1,
                     spanStart: 2790, spanEnd: 11380, yBottom: 0, yTop: 2800, thickness: 200,
                     openings: groundOpenings.filter(o => o.id === 'O3'),
-                    wallBuilder: brickBuilder, wallColor: [1, 1, 1], uvScale: 0.8,
+                    wallBuilder: brickBuilder, wallColor: [1, 1, 1], uvScale: brickUv,
                     jambBuilder, glassBuilder, garageBuilder, edges, yOffset: 0
                 });
                 // 200 × 200 mm bottom sill & top soffit cap at the recessed O4+O3 corner (X = -285..-85, Z = 11380..11580)
@@ -1638,21 +2007,21 @@
                 jambBuilder.addBoxMm(-285, 2784, 11380, -85, 2804, 11580, ralCol, 1.0, 0);
                 addEdgeBoxMm(edges, -285, 0, 2790, -285, 2800, 6290, [0.12, 0.15, 0.20], 0);
 
-                // 11. INTERMEDIATE CORNICE BAND (Gzyms Pośredni: Y = 2,800 to 3,430 mm, 100 mm overhang)
+                // 11. INTERMEDIATE CORNICE BAND (Gzyms Pośredni: Y = 2,800 to 3,430 mm, 100 mm overhang, RAL 7021)
                 // Central East-West block cornice
                 fasciaBuilder.addBoxMm(-385, 2800, 2690, 20805, 3430, 11680, [1, 1, 1], 1.1, 0);
-                addEdgeBoxMm(edges, -385, 2800, 2690, 20805, 3430, 11680, [0.05, 0.07, 0.10], 0);
+                addEdgeBoxMm(edges, -385, 2800, 2690, 20805, 3430, 11680, [0.06, 0.08, 0.07], 0);
                 // Protruding North-West Garage block cornice & flat roof
                 fasciaBuilder.addBoxMm(11640, 2800, -390, 20805, 3430, 2790, [1, 1, 1], 1.1, 0);
-                siteBuilder.addBoxMm(11840, 3430, -190, 20605, 3445, 2790, [0.22, 0.25, 0.30], 1.0, 0);
-                addEdgeBoxMm(edges, 11640, 2800, -390, 20805, 3430, 2790, [0.05, 0.07, 0.10], 0);
-                // Protruding South-West Gym block cornice & flat roof (extends 1,200 mm East of X = 14,695 mm wall -> X = 13,495 mm)
-                fasciaBuilder.addBoxMm(13495, 2800, 11580, 20805, 3430, 21230, [1, 1, 1], 1.1, 0);
-                siteBuilder.addBoxMm(13695, 3430, 11580, 20605, 3445, 21030, [0.22, 0.25, 0.30], 1.0, 0);
-                // Cantilevered 1,200 mm East soffit underside (X = 13,495..14,695 mm, Z = 11,580..21,230 mm)
-                jambBuilder.addBoxMm(13495, 2795, 11580, 14695, 2802, 21230, [0.09, 0.11, 0.14], 1.0, 0);
-                addEdgeBoxMm(edges, 13495, 2800, 11580, 20805, 3430, 21230, [0.05, 0.07, 0.10], 0);
-                addEdgeBoxMm(edges, 13495, 2800, 11580, 14695, 2800, 21230, [0.18, 0.22, 0.28], 0);
+                siteBuilder.addBoxMm(11840, 3430, -190, 20605, 3445, 2790, ralCol, 1.0, 0);
+                addEdgeBoxMm(edges, 11640, 2800, -390, 20805, 3430, 2790, [0.06, 0.08, 0.07], 0);
+                // Protruding South-West Gym block cornice & flat roof (extends 1,960 mm East of X = 14,695 mm wall -> X = 12,735 mm)
+                fasciaBuilder.addBoxMm(12735, 2800, 11580, 20805, 3430, 21230, [1, 1, 1], 1.1, 0);
+                siteBuilder.addBoxMm(12935, 3430, 11580, 20605, 3445, 21030, ralCol, 1.0, 0);
+                // Cantilevered 1,960 mm East soffit underside (X = 12,735..14,695 mm, Z = 11,580..21,230 mm)
+                jambBuilder.addBoxMm(12735, 2795, 11580, 14695, 2802, 21230, ralCol, 1.0, 0);
+                addEdgeBoxMm(edges, 12735, 2800, 11580, 20805, 3430, 21230, [0.06, 0.08, 0.07], 0);
+                addEdgeBoxMm(edges, 12735, 2800, 11580, 14695, 2800, 21230, [0.12, 0.14, 0.13], 0);
             }
 
             // ====================================================================
@@ -1666,12 +2035,12 @@
                     axis: 'x', fixedCoord: 2790, inwardSign: 1,
                     spanStart: 6515, spanEnd: 20505, yBottom: 3430, yTop: 6130, thickness: 200,
                     openings: upperOpenings.filter(o => o.facade === 'North Facade'),
-                    wallBuilder: woodBuilder, wallColor: [1, 1, 1], uvScale: 0.9,
+                    wallBuilder: woodBuilder, wallColor: [1, 1, 1], uvScale: woodUv,
                     jambBuilder, glassBuilder, garageBuilder, edges, yOffset: upperOffsetM
                 });
                 // North-West Upper Corner (X = 20505..20705, Z = 2790..2990):
                 // Only the bottom 850 mm parapet (3430..4180) is at the outer corner; above 4180 mm, O13a and O13b_1 meet at recessed corner (20505, 2990)!
-                woodBuilder.addBoxMm(20505, 3430, 2790, 20705, 4180, 2990, [1, 1, 1], 0.9, upperOffsetM);
+                woodBuilder.addBoxMm(20505, 3430, 2790, 20705, 4180, 2990, [1, 1, 1], woodUv, upperOffsetM);
                 jambBuilder.addBoxMm(20505, 4168, 2790, 20705, 4192, 2990, ralCol, 1.0, upperOffsetM);
                 jambBuilder.addBoxMm(20505, 6114, 2790, 20705, 6134, 2990, ralCol, 1.0, upperOffsetM);
                 addEdgeBoxMm(edges, 6515, 3430, 2790, 20705, 4180, 2790, [0.35, 0.28, 0.20], upperOffsetM);
@@ -1681,12 +2050,12 @@
                     axis: 'z', fixedCoord: 20705, inwardSign: -1,
                     spanStart: 2990, spanEnd: 11380, yBottom: 3430, yTop: 6130, thickness: 200,
                     openings: upperOpenings.filter(o => o.facade === 'West Facade'),
-                    wallBuilder: woodBuilder, wallColor: [1, 1, 1], uvScale: 0.9,
+                    wallBuilder: woodBuilder, wallColor: [1, 1, 1], uvScale: woodUv,
                     jambBuilder, glassBuilder, garageBuilder, edges, yOffset: upperOffsetM
                 });
                 // South-West Upper Corner (Z = 11380..11580, X = 20505..20705):
                 // Only the bottom 850 mm parapet (3430..4180) is at the outer corner; above 4180 mm, O13b_2 and O13a_2 meet at recessed corner (20505, 11380)!
-                woodBuilder.addBoxMm(20505, 3430, 11380, 20705, 4180, 11580, [1, 1, 1], 0.9, upperOffsetM);
+                woodBuilder.addBoxMm(20505, 3430, 11380, 20705, 4180, 11580, [1, 1, 1], woodUv, upperOffsetM);
                 jambBuilder.addBoxMm(20505, 4168, 11380, 20705, 4192, 11580, ralCol, 1.0, upperOffsetM);
                 jambBuilder.addBoxMm(20505, 6114, 11380, 20705, 6134, 11580, ralCol, 1.0, upperOffsetM);
                 addEdgeBoxMm(edges, 20705, 3430, 2790, 20705, 4180, 11580, [0.35, 0.28, 0.20], upperOffsetM);
@@ -1696,7 +2065,7 @@
                     axis: 'x', fixedCoord: 11580, inwardSign: -1,
                     spanStart: -85, spanEnd: 20505, yBottom: 3430, yTop: 6130, thickness: 200,
                     openings: upperOpenings.filter(o => o.facade === 'South Facade'),
-                    wallBuilder: woodBuilder, wallColor: [1, 1, 1], uvScale: 0.9,
+                    wallBuilder: woodBuilder, wallColor: [1, 1, 1], uvScale: woodUv,
                     jambBuilder, glassBuilder, garageBuilder, edges, yOffset: upperOffsetM
                 });
                 addEdgeBoxMm(edges, 6215, 3430, 11580, 20705, 4180, 11580, [0.35, 0.28, 0.20], upperOffsetM);
@@ -1706,7 +2075,7 @@
                     axis: 'z', fixedCoord: -285, inwardSign: 1,
                     spanStart: 5890, spanEnd: 11380, yBottom: 3430, yTop: 6130, thickness: 200,
                     openings: upperOpenings.filter(o => o.id === 'O9'),
-                    wallBuilder: woodBuilder, wallColor: [1, 1, 1], uvScale: 0.9,
+                    wallBuilder: woodBuilder, wallColor: [1, 1, 1], uvScale: woodUv,
                     jambBuilder, glassBuilder, garageBuilder, edges, yOffset: upperOffsetM
                 });
                 // 200 × 200 mm bottom sill & top soffit cap at the recessed O10+O9 corner (X = -285..-85, Z = 11380..11580)
@@ -1718,7 +2087,7 @@
                 // Terrace gres floor deck
                 terraceBuilder.addBoxMm(-285, 3430, 2790, 6315, 3460, 5890, [0.92, 0.94, 0.96], 0.6, upperOffsetM);
                 // Recessed North-facing back wall of terrace (X = -285..6315, Z = 5890)
-                woodBuilder.addBoxMm(-285, 3430, 5890, 6315, 6130, 6090, [0.88, 0.86, 0.82], 0.9, upperOffsetM);
+                woodBuilder.addBoxMm(-285, 3430, 5890, 6315, 6130, 6090, [0.88, 0.86, 0.82], woodUv, upperOffsetM);
                 addEdgeBoxMm(edges, -285, 3430, 5890, 6315, 6130, 5890, [0.35, 0.28, 0.20], upperOffsetM);
 
                 // Recessed East-facing wall of terrace with O14b + D1 (X = 6315, Z = 2990..5890; O14b meets 14a at recessed corner X=6515, Z=2990)
@@ -1726,14 +2095,14 @@
                     axis: 'z', fixedCoord: 6315, inwardSign: 1,
                     spanStart: 2990, spanEnd: 5890, yBottom: 3430, yTop: 6130, thickness: 200,
                     openings: upperOpenings.filter(o => o.id === 'O14b'),
-                    wallBuilder: woodBuilder, wallColor: [0.92, 0.90, 0.86], uvScale: 0.9,
+                    wallBuilder: woodBuilder, wallColor: [0.92, 0.90, 0.86], uvScale: woodUv,
                     jambBuilder, glassBuilder, garageBuilder, edges, yOffset: upperOffsetM
                 });
                 jambBuilder.addBoxMm(6315, 3418, 2790, 6515, 3444, 2990, ralCol, 1.0, upperOffsetM);
                 jambBuilder.addBoxMm(6315, 6114, 2790, 6515, 6134, 2990, ralCol, 1.0, upperOffsetM);
 
                 // North-East Corner Support Column & 220 mm Timber Slat Return (X = -285..0, Z = 2790)
-                woodBuilder.addBoxMm(-285, 3430, 2790, -65, 6130, 2990, [0.82, 0.78, 0.72], 0.9, upperOffsetM);
+                woodBuilder.addBoxMm(-285, 3430, 2790, -65, 6130, 2990, [0.82, 0.78, 0.72], woodUv, upperOffsetM);
                 jambBuilder.addBoxMm(-65, 3430, 2790, 85, 6130, 2940, ralCol, 1.0, upperOffsetM);
 
                 // Glass Balustrade along North (X = 0..6315, Z = 2790) and East (X = -285, Z = 2790..5890), H = 950 mm
@@ -1743,11 +2112,11 @@
                 jambBuilder.addBoxMm(-285, 4360, 2780, 6315, 4410, 2840, ralCol, 1.0, upperOffsetM);
                 jambBuilder.addBoxMm(-295, 4360, 2780, -235, 4410, 5890, ralCol, 1.0, upperOffsetM);
 
-                // 6. MAIN CANTILEVERED FLAT ROOF ATTICA CORNICE (Y = 6,130 to 6,880 mm, 300 mm overhang all around)
+                // 6. MAIN CANTILEVERED FLAT ROOF ATTICA CORNICE (Y = 6,130 to 6,880 mm, 300 mm overhang all around, RAL 7021)
                 fasciaBuilder.addBoxMm(-585, 6130, 2490, 21005, 6880, 11880, [1, 1, 1], 1.1, upperOffsetM);
                 // Flat roof inner membrane surface
-                siteBuilder.addBoxMm(-385, 6880, 2690, 20805, 6900, 11680, [0.16, 0.19, 0.24], 1.0, upperOffsetM);
-                addEdgeBoxMm(edges, -585, 6130, 2490, 21005, 6880, 11880, [0.05, 0.07, 0.10], upperOffsetM);
+                siteBuilder.addBoxMm(-385, 6880, 2690, 20805, 6900, 11680, ralCol, 1.0, upperOffsetM);
+                addEdgeBoxMm(edges, -585, 6130, 2490, 21005, 6880, 11880, [0.06, 0.08, 0.07], upperOffsetM);
 
                 // 7. ROOF CHIMNEY / VENTILATION SHAFT (+6.88 m to +7.26 m = 380 mm above roof)
                 siteBuilder.addBoxMm(14115, 6880, 6450, 15015, 7220, 7400, [0.85, 0.88, 0.92], 1.0, upperOffsetM);
@@ -1759,8 +2128,8 @@
             const opaque = [
                 siteBuilder.toBatch(glCtx, null, false, 1.0),
                 terraceBuilder.toBatch(glCtx, textures.terrace, true, 1.0),
-                brickBuilder.toBatch(glCtx, textures.brick, true, 1.0),
-                woodBuilder.toBatch(glCtx, textures.wood, true, 1.0),
+                brickBuilder.toBatch(glCtx, textures[lowerMat.textureKey] || textures.brick, true, 1.0),
+                woodBuilder.toBatch(glCtx, textures[upperMat.textureKey] || textures.wood, true, 1.0),
                 fasciaBuilder.toBatch(glCtx, textures.fascia, true, 1.0),
                 garageBuilder.toBatch(glCtx, textures.garage, true, 1.0),
                 jambBuilder.toBatch(glCtx, null, false, 1.0),
@@ -2043,7 +2412,7 @@
                 const dimLines = [
                     { p1: [-0.285, 0.05, -1.6], p2: [20.705, 0.05, -1.6], label: '🧭 NORTH: 20,590 mm Parter / 20,505 mm Piętro', color: '#38bdf8' },
                     { p1: [-0.285, 0.05, 22.5], p2: [20.705, 0.05, 22.5], label: '☀️ SOUTH: 20,990 mm (14,980 Recessed + 6,010 SW Wing)', color: '#fbbf24' },
-                    { p1: [13.495, 3.46, 21.23], p2: [14.695, 3.46, 21.23], label: '↔ 1,200 mm Wing Roof Overhang (East)', color: '#f97316' },
+                    { p1: [12.735, 3.46, 21.23], p2: [14.695, 3.46, 21.23], label: '↔ 1,960 mm Wing Roof Overhang (East)', color: '#f97316' },
                     { p1: [22.1, 0.05, -0.29], p2: [22.1, 0.05, 21.13], label: '🚪 WEST: 21,420 mm Parter / 8,790 mm Piętro', color: '#c084fc' },
                     { p1: [-1.8, 0.05, -0.29], p2: [-1.8, 0.05, 21.13], label: '🌅 EAST: 21,415 mm (3,105 N + 8,785 Center + 9,525 S)', color: '#4ade80' }
                 ];
@@ -2323,6 +2692,35 @@
             renderFrame();
         }
 
+        function updateMaterialsLegend() {
+            const lowerMat = LOWER_FLOOR_MATERIALS[state.lowerMaterial] || LOWER_FLOOR_MATERIALS.default;
+            const upperMat = UPPER_FLOOR_MATERIALS[state.upperMaterial] || UPPER_FLOOR_MATERIALS.default;
+
+            const lowerSwatch = document.getElementById('legend-lower-swatch');
+            const lowerDesc = document.getElementById('legend-lower-desc');
+            if (lowerSwatch) lowerSwatch.setAttribute('style', lowerMat.swatchStyle);
+            if (lowerDesc) lowerDesc.textContent = lowerMat.legendDesc;
+
+            const upperSwatch = document.getElementById('legend-upper-swatch');
+            const upperDesc = document.getElementById('legend-upper-desc');
+            if (upperSwatch) upperSwatch.setAttribute('style', upperMat.swatchStyle);
+            if (upperDesc) upperDesc.textContent = upperMat.legendDesc;
+        }
+
+        function onLowerMaterialChange(val) {
+            state.lowerMaterial = LOWER_FLOOR_MATERIALS[val] ? val : 'default';
+            updateMaterialsLegend();
+            buildSceneGeometry(gl);
+            renderFrame();
+        }
+
+        function onUpperMaterialChange(val) {
+            state.upperMaterial = UPPER_FLOOR_MATERIALS[val] ? val : 'default';
+            updateMaterialsLegend();
+            buildSceneGeometry(gl);
+            renderFrame();
+        }
+
         function onSunSliderChange(val) {
             state.sunAzimuthDeg = Number(val);
             document.getElementById('sun-label').textContent = Math.round(state.sunAzimuthDeg) + '°';
@@ -2438,7 +2836,7 @@
             }, { passive: false });
 
             window.addEventListener('keydown', e => {
-                if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+                if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT')) return;
                 const step = 28;
                 switch (e.key.toLowerCase()) {
                     case 'w':
@@ -2486,6 +2884,7 @@
             program = createProgram(gl, VS_SOURCE, FS_SOURCE);
             lineProgram = createProgram(gl, LINE_VS_SOURCE, LINE_FS_SOURCE);
             initProceduralTextures(gl);
+            updateMaterialsLegend();
             buildSceneGeometry(gl);
             updateInspectorPanel(state.selectedOpeningId);
             setupMouseAndKeyboardControls();

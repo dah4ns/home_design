@@ -758,11 +758,11 @@
                             <line x1="0" y1="0" x2="10" y2="10" stroke="#64748b" stroke-width="0.8" opacity="0.55" />
                         </pattern>
 
-                        <!-- Metal Fascia / Attica Gradient (Anthracite / Light Cassette Paneling) -->
+                        <!-- Metal Fascia / Attica Gradient (RAL 7021 #1f2421) -->
                         <linearGradient id="fascia-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                            <stop offset="0%" stop-color="#222731" />
-                            <stop offset="50%" stop-color="#181b22" />
-                            <stop offset="100%" stop-color="#0d0f14" />
+                            <stop offset="0%" stop-color="#242a27" />
+                            <stop offset="50%" stop-color="#1f2421" />
+                            <stop offset="100%" stop-color="#161a18" />
                         </linearGradient>
 
                         <!-- Glass Glazing Gradient (Reflective Tinted Glass) -->
@@ -842,17 +842,17 @@
                     </g>
 
                     <!-- ==================================== -->
-                    <!-- INTERMEDIATE CORNICE (GZYMS POŚREDNI) & WING ROOF (+1,200 mm EAST OVERHANG) -->
+                    <!-- INTERMEDIATE CORNICE (GZYMS POŚREDNI) & WING ROOF (+1,960 mm EAST OVERHANG) -->
                     <!-- Level: +2.80m (Y=-280) to +3.43m (Y=-343) = 630 mm high -->
-                    <!-- Protruding Left Wing Roof: X = -10 to 721 (6,010 mm wing + 1,200 mm East overhang = 7,210 mm) -->
-                    <!-- Recessed Main Building Cornice: X = 721 to 2109 -->
+                    <!-- Protruding Left Wing Roof: X = -10 to 797 (6,010 mm wing + 1,960 mm East overhang = 7,970 mm) -->
+                    <!-- Recessed Main Building Cornice: X = 797 to 2109 -->
                     <!-- ==================================== -->
                     <g id="intermediate-cornice" class="interactive-element" onclick="showElementDetails('CORNICE')">
-                        <!-- 1. Recessed Main Building Cornice (X = 721 to 2109 — IN THE BACK) -->
-                        <rect x="721" y="-280" width="1388" height="6" fill="#090b0e" />
-                        <polygon points="721,-343 2109,-343 2109,-280 721,-280" fill="url(#fascia-gradient)" stroke="#0a0c10" stroke-width="1.4" />
-                        <line x1="721" y1="-343" x2="2109" y2="-343" stroke="#475569" stroke-width="1.2" />
-                        <line x1="721" y1="-280" x2="2109" y2="-280" stroke="#1e293b" stroke-width="1" />
+                        <!-- 1. Recessed Main Building Cornice (X = 797 to 2109 — IN THE BACK) -->
+                        <rect x="797" y="-280" width="1312" height="6" fill="#090b0e" />
+                        <polygon points="797,-343 2109,-343 2109,-280 797,-280" fill="url(#fascia-gradient)" stroke="#0a0c10" stroke-width="1.4" />
+                        <line x1="797" y1="-343" x2="2109" y2="-343" stroke="#475569" stroke-width="1.2" />
+                        <line x1="797" y1="-280" x2="2109" y2="-280" stroke="#1e293b" stroke-width="1" />
                         <line x1="800" y1="-343" x2="800" y2="-280" stroke="#2d3748" stroke-width="1" />
                         <line x1="880" y1="-343" x2="880" y2="-280" stroke="#2d3748" stroke-width="1" />
                         <line x1="960" y1="-343" x2="960" y2="-280" stroke="#2d3748" stroke-width="1" />
@@ -871,14 +871,14 @@
                         <line x1="2000" y1="-343" x2="2000" y2="-280" stroke="#2d3748" stroke-width="1" />
                         <line x1="2099" y1="-343" x2="2099" y2="-280" stroke="#2d3748" stroke-width="1.2" />
 
-                        <!-- Lateral depth shadow cast by the protruding wing roof (at X = 721) onto the recessed cornice -->
-                        <rect x="721" y="-343" width="24" height="63" fill="#000000" opacity="0.38" pointer-events="none" />
+                        <!-- Lateral depth shadow cast by the protruding wing roof (at X = 797) onto the recessed cornice -->
+                        <rect x="797" y="-343" width="24" height="63" fill="#000000" opacity="0.38" pointer-events="none" />
 
-                        <!-- 2. Protruding Left Wing Roof (X = -10 to 721 — IN FRONT, extending 1,200 mm East of X = 601 wall) -->
-                        <rect x="-10" y="-280" width="731" height="6" fill="#090b0e" />
-                        <polygon points="-10,-343 721,-343 721,-280 -10,-280" fill="url(#fascia-gradient)" stroke="#0a0c10" stroke-width="2" filter="url(#shadow)" />
-                        <line x1="-10" y1="-343" x2="721" y2="-343" stroke="#64748b" stroke-width="1.5" />
-                        <line x1="-10" y1="-280" x2="721" y2="-280" stroke="#1e293b" stroke-width="1.2" />
+                        <!-- 2. Protruding Left Wing Roof (X = -10 to 797 — IN FRONT, extending 1,960 mm East of X = 601 wall) -->
+                        <rect x="-10" y="-280" width="807" height="6" fill="#090b0e" />
+                        <polygon points="-10,-343 797,-343 797,-280 -10,-280" fill="url(#fascia-gradient)" stroke="#0a0c10" stroke-width="2" filter="url(#shadow)" />
+                        <line x1="-10" y1="-343" x2="797" y2="-343" stroke="#64748b" stroke-width="1.5" />
+                        <line x1="-10" y1="-280" x2="797" y2="-280" stroke="#1e293b" stroke-width="1.2" />
                         <line x1="0" y1="-343" x2="0" y2="-280" stroke="#2d3748" stroke-width="1.2" />
                         <line x1="80" y1="-343" x2="80" y2="-280" stroke="#2d3748" stroke-width="1" />
                         <line x1="160" y1="-343" x2="160" y2="-280" stroke="#2d3748" stroke-width="1" />
@@ -890,17 +890,18 @@
                         <!-- Dashed alignment marker at X = 601 showing the wing wall corner below the cantilevered roof -->
                         <line x1="601" y1="-343" x2="601" y2="-280" stroke="#f59e0b" stroke-width="1.4" stroke-dasharray="4 3" opacity="0.85" />
                         <line x1="640" y1="-343" x2="640" y2="-280" stroke="#2d3748" stroke-width="1" />
-                        <!-- East edge of the 1,200 mm cantilevered wing roof at X = 721 (6,010 + 1,200 = 7,210 mm) -->
-                        <line x1="721" y1="-343" x2="721" y2="-280" stroke="#f59e0b" stroke-width="2.2" />
+                        <line x1="720" y1="-343" x2="720" y2="-280" stroke="#2d3748" stroke-width="1" />
+                        <!-- East edge of the 1,960 mm cantilevered wing roof at X = 797 (6,010 + 1,960 = 7,970 mm) -->
+                        <line x1="797" y1="-343" x2="797" y2="-280" stroke="#f59e0b" stroke-width="2.2" />
 
-                        <!-- Readable Architectural Callout for the 1,200 mm East Wing Roof Overhang (X = 601 to 721) -->
+                        <!-- Readable Architectural Callout for the 1,960 mm East Wing Roof Overhang (X = 601 to 797) -->
                         <g pointer-events="none">
-                            <rect x="601" y="-343" width="120" height="63" fill="#f59e0b" fill-opacity="0.10" />
-                            <line x1="604" y1="-311.5" x2="718" y2="-311.5" stroke="#fbbf24" stroke-width="1.5" />
+                            <rect x="601" y="-343" width="196" height="63" fill="#f59e0b" fill-opacity="0.10" />
+                            <line x1="604" y1="-311.5" x2="794" y2="-311.5" stroke="#fbbf24" stroke-width="1.5" />
                             <polyline points="612,-316.5 604,-311.5 612,-306.5" fill="none" stroke="#fbbf24" stroke-width="1.5" />
-                            <polyline points="710,-316.5 718,-311.5 710,-306.5" fill="none" stroke="#fbbf24" stroke-width="1.5" />
-                            <rect x="615" y="-322" width="92" height="20" rx="3" fill="#0f172a" fill-opacity="0.92" stroke="#f59e0b" stroke-width="1" />
-                            <text x="661" y="-308.5" font-family="'JetBrains Mono', monospace" font-size="9.5" font-weight="800" fill="#fde68a" text-anchor="middle">+1,200 dach</text>
+                            <polyline points="786,-316.5 794,-311.5 786,-306.5" fill="none" stroke="#fbbf24" stroke-width="1.5" />
+                            <rect x="653" y="-322" width="92" height="20" rx="3" fill="#0f172a" fill-opacity="0.92" stroke="#f59e0b" stroke-width="1" />
+                            <text x="699" y="-308.5" font-family="'JetBrains Mono', monospace" font-size="9.5" font-weight="800" fill="#fde68a" text-anchor="middle">+1,960 dach</text>
                         </g>
                     </g>
 
@@ -980,8 +981,8 @@
                     <g id="layer-shadows" pointer-events="none">
                         <!-- Depth Shadow cast by Projecting Left Ground-Floor Volume (X = 0..601) onto Recessed Brick Pier (X = 601..657) -->
                         <polygon points="601,-280 601,2 657,2 657,-280" fill="#000000" opacity="0.28" />
-                        <!-- Deeper soffit shadow under the 1,200 mm East Wing Roof Overhang (X = 601..721) -->
-                        <rect x="601" y="-280" width="120" height="28" fill="#000000" opacity="0.42" />
+                        <!-- Deeper soffit shadow under the 1,960 mm East Wing Roof Overhang (X = 601..797) -->
+                        <rect x="601" y="-280" width="196" height="28" fill="#000000" opacity="0.42" />
                         <!-- Roof overhang soffit shadow -->
                         <rect x="0" y="-613" width="2099" height="24" fill="#000000" opacity="0.35" />
                         <!-- Intermediate cornice shadow on ground floor wall -->
@@ -1289,7 +1290,7 @@
                     <div class="info-card">
                         <h4>🎯 3. Ground Floor Massing &amp; Alignments</h4>
                         <p>
-                            • <strong>Projecting Left Ground Floor (0 to 6,010 mm: 3,810 + 2,000 O7 + 200 jamb):</strong> Wall aligns at <code>6,010 mm</code> with the left edge of upper window <code>O12</code>, while its <strong>roof extends 1,200 mm to the East</strong> (to <code>7,210 mm</code>).<br>
+                            • <strong>Projecting Left Ground Floor (0 to 6,010 mm: 3,810 + 2,000 O7 + 200 jamb):</strong> Wall aligns at <code>6,010 mm</code> with the left edge of upper window <code>O12</code>, while its <strong>roof extends 1,960 mm to the East</strong> (to <code>7,970 mm</code>).<br>
                             • <strong>At 14,490 to 20,790 mm:</strong> Ground HST door <code>O4</code> aligns vertically with upper window <code>O10</code>.
                         </p>
                     </div>
@@ -1419,9 +1420,9 @@
             },
             'CORNICE': {
                 title: 'Intermediate Cornice & Wing Roof (Gzyms Pośredni)',
-                subtitle: 'Projecting Left Wing Roof (0 to 7,210 mm, +1,200 mm East Overhang) & Main Band (+2.80 m to +3.43 m)',
-                dims: 'Height: 630 mm | Levels: +2.80 m to +3.43 m | Left Wing Roof: 6,010 mm + 1,200 mm East overhang = 7,210 mm | Overall Span: 20,990 mm',
-                room: 'Separates the ground floor clinker brick facade from the upper floor vertical timber slat cladding, and forms the cantilevered roof of the South-West wing extending 1,200 mm to the East.',
+                subtitle: 'Projecting Left Wing Roof (0 to 7,970 mm, +1,960 mm East Overhang) & Main Band (+2.80 m to +3.43 m)',
+                dims: 'Height: 630 mm | Levels: +2.80 m to +3.43 m | Left Wing Roof: 6,010 mm + 1,960 mm East overhang = 7,970 mm | Overall Span: 20,990 mm',
+                room: 'Separates the ground floor clinker brick facade from the upper floor vertical timber slat cladding, and forms the cantilevered roof of the South-West wing extending 1,960 mm to the East.',
                 specs: 'Anthracite / light gray architectural aluminum composite cassette panels with modular vertical joint reveals every 800 mm.'
             },
             'ROOF': {
