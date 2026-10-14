@@ -711,10 +711,11 @@
                 id: '14a', name: '14a', facade: 'North Facade', floor: 'first',
                 room: '1.04 Sypialnia (East Bedroom)',
                 wallNormal: [0, 0, -1],
-                x1: 6315, x2: 7505, z1: 2790, z2: 2790,
+                x1: 6515, x2: 7505, z1: 2790, z2: 2790,
                 y1: 3430, y2: 6130, widthMm: 1190, heightMm: 2700, sillMm: 0,
                 sashes: 1, pillarMm: 0, hasMullion: false, jambs: ['right'],
-                specs: '1,190 × 2,700 mm (hp = 0 mm) • Full-height glazing starting immediately after 6,315 mm balcony'
+                cornerJoinStart: true,
+                specs: '1,190 × 2,700 mm (hp = 0 mm) • Full-height glazing meeting O14b at recessed NE terrace corner, 200 mm West jamb'
             },
             {
                 id: 'O15', name: 'O15', facade: 'North Facade', floor: 'first',
@@ -750,8 +751,8 @@
                 x1: 18125, x2: 20505, z1: 2790, z2: 2790,
                 y1: 4180, y2: 6130, widthMm: 2380, heightMm: 1950, sillMm: 850,
                 sashes: 1, pillarMm: 0, hasMullion: false, jambs: ['left'],
-                cornerJoinRight: true,
-                specs: '2,380 × 1,950 mm (hp = 850 mm) • Frameless corner window meeting O13b_1 at NW corner'
+                cornerJoinEnd: true,
+                specs: '2,380 × 1,950 mm (hp = 850 mm) • Recessed 200 mm corner window meeting O13b_1 at NW corner, jamb at East end'
             },
 
             // ================= SOUTH FACADE (facing South: normal [0, 0, +1]) =================
@@ -762,7 +763,8 @@
                 x1: 14895, x2: 16895, z1: 21130, z2: 21130,
                 y1: 0, y2: 2800, widthMm: 2000, heightMm: 2800, sillMm: 0,
                 sashes: 1, pillarMm: 0, hasMullion: false, jambs: ['left'],
-                specs: '2,000 × 2,800 mm (hp = 0 mm, Bigger default) • Full-height fixed window with 200 mm East jamb'
+                cornerJoinStart: true,
+                specs: '2,000 × 2,800 mm (hp = 0 mm, Bigger default) • Recessed 200 mm corner window meeting O6b, jamb at West end'
             },
             {
                 id: 'O5', name: 'O5', facade: 'South Facade', floor: 'ground',
@@ -780,7 +782,8 @@
                 x1: -85, x2: 6215, z1: 11580, z2: 11580,
                 y1: 0, y2: 2800, widthMm: 6300, heightMm: 2800, sillMm: 0,
                 sashes: 3, pillarMm: 90, hasMullion: true, jambs: ['left'],
-                specs: '6,300 × 2,800 mm (hp = 0 mm) • 3 × 2,040 mm panes + 2 × 90 mm inner pillars (HST terrace glazing)'
+                cornerJoinStart: true,
+                specs: '6,300 × 2,800 mm (hp = 0 mm) • 3 × 2,040 mm panes + 2 × 90 mm inner pillars, meeting O3 at recessed SE corner'
             },
             {
                 id: 'O13a_2', name: 'O13a (South)', facade: 'South Facade', floor: 'first',
@@ -789,7 +792,8 @@
                 x1: 18125, x2: 20505, z1: 11580, z2: 11580,
                 y1: 4180, y2: 6130, widthMm: 2380, heightMm: 1950, sillMm: 850,
                 sashes: 2, pillarMm: 0, hasMullion: true, jambs: ['right'],
-                specs: '2,380 × 1,950 mm (hp = 850 mm) • 2-sash bedroom window, 200 mm from West corner'
+                cornerJoinEnd: true,
+                specs: '2,380 × 1,950 mm (hp = 850 mm) • 2-sash bedroom window meeting O13b_2 at recessed SW corner, jamb at East end'
             },
             {
                 id: 'O12', name: 'O12', facade: 'South Facade', floor: 'first',
@@ -816,7 +820,8 @@
                 x1: -85, x2: 6215, z1: 11580, z2: 11580,
                 y1: 3430, y2: 6130, widthMm: 6300, heightMm: 2700, sillMm: 0,
                 sashes: 3, pillarMm: 90, hasMullion: true, jambs: ['left'],
-                specs: '6,300 × 2,700 mm (hp = 0 mm) • 3 × 2,040 mm panes + 2 × 90 mm inner pillars'
+                cornerJoinStart: true,
+                specs: '6,300 × 2,700 mm (hp = 0 mm) • 3 × 2,040 mm panes + 2 × 90 mm inner pillars, meeting O9 at recessed SE corner'
             },
 
             // ================= WEST FACADE (facing West: normal [+1, 0, 0]) =================
@@ -854,8 +859,8 @@
                 x1: 20705, x2: 20705, z1: 2990, z2: 5360,
                 y1: 4180, y2: 6130, widthMm: 2370, heightMm: 1950, sillMm: 850,
                 sashes: 1, pillarMm: 0, hasMullion: false, jambs: ['right'],
-                cornerJoinLeft: true,
-                specs: '2,370 × 1,950 mm (hp = 850 mm) • Frameless corner window West face, 200 mm from North upper edge'
+                cornerJoinStart: true,
+                specs: '2,370 × 1,950 mm (hp = 850 mm) • Recessed 200 mm corner window meeting O13a at NW corner, jamb at South end'
             },
             {
                 id: 'O13b_2', name: 'O13b (South-West)', facade: 'West Facade', floor: 'first',
@@ -864,7 +869,8 @@
                 x1: 20705, x2: 20705, z1: 9010, z2: 11380,
                 y1: 4180, y2: 6130, widthMm: 2370, heightMm: 1950, sillMm: 850,
                 sashes: 1, pillarMm: 0, hasMullion: false, jambs: ['left'],
-                specs: '2,370 × 1,950 mm (hp = 850 mm) • Picture bedroom window, 200 mm from South upper edge'
+                cornerJoinEnd: true,
+                specs: '2,370 × 1,950 mm (hp = 850 mm) • Recessed 200 mm corner window meeting O13a_2 at SW corner, jamb at North end'
             },
 
             // ================= EAST FACADE (facing East: normal [-1, 0, 0]) =================
@@ -872,10 +878,11 @@
                 id: 'O6b', name: 'O6b', facade: 'East Facade', floor: 'ground',
                 room: '0.10 Siłownia (Recessed South Wing)',
                 wallNormal: [-1, 0, 0],
-                x1: 14695, x2: 14695, z1: 15285, z2: 20925,
+                x1: 14695, x2: 14695, z1: 15285, z2: 20930,
                 y1: 0, y2: 2800, widthMm: 5640, heightMm: 2800, sillMm: 0,
                 sashes: 3, pillarMm: 90, hasMullion: true, jambs: ['right'],
-                specs: '5,640 × 2,800 mm (hp = 0 mm) • 3 × 1,820 mm panes + 2 × 90 mm inner pillars on recessed wing'
+                cornerJoinEnd: true,
+                specs: '5,640 × 2,800 mm (hp = 0 mm) • 3 × 1,820 mm panes + 2 × 90 mm inner pillars, meeting O7 at recessed corner, jamb at North end'
             },
             {
                 id: 'O6a', name: 'O6a', facade: 'East Facade', floor: 'ground',
@@ -893,7 +900,8 @@
                 x1: -285, x2: -285, z1: 6290, z2: 11380,
                 y1: 0, y2: 2800, widthMm: 5090, heightMm: 2800, sillMm: 0,
                 sashes: 2, pillarMm: 90, hasMullion: true, jambs: ['right'],
-                specs: '5,090 × 2,800 mm (hp = 0 mm, Bigger default) • 2 × 2,500 mm panes + 1 × 90 mm inner pillar'
+                cornerJoinEnd: true,
+                specs: '5,090 × 2,800 mm (hp = 0 mm, Bigger default) • 2 × 2,500 mm panes + 1 × 90 mm inner pillar, meeting O4 at recessed SE corner'
             },
             {
                 id: 'O9', name: 'O9', facade: 'East Facade', floor: 'first',
@@ -902,7 +910,8 @@
                 x1: -285, x2: -285, z1: 6290, z2: 11380,
                 y1: 3430, y2: 6130, widthMm: 5090, heightMm: 2700, sillMm: 0,
                 sashes: 2, pillarMm: 90, hasMullion: true, jambs: ['right'],
-                specs: '5,090 × 2,700 mm (hp = 0 mm, Bigger default) • 2 × 2,500 mm panes + 1 × 90 mm inner pillar, aligned with O3'
+                cornerJoinEnd: true,
+                specs: '5,090 × 2,700 mm (hp = 0 mm, Bigger default) • 2 × 2,500 mm panes + 1 × 90 mm inner pillar, meeting O10 at recessed SE corner'
             },
             {
                 id: 'O14b', name: 'O14b + D1', facade: 'East Facade', floor: 'first',
@@ -911,6 +920,7 @@
                 x1: 6315, x2: 6315, z1: 2990, z2: 5800,
                 y1: 3430, y2: 6130, widthMm: 2810, heightMm: 2700, sillMm: 0,
                 sashes: 2, sashRatios: [1820 / 2720, 900 / 2720], pillarMm: 90, hasMullion: true, jambs: ['left'],
+                cornerJoinStart: true,
                 specs: '2,810 × 2,700 mm (hp = 0 mm) • 900 mm door D1 + 90 mm pillar + 1,820 mm fixed window on covered terrace'
             }
         ];
@@ -1323,82 +1333,82 @@
                 const opStart = (axis === 'x') ? Math.min(op.x1, op.x2) : Math.min(op.z1, op.z2);
                 const opEnd = (axis === 'x') ? Math.max(op.x1, op.x2) : Math.max(op.z1, op.z2);
 
-                // 1. Full-height pier before opening
-                if (opStart > cursor) {
-                    makeWallBlock(cursor, opStart, yBottom, yTop, wallBuilder, wallColor);
-                }
-
-                // 2. Under-window sill wall (parapet)
-                if (op.y1 > yBottom) {
-                    makeWallBlock(opStart, opEnd, yBottom, op.y1, wallBuilder, wallColor);
-                }
-
-                // 3. Above-window lintel wall
-                if (op.y2 < yTop) {
-                    makeWallBlock(opStart, opEnd, op.y2, yTop, wallBuilder, wallColor);
-                }
-
-                // 4. Build 200 mm Window Jambs (Ościeża), Frame, Pillars & Glass inside the opening
-                const jambDepth = 200;
+                const jambDepth = 200; // 200 mm recession depth from outer facade to window
                 const cJambInner = fixedCoord + inwardSign * jambDepth;
                 const ralCol = [0.12, 0.14, 0.13]; // RAL 7021 (#1f2421)
                 const useRalJamb = (state.jambMaterial === 'ral7021');
                 const activeJambBuilder = useRalJamb ? jambBuilder : wallBuilder;
                 const activeJambCol = useRalJamb ? ralCol : wallColor;
 
-                // Left / Right / Top 200 mm reveal liners (18 mm thick lining inside reveal)
-                const linerT = 18;
-                if (!op.cornerJoinLeft) {
-                    if (axis === 'x') {
-                        activeJambBuilder.addBoxMm(opStart - linerT, op.y1, cOuter, opStart + linerT, op.y2, cJambInner, activeJambCol, uvScale, yOffset);
-                    } else {
-                        activeJambBuilder.addBoxMm(cOuter, op.y1, opStart - linerT, cJambInner, op.y2, opStart + linerT, activeJambCol, uvScale, yOffset);
-                    }
-                }
-                if (!op.cornerJoinRight) {
-                    if (axis === 'x') {
-                        activeJambBuilder.addBoxMm(opEnd - linerT, op.y1, cOuter, opEnd + linerT, op.y2, cJambInner, activeJambCol, uvScale, yOffset);
-                    } else {
-                        activeJambBuilder.addBoxMm(cOuter, op.y1, opEnd - linerT, cJambInner, op.y2, opEnd + linerT, activeJambCol, uvScale, yOffset);
-                    }
-                }
-                // Top reveal liner & exterior sill plate
-                if (axis === 'x') {
-                    activeJambBuilder.addBoxMm(opStart, op.y2 - linerT, cOuter, opEnd, op.y2 + linerT, cJambInner, activeJambCol, uvScale, yOffset);
-                    jambBuilder.addBoxMm(opStart, op.y1 - 15, cOuter - inwardSign * 15, opEnd, op.y1 + 15, cJambInner, ralCol, 1.0, yOffset);
-                } else {
-                    activeJambBuilder.addBoxMm(cOuter, op.y2 - linerT, opStart, cJambInner, op.y2 + linerT, opEnd, activeJambCol, uvScale, yOffset);
-                    jambBuilder.addBoxMm(cOuter - inwardSign * 15, op.y1 - 15, opStart, cJambInner, op.y1 + 15, opEnd, ralCol, 1.0, yOffset);
+                // Reveal liner thickness at the non-corner ends of the window (no z-fighting with adjacent pier)
+                const linerT = 24;
+                const wallCutStart = op.cornerJoinStart ? opStart : Math.max(cursor, opStart - linerT);
+                const wallCutEnd = op.cornerJoinEnd ? opEnd : Math.min(spanEnd, opEnd + linerT);
+
+                // 1. Full-height pier before opening
+                if (wallCutStart > cursor) {
+                    makeWallBlock(cursor, wallCutStart, yBottom, yTop, wallBuilder, wallColor);
                 }
 
-                // Recessed plane where the window frame & glass sit (160 mm recessed from outer face)
-                const cFrameFront = fixedCoord + inwardSign * 145;
-                const cFrameBack = fixedCoord + inwardSign * 195;
-                const cGlassFront = fixedCoord + inwardSign * 162;
-                const cGlassBack = fixedCoord + inwardSign * 178;
+                // 2. Under-window sill wall (parapet)
+                if (op.y1 > yBottom) {
+                    makeWallBlock(wallCutStart, wallCutEnd, yBottom, op.y1, wallBuilder, wallColor);
+                }
+
+                // 3. Above-window lintel wall
+                if (op.y2 < yTop) {
+                    makeWallBlock(wallCutStart, wallCutEnd, op.y2, yTop, wallBuilder, wallColor);
+                }
+
+                // 4. 200 mm Deep Window Jambs (Ościeża) at the ENDS of the window (indicating 200 mm setback from facade)
+                if (!op.cornerJoinStart) {
+                    if (axis === 'x') {
+                        activeJambBuilder.addBoxMm(wallCutStart, op.y1, cOuter, opStart, op.y2, cJambInner, activeJambCol, uvScale, yOffset);
+                        addEdgeBoxMm(edges, wallCutStart, op.y1, cOuter, opStart, op.y2, cJambInner, [0.06, 0.08, 0.10], yOffset);
+                    } else {
+                        activeJambBuilder.addBoxMm(cOuter, op.y1, wallCutStart, cJambInner, op.y2, opStart, activeJambCol, uvScale, yOffset);
+                        addEdgeBoxMm(edges, cOuter, op.y1, wallCutStart, cJambInner, op.y2, opStart, [0.06, 0.08, 0.10], yOffset);
+                    }
+                }
+                if (!op.cornerJoinEnd) {
+                    if (axis === 'x') {
+                        activeJambBuilder.addBoxMm(opEnd, op.y1, cOuter, wallCutEnd, op.y2, cJambInner, activeJambCol, uvScale, yOffset);
+                        addEdgeBoxMm(edges, opEnd, op.y1, cOuter, wallCutEnd, op.y2, cJambInner, [0.06, 0.08, 0.10], yOffset);
+                    } else {
+                        activeJambBuilder.addBoxMm(cOuter, op.y1, opEnd, cJambInner, op.y2, wallCutEnd, activeJambCol, uvScale, yOffset);
+                        addEdgeBoxMm(edges, cOuter, op.y1, opEnd, cJambInner, op.y2, wallCutEnd, [0.06, 0.08, 0.10], yOffset);
+                    }
+                }
+
+                // Top reveal soffit liner & bottom 200 mm deep exterior sill plate
+                if (axis === 'x') {
+                    activeJambBuilder.addBoxMm(opStart, op.y2 - 16, cOuter, opEnd, op.y2 + 4, cJambInner, activeJambCol, uvScale, yOffset);
+                    jambBuilder.addBoxMm(opStart, op.y1 - 12, cOuter - inwardSign * 10, opEnd, op.y1 + 14, cJambInner, ralCol, 1.0, yOffset);
+                } else {
+                    activeJambBuilder.addBoxMm(cOuter, op.y2 - 16, opStart, cJambInner, op.y2 + 4, opEnd, activeJambCol, uvScale, yOffset);
+                    jambBuilder.addBoxMm(cOuter - inwardSign * 10, op.y1 - 12, opStart, cJambInner, op.y1 + 14, opEnd, ralCol, 1.0, yOffset);
+                }
+
+                // Recessed plane at 200 mm depth where the window frame & glass sit (so corner windows meet cleanly at cJambInner)
+                const cFrameFront = fixedCoord + inwardSign * 175;
+                const cFrameBack = fixedCoord + inwardSign * 215;
+                const cGlassFront = fixedCoord + inwardSign * 188;
+                const cGlassBack = fixedCoord + inwardSign * 202;
 
                 const frameW = 55; // 55 mm perimeter aluminum profile
-                // Perimeter frame (Top, Bottom, Left unless corner join, Right unless corner join)
+                // Perimeter frame (Top, Bottom, Start, End; at corner joins, a 55 mm corner mullion joins the two recessed windows)
                 if (axis === 'x') {
                     jambBuilder.addBoxMm(opStart, op.y1, cFrameFront, opEnd, op.y1 + frameW, cFrameBack, ralCol, 1.0, yOffset);
                     jambBuilder.addBoxMm(opStart, op.y2 - frameW, cFrameFront, opEnd, op.y2, cFrameBack, ralCol, 1.0, yOffset);
-                    if (!op.cornerJoinLeft) {
-                        jambBuilder.addBoxMm(opStart, op.y1, cFrameFront, opStart + frameW, op.y2, cFrameBack, ralCol, 1.0, yOffset);
-                    }
-                    if (!op.cornerJoinRight) {
-                        jambBuilder.addBoxMm(opEnd - frameW, op.y1, cFrameFront, opEnd, op.y2, cFrameBack, ralCol, 1.0, yOffset);
-                    }
-                    addEdgeBoxMm(edges, opStart, op.y1, cOuter, opEnd, op.y2, cFrameBack, [0.08, 0.10, 0.12], yOffset);
+                    jambBuilder.addBoxMm(opStart, op.y1, cFrameFront, opStart + frameW, op.y2, cFrameBack, ralCol, 1.0, yOffset);
+                    jambBuilder.addBoxMm(opEnd - frameW, op.y1, cFrameFront, opEnd, op.y2, cFrameBack, ralCol, 1.0, yOffset);
+                    addEdgeBoxMm(edges, opStart, op.y1, cFrameFront, opEnd, op.y2, cFrameBack, [0.08, 0.10, 0.12], yOffset);
                 } else {
                     jambBuilder.addBoxMm(cFrameFront, op.y1, opStart, cFrameBack, op.y1 + frameW, opEnd, ralCol, 1.0, yOffset);
                     jambBuilder.addBoxMm(cFrameFront, op.y2 - frameW, opStart, cFrameBack, op.y2, opEnd, ralCol, 1.0, yOffset);
-                    if (!op.cornerJoinLeft) {
-                        jambBuilder.addBoxMm(cFrameFront, op.y1, opStart, cFrameBack, op.y2, opStart + frameW, ralCol, 1.0, yOffset);
-                    }
-                    if (!op.cornerJoinRight) {
-                        jambBuilder.addBoxMm(cFrameFront, op.y1, opEnd - frameW, cFrameBack, op.y2, opEnd, ralCol, 1.0, yOffset);
-                    }
-                    addEdgeBoxMm(edges, cOuter, op.y1, opStart, cFrameBack, op.y2, opEnd, [0.08, 0.10, 0.12], yOffset);
+                    jambBuilder.addBoxMm(cFrameFront, op.y1, opStart, cFrameBack, op.y2, opStart + frameW, ralCol, 1.0, yOffset);
+                    jambBuilder.addBoxMm(cFrameFront, op.y1, opEnd - frameW, cFrameBack, op.y2, opEnd, ralCol, 1.0, yOffset);
+                    addEdgeBoxMm(edges, cFrameFront, op.y1, opStart, cFrameBack, op.y2, opEnd, [0.08, 0.10, 0.12], yOffset);
                 }
 
                 // Inner Sashes / 90 mm Pillars / Garage or Entrance Door Fill
@@ -1448,7 +1458,7 @@
                     }
                 }
 
-                cursor = Math.max(cursor, opEnd);
+                cursor = Math.max(cursor, wallCutEnd);
             });
 
             // Final pier after last opening
@@ -1474,9 +1484,6 @@
             const upperOffsetM = (state.floorMode === 'explode') ? 2.4 : 0.0;
 
             const ralCol = [0.12, 0.14, 0.13]; // RAL 7021 (#1f2421)
-            const cornerJambBuilder = (state.jambMaterial === 'ral7021') ? jambBuilder : brickBuilder;
-            const cornerJambUpperBuilder = (state.jambMaterial === 'ral7021') ? jambBuilder : woodBuilder;
-            const cornerJambCol = (state.jambMaterial === 'ral7021') ? ralCol : [1, 1, 1];
 
             // ====================================================================
             // A. SITE, LAWN, DRIVEWAY & GARDEN TERRACES
@@ -1585,49 +1592,51 @@
                 });
                 addEdgeBoxMm(edges, 20705, 0, -290, 20705, 2800, 21130, [0.12, 0.15, 0.20], 0);
 
-                // 7. South-West Protruding Wing South Wall (O7: X = 14695..20705, Z = 21130)
+                // 7. South-West Protruding Wing South Wall (O7: X = 14895..20705, Z = 21130; O7 meets O6b at recessed corner X=14895, Z=20930)
                 buildWallWithOpenings({
                     axis: 'x', fixedCoord: 21130, inwardSign: -1,
-                    spanStart: 14895, spanEnd: 20705, yBottom: 0, yTop: 2800, thickness: 240,
+                    spanStart: 14895, spanEnd: 20705, yBottom: 0, yTop: 2800, thickness: 200,
                     openings: groundOpenings.filter(o => o.id === 'O7'),
                     wallBuilder: brickBuilder, wallColor: [1, 1, 1], uvScale: 0.8,
                     jambBuilder, glassBuilder, garageBuilder, edges, yOffset: 0
                 });
-                // 200 mm Corner Jamb Strip East of O7 / South of O6b (X = 14695..14895, Z = 20925..21130)
-                cornerJambBuilder.addBoxMm(14695, 0, 20925, 14895, 2800, 21130, cornerJambCol, 0.8, 0);
-                addEdgeBoxMm(edges, 14695, 0, 21130, 20705, 2800, 21130, [0.12, 0.15, 0.20], 0);
+                addEdgeBoxMm(edges, 16895, 0, 21130, 20705, 2800, 21130, [0.12, 0.15, 0.20], 0);
 
-                // 8. South-West Wing East Wall (Left Recessed Wing on East Facade: O6b & O6a, Z = 11580..20925, X = 14695)
+                // 8. South-West Wing East Wall (O6b & O6a: Z = 11580..20930, X = 14695; inwardSign = +1 into wing so O6b sits at X=14895!)
                 buildWallWithOpenings({
-                    axis: 'z', fixedCoord: 14695, inwardSign: -1,
-                    spanStart: 11580, spanEnd: 20925, yBottom: 0, yTop: 2800, thickness: 240,
+                    axis: 'z', fixedCoord: 14695, inwardSign: 1,
+                    spanStart: 11580, spanEnd: 20930, yBottom: 0, yTop: 2800, thickness: 200,
                     openings: groundOpenings.filter(o => o.id === 'O6b' || o.id === 'O6a'),
                     wallBuilder: brickBuilder, wallColor: [0.94, 0.94, 0.96], uvScale: 0.8,
                     jambBuilder, glassBuilder, garageBuilder, edges, yOffset: 0
                 });
-                addEdgeBoxMm(edges, 14695, 0, 11580, 14695, 2800, 21130, [0.12, 0.15, 0.20], 0);
+                // 200 × 200 mm bottom sill/plinth & top soffit cap at the recessed O7+O6b corner (X = 14695..14895, Z = 20930..21130)
+                jambBuilder.addBoxMm(14695, -12, 20930, 14895, 14, 21130, ralCol, 1.0, 0);
+                jambBuilder.addBoxMm(14695, 2784, 20930, 14895, 2804, 21130, ralCol, 1.0, 0);
+                addEdgeBoxMm(edges, 14695, 0, 11580, 14695, 2800, 15285, [0.12, 0.15, 0.20], 0);
 
-                // 9. Recessed South Wall (O5 & O4: X = -85..14695, Z = 11580)
+                // 9. Recessed South Wall (O5 & O4: X = -85..14695, Z = 11580; O4 meets O3 at recessed corner X=-85, Z=11380)
                 buildWallWithOpenings({
                     axis: 'x', fixedCoord: 11580, inwardSign: -1,
-                    spanStart: -85, spanEnd: 14695, yBottom: 0, yTop: 2800, thickness: 240,
+                    spanStart: -85, spanEnd: 14695, yBottom: 0, yTop: 2800, thickness: 200,
                     openings: groundOpenings.filter(o => o.id === 'O5' || o.id === 'O4'),
                     wallBuilder: brickBuilder, wallColor: [1, 1, 1], uvScale: 0.8,
                     jambBuilder, glassBuilder, garageBuilder, edges, yOffset: 0
                 });
-                // 200 mm Corner Jamb Strip East of O4 / South of O3 (X = -285..-85, Z = 11380..11580)
-                cornerJambBuilder.addBoxMm(-285, 0, 11380, -85, 2800, 11580, cornerJambCol, 0.8, 0);
-                addEdgeBoxMm(edges, -285, 0, 11580, 14695, 2800, 11580, [0.12, 0.15, 0.20], 0);
+                addEdgeBoxMm(edges, 6215, 0, 11580, 14695, 2800, 11580, [0.12, 0.15, 0.20], 0);
 
-                // 10. Center Projecting East Wall (O3: Z = 2790..11380, X = -285)
+                // 10. Center Projecting East Wall (O3: Z = 2790..11380, X = -285; O3 meets O4 at recessed corner X=-85, Z=11380)
                 buildWallWithOpenings({
                     axis: 'z', fixedCoord: -285, inwardSign: 1,
-                    spanStart: 2790, spanEnd: 11380, yBottom: 0, yTop: 2800, thickness: 240,
+                    spanStart: 2790, spanEnd: 11380, yBottom: 0, yTop: 2800, thickness: 200,
                     openings: groundOpenings.filter(o => o.id === 'O3'),
                     wallBuilder: brickBuilder, wallColor: [1, 1, 1], uvScale: 0.8,
                     jambBuilder, glassBuilder, garageBuilder, edges, yOffset: 0
                 });
-                addEdgeBoxMm(edges, -285, 0, 2790, -285, 2800, 11580, [0.12, 0.15, 0.20], 0);
+                // 200 × 200 mm bottom sill & top soffit cap at the recessed O4+O3 corner (X = -285..-85, Z = 11380..11580)
+                jambBuilder.addBoxMm(-285, -12, 11380, -85, 14, 11580, ralCol, 1.0, 0);
+                jambBuilder.addBoxMm(-285, 2784, 11380, -85, 2804, 11580, ralCol, 1.0, 0);
+                addEdgeBoxMm(edges, -285, 0, 2790, -285, 2800, 6290, [0.12, 0.15, 0.20], 0);
 
                 // 11. INTERMEDIATE CORNICE BAND (Gzyms Pośredni: Y = 2,800 to 3,430 mm, 100 mm overhang)
                 // Central East-West block cornice
@@ -1637,10 +1646,13 @@
                 fasciaBuilder.addBoxMm(11640, 2800, -390, 20805, 3430, 2790, [1, 1, 1], 1.1, 0);
                 siteBuilder.addBoxMm(11840, 3430, -190, 20605, 3445, 2790, [0.22, 0.25, 0.30], 1.0, 0);
                 addEdgeBoxMm(edges, 11640, 2800, -390, 20805, 3430, 2790, [0.05, 0.07, 0.10], 0);
-                // Protruding South-West Gym block cornice & flat roof
-                fasciaBuilder.addBoxMm(14595, 2800, 11580, 20805, 3430, 21230, [1, 1, 1], 1.1, 0);
-                siteBuilder.addBoxMm(14795, 3430, 11580, 20605, 3445, 21030, [0.22, 0.25, 0.30], 1.0, 0);
-                addEdgeBoxMm(edges, 14595, 2800, 11580, 20805, 3430, 21230, [0.05, 0.07, 0.10], 0);
+                // Protruding South-West Gym block cornice & flat roof (extends 1,200 mm East of X = 14,695 mm wall -> X = 13,495 mm)
+                fasciaBuilder.addBoxMm(13495, 2800, 11580, 20805, 3430, 21230, [1, 1, 1], 1.1, 0);
+                siteBuilder.addBoxMm(13695, 3430, 11580, 20605, 3445, 21030, [0.22, 0.25, 0.30], 1.0, 0);
+                // Cantilevered 1,200 mm East soffit underside (X = 13,495..14,695 mm, Z = 11,580..21,230 mm)
+                jambBuilder.addBoxMm(13495, 2795, 11580, 14695, 2802, 21230, [0.09, 0.11, 0.14], 1.0, 0);
+                addEdgeBoxMm(edges, 13495, 2800, 11580, 20805, 3430, 21230, [0.05, 0.07, 0.10], 0);
+                addEdgeBoxMm(edges, 13495, 2800, 11580, 14695, 2800, 21230, [0.18, 0.22, 0.28], 0);
             }
 
             // ====================================================================
@@ -1649,19 +1661,20 @@
             if (showUpper) {
                 const upperOpenings = OPENINGS_3D.filter(o => o.floor === 'first');
 
-                // 1. North Upper Wall (14a, O15, O11_2, O11_3, O13a: X = 6315..20505, Z = 2790)
+                // 1. North Upper Wall (14a, O15, O11_2, O11_3, O13a: X = 6515..20505, Z = 2790)
                 buildWallWithOpenings({
                     axis: 'x', fixedCoord: 2790, inwardSign: 1,
-                    spanStart: 6315, spanEnd: 20505, yBottom: 3430, yTop: 6130, thickness: 200,
+                    spanStart: 6515, spanEnd: 20505, yBottom: 3430, yTop: 6130, thickness: 200,
                     openings: upperOpenings.filter(o => o.facade === 'North Facade'),
                     wallBuilder: woodBuilder, wallColor: [1, 1, 1], uvScale: 0.9,
                     jambBuilder, glassBuilder, garageBuilder, edges, yOffset: upperOffsetM
                 });
-                // 200 mm West of O13a / North of O13b_1:
-                // Bottom 850 mm (3430..4180) is wood parapet; Upper 1,950 mm (4180..6130) is corner window jamb / glass join
+                // North-West Upper Corner (X = 20505..20705, Z = 2790..2990):
+                // Only the bottom 850 mm parapet (3430..4180) is at the outer corner; above 4180 mm, O13a and O13b_1 meet at recessed corner (20505, 2990)!
                 woodBuilder.addBoxMm(20505, 3430, 2790, 20705, 4180, 2990, [1, 1, 1], 0.9, upperOffsetM);
-                cornerJambUpperBuilder.addBoxMm(20505, 4180, 2790, 20705, 6130, 2990, cornerJambCol, 0.9, upperOffsetM);
-                addEdgeBoxMm(edges, 6315, 3430, 2790, 20705, 6130, 2790, [0.35, 0.28, 0.20], upperOffsetM);
+                jambBuilder.addBoxMm(20505, 4168, 2790, 20705, 4192, 2990, ralCol, 1.0, upperOffsetM);
+                jambBuilder.addBoxMm(20505, 6114, 2790, 20705, 6134, 2990, ralCol, 1.0, upperOffsetM);
+                addEdgeBoxMm(edges, 6515, 3430, 2790, 20705, 4180, 2790, [0.35, 0.28, 0.20], upperOffsetM);
 
                 // 2. West Upper Wall (O13b_1 & O13b_2: Z = 2990..11380, X = 20705)
                 buildWallWithOpenings({
@@ -1671,13 +1684,14 @@
                     wallBuilder: woodBuilder, wallColor: [1, 1, 1], uvScale: 0.9,
                     jambBuilder, glassBuilder, garageBuilder, edges, yOffset: upperOffsetM
                 });
-                // 200 mm South-West Upper Corner (Z = 11380..11580, X = 20505..20705):
-                // Bottom 850 mm (3430..4180) is wood parapet; Upper 1,950 mm (4180..6130) is 200 mm corner jamb for O13b_2 & O13a_2!
+                // South-West Upper Corner (Z = 11380..11580, X = 20505..20705):
+                // Only the bottom 850 mm parapet (3430..4180) is at the outer corner; above 4180 mm, O13b_2 and O13a_2 meet at recessed corner (20505, 11380)!
                 woodBuilder.addBoxMm(20505, 3430, 11380, 20705, 4180, 11580, [1, 1, 1], 0.9, upperOffsetM);
-                cornerJambUpperBuilder.addBoxMm(20505, 4180, 11380, 20705, 6130, 11580, cornerJambCol, 0.9, upperOffsetM);
-                addEdgeBoxMm(edges, 20705, 3430, 2790, 20705, 6130, 11580, [0.35, 0.28, 0.20], upperOffsetM);
+                jambBuilder.addBoxMm(20505, 4168, 11380, 20705, 4192, 11580, ralCol, 1.0, upperOffsetM);
+                jambBuilder.addBoxMm(20505, 6114, 11380, 20705, 6134, 11580, ralCol, 1.0, upperOffsetM);
+                addEdgeBoxMm(edges, 20705, 3430, 2790, 20705, 4180, 11580, [0.35, 0.28, 0.20], upperOffsetM);
 
-                // 3. South Upper Wall (O10, SO3, O12, O13a_2: X = -85..20505, Z = 11580)
+                // 3. South Upper Wall (O10, SO3, O12, O13a_2: X = -85..20505, Z = 11580; O10 meets O9 at recessed SE corner)
                 buildWallWithOpenings({
                     axis: 'x', fixedCoord: 11580, inwardSign: -1,
                     spanStart: -85, spanEnd: 20505, yBottom: 3430, yTop: 6130, thickness: 200,
@@ -1685,11 +1699,9 @@
                     wallBuilder: woodBuilder, wallColor: [1, 1, 1], uvScale: 0.9,
                     jambBuilder, glassBuilder, garageBuilder, edges, yOffset: upperOffsetM
                 });
-                // 200 mm South-East Upper Corner Jamb (East of O10 / South of O9: X = -285..-85, Z = 11380..11580, full height 2700 mm)
-                cornerJambUpperBuilder.addBoxMm(-285, 3430, 11380, -85, 6130, 11580, cornerJambCol, 0.9, upperOffsetM);
-                addEdgeBoxMm(edges, -285, 3430, 11580, 20705, 6130, 11580, [0.35, 0.28, 0.20], upperOffsetM);
+                addEdgeBoxMm(edges, 6215, 3430, 11580, 20705, 4180, 11580, [0.35, 0.28, 0.20], upperOffsetM);
 
-                // 4. East Projecting Upper Wall (O9 + 400 mm North Pier: Z = 5890..11380, X = -285)
+                // 4. East Projecting Upper Wall (O9 + 400 mm North Pier: Z = 5890..11380, X = -285; O9 meets O10 at recessed SE corner)
                 buildWallWithOpenings({
                     axis: 'z', fixedCoord: -285, inwardSign: 1,
                     spanStart: 5890, spanEnd: 11380, yBottom: 3430, yTop: 6130, thickness: 200,
@@ -1697,7 +1709,10 @@
                     wallBuilder: woodBuilder, wallColor: [1, 1, 1], uvScale: 0.9,
                     jambBuilder, glassBuilder, garageBuilder, edges, yOffset: upperOffsetM
                 });
-                addEdgeBoxMm(edges, -285, 3430, 5890, -285, 6130, 11580, [0.35, 0.28, 0.20], upperOffsetM);
+                // 200 × 200 mm bottom sill & top soffit cap at the recessed O10+O9 corner (X = -285..-85, Z = 11380..11580)
+                jambBuilder.addBoxMm(-285, 3418, 11380, -85, 3444, 11580, ralCol, 1.0, upperOffsetM);
+                jambBuilder.addBoxMm(-285, 6114, 11380, -85, 6134, 11580, ralCol, 1.0, upperOffsetM);
+                addEdgeBoxMm(edges, -285, 3430, 5890, -285, 6130, 6290, [0.35, 0.28, 0.20], upperOffsetM);
 
                 // 5. North-East Covered Upper Terrace (Balkon / Taras 17.3 m²: X = -285..6315, Z = 2790..5890)
                 // Terrace gres floor deck
@@ -1706,7 +1721,7 @@
                 woodBuilder.addBoxMm(-285, 3430, 5890, 6315, 6130, 6090, [0.88, 0.86, 0.82], 0.9, upperOffsetM);
                 addEdgeBoxMm(edges, -285, 3430, 5890, 6315, 6130, 5890, [0.35, 0.28, 0.20], upperOffsetM);
 
-                // Recessed East-facing wall of terrace with O14b + D1 (X = 6315, Z = 2990..5890)
+                // Recessed East-facing wall of terrace with O14b + D1 (X = 6315, Z = 2990..5890; O14b meets 14a at recessed corner X=6515, Z=2990)
                 buildWallWithOpenings({
                     axis: 'z', fixedCoord: 6315, inwardSign: 1,
                     spanStart: 2990, spanEnd: 5890, yBottom: 3430, yTop: 6130, thickness: 200,
@@ -1714,8 +1729,8 @@
                     wallBuilder: woodBuilder, wallColor: [0.92, 0.90, 0.86], uvScale: 0.9,
                     jambBuilder, glassBuilder, garageBuilder, edges, yOffset: upperOffsetM
                 });
-                // 200 mm North Jamb of O14b (Z = 2790..2990, X = 6315..6515)
-                cornerJambUpperBuilder.addBoxMm(6315, 3430, 2790, 6515, 6130, 2990, cornerJambCol, 0.9, upperOffsetM);
+                jambBuilder.addBoxMm(6315, 3418, 2790, 6515, 3444, 2990, ralCol, 1.0, upperOffsetM);
+                jambBuilder.addBoxMm(6315, 6114, 2790, 6515, 6134, 2990, ralCol, 1.0, upperOffsetM);
 
                 // North-East Corner Support Column & 220 mm Timber Slat Return (X = -285..0, Z = 2790)
                 woodBuilder.addBoxMm(-285, 3430, 2790, -65, 6130, 2990, [0.82, 0.78, 0.72], 0.9, upperOffsetM);
@@ -2028,6 +2043,7 @@
                 const dimLines = [
                     { p1: [-0.285, 0.05, -1.6], p2: [20.705, 0.05, -1.6], label: '🧭 NORTH: 20,590 mm Parter / 20,505 mm Piętro', color: '#38bdf8' },
                     { p1: [-0.285, 0.05, 22.5], p2: [20.705, 0.05, 22.5], label: '☀️ SOUTH: 20,990 mm (14,980 Recessed + 6,010 SW Wing)', color: '#fbbf24' },
+                    { p1: [13.495, 3.46, 21.23], p2: [14.695, 3.46, 21.23], label: '↔ 1,200 mm Wing Roof Overhang (East)', color: '#f97316' },
                     { p1: [22.1, 0.05, -0.29], p2: [22.1, 0.05, 21.13], label: '🚪 WEST: 21,420 mm Parter / 8,790 mm Piętro', color: '#c084fc' },
                     { p1: [-1.8, 0.05, -0.29], p2: [-1.8, 0.05, 21.13], label: '🌅 EAST: 21,415 mm (3,105 N + 8,785 Center + 9,525 S)', color: '#4ade80' }
                 ];
