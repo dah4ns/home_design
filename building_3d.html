@@ -1,0 +1,2481 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- TODO(security): Enforce strict Content-Security-Policy and X-Frame-Options headers at the web server level when deployed -->
+    <title>3D Building Model — Interactive Architectural View (All 4 Facades)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0b1120;
+            --bg-panel: rgba(15, 23, 42, 0.88);
+            --bg-card: rgba(30, 41, 59, 0.78);
+            --border-subtle: rgba(148, 163, 184, 0.2);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-blue: #38bdf8;
+            --accent-amber: #f59e0b;
+            --accent-emerald: #10b981;
+            --ral-7021: #1f2421;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .page-shell {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Top Navigation & Header Bar */
+        .top-header {
+            background: rgba(15, 23, 42, 0.96);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 12px 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            z-index: 30;
+        }
+
+        .nav-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 7px;
+            font-size: 12.5px;
+            font-weight: 600;
+            text-decoration: none;
+            border: 1px solid transparent;
+            transition: all 0.18s ease;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.06);
+        }
+
+        .header-title-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .header-title-group h1 {
+            font-size: 17px;
+            font-weight: 800;
+            margin: 0;
+            color: #f8fafc;
+            letter-spacing: -0.01em;
+        }
+
+        .tech-pill {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 9px;
+            border-radius: 6px;
+            background: rgba(56, 189, 248, 0.12);
+            color: #7dd3fc;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+
+        /* Main 3D Viewport Area */
+        .viewport-wrapper {
+            position: relative;
+            flex: 1;
+            min-height: calc(100vh - 60px);
+            width: 100%;
+            background: radial-gradient(circle at 50% 35%, #1e293b 0%, #090d16 100%);
+            overflow: hidden;
+            user-select: none;
+        }
+
+        #webgl-canvas,
+        #hud-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        #webgl-canvas {
+            cursor: grab;
+            z-index: 1;
+        }
+
+        #webgl-canvas:active {
+            cursor: grabbing;
+        }
+
+        #hud-canvas {
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* Floating Control Dock (Left) */
+        .control-dock {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            width: 310px;
+            max-height: calc(100vh - 92px);
+            overflow-y: auto;
+            background: var(--bg-panel);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 14px;
+            z-index: 10;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .dock-section {
+            border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+            padding-bottom: 12px;
+        }
+
+        .dock-section:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .dock-title {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #94a3b8;
+            margin: 0 0 8px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .preset-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .preset-grid.four-cols {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .ctrl-btn {
+            background: rgba(30, 41, 59, 0.85);
+            border: 1px solid rgba(148, 163, 184, 0.24);
+            color: #e2e8f0;
+            border-radius: 7px;
+            padding: 6px 8px;
+            font-size: 11.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            text-align: center;
+        }
+
+        .ctrl-btn:hover {
+            background: rgba(51, 65, 85, 0.95);
+            border-color: rgba(56, 189, 248, 0.5);
+            color: #ffffff;
+        }
+
+        .ctrl-btn.active {
+            background: rgba(2, 132, 199, 0.28);
+            border-color: #38bdf8;
+            color: #7dd3fc;
+            box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.25);
+        }
+
+        .ctrl-btn.amber.active {
+            background: rgba(217, 119, 6, 0.28);
+            border-color: #f59e0b;
+            color: #fde68a;
+        }
+
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 6px;
+        }
+
+        .slider-row label {
+            font-size: 11.5px;
+            color: #cbd5e1;
+            min-width: 70px;
+            font-weight: 500;
+        }
+
+        .slider-row input[type="range"] {
+            flex: 1;
+            accent-color: #38bdf8;
+            cursor: pointer;
+        }
+
+        .slider-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: #7dd3fc;
+            min-width: 44px;
+            text-align: right;
+        }
+
+        /* On-Screen Navigation Pad (Bottom Center) */
+        .nav-hud-bar {
+            position: absolute;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-panel);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 8px 14px;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+            flex-wrap: wrap;
+        }
+
+        .hud-divider {
+            width: 1px;
+            height: 24px;
+            background: rgba(148, 163, 184, 0.25);
+        }
+
+        .hud-hint {
+            font-size: 11.5px;
+            color: #cbd5e1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .key-cap {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10.5px;
+            font-weight: 600;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #7dd3fc;
+        }
+
+        /* Right Side Inspector & Defaults Legend Panel */
+        .right-dock {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 340px;
+            max-height: calc(100vh - 92px);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 10;
+        }
+
+        .inspector-card {
+            background: var(--bg-panel);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 14px 16px;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+        }
+
+        .inspector-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+        }
+
+        .inspector-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: #f8fafc;
+            margin: 0;
+        }
+
+        .inspector-subtitle {
+            font-size: 11.5px;
+            color: #38bdf8;
+            font-family: 'JetBrains Mono', monospace;
+            margin: 2px 0 0 0;
+        }
+
+        .kv-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-size: 12px;
+        }
+
+        .kv-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            border-bottom: 1px dashed rgba(148, 163, 184, 0.12);
+            padding-bottom: 4px;
+        }
+
+        .kv-key {
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .kv-val {
+            color: #f1f5f9;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 11.5px;
+            color: #cbd5e1;
+            margin-bottom: 6px;
+        }
+
+        .swatch {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 1100px) {
+            .control-dock {
+                width: 260px;
+            }
+            .right-dock {
+                width: 280px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-shell">
+        <!-- TOP HEADER & NAVIGATION -->
+        <header class="top-header">
+            <div class="nav-bar">
+                <a href="index.html" class="nav-btn" style="background: #1e293b; color: #e2e8f0; border-color: #334155;">
+                    <span>🏠</span> Dashboard
+                </a>
+                <a href="north_facade.html" class="nav-btn" style="background: rgba(2, 132, 199, 0.2); color: #7dd3fc; border-color: rgba(56, 189, 248, 0.35);">
+                    <span>🧭</span> North
+                </a>
+                <a href="south_facade.html" class="nav-btn" style="background: rgba(217, 119, 6, 0.2); color: #fcd34d; border-color: rgba(245, 158, 11, 0.35);">
+                    <span>☀️</span> South
+                </a>
+                <a href="west_facade.html" class="nav-btn" style="background: rgba(124, 58, 237, 0.2); color: #c4b5fd; border-color: rgba(167, 139, 250, 0.35);">
+                    <span>🚪</span> West
+                </a>
+                <a href="east_facade.html" class="nav-btn" style="background: rgba(22, 163, 74, 0.2); color: #86efac; border-color: rgba(74, 222, 128, 0.35);">
+                    <span>🌅</span> East
+                </a>
+                <a href="facade_summary.html" class="nav-btn" style="background: rgba(248, 250, 252, 0.1); color: #f8fafc; border-color: rgba(248, 250, 252, 0.25);">
+                    <span>📊</span> Summary
+                </a>
+                <a href="building_3d.html" class="nav-btn" style="background: #0284c7; color: #ffffff; border-color: #38bdf8;">
+                    <span>🧊</span> 3D Building View
+                </a>
+            </div>
+
+            <div class="header-title-group">
+                <h1>3D Architectural Building Model (All 4 Facades • Default Options)</h1>
+                <span class="tech-pill">Zero-Dependency WebGL + 2D CAD HUD</span>
+            </div>
+        </header>
+
+        <!-- MAIN 3D VIEWPORT -->
+        <div class="viewport-wrapper" id="viewport-wrapper">
+            <canvas id="webgl-canvas"></canvas>
+            <canvas id="hud-canvas"></canvas>
+
+            <!-- LEFT CONTROL DOCK -->
+            <aside class="control-dock">
+                <!-- Camera Angle Presets -->
+                <div class="dock-section">
+                    <div class="dock-title">
+                        <span>🎥 Isometric Camera Views</span>
+                        <button class="ctrl-btn" style="padding: 2px 7px; font-size: 10.5px;" onclick="resetCamera()">Reset (R)</button>
+                    </div>
+                    <div class="preset-grid">
+                        <button class="ctrl-btn active" id="cam-ne" onclick="setCameraPreset('ne', this)">🧭 North-East (Render)</button>
+                        <button class="ctrl-btn" id="cam-se" onclick="setCameraPreset('se', this)">☀️ South-East (Garden)</button>
+                        <button class="ctrl-btn" id="cam-nw" onclick="setCameraPreset('nw', this)">🚗 North-West (Garage)</button>
+                        <button class="ctrl-btn" id="cam-sw" onclick="setCameraPreset('sw', this)">🚪 South-West (Entry)</button>
+                    </div>
+                    <div class="dock-title" style="margin-top: 10px;">
+                        <span>📐 Direct Facade &amp; Plan Views</span>
+                    </div>
+                    <div class="preset-grid four-cols">
+                        <button class="ctrl-btn" id="cam-n" onclick="setCameraPreset('n', this)">North</button>
+                        <button class="ctrl-btn" id="cam-s" onclick="setCameraPreset('s', this)">South</button>
+                        <button class="ctrl-btn" id="cam-w" onclick="setCameraPreset('w', this)">West</button>
+                        <button class="ctrl-btn" id="cam-e" onclick="setCameraPreset('e', this)">East</button>
+                    </div>
+                    <div style="margin-top: 6px;">
+                        <button class="ctrl-btn" style="width: 100%;" id="cam-top" onclick="setCameraPreset('top', this)">🦅 Top-Down Roof &amp; Footprint Plan</button>
+                    </div>
+                </div>
+
+                <!-- Zoom & Projection Mode -->
+                <div class="dock-section">
+                    <div class="dock-title">
+                        <span>🔍 Zoom &amp; Projection</span>
+                    </div>
+                    <div class="preset-grid">
+                        <button class="ctrl-btn active" id="proj-persp" onclick="setProjectionMode('perspective')">Perspective 3D</button>
+                        <button class="ctrl-btn" id="proj-ortho" onclick="setProjectionMode('orthographic')">Orthographic CAD</button>
+                    </div>
+                    <div class="slider-row">
+                        <label for="zoom-slider">Zoom Level</label>
+                        <input type="range" id="zoom-slider" min="25" max="280" value="100" oninput="onZoomSliderChange(this.value)">
+                        <span class="slider-val" id="zoom-label">100%</span>
+                    </div>
+                </div>
+
+                <!-- Floor / Massing Mode -->
+                <div class="dock-section">
+                    <div class="dock-title">
+                        <span>🏢 Floor Visibility &amp; Explode</span>
+                    </div>
+                    <div class="preset-grid">
+                        <button class="ctrl-btn active" id="floor-all" onclick="setFloorMode('all')">All Floors</button>
+                        <button class="ctrl-btn amber" id="floor-explode" onclick="setFloorMode('explode')">⬆️ Explode Upper</button>
+                        <button class="ctrl-btn" id="floor-ground" onclick="setFloorMode('ground')">Parter Only</button>
+                        <button class="ctrl-btn" id="floor-upper" onclick="setFloorMode('upper')">Piętro Only</button>
+                    </div>
+                </div>
+
+                <!-- Display Layers -->
+                <div class="dock-section">
+                    <div class="dock-title">
+                        <span>🎛️ 3D Display Layers</span>
+                    </div>
+                    <div class="preset-grid">
+                        <button class="ctrl-btn active" id="toggle-labels" onclick="toggle3DLayer('labels', this)">🏷️ Window Tags</button>
+                        <button class="ctrl-btn active" id="toggle-dims" onclick="toggle3DLayer('dims', this)">📏 3D Dimensions</button>
+                        <button class="ctrl-btn active" id="toggle-levels" onclick="toggle3DLayer('levels', this)">📐 Height Levels</button>
+                        <button class="ctrl-btn active" id="toggle-edges" onclick="toggle3DLayer('edges', this)">✏️ CAD Outlines</button>
+                        <button class="ctrl-btn active" id="toggle-trees" onclick="toggle3DLayer('trees', this)">🌲 Pine Trees</button>
+                        <button class="ctrl-btn active" id="toggle-jambs" onclick="toggleJambMaterial(this)">⬛ Jambs: RAL 7021</button>
+                    </div>
+                    <div class="slider-row" style="margin-top: 10px;">
+                        <label for="sun-slider">☀️ Sun Angle</label>
+                        <input type="range" id="sun-slider" min="0" max="360" value="135" oninput="onSunSliderChange(this.value)">
+                        <span class="slider-val" id="sun-label">135°</span>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- RIGHT INSPECTOR & ARCHITECTURAL LEGEND -->
+            <aside class="right-dock">
+                <!-- Selected Element / Opening Inspector -->
+                <div class="inspector-card" id="opening-inspector-card">
+                    <div class="inspector-header">
+                        <div>
+                            <h3 class="inspector-title" id="insp-title">Click Any Window or Wall</h3>
+                            <p class="inspector-subtitle" id="insp-subtitle">19 Default Openings Across 4 Facades</p>
+                        </div>
+                        <span class="tech-pill" id="insp-badge">3D Interactive</span>
+                    </div>
+                    <div class="kv-list" id="insp-kv-list"></div>
+                </div>
+
+                <!-- Material & Default Options Summary Card -->
+                <div class="inspector-card">
+                    <div class="dock-title">
+                        <span>🧱 Materials &amp; Active Defaults</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="swatch" style="background: #383d47;"></span>
+                        <span><strong>Parter (+0.00 to +2.80m):</strong> Graphite Clinker Brick (137.18 m² net, 6 corners)</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="swatch" style="background: #cbb497;"></span>
+                        <span><strong>Piętro (+3.43 to +6.13m):</strong> Vertical Thermo-Timber Slats (75.23 m² net)</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="swatch" style="background: #181b22;"></span>
+                        <span><strong>Cornices (+2.80..+3.43m &amp; +6.13..+6.88m):</strong> Anthracite Metal Cassettes</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="swatch" style="background: #1f2421;"></span>
+                        <span><strong>Window Jambs (Ościeża):</strong> RAL 7021 (#1f2421, 200 mm depth)</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="swatch" style="background: linear-gradient(135deg, #38bdf8, #0f172a);"></span>
+                        <span><strong>Glazing:</strong> Triple-pane VSG/ESG with 90 mm inner pillars (O3, O4, O5, O6b, O9, O10, O12, O14b)</span>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- BOTTOM NAVIGATION HUD BAR -->
+            <div class="nav-hud-bar">
+                <button class="ctrl-btn" onclick="zoomByFactor(1.18)" title="Zoom In (+)">➕ Zoom In</button>
+                <button class="ctrl-btn" onclick="zoomByFactor(1/1.18)" title="Zoom Out (-)">➖ Zoom Out</button>
+                <div class="hud-divider"></div>
+                <button class="ctrl-btn" onclick="panCameraScreen(-60, 0)" title="Move Left">⬅️ Left</button>
+                <button class="ctrl-btn" onclick="panCameraScreen(0, 60)" title="Move Forward / Up">⬆️ Up</button>
+                <button class="ctrl-btn" onclick="panCameraScreen(0, -60)" title="Move Back / Down">⬇️ Down</button>
+                <button class="ctrl-btn" onclick="panCameraScreen(60, 0)" title="Move Right">➡️ Right</button>
+                <div class="hud-divider"></div>
+                <div class="hud-hint">
+                    <span><span class="key-cap">Left Drag</span> Orbit 3D</span>
+                    <span><span class="key-cap">Right Drag</span> / <span class="key-cap">Shift+Drag</span> / <span class="key-cap">WASD</span> Move</span>
+                    <span><span class="key-cap">Scroll</span> Zoom</span>
+                    <span><span class="key-cap">Click Window</span> Inspect</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Canonical Window & Coordinate Scripts -->
+    <script src="data/windows.js"></script>
+    <script src="js/window-store.js"></script>
+    <script src="js/coordinate-service.js"></script>
+
+    <script>
+        /**
+         * ============================================================================
+         * 3D ARCHITECTURAL BUILDING ENGINE (ZERO-DEPENDENCY WEBGL + 2D HUD OVERLAY)
+         * ============================================================================
+         * Why Zero-Dependency WebGL?
+         * - Works 100% offline under file:// or local servers with zero external CDNs.
+         * - Hardware 24-bit depth buffer (gl.DEPTH_TEST) eliminates painter-sorting
+         *   artifacts on recessed 200 mm window jambs, balconies, and overhangs.
+         * - Procedural high-DPI canvas textures reproduce the exact clinker brick,
+         *   vertical timber slats, cassette fascia seams, and multi-sash window frames.
+         * ============================================================================
+         */
+
+        // 1. Apply canonical default options across all 4 facades
+        function applyDefaultFacadeOptions() {
+            if (typeof WindowStore === 'undefined') return;
+            // North defaults
+            WindowStore.update('O15', { x: 8480, width: 2100, height: 2700, sill: 3430, views: ['north_facade'] });
+            WindowStore.update('O11_1', { views: [] });
+            WindowStore.update('O1', { x: 8480, width: 2100, height: 1400, sill: 1100, sashWidths: [1050, 1050], views: ['north_facade', 'kitchen_north_wall'] });
+
+            // South defaults (Bigger windows)
+            WindowStore.update('O13a_2', { x: 18410, width: 2380, height: 1950, sill: 4180, views: ['south_facade'] });
+            WindowStore.update('O12', { sashes: 2, pillarWidth: 90, hasMullion: true, width: 4000, height: 2700, sill: 3430, views: ['south_facade'] });
+            WindowStore.update('O10', { sashes: 3, pillarWidth: 90, hasMullion: true, width: 6300, height: 2700, sill: 3430, views: ['south_facade'] });
+            WindowStore.update('O7', { x: 15180, width: 2000, height: 2800, sill: 0, sashes: 1, hasMullion: false, tiltTurnSashes: [], views: ['south_facade'] });
+            WindowStore.update('O5', { sashes: 3, pillarWidth: 90, hasMullion: true, slidingArrows: false, width: 6480, height: 2800, sill: 0, views: ['south_facade'] });
+            WindowStore.update('O4', { sashes: 3, pillarWidth: 90, hasMullion: true, slidingArrows: false, width: 6300, height: 2800, sill: 0, views: ['south_facade'] });
+
+            // West defaults (O8a only)
+            WindowStore.update('O8c', { views: [] });
+            WindowStore.update('O8b', { views: [] });
+            WindowStore.update('O8a', { y: 15250, width: 5500, height: 740, sill: 2060, views: ['west_facade'] });
+            WindowStore.update('O13b_1', { y: 2990, width: 2370, height: 1950, sill: 4180, views: ['west_facade'] });
+            WindowStore.update('O13b_2', { y: 9010, width: 2370, height: 1950, sill: 4180, views: ['west_facade'] });
+
+            // East defaults (Bigger windows: O9 & O3 = 2 sashes of 2,500 mm + 90 mm pillar)
+            WindowStore.update('O9', { sashes: 2, pillarWidth: 90, hasMullion: true, width: 5090, height: 2700, sill: 3430, views: ['east_facade'] });
+            WindowStore.update('O3', { sashes: 2, pillarWidth: 90, hasMullion: true, width: 5090, height: 2800, sill: 0, views: ['east_facade'] });
+        }
+
+        // ============================================================================
+        // 2. UNIFIED 3D BUILDING COORDINATE SYSTEM (IN MILLIMETERS)
+        // ============================================================================
+        // Plan X-axis (East -> West):
+        //   X = -285 mm : East-most outer wall plane (Central 2-story block & South-East wall)
+        //   X =    0 mm : Axis 6 / Point 0 on North Facade (beginning of 6,315 mm upper balcony)
+        //   X = 6315 mm : End of upper North-East covered terrace / start of 14a & recessed O14b wall
+        //   X = 11740 mm: Step between North recessed Kitchen/Gabinet wall and protruding Garage
+        //   X = 14695 mm: Step between South-East recessed living wall and South-West protruding wing (O7 / O6b / O6a)
+        //   X = 20705 mm: West-most outer wall plane (20,990 mm total width from X = -285 mm)
+        //
+        // Plan Z-axis (North -> South, corresponding to global Y in windows.js):
+        //   Z = -290 mm : North-most outer wall plane (Garage North blind wall)
+        //   Z =    0 mm : Axis A / Point 0 on West & East Facades
+        //   Z = 2790 mm : Recessed North wall (Gabinet O2, Kitchen O1) & Upper Floor North wall
+        //   Z = 5890 mm : Back wall of North-East upper covered terrace
+        //   Z = 8560..11020 mm: Recessed Entrance Alcove (Wnęka Wejściowa Z1, recessed to X = 19,555 mm)
+        //   Z = 11580 mm: Recessed South wall (O4, O5) & Upper Floor South wall (O10, SO3, O12, O13a_2)
+        //   Z = 21130 mm: South-most outer wall plane of South-West wing (O7, total West length = 21,420 mm)
+        //
+        // Vertical Y-axis (Elevation from finished floor ±0.00m = 0 mm):
+        //   Y =   -20 mm: Exterior terrain / grade level (-0.02 m)
+        //   Y =     0 mm: Ground floor datum (±0.00 m)
+        //   Y =  2800 mm: Top of Lower Floor clinker brick / bottom of intermediate cornice (+2.80 m)
+        //   Y =  3430 mm: Top of intermediate cornice / Upper Floor sill datum (+3.43 m)
+        //   Y =  6130 mm: Top of Upper Floor timber cladding / roof soffit (+6.13 m)
+        //   Y =  6880 mm: Top of main roof attica cornice (+6.88 m)
+        //   Y =  7260 mm: Top of chimney shaft (+7.26 m)
+        // ============================================================================
+
+        const BUILDING_CENTER = { x: 10.21, y: 3.2, z: 10.42 }; // in meters (mm / 1000)
+
+        const state = {
+            yaw: -140 * Math.PI / 180,     // Camera horizontal orbit angle (radians)
+            pitch: 24 * Math.PI / 180,     // Camera vertical elevation angle (radians)
+            distance: 34.0,                // Camera distance in meters
+            zoom: 1.0,                     // Zoom multiplier
+            target: { x: BUILDING_CENTER.x, y: 2.6, z: BUILDING_CENTER.z },
+            projection: 'perspective',     // 'perspective' | 'orthographic'
+            floorMode: 'all',              // 'all' | 'explode' | 'ground' | 'upper'
+            jambMaterial: 'ral7021',       // 'ral7021' | 'floor'
+            sunAzimuthDeg: 135,
+            layers: {
+                labels: true,
+                dims: true,
+                levels: true,
+                edges: true,
+                trees: true
+            },
+            selectedOpeningId: 'O3',
+            hoveredOpeningId: null,
+            projectedLabels: []
+        };
+
+        // Canonical 3D Opening Definitions (19 default openings across all 4 facades)
+        const OPENINGS_3D = [
+            // ================= NORTH FACADE (facing North: normal [0, 0, -1]) =================
+            {
+                id: 'O2', name: 'O2', facade: 'North Facade', floor: 'ground',
+                room: '0.15 Gabinet (Study)',
+                wallNormal: [0, 0, -1],
+                x1: 880, x2: 2680, z1: 2790, z2: 2790,
+                y1: 800, y2: 2500, widthMm: 1800, heightMm: 1700, sillMm: 800,
+                sashes: 2, pillarMm: 0, hasMullion: true, jambs: ['left', 'right', 'top'],
+                specs: '1,800 × 1,700 mm (hp = 800 mm) • 2-sash study window, 1,150 mm from East ground wall edge'
+            },
+            {
+                id: 'O1', name: 'O1', facade: 'North Facade', floor: 'ground',
+                room: '0.13 Kuchnia (Kitchen)',
+                wallNormal: [0, 0, -1],
+                x1: 8480, x2: 10580, z1: 2790, z2: 2790,
+                y1: 1100, y2: 2500, widthMm: 2100, heightMm: 1400, sillMm: 1100,
+                sashes: 2, pillarMm: 0, hasMullion: true, jambs: ['left', 'right', 'top'],
+                specs: '2,100 × 1,400 mm (hp = 1,100 mm) • Split 1,050 + 1,050 mm, vertically aligned with O15'
+            },
+            {
+                id: '14a', name: '14a', facade: 'North Facade', floor: 'first',
+                room: '1.04 Sypialnia (East Bedroom)',
+                wallNormal: [0, 0, -1],
+                x1: 6315, x2: 7505, z1: 2790, z2: 2790,
+                y1: 3430, y2: 6130, widthMm: 1190, heightMm: 2700, sillMm: 0,
+                sashes: 1, pillarMm: 0, hasMullion: false, jambs: ['right'],
+                specs: '1,190 × 2,700 mm (hp = 0 mm) • Full-height glazing starting immediately after 6,315 mm balcony'
+            },
+            {
+                id: 'O15', name: 'O15', facade: 'North Facade', floor: 'first',
+                room: '1.04 Sypialnia Master',
+                wallNormal: [0, 0, -1],
+                x1: 8480, x2: 10580, z1: 2790, z2: 2790,
+                y1: 3430, y2: 6130, widthMm: 2100, heightMm: 2700, sillMm: 0,
+                sashes: 1, pillarMm: 0, hasMullion: false, jambs: ['left', 'right'],
+                specs: '2,100 × 2,700 mm (hp = 0 mm, default) • Full-height window aligned with Kitchen O1'
+            },
+            {
+                id: 'O11_2', name: 'O11 (Bathroom)', facade: 'North Facade', floor: 'first',
+                room: '1.02 Łazienka Master',
+                wallNormal: [0, 0, -1],
+                x1: 11375, x2: 12375, z1: 2790, z2: 2790,
+                y1: 4180, y2: 6130, widthMm: 1000, heightMm: 1950, sillMm: 850,
+                sashes: 1, pillarMm: 0, hasMullion: false, jambs: ['left', 'right'],
+                specs: '1,000 × 1,950 mm (hp = 850 mm) • Vertical slot bathroom window'
+            },
+            {
+                id: 'O11_3', name: 'O11 (Stairs)', facade: 'North Facade', floor: 'first',
+                room: '1.07 Komunikacja / Schody',
+                wallNormal: [0, 0, -1],
+                x1: 14015, x2: 15015, z1: 2790, z2: 2790,
+                y1: 4180, y2: 6130, widthMm: 1000, heightMm: 1950, sillMm: 850,
+                sashes: 1, pillarMm: 0, hasMullion: false, jambs: ['left', 'right'],
+                specs: '1,000 × 1,950 mm (hp = 850 mm) • Staircase / corridor daylight slot window'
+            },
+            {
+                id: 'O13a', name: 'O13a (North)', facade: 'North Facade', floor: 'first',
+                room: '1.01 Sypialnia Master (Corner)',
+                wallNormal: [0, 0, -1],
+                x1: 18125, x2: 20505, z1: 2790, z2: 2790,
+                y1: 4180, y2: 6130, widthMm: 2380, heightMm: 1950, sillMm: 850,
+                sashes: 1, pillarMm: 0, hasMullion: false, jambs: ['left'],
+                cornerJoinRight: true,
+                specs: '2,380 × 1,950 mm (hp = 850 mm) • Frameless corner window meeting O13b_1 at NW corner'
+            },
+
+            // ================= SOUTH FACADE (facing South: normal [0, 0, +1]) =================
+            {
+                id: 'O7', name: 'O7', facade: 'South Facade', floor: 'ground',
+                room: '0.09 Pokój (SW Ground Wing)',
+                wallNormal: [0, 0, 1],
+                x1: 14895, x2: 16895, z1: 21130, z2: 21130,
+                y1: 0, y2: 2800, widthMm: 2000, heightMm: 2800, sillMm: 0,
+                sashes: 1, pillarMm: 0, hasMullion: false, jambs: ['left'],
+                specs: '2,000 × 2,800 mm (hp = 0 mm, Bigger default) • Full-height fixed window with 200 mm East jamb'
+            },
+            {
+                id: 'O5', name: 'O5', facade: 'South Facade', floor: 'ground',
+                room: '0.12 Jadalnia / Salon',
+                wallNormal: [0, 0, 1],
+                x1: 7215, x2: 13695, z1: 11580, z2: 11580,
+                y1: 0, y2: 2800, widthMm: 6480, heightMm: 2800, sillMm: 0,
+                sashes: 3, pillarMm: 90, hasMullion: true, jambs: ['left', 'right'],
+                specs: '6,480 × 2,800 mm (hp = 0 mm) • 3 × 2,100 mm panes + 2 × 90 mm inner pillars (HST terrace glazing)'
+            },
+            {
+                id: 'O4', name: 'O4', facade: 'South Facade', floor: 'ground',
+                room: '0.11 Salon (Living Room)',
+                wallNormal: [0, 0, 1],
+                x1: -85, x2: 6215, z1: 11580, z2: 11580,
+                y1: 0, y2: 2800, widthMm: 6300, heightMm: 2800, sillMm: 0,
+                sashes: 3, pillarMm: 90, hasMullion: true, jambs: ['left'],
+                specs: '6,300 × 2,800 mm (hp = 0 mm) • 3 × 2,040 mm panes + 2 × 90 mm inner pillars (HST terrace glazing)'
+            },
+            {
+                id: 'O13a_2', name: 'O13a (South)', facade: 'South Facade', floor: 'first',
+                room: '1.01 Sypialnia Master',
+                wallNormal: [0, 0, 1],
+                x1: 18125, x2: 20505, z1: 11580, z2: 11580,
+                y1: 4180, y2: 6130, widthMm: 2380, heightMm: 1950, sillMm: 850,
+                sashes: 2, pillarMm: 0, hasMullion: true, jambs: ['right'],
+                specs: '2,380 × 1,950 mm (hp = 850 mm) • 2-sash bedroom window, 200 mm from West corner'
+            },
+            {
+                id: 'O12', name: 'O12', facade: 'South Facade', floor: 'first',
+                room: '1.05 Sypialnia Południowa',
+                wallNormal: [0, 0, 1],
+                x1: 10695, x2: 14695, z1: 11580, z2: 11580,
+                y1: 3430, y2: 6130, widthMm: 4000, heightMm: 2700, sillMm: 0,
+                sashes: 2, pillarMm: 90, hasMullion: true, jambs: ['left', 'right'],
+                specs: '4,000 × 2,700 mm (hp = 0 mm) • 2 × 1,955 mm panes + 1 × 90 mm inner pillar'
+            },
+            {
+                id: 'SO3', name: 'SO3', facade: 'South Facade', floor: 'first',
+                room: '1.06 Łazienka / Garderoba',
+                wallNormal: [0, 0, 1],
+                x1: 7215, x2: 8215, z1: 11580, z2: 11580,
+                y1: 4180, y2: 6130, widthMm: 1000, heightMm: 1950, sillMm: 850,
+                sashes: 1, pillarMm: 0, hasMullion: false, jambs: ['left', 'right'],
+                specs: '1,000 × 1,950 mm (hp = 850 mm) • Single-sash tilt-and-turn bathroom window'
+            },
+            {
+                id: 'O10', name: 'O10', facade: 'South Facade', floor: 'first',
+                room: '1.04 Sypialnia Wschodnia',
+                wallNormal: [0, 0, 1],
+                x1: -85, x2: 6215, z1: 11580, z2: 11580,
+                y1: 3430, y2: 6130, widthMm: 6300, heightMm: 2700, sillMm: 0,
+                sashes: 3, pillarMm: 90, hasMullion: true, jambs: ['left'],
+                specs: '6,300 × 2,700 mm (hp = 0 mm) • 3 × 2,040 mm panes + 2 × 90 mm inner pillars'
+            },
+
+            // ================= WEST FACADE (facing West: normal [+1, 0, 0]) =================
+            {
+                id: 'Z2', name: 'Z2 (Garage)', facade: 'West Facade', floor: 'ground',
+                room: '0.01 Garaż Dwustanowiskowy',
+                wallNormal: [1, 0, 0],
+                x1: 20705, x2: 20705, z1: 690, z2: 5890,
+                y1: 0, y2: 2200, widthMm: 5200, heightMm: 2200, sillMm: 0,
+                sashes: 1, pillarMm: 0, hasMullion: false, openingType: 'garage_door', jambs: ['left', 'right', 'top'],
+                specs: '5,200 × 2,200 mm (hp = 0 mm) • Double-car insulated sectional garage door in RAL 7021'
+            },
+            {
+                id: 'Z1', name: 'Z1 (Entrance)', facade: 'West Facade', floor: 'ground',
+                room: '0.04 Wiatrołap (Main Entrance Nook)',
+                wallNormal: [1, 0, 0],
+                x1: 19555, x2: 19555, z1: 8920, z2: 10620,
+                y1: 0, y2: 2250, widthMm: 1700, heightMm: 2250, sillMm: 0,
+                sashes: 2, pillarMm: 0, hasMullion: true, openingType: 'entrance_door', jambs: [],
+                specs: '1,700 × 2,250 mm (hp = 0 mm) • Main entrance door + sidelight inside 2,460 mm recessed alcove'
+            },
+            {
+                id: 'O8a', name: 'O8a', facade: 'West Facade', floor: 'ground',
+                room: '0.11 Salon (Western Clerestory)',
+                wallNormal: [1, 0, 0],
+                x1: 20705, x2: 20705, z1: 15250, z2: 20750,
+                y1: 2060, y2: 2800, widthMm: 5500, heightMm: 740, sillMm: 2060,
+                sashes: 3, pillarMm: 0, hasMullion: true, jambs: ['left', 'right'],
+                specs: '5,500 × 740 mm (hp = 2,060 mm, default O8a only) • 3-pane high clerestory ribbon window'
+            },
+            {
+                id: 'O13b_1', name: 'O13b (North-West)', facade: 'West Facade', floor: 'first',
+                room: '1.01 Sypialnia Master (Corner)',
+                wallNormal: [1, 0, 0],
+                x1: 20705, x2: 20705, z1: 2990, z2: 5360,
+                y1: 4180, y2: 6130, widthMm: 2370, heightMm: 1950, sillMm: 850,
+                sashes: 1, pillarMm: 0, hasMullion: false, jambs: ['right'],
+                cornerJoinLeft: true,
+                specs: '2,370 × 1,950 mm (hp = 850 mm) • Frameless corner window West face, 200 mm from North upper edge'
+            },
+            {
+                id: 'O13b_2', name: 'O13b (South-West)', facade: 'West Facade', floor: 'first',
+                room: '1.05 Sypialnia Zachodnia',
+                wallNormal: [1, 0, 0],
+                x1: 20705, x2: 20705, z1: 9010, z2: 11380,
+                y1: 4180, y2: 6130, widthMm: 2370, heightMm: 1950, sillMm: 850,
+                sashes: 1, pillarMm: 0, hasMullion: false, jambs: ['left'],
+                specs: '2,370 × 1,950 mm (hp = 850 mm) • Picture bedroom window, 200 mm from South upper edge'
+            },
+
+            // ================= EAST FACADE (facing East: normal [-1, 0, 0]) =================
+            {
+                id: 'O6b', name: 'O6b', facade: 'East Facade', floor: 'ground',
+                room: '0.10 Siłownia (Recessed South Wing)',
+                wallNormal: [-1, 0, 0],
+                x1: 14695, x2: 14695, z1: 15285, z2: 20925,
+                y1: 0, y2: 2800, widthMm: 5640, heightMm: 2800, sillMm: 0,
+                sashes: 3, pillarMm: 90, hasMullion: true, jambs: ['right'],
+                specs: '5,640 × 2,800 mm (hp = 0 mm) • 3 × 1,820 mm panes + 2 × 90 mm inner pillars on recessed wing'
+            },
+            {
+                id: 'O6a', name: 'O6a', facade: 'East Facade', floor: 'ground',
+                room: '0.12 Komunikacja (Recessed South Wing)',
+                wallNormal: [-1, 0, 0],
+                x1: 14695, x2: 14695, z1: 13275, z2: 15035,
+                y1: 2060, y2: 2800, widthMm: 1760, heightMm: 740, sillMm: 2060,
+                sashes: 1, pillarMm: 0, hasMullion: false, jambs: ['left', 'right'],
+                specs: '1,760 × 740 mm (hp = 2,060 mm) • High clerestory ribbon window, 250 mm North of O6b'
+            },
+            {
+                id: 'O3', name: 'O3', facade: 'East Facade', floor: 'ground',
+                room: '0.11 Salon (Projecting Center Block)',
+                wallNormal: [-1, 0, 0],
+                x1: -285, x2: -285, z1: 6290, z2: 11380,
+                y1: 0, y2: 2800, widthMm: 5090, heightMm: 2800, sillMm: 0,
+                sashes: 2, pillarMm: 90, hasMullion: true, jambs: ['right'],
+                specs: '5,090 × 2,800 mm (hp = 0 mm, Bigger default) • 2 × 2,500 mm panes + 1 × 90 mm inner pillar'
+            },
+            {
+                id: 'O9', name: 'O9', facade: 'East Facade', floor: 'first',
+                room: '1.04 Sypialnia Wschodnia (Center Block)',
+                wallNormal: [-1, 0, 0],
+                x1: -285, x2: -285, z1: 6290, z2: 11380,
+                y1: 3430, y2: 6130, widthMm: 5090, heightMm: 2700, sillMm: 0,
+                sashes: 2, pillarMm: 90, hasMullion: true, jambs: ['right'],
+                specs: '5,090 × 2,700 mm (hp = 0 mm, Bigger default) • 2 × 2,500 mm panes + 1 × 90 mm inner pillar, aligned with O3'
+            },
+            {
+                id: 'O14b', name: 'O14b + D1', facade: 'East Facade', floor: 'first',
+                room: '1.04 Sypialnia / Taras (Covered Terrace)',
+                wallNormal: [-1, 0, 0],
+                x1: 6315, x2: 6315, z1: 2990, z2: 5800,
+                y1: 3430, y2: 6130, widthMm: 2810, heightMm: 2700, sillMm: 0,
+                sashes: 2, sashRatios: [1820 / 2720, 900 / 2720], pillarMm: 90, hasMullion: true, jambs: ['left'],
+                specs: '2,810 × 2,700 mm (hp = 0 mm) • 900 mm door D1 + 90 mm pillar + 1,820 mm fixed window on covered terrace'
+            }
+        ];
+
+        // ============================================================================
+        // 3. WEBGL SHADERS & PROCEDURAL ARCHITECTURAL TEXTURES
+        // ============================================================================
+        let gl = null;
+        let program = null;
+        let lineProgram = null;
+        let textures = {};
+        let sceneBatches = [];
+        let edgeBuffer = null;
+        let edgeVertexCount = 0;
+
+        const VS_SOURCE = `
+            attribute vec3 aPos;
+            attribute vec3 aNormal;
+            attribute vec2 aUV;
+            attribute vec3 aColor;
+
+            uniform mat4 uProj;
+            uniform mat4 uView;
+
+            varying vec3 vNormal;
+            varying vec2 vUV;
+            varying vec3 vColor;
+            varying vec3 vWorldPos;
+
+            void main() {
+                vNormal = aNormal;
+                vUV = aUV;
+                vColor = aColor;
+                vWorldPos = aPos;
+                gl_Position = uProj * uView * vec4(aPos, 1.0);
+            }
+        `;
+
+        const FS_SOURCE = `
+            precision mediump float;
+
+            varying vec3 vNormal;
+            varying vec2 vUV;
+            varying vec3 vColor;
+            varying vec3 vWorldPos;
+
+            uniform sampler2D uTex;
+            uniform int uUseTex;
+            uniform vec3 uSunDir;
+            uniform float uAlpha;
+
+            void main() {
+                vec3 n = normalize(vNormal);
+                float ndotl = max(dot(n, uSunDir), 0.0);
+                // Warm architectural daylight + sky hemisphere ambient
+                float skyBounce = 0.5 + 0.5 * n.y;
+                // Subtle ground/cornice ambient occlusion near y=0, y=2.8, y=6.13
+                float light = 0.52 + 0.42 * ndotl + 0.08 * skyBounce;
+
+                vec4 base = vec4(vColor, uAlpha);
+                if (uUseTex == 1) {
+                    vec4 texCol = texture2D(uTex, fract(vUV));
+                    base = vec4(texCol.rgb * vColor, texCol.a * uAlpha);
+                }
+
+                gl_FragColor = vec4(base.rgb * light, base.a);
+            }
+        `;
+
+        const LINE_VS_SOURCE = `
+            attribute vec3 aPos;
+            attribute vec3 aColor;
+            uniform mat4 uProj;
+            uniform mat4 uView;
+            varying vec3 vColor;
+            void main() {
+                vColor = aColor;
+                gl_Position = uProj * uView * vec4(aPos, 1.0);
+            }
+        `;
+
+        const LINE_FS_SOURCE = `
+            precision mediump float;
+            varying vec3 vColor;
+            void main() {
+                gl_FragColor = vec4(vColor, 0.85);
+            }
+        `;
+
+        function createShader(glCtx, type, src) {
+            const s = glCtx.createShader(type);
+            glCtx.shaderSource(s, src);
+            glCtx.compileShader(s);
+            return s;
+        }
+
+        function createProgram(glCtx, vsSrc, fsSrc) {
+            const p = glCtx.createProgram();
+            glCtx.attachShader(p, createShader(glCtx, glCtx.VERTEX_SHADER, vsSrc));
+            glCtx.attachShader(p, createShader(glCtx, glCtx.FRAGMENT_SHADER, fsSrc));
+            glCtx.linkProgram(p);
+            return p;
+        }
+
+        function createCanvasTexture(glCtx, drawFn, width, height) {
+            const c = document.createElement('canvas');
+            c.width = width;
+            c.height = height;
+            const ctx = c.getContext('2d');
+            drawFn(ctx, width, height);
+
+            const tex = glCtx.createTexture();
+            glCtx.bindTexture(glCtx.TEXTURE_2D, tex);
+            glCtx.texImage2D(glCtx.TEXTURE_2D, 0, glCtx.RGBA, glCtx.RGBA, glCtx.UNSIGNED_BYTE, c);
+            glCtx.generateMipmap(glCtx.TEXTURE_2D);
+            glCtx.texParameteri(glCtx.TEXTURE_2D, glCtx.TEXTURE_MIN_FILTER, glCtx.LINEAR_MIPMAP_LINEAR);
+            glCtx.texParameteri(glCtx.TEXTURE_2D, glCtx.TEXTURE_MAG_FILTER, glCtx.LINEAR);
+            glCtx.texParameteri(glCtx.TEXTURE_2D, glCtx.TEXTURE_WRAP_S, glCtx.REPEAT);
+            glCtx.texParameteri(glCtx.TEXTURE_2D, glCtx.TEXTURE_WRAP_T, glCtx.REPEAT);
+            return tex;
+        }
+
+        function initProceduralTextures(glCtx) {
+            // 1. Dark Graphite Clinker Brick Texture (tile repeat: 1m x 1m)
+            textures.brick = createCanvasTexture(glCtx, (ctx, w, h) => {
+                ctx.fillStyle = '#252830'; // Mortar grout
+                ctx.fillRect(0, 0, w, h);
+                const rows = 12;
+                const cols = 4;
+                const rowH = h / rows;
+                const colW = w / cols;
+                const shades = ['#353a44', '#383d47', '#3d434e', '#30343d', '#414753'];
+                for (let r = 0; r < rows; r++) {
+                    const offset = (r % 2 === 1) ? colW * 0.5 : 0;
+                    for (let c = -1; c <= cols; c++) {
+                        const bx = c * colW + offset;
+                        const by = r * rowH;
+                        ctx.fillStyle = shades[(r * 7 + c * 3 + 100) % shades.length];
+                        ctx.fillRect(bx + 2, by + 2, colW - 4, rowH - 4);
+                        // Subtle highlight strip
+                        ctx.fillStyle = 'rgba(255,255,255,0.04)';
+                        ctx.fillRect(bx + 3, by + 3, colW - 6, 3);
+                    }
+                }
+            }, 256, 256);
+
+            // 2. Vertical Natural Thermo-Timber Slats Texture (tile repeat: 1m x 1m)
+            textures.wood = createCanvasTexture(glCtx, (ctx, w, h) => {
+                ctx.fillStyle = '#5d4c38';
+                ctx.fillRect(0, 0, w, h);
+                const slats = 16;
+                const slatW = w / slats;
+                const tones = ['#cbb497', '#d5bfa3', '#c4ac8e', '#d8c5ab', '#bfa688'];
+                for (let i = 0; i < slats; i++) {
+                    const sx = i * slatW;
+                    ctx.fillStyle = tones[i % tones.length];
+                    ctx.fillRect(sx, 0, slatW - 2.5, h);
+                    ctx.fillStyle = 'rgba(255, 248, 235, 0.16)';
+                    ctx.fillRect(sx + 1, 0, 2, h);
+                }
+            }, 256, 256);
+
+            // 3. Anthracite Metal Cassette Fascia Texture (tile repeat: 0.9m width)
+            textures.fascia = createCanvasTexture(glCtx, (ctx, w, h) => {
+                const grad = ctx.createLinearGradient(0, 0, 0, h);
+                grad.addColorStop(0, '#252b37');
+                grad.addColorStop(0.5, '#1b2029');
+                grad.addColorStop(1, '#12151c');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, w, h);
+                // Vertical cassette panel reveal seam
+                ctx.fillStyle = '#090b0f';
+                ctx.fillRect(0, 0, 5, h);
+                ctx.fillStyle = 'rgba(255,255,255,0.08)';
+                ctx.fillRect(5, 0, 2, h);
+                // Top & bottom drip edge highlights
+                ctx.fillStyle = 'rgba(255,255,255,0.12)';
+                ctx.fillRect(0, 0, w, 4);
+                ctx.fillStyle = '#07090c';
+                ctx.fillRect(0, h - 5, w, 5);
+            }, 256, 256);
+
+            // 4. Reflective Architectural Glass Texture
+            textures.glass = createCanvasTexture(glCtx, (ctx, w, h) => {
+                const grad = ctx.createLinearGradient(0, 0, w, h);
+                grad.addColorStop(0, '#385a7c');
+                grad.addColorStop(0.35, '#1e3a56');
+                grad.addColorStop(0.5, '#4b7aa6');
+                grad.addColorStop(0.7, '#16283b');
+                grad.addColorStop(1, '#0d1824');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, w, h);
+                // Diagonal sky reflection band
+                ctx.strokeStyle = 'rgba(186, 230, 253, 0.22)';
+                ctx.lineWidth = 26;
+                ctx.beginPath();
+                ctx.moveTo(-20, h * 0.75);
+                ctx.lineTo(w * 0.75, -20);
+                ctx.stroke();
+                ctx.lineWidth = 10;
+                ctx.beginPath();
+                ctx.moveTo(w * 0.2, h + 20);
+                ctx.lineTo(w + 20, h * 0.2);
+                ctx.stroke();
+            }, 256, 256);
+
+            // 5. Sectional Garage Door Texture (Horizontal ribs)
+            textures.garage = createCanvasTexture(glCtx, (ctx, w, h) => {
+                ctx.fillStyle = '#22262c';
+                ctx.fillRect(0, 0, w, h);
+                const panels = 8;
+                const ph = h / panels;
+                for (let i = 0; i < panels; i++) {
+                    const py = i * ph;
+                    ctx.fillStyle = '#2a2f37';
+                    ctx.fillRect(2, py + 3, w - 4, ph - 6);
+                    ctx.fillStyle = '#15181c';
+                    ctx.fillRect(0, py, w, 3);
+                    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+                    ctx.fillRect(0, py + 3, w, 2);
+                }
+            }, 256, 256);
+
+            // 6. Terrace Gres Decking Tile Texture
+            textures.terrace = createCanvasTexture(glCtx, (ctx, w, h) => {
+                ctx.fillStyle = '#64748b';
+                ctx.fillRect(0, 0, w, h);
+                const n = 4;
+                const step = w / n;
+                for (let i = 0; i < n; i++) {
+                    for (let j = 0; j < n; j++) {
+                        ctx.fillStyle = ((i + j) % 2 === 0) ? '#94a3b8' : '#8695a8';
+                        ctx.fillRect(i * step + 2, j * step + 2, step - 4, step - 4);
+                    }
+                }
+            }, 256, 256);
+        }
+
+        // ============================================================================
+        // 4. GEOMETRY BUILDER (WALLS, CORNICES, ROOFS, JAMBS, SASHES, PILLARS)
+        // ============================================================================
+        class MeshBuilder {
+            constructor() {
+                this.positions = [];
+                this.normals = [];
+                this.uvs = [];
+                this.colors = [];
+            }
+
+            addQuad(p0, p1, p2, p3, normal, uv0, uv1, uv2, uv3, color) {
+                const c = color || [1, 1, 1];
+                // Triangle 1: p0, p1, p2
+                this.positions.push(...p0, ...p1, ...p2);
+                this.normals.push(...normal, ...normal, ...normal);
+                this.uvs.push(...uv0, ...uv1, ...uv2);
+                this.colors.push(...c, ...c, ...c);
+                // Triangle 2: p0, p2, p3
+                this.positions.push(...p0, ...p2, ...p3);
+                this.normals.push(...normal, ...normal, ...normal);
+                this.uvs.push(...uv0, ...uv2, ...uv3);
+                this.colors.push(...c, ...c, ...c);
+            }
+
+            // Add an axis-aligned 3D box in millimeters (converted to meters)
+            addBoxMm(x1, y1, z1, x2, y2, z2, color, uvScale = 1.0, yOffsetMeters = 0) {
+                const X1 = Math.min(x1, x2) / 1000;
+                const X2 = Math.max(x1, x2) / 1000;
+                const Y1 = Math.min(y1, y2) / 1000 + yOffsetMeters;
+                const Y2 = Math.max(y1, y2) / 1000 + yOffsetMeters;
+                const Z1 = Math.min(z1, z2) / 1000;
+                const Z2 = Math.max(z1, z2) / 1000;
+
+                const dx = (X2 - X1) * uvScale;
+                const dy = (Y2 - Y1) * uvScale;
+                const dz = (Z2 - Z1) * uvScale;
+
+                // Front (+Z, South)
+                this.addQuad(
+                    [X1, Y1, Z2], [X2, Y1, Z2], [X2, Y2, Z2], [X1, Y2, Z2],
+                    [0, 0, 1], [0, 0], [dx, 0], [dx, dy], [0, dy], color
+                );
+                // Back (-Z, North)
+                this.addQuad(
+                    [X2, Y1, Z1], [X1, Y1, Z1], [X1, Y2, Z1], [X2, Y2, Z1],
+                    [0, 0, -1], [0, 0], [dx, 0], [dx, dy], [0, dy], color
+                );
+                // Right (+X, West)
+                this.addQuad(
+                    [X2, Y1, Z2], [X2, Y1, Z1], [X2, Y2, Z1], [X2, Y2, Z2],
+                    [1, 0, 0], [0, 0], [dz, 0], [dz, dy], [0, dy], color
+                );
+                // Left (-X, East)
+                this.addQuad(
+                    [X1, Y1, Z1], [X1, Y1, Z2], [X1, Y2, Z2], [X1, Y2, Z1],
+                    [-1, 0, 0], [0, 0], [dz, 0], [dz, dy], [0, dy], color
+                );
+                // Top (+Y)
+                this.addQuad(
+                    [X1, Y2, Z2], [X2, Y2, Z2], [X2, Y2, Z1], [X1, Y2, Z1],
+                    [0, 1, 0], [0, 0], [dx, 0], [dx, dz], [0, dz], color
+                );
+                // Bottom (-Y)
+                this.addQuad(
+                    [X1, Y1, Z1], [X2, Y1, Z1], [X2, Y1, Z2], [X1, Y1, Z2],
+                    [0, -1, 0], [0, 0], [dx, 0], [dx, dz], [0, dz], color
+                );
+            }
+
+            toBatch(glCtx, tex, useTex, alpha = 1.0) {
+                if (this.positions.length === 0) return null;
+                const posBuf = glCtx.createBuffer();
+                glCtx.bindBuffer(glCtx.ARRAY_BUFFER, posBuf);
+                glCtx.bufferData(glCtx.ARRAY_BUFFER, new Float32Array(this.positions), glCtx.STATIC_DRAW);
+
+                const normBuf = glCtx.createBuffer();
+                glCtx.bindBuffer(glCtx.ARRAY_BUFFER, normBuf);
+                glCtx.bufferData(glCtx.ARRAY_BUFFER, new Float32Array(this.normals), glCtx.STATIC_DRAW);
+
+                const uvBuf = glCtx.createBuffer();
+                glCtx.bindBuffer(glCtx.ARRAY_BUFFER, uvBuf);
+                glCtx.bufferData(glCtx.ARRAY_BUFFER, new Float32Array(this.uvs), glCtx.STATIC_DRAW);
+
+                const colBuf = glCtx.createBuffer();
+                glCtx.bindBuffer(glCtx.ARRAY_BUFFER, colBuf);
+                glCtx.bufferData(glCtx.ARRAY_BUFFER, new Float32Array(this.colors), glCtx.STATIC_DRAW);
+
+                return {
+                    posBuf,
+                    normBuf,
+                    uvBuf,
+                    colBuf,
+                    vertexCount: this.positions.length / 3,
+                    tex: tex || null,
+                    useTex: useTex ? 1 : 0,
+                    alpha
+                };
+            }
+        }
+
+        function addEdgeBoxMm(edges, x1, y1, z1, x2, y2, z2, col, yOffsetMeters = 0) {
+            const X1 = Math.min(x1, x2) / 1000;
+            const X2 = Math.max(x1, x2) / 1000;
+            const Y1 = Math.min(y1, y2) / 1000 + yOffsetMeters;
+            const Y2 = Math.max(y1, y2) / 1000 + yOffsetMeters;
+            const Z1 = Math.min(z1, z2) / 1000;
+            const Z2 = Math.max(z1, z2) / 1000;
+
+            const pts = [
+                [X1, Y1, Z1], [X2, Y1, Z1], [X2, Y1, Z2], [X1, Y1, Z2],
+                [X1, Y2, Z1], [X2, Y2, Z1], [X2, Y2, Z2], [X1, Y2, Z2]
+            ];
+            const pairs = [
+                [0, 1], [1, 2], [2, 3], [3, 0],
+                [4, 5], [5, 6], [6, 7], [7, 4],
+                [0, 4], [1, 5], [2, 6], [3, 7]
+            ];
+            for (const [a, b] of pairs) {
+                edges.positions.push(...pts[a], ...pts[b]);
+                edges.colors.push(...col, ...col);
+            }
+        }
+
+        /**
+         * Build a wall segment with exact cutouts for openings (windows/doors),
+         * 200 mm deep recessed window jambs (Ościeża), outer frames, 90 mm inner pillars,
+         * and recessed glass panes.
+         */
+        function buildWallWithOpenings(opts) {
+            const {
+                axis,        // 'x' (wall runs along X at fixed Z) or 'z' (wall runs along Z at fixed X)
+                fixedCoord,  // outer face coordinate in mm
+                inwardSign,  // +1 or -1 indicating which direction goes INTO the building
+                spanStart,   // min coordinate along wall axis (mm)
+                spanEnd,     // max coordinate along wall axis (mm)
+                yBottom,     // bottom elevation (mm)
+                yTop,        // top elevation (mm)
+                thickness,   // wall thickness (mm, typically 200 mm for jamb reveal)
+                openings,    // array of openings on this wall
+                wallBuilder, // MeshBuilder for the wall material (brick or wood)
+                wallColor,   // RGB tint for wall material
+                uvScale,     // texture scale
+                jambBuilder, // MeshBuilder for RAL 7021 jambs & frames
+                glassBuilder,// MeshBuilder for glass
+                garageBuilder,// MeshBuilder for sectional garage door
+                edges,       // edge accumulator
+                yOffset      // vertical offset in meters (for explode mode)
+            } = opts;
+
+            // Sort openings along the wall span
+            const sorted = [...openings].sort((a, b) => {
+                const aStart = (axis === 'x') ? Math.min(a.x1, a.x2) : Math.min(a.z1, a.z2);
+                const bStart = (axis === 'x') ? Math.min(b.x1, b.x2) : Math.min(b.z1, b.z2);
+                return aStart - bStart;
+            });
+
+            const cOuter = fixedCoord;
+            const cInner = fixedCoord + inwardSign * thickness;
+
+            function makeWallBlock(s1, s2, yb, yt, builder, col) {
+                if (s2 - s1 <= 1 || yt - yb <= 1) return;
+                if (axis === 'x') {
+                    builder.addBoxMm(s1, yb, cOuter, s2, yt, cInner, col, uvScale, yOffset);
+                } else {
+                    builder.addBoxMm(cOuter, yb, s1, cInner, yt, s2, col, uvScale, yOffset);
+                }
+            }
+
+            let cursor = spanStart;
+            sorted.forEach(op => {
+                const opStart = (axis === 'x') ? Math.min(op.x1, op.x2) : Math.min(op.z1, op.z2);
+                const opEnd = (axis === 'x') ? Math.max(op.x1, op.x2) : Math.max(op.z1, op.z2);
+
+                // 1. Full-height pier before opening
+                if (opStart > cursor) {
+                    makeWallBlock(cursor, opStart, yBottom, yTop, wallBuilder, wallColor);
+                }
+
+                // 2. Under-window sill wall (parapet)
+                if (op.y1 > yBottom) {
+                    makeWallBlock(opStart, opEnd, yBottom, op.y1, wallBuilder, wallColor);
+                }
+
+                // 3. Above-window lintel wall
+                if (op.y2 < yTop) {
+                    makeWallBlock(opStart, opEnd, op.y2, yTop, wallBuilder, wallColor);
+                }
+
+                // 4. Build 200 mm Window Jambs (Ościeża), Frame, Pillars & Glass inside the opening
+                const jambDepth = 200;
+                const cJambInner = fixedCoord + inwardSign * jambDepth;
+                const ralCol = [0.12, 0.14, 0.13]; // RAL 7021 (#1f2421)
+                const useRalJamb = (state.jambMaterial === 'ral7021');
+                const activeJambBuilder = useRalJamb ? jambBuilder : wallBuilder;
+                const activeJambCol = useRalJamb ? ralCol : wallColor;
+
+                // Left / Right / Top 200 mm reveal liners (18 mm thick lining inside reveal)
+                const linerT = 18;
+                if (!op.cornerJoinLeft) {
+                    if (axis === 'x') {
+                        activeJambBuilder.addBoxMm(opStart - linerT, op.y1, cOuter, opStart + linerT, op.y2, cJambInner, activeJambCol, uvScale, yOffset);
+                    } else {
+                        activeJambBuilder.addBoxMm(cOuter, op.y1, opStart - linerT, cJambInner, op.y2, opStart + linerT, activeJambCol, uvScale, yOffset);
+                    }
+                }
+                if (!op.cornerJoinRight) {
+                    if (axis === 'x') {
+                        activeJambBuilder.addBoxMm(opEnd - linerT, op.y1, cOuter, opEnd + linerT, op.y2, cJambInner, activeJambCol, uvScale, yOffset);
+                    } else {
+                        activeJambBuilder.addBoxMm(cOuter, op.y1, opEnd - linerT, cJambInner, op.y2, opEnd + linerT, activeJambCol, uvScale, yOffset);
+                    }
+                }
+                // Top reveal liner & exterior sill plate
+                if (axis === 'x') {
+                    activeJambBuilder.addBoxMm(opStart, op.y2 - linerT, cOuter, opEnd, op.y2 + linerT, cJambInner, activeJambCol, uvScale, yOffset);
+                    jambBuilder.addBoxMm(opStart, op.y1 - 15, cOuter - inwardSign * 15, opEnd, op.y1 + 15, cJambInner, ralCol, 1.0, yOffset);
+                } else {
+                    activeJambBuilder.addBoxMm(cOuter, op.y2 - linerT, opStart, cJambInner, op.y2 + linerT, opEnd, activeJambCol, uvScale, yOffset);
+                    jambBuilder.addBoxMm(cOuter - inwardSign * 15, op.y1 - 15, opStart, cJambInner, op.y1 + 15, opEnd, ralCol, 1.0, yOffset);
+                }
+
+                // Recessed plane where the window frame & glass sit (160 mm recessed from outer face)
+                const cFrameFront = fixedCoord + inwardSign * 145;
+                const cFrameBack = fixedCoord + inwardSign * 195;
+                const cGlassFront = fixedCoord + inwardSign * 162;
+                const cGlassBack = fixedCoord + inwardSign * 178;
+
+                const frameW = 55; // 55 mm perimeter aluminum profile
+                // Perimeter frame (Top, Bottom, Left unless corner join, Right unless corner join)
+                if (axis === 'x') {
+                    jambBuilder.addBoxMm(opStart, op.y1, cFrameFront, opEnd, op.y1 + frameW, cFrameBack, ralCol, 1.0, yOffset);
+                    jambBuilder.addBoxMm(opStart, op.y2 - frameW, cFrameFront, opEnd, op.y2, cFrameBack, ralCol, 1.0, yOffset);
+                    if (!op.cornerJoinLeft) {
+                        jambBuilder.addBoxMm(opStart, op.y1, cFrameFront, opStart + frameW, op.y2, cFrameBack, ralCol, 1.0, yOffset);
+                    }
+                    if (!op.cornerJoinRight) {
+                        jambBuilder.addBoxMm(opEnd - frameW, op.y1, cFrameFront, opEnd, op.y2, cFrameBack, ralCol, 1.0, yOffset);
+                    }
+                    addEdgeBoxMm(edges, opStart, op.y1, cOuter, opEnd, op.y2, cFrameBack, [0.08, 0.10, 0.12], yOffset);
+                } else {
+                    jambBuilder.addBoxMm(cFrameFront, op.y1, opStart, cFrameBack, op.y1 + frameW, opEnd, ralCol, 1.0, yOffset);
+                    jambBuilder.addBoxMm(cFrameFront, op.y2 - frameW, opStart, cFrameBack, op.y2, opEnd, ralCol, 1.0, yOffset);
+                    if (!op.cornerJoinLeft) {
+                        jambBuilder.addBoxMm(cFrameFront, op.y1, opStart, cFrameBack, op.y2, opStart + frameW, ralCol, 1.0, yOffset);
+                    }
+                    if (!op.cornerJoinRight) {
+                        jambBuilder.addBoxMm(cFrameFront, op.y1, opEnd - frameW, cFrameBack, op.y2, opEnd, ralCol, 1.0, yOffset);
+                    }
+                    addEdgeBoxMm(edges, cOuter, op.y1, opStart, cFrameBack, op.y2, opEnd, [0.08, 0.10, 0.12], yOffset);
+                }
+
+                // Inner Sashes / 90 mm Pillars / Garage or Entrance Door Fill
+                if (op.openingType === 'garage_door') {
+                    if (axis === 'z') {
+                        garageBuilder.addBoxMm(cFrameFront, op.y1 + frameW, opStart + frameW, cFrameBack, op.y2 - frameW, opEnd - frameW, [1, 1, 1], 0.45, yOffset);
+                    }
+                } else if (op.openingType === 'entrance_door') {
+                    // Main door leaf (1,100 mm) + glass sidelight (600 mm)
+                    const splitZ = opStart + 1100;
+                    jambBuilder.addBoxMm(cFrameFront, op.y1 + frameW, opStart + frameW, cFrameBack, op.y2 - frameW, splitZ - 25, [0.16, 0.18, 0.21], 1.0, yOffset);
+                    // Vertical stainless pull handle bar
+                    jambBuilder.addBoxMm(cFrameFront - 25, op.y1 + 400, splitZ - 140, cFrameFront, op.y1 + 1850, splitZ - 110, [0.82, 0.86, 0.90], 1.0, yOffset);
+                    // Sidelight mullion & glass
+                    jambBuilder.addBoxMm(cFrameFront, op.y1, splitZ - 25, cFrameBack, op.y2, splitZ + 25, ralCol, 1.0, yOffset);
+                    glassBuilder.addBoxMm(cGlassFront, op.y1 + frameW, splitZ + 25, cGlassBack, op.y2 - frameW, opEnd - frameW, [0.85, 0.94, 1.0], 0.35, yOffset);
+                } else {
+                    // Glazed Window / HST Terrace Door
+                    const isSelected = (state.selectedOpeningId === op.id);
+                    const isHovered = (state.hoveredOpeningId === op.id);
+                    const glassTint = isSelected
+                        ? [0.55, 0.92, 1.0]
+                        : (isHovered ? [0.70, 0.95, 1.0] : [0.88, 0.95, 1.0]);
+
+                    if (axis === 'x') {
+                        glassBuilder.addBoxMm(opStart + 20, op.y1 + frameW, cGlassFront, opEnd - 20, op.y2 - frameW, cGlassBack, glassTint, 0.25, yOffset);
+                    } else {
+                        glassBuilder.addBoxMm(cGlassFront, op.y1 + frameW, opStart + 20, cGlassBack, op.y2 - frameW, opEnd - 20, glassTint, 0.25, yOffset);
+                    }
+
+                    // Inner 90 mm pillars or mullions
+                    const numSashes = Math.max(1, op.sashes || 1);
+                    if (numSashes > 1) {
+                        const pWidth = op.pillarMm || 65;
+                        for (let s = 1; s < numSashes; s++) {
+                            let ratio = s / numSashes;
+                            if (Array.isArray(op.sashRatios) && op.sashRatios.length >= s) {
+                                ratio = op.sashRatios[0];
+                            }
+                            const mCenter = opStart + (opEnd - opStart) * ratio;
+                            if (axis === 'x') {
+                                jambBuilder.addBoxMm(mCenter - pWidth / 2, op.y1, cFrameFront - inwardSign * 8, mCenter + pWidth / 2, op.y2, cFrameBack, ralCol, 1.0, yOffset);
+                            } else {
+                                jambBuilder.addBoxMm(cFrameFront - inwardSign * 8, op.y1, mCenter - pWidth / 2, cFrameBack, op.y2, mCenter + pWidth / 2, ralCol, 1.0, yOffset);
+                            }
+                        }
+                    }
+                }
+
+                cursor = Math.max(cursor, opEnd);
+            });
+
+            // Final pier after last opening
+            if (cursor < spanEnd) {
+                makeWallBlock(cursor, spanEnd, yBottom, yTop, wallBuilder, wallColor);
+            }
+        }
+
+        function buildSceneGeometry(glCtx) {
+            sceneBatches = [];
+            const brickBuilder = new MeshBuilder();
+            const woodBuilder = new MeshBuilder();
+            const fasciaBuilder = new MeshBuilder();
+            const jambBuilder = new MeshBuilder();
+            const glassBuilder = new MeshBuilder();
+            const garageBuilder = new MeshBuilder();
+            const terraceBuilder = new MeshBuilder();
+            const siteBuilder = new MeshBuilder();
+            const edges = { positions: [], colors: [] };
+
+            const showGround = (state.floorMode !== 'upper');
+            const showUpper = (state.floorMode !== 'ground');
+            const upperOffsetM = (state.floorMode === 'explode') ? 2.4 : 0.0;
+
+            const ralCol = [0.12, 0.14, 0.13]; // RAL 7021 (#1f2421)
+            const cornerJambBuilder = (state.jambMaterial === 'ral7021') ? jambBuilder : brickBuilder;
+            const cornerJambUpperBuilder = (state.jambMaterial === 'ral7021') ? jambBuilder : woodBuilder;
+            const cornerJambCol = (state.jambMaterial === 'ral7021') ? ralCol : [1, 1, 1];
+
+            // ====================================================================
+            // A. SITE, LAWN, DRIVEWAY & GARDEN TERRACES
+            // ====================================================================
+            // Lawn base (-120 to -20 mm)
+            siteBuilder.addBoxMm(-7000, -140, -6500, 27500, -20, 27500, [0.22, 0.31, 0.23], 1.0, 0);
+            // Plinth / foundation strip (-20 to 0 mm)
+            siteBuilder.addBoxMm(-285, -20, 2790, 20705, 0, 11580, [0.42, 0.46, 0.52], 1.0, 0);
+            siteBuilder.addBoxMm(11740, -20, -290, 20705, 0, 2790, [0.42, 0.46, 0.52], 1.0, 0);
+            siteBuilder.addBoxMm(14695, -20, 11580, 20705, 0, 21130, [0.42, 0.46, 0.52], 1.0, 0);
+
+            // West Driveway to Garage Door Z2 & Walkway to Entrance Z1
+            siteBuilder.addBoxMm(20705, -18, 400, 26800, -2, 6200, [0.24, 0.27, 0.32], 1.0, 0);
+            siteBuilder.addBoxMm(19555, -15, 8560, 26800, 0, 11020, [0.36, 0.39, 0.44], 1.0, 0);
+
+            // South & East Garden Terrace Decking outside O4, O5, O3, O6b
+            terraceBuilder.addBoxMm(-3200, -15, 6000, 14695, -2, 16200, [0.95, 0.95, 0.95], 0.5, 0);
+            terraceBuilder.addBoxMm(11500, -15, 15000, 14695, -2, 21130, [0.95, 0.95, 0.95], 0.5, 0);
+
+            // Optional Izabelin Pine Trees
+            if (state.layers.trees) {
+                const treeCoords = [
+                    [-4800, -3200, 7200], [-3600, 1200, 6800], [-4500, 18500, 7500],
+                    [4500, -4500, 7800], [9500, -4800, 7100], [24500, -2800, 7400],
+                    [24800, 23500, 7600], [6500, 24500, 7000]
+                ];
+                treeCoords.forEach(([tx, tz, th]) => {
+                    // Trunk
+                    siteBuilder.addBoxMm(tx - 140, -20, tz - 140, tx + 140, th * 0.42, tz + 140, [0.36, 0.25, 0.18], 1.0, 0);
+                    // Canopy tiers
+                    siteBuilder.addBoxMm(tx - 1100, th * 0.35, tz - 1100, tx + 1100, th * 0.65, tz + 1100, [0.16, 0.29, 0.20], 1.0, 0);
+                    siteBuilder.addBoxMm(tx - 800, th * 0.60, tz - 800, tx + 800, th * 0.85, tz + 800, [0.19, 0.34, 0.23], 1.0, 0);
+                    siteBuilder.addBoxMm(tx - 450, th * 0.82, tz - 450, tx + 450, th, tz + 450, [0.22, 0.38, 0.26], 1.0, 0);
+                });
+            }
+
+            // ====================================================================
+            // B. GROUND FLOOR (PARTER: Y = 0 to 2,800 mm) + INTERMEDIATE CORNICE
+            // ====================================================================
+            if (showGround) {
+                const groundOpenings = OPENINGS_3D.filter(o => o.floor === 'ground');
+
+                // 1. North Recessed Wall (Gabinet O2 & Kitchen O1: X = -285..11740, Z = 2790)
+                buildWallWithOpenings({
+                    axis: 'x', fixedCoord: 2790, inwardSign: 1,
+                    spanStart: -285, spanEnd: 11740, yBottom: 0, yTop: 2800, thickness: 240,
+                    openings: groundOpenings.filter(o => o.facade === 'North Facade'),
+                    wallBuilder: brickBuilder, wallColor: [1, 1, 1], uvScale: 0.8,
+                    jambBuilder, glassBuilder, garageBuilder, edges, yOffset: 0
+                });
+                addEdgeBoxMm(edges, -285, 0, 2790, 11740, 2800, 2790, [0.12, 0.15, 0.20], 0);
+
+                // 2. Garage East Step Wall (Right Recessed Wing on East Facade: Z = -290..2790, X = 11740)
+                buildWallWithOpenings({
+                    axis: 'z', fixedCoord: 11740, inwardSign: 1,
+                    spanStart: -290, spanEnd: 2790, yBottom: 0, yTop: 2800, thickness: 240,
+                    openings: [],
+                    wallBuilder: brickBuilder, wallColor: [0.92, 0.92, 0.94], uvScale: 0.8,
+                    jambBuilder, glassBuilder, garageBuilder, edges, yOffset: 0
+                });
+                // Technical vent box on Garage East wall (matching east_facade.html)
+                jambBuilder.addBoxMm(11710, 2390, 220, 11740, 2630, 600, [0.78, 0.82, 0.87], 1.0, 0);
+                addEdgeBoxMm(edges, 11740, 0, -290, 11740, 2800, 2790, [0.12, 0.15, 0.20], 0);
+
+                // 3. Garage North Protruding Blind Wall (X = 11740..20705, Z = -290)
+                buildWallWithOpenings({
+                    axis: 'x', fixedCoord: -290, inwardSign: 1,
+                    spanStart: 11740, spanEnd: 20705, yBottom: 0, yTop: 2800, thickness: 240,
+                    openings: [],
+                    wallBuilder: brickBuilder, wallColor: [1, 1, 1], uvScale: 0.8,
+                    jambBuilder, glassBuilder, garageBuilder, edges, yOffset: 0
+                });
+                addEdgeBoxMm(edges, 11740, 0, -290, 20705, 2800, -290, [0.12, 0.15, 0.20], 0);
+
+                // 4. West Wall North Segment (Garage Door Z2: Z = -290..8560, X = 20705)
+                buildWallWithOpenings({
+                    axis: 'z', fixedCoord: 20705, inwardSign: -1,
+                    spanStart: -290, spanEnd: 8560, yBottom: 0, yTop: 2800, thickness: 240,
+                    openings: groundOpenings.filter(o => o.id === 'Z2'),
+                    wallBuilder: brickBuilder, wallColor: [1, 1, 1], uvScale: 0.8,
+                    jambBuilder, glassBuilder, garageBuilder, edges, yOffset: 0
+                });
+
+                // 5. West Recessed Entrance Alcove (Wnęka Wejściowa Z1: Z = 8560..11020, recessed to X = 19555)
+                // North return wall of alcove (Z = 8560, X = 19555..20705)
+                brickBuilder.addBoxMm(19555, 0, 8560, 20705, 2800, 8760, [0.82, 0.82, 0.86], 0.8, 0);
+                // South return wall of alcove (Z = 11020, X = 19555..20705)
+                brickBuilder.addBoxMm(19555, 0, 10820, 20705, 2800, 11020, [0.82, 0.82, 0.86], 0.8, 0);
+                // Back wall of alcove with Entrance Door Z1 (X = 19555, Z = 8560..11020)
+                buildWallWithOpenings({
+                    axis: 'z', fixedCoord: 19555, inwardSign: -1,
+                    spanStart: 8560, spanEnd: 11020, yBottom: 0, yTop: 2800, thickness: 240,
+                    openings: groundOpenings.filter(o => o.id === 'Z1'),
+                    wallBuilder: brickBuilder, wallColor: [0.86, 0.86, 0.90], uvScale: 0.8,
+                    jambBuilder, glassBuilder, garageBuilder, edges, yOffset: 0
+                });
+                addEdgeBoxMm(edges, 19555, 0, 8560, 20705, 2800, 11020, [0.10, 0.12, 0.16], 0);
+
+                // 6. West Wall South Segment (Clerestory O8a: Z = 11020..21130, X = 20705)
+                buildWallWithOpenings({
+                    axis: 'z', fixedCoord: 20705, inwardSign: -1,
+                    spanStart: 11020, spanEnd: 21130, yBottom: 0, yTop: 2800, thickness: 240,
+                    openings: groundOpenings.filter(o => o.id === 'O8a'),
+                    wallBuilder: brickBuilder, wallColor: [1, 1, 1], uvScale: 0.8,
+                    jambBuilder, glassBuilder, garageBuilder, edges, yOffset: 0
+                });
+                addEdgeBoxMm(edges, 20705, 0, -290, 20705, 2800, 21130, [0.12, 0.15, 0.20], 0);
+
+                // 7. South-West Protruding Wing South Wall (O7: X = 14695..20705, Z = 21130)
+                buildWallWithOpenings({
+                    axis: 'x', fixedCoord: 21130, inwardSign: -1,
+                    spanStart: 14895, spanEnd: 20705, yBottom: 0, yTop: 2800, thickness: 240,
+                    openings: groundOpenings.filter(o => o.id === 'O7'),
+                    wallBuilder: brickBuilder, wallColor: [1, 1, 1], uvScale: 0.8,
+                    jambBuilder, glassBuilder, garageBuilder, edges, yOffset: 0
+                });
+                // 200 mm Corner Jamb Strip East of O7 / South of O6b (X = 14695..14895, Z = 20925..21130)
+                cornerJambBuilder.addBoxMm(14695, 0, 20925, 14895, 2800, 21130, cornerJambCol, 0.8, 0);
+                addEdgeBoxMm(edges, 14695, 0, 21130, 20705, 2800, 21130, [0.12, 0.15, 0.20], 0);
+
+                // 8. South-West Wing East Wall (Left Recessed Wing on East Facade: O6b & O6a, Z = 11580..20925, X = 14695)
+                buildWallWithOpenings({
+                    axis: 'z', fixedCoord: 14695, inwardSign: -1,
+                    spanStart: 11580, spanEnd: 20925, yBottom: 0, yTop: 2800, thickness: 240,
+                    openings: groundOpenings.filter(o => o.id === 'O6b' || o.id === 'O6a'),
+                    wallBuilder: brickBuilder, wallColor: [0.94, 0.94, 0.96], uvScale: 0.8,
+                    jambBuilder, glassBuilder, garageBuilder, edges, yOffset: 0
+                });
+                addEdgeBoxMm(edges, 14695, 0, 11580, 14695, 2800, 21130, [0.12, 0.15, 0.20], 0);
+
+                // 9. Recessed South Wall (O5 & O4: X = -85..14695, Z = 11580)
+                buildWallWithOpenings({
+                    axis: 'x', fixedCoord: 11580, inwardSign: -1,
+                    spanStart: -85, spanEnd: 14695, yBottom: 0, yTop: 2800, thickness: 240,
+                    openings: groundOpenings.filter(o => o.id === 'O5' || o.id === 'O4'),
+                    wallBuilder: brickBuilder, wallColor: [1, 1, 1], uvScale: 0.8,
+                    jambBuilder, glassBuilder, garageBuilder, edges, yOffset: 0
+                });
+                // 200 mm Corner Jamb Strip East of O4 / South of O3 (X = -285..-85, Z = 11380..11580)
+                cornerJambBuilder.addBoxMm(-285, 0, 11380, -85, 2800, 11580, cornerJambCol, 0.8, 0);
+                addEdgeBoxMm(edges, -285, 0, 11580, 14695, 2800, 11580, [0.12, 0.15, 0.20], 0);
+
+                // 10. Center Projecting East Wall (O3: Z = 2790..11380, X = -285)
+                buildWallWithOpenings({
+                    axis: 'z', fixedCoord: -285, inwardSign: 1,
+                    spanStart: 2790, spanEnd: 11380, yBottom: 0, yTop: 2800, thickness: 240,
+                    openings: groundOpenings.filter(o => o.id === 'O3'),
+                    wallBuilder: brickBuilder, wallColor: [1, 1, 1], uvScale: 0.8,
+                    jambBuilder, glassBuilder, garageBuilder, edges, yOffset: 0
+                });
+                addEdgeBoxMm(edges, -285, 0, 2790, -285, 2800, 11580, [0.12, 0.15, 0.20], 0);
+
+                // 11. INTERMEDIATE CORNICE BAND (Gzyms Pośredni: Y = 2,800 to 3,430 mm, 100 mm overhang)
+                // Central East-West block cornice
+                fasciaBuilder.addBoxMm(-385, 2800, 2690, 20805, 3430, 11680, [1, 1, 1], 1.1, 0);
+                addEdgeBoxMm(edges, -385, 2800, 2690, 20805, 3430, 11680, [0.05, 0.07, 0.10], 0);
+                // Protruding North-West Garage block cornice & flat roof
+                fasciaBuilder.addBoxMm(11640, 2800, -390, 20805, 3430, 2790, [1, 1, 1], 1.1, 0);
+                siteBuilder.addBoxMm(11840, 3430, -190, 20605, 3445, 2790, [0.22, 0.25, 0.30], 1.0, 0);
+                addEdgeBoxMm(edges, 11640, 2800, -390, 20805, 3430, 2790, [0.05, 0.07, 0.10], 0);
+                // Protruding South-West Gym block cornice & flat roof
+                fasciaBuilder.addBoxMm(14595, 2800, 11580, 20805, 3430, 21230, [1, 1, 1], 1.1, 0);
+                siteBuilder.addBoxMm(14795, 3430, 11580, 20605, 3445, 21030, [0.22, 0.25, 0.30], 1.0, 0);
+                addEdgeBoxMm(edges, 14595, 2800, 11580, 20805, 3430, 21230, [0.05, 0.07, 0.10], 0);
+            }
+
+            // ====================================================================
+            // C. UPPER FLOOR (PIĘTRO: Y = 3,430 to 6,130 mm) + MAIN ROOF & CHIMNEY
+            // ====================================================================
+            if (showUpper) {
+                const upperOpenings = OPENINGS_3D.filter(o => o.floor === 'first');
+
+                // 1. North Upper Wall (14a, O15, O11_2, O11_3, O13a: X = 6315..20505, Z = 2790)
+                buildWallWithOpenings({
+                    axis: 'x', fixedCoord: 2790, inwardSign: 1,
+                    spanStart: 6315, spanEnd: 20505, yBottom: 3430, yTop: 6130, thickness: 200,
+                    openings: upperOpenings.filter(o => o.facade === 'North Facade'),
+                    wallBuilder: woodBuilder, wallColor: [1, 1, 1], uvScale: 0.9,
+                    jambBuilder, glassBuilder, garageBuilder, edges, yOffset: upperOffsetM
+                });
+                // 200 mm West of O13a / North of O13b_1:
+                // Bottom 850 mm (3430..4180) is wood parapet; Upper 1,950 mm (4180..6130) is corner window jamb / glass join
+                woodBuilder.addBoxMm(20505, 3430, 2790, 20705, 4180, 2990, [1, 1, 1], 0.9, upperOffsetM);
+                cornerJambUpperBuilder.addBoxMm(20505, 4180, 2790, 20705, 6130, 2990, cornerJambCol, 0.9, upperOffsetM);
+                addEdgeBoxMm(edges, 6315, 3430, 2790, 20705, 6130, 2790, [0.35, 0.28, 0.20], upperOffsetM);
+
+                // 2. West Upper Wall (O13b_1 & O13b_2: Z = 2990..11380, X = 20705)
+                buildWallWithOpenings({
+                    axis: 'z', fixedCoord: 20705, inwardSign: -1,
+                    spanStart: 2990, spanEnd: 11380, yBottom: 3430, yTop: 6130, thickness: 200,
+                    openings: upperOpenings.filter(o => o.facade === 'West Facade'),
+                    wallBuilder: woodBuilder, wallColor: [1, 1, 1], uvScale: 0.9,
+                    jambBuilder, glassBuilder, garageBuilder, edges, yOffset: upperOffsetM
+                });
+                // 200 mm South-West Upper Corner (Z = 11380..11580, X = 20505..20705):
+                // Bottom 850 mm (3430..4180) is wood parapet; Upper 1,950 mm (4180..6130) is 200 mm corner jamb for O13b_2 & O13a_2!
+                woodBuilder.addBoxMm(20505, 3430, 11380, 20705, 4180, 11580, [1, 1, 1], 0.9, upperOffsetM);
+                cornerJambUpperBuilder.addBoxMm(20505, 4180, 11380, 20705, 6130, 11580, cornerJambCol, 0.9, upperOffsetM);
+                addEdgeBoxMm(edges, 20705, 3430, 2790, 20705, 6130, 11580, [0.35, 0.28, 0.20], upperOffsetM);
+
+                // 3. South Upper Wall (O10, SO3, O12, O13a_2: X = -85..20505, Z = 11580)
+                buildWallWithOpenings({
+                    axis: 'x', fixedCoord: 11580, inwardSign: -1,
+                    spanStart: -85, spanEnd: 20505, yBottom: 3430, yTop: 6130, thickness: 200,
+                    openings: upperOpenings.filter(o => o.facade === 'South Facade'),
+                    wallBuilder: woodBuilder, wallColor: [1, 1, 1], uvScale: 0.9,
+                    jambBuilder, glassBuilder, garageBuilder, edges, yOffset: upperOffsetM
+                });
+                // 200 mm South-East Upper Corner Jamb (East of O10 / South of O9: X = -285..-85, Z = 11380..11580, full height 2700 mm)
+                cornerJambUpperBuilder.addBoxMm(-285, 3430, 11380, -85, 6130, 11580, cornerJambCol, 0.9, upperOffsetM);
+                addEdgeBoxMm(edges, -285, 3430, 11580, 20705, 6130, 11580, [0.35, 0.28, 0.20], upperOffsetM);
+
+                // 4. East Projecting Upper Wall (O9 + 400 mm North Pier: Z = 5890..11380, X = -285)
+                buildWallWithOpenings({
+                    axis: 'z', fixedCoord: -285, inwardSign: 1,
+                    spanStart: 5890, spanEnd: 11380, yBottom: 3430, yTop: 6130, thickness: 200,
+                    openings: upperOpenings.filter(o => o.id === 'O9'),
+                    wallBuilder: woodBuilder, wallColor: [1, 1, 1], uvScale: 0.9,
+                    jambBuilder, glassBuilder, garageBuilder, edges, yOffset: upperOffsetM
+                });
+                addEdgeBoxMm(edges, -285, 3430, 5890, -285, 6130, 11580, [0.35, 0.28, 0.20], upperOffsetM);
+
+                // 5. North-East Covered Upper Terrace (Balkon / Taras 17.3 m²: X = -285..6315, Z = 2790..5890)
+                // Terrace gres floor deck
+                terraceBuilder.addBoxMm(-285, 3430, 2790, 6315, 3460, 5890, [0.92, 0.94, 0.96], 0.6, upperOffsetM);
+                // Recessed North-facing back wall of terrace (X = -285..6315, Z = 5890)
+                woodBuilder.addBoxMm(-285, 3430, 5890, 6315, 6130, 6090, [0.88, 0.86, 0.82], 0.9, upperOffsetM);
+                addEdgeBoxMm(edges, -285, 3430, 5890, 6315, 6130, 5890, [0.35, 0.28, 0.20], upperOffsetM);
+
+                // Recessed East-facing wall of terrace with O14b + D1 (X = 6315, Z = 2990..5890)
+                buildWallWithOpenings({
+                    axis: 'z', fixedCoord: 6315, inwardSign: 1,
+                    spanStart: 2990, spanEnd: 5890, yBottom: 3430, yTop: 6130, thickness: 200,
+                    openings: upperOpenings.filter(o => o.id === 'O14b'),
+                    wallBuilder: woodBuilder, wallColor: [0.92, 0.90, 0.86], uvScale: 0.9,
+                    jambBuilder, glassBuilder, garageBuilder, edges, yOffset: upperOffsetM
+                });
+                // 200 mm North Jamb of O14b (Z = 2790..2990, X = 6315..6515)
+                cornerJambUpperBuilder.addBoxMm(6315, 3430, 2790, 6515, 6130, 2990, cornerJambCol, 0.9, upperOffsetM);
+
+                // North-East Corner Support Column & 220 mm Timber Slat Return (X = -285..0, Z = 2790)
+                woodBuilder.addBoxMm(-285, 3430, 2790, -65, 6130, 2990, [0.82, 0.78, 0.72], 0.9, upperOffsetM);
+                jambBuilder.addBoxMm(-65, 3430, 2790, 85, 6130, 2940, ralCol, 1.0, upperOffsetM);
+
+                // Glass Balustrade along North (X = 0..6315, Z = 2790) and East (X = -285, Z = 2790..5890), H = 950 mm
+                glassBuilder.addBoxMm(0, 3430, 2790, 6315, 4380, 2830, [0.65, 0.88, 0.98], 0.3, upperOffsetM);
+                glassBuilder.addBoxMm(-285, 3430, 2790, -245, 4380, 5890, [0.65, 0.88, 0.98], 0.3, upperOffsetM);
+                // Black Top Handrail & Stanchions
+                jambBuilder.addBoxMm(-285, 4360, 2780, 6315, 4410, 2840, ralCol, 1.0, upperOffsetM);
+                jambBuilder.addBoxMm(-295, 4360, 2780, -235, 4410, 5890, ralCol, 1.0, upperOffsetM);
+
+                // 6. MAIN CANTILEVERED FLAT ROOF ATTICA CORNICE (Y = 6,130 to 6,880 mm, 300 mm overhang all around)
+                fasciaBuilder.addBoxMm(-585, 6130, 2490, 21005, 6880, 11880, [1, 1, 1], 1.1, upperOffsetM);
+                // Flat roof inner membrane surface
+                siteBuilder.addBoxMm(-385, 6880, 2690, 20805, 6900, 11680, [0.16, 0.19, 0.24], 1.0, upperOffsetM);
+                addEdgeBoxMm(edges, -585, 6130, 2490, 21005, 6880, 11880, [0.05, 0.07, 0.10], upperOffsetM);
+
+                // 7. ROOF CHIMNEY / VENTILATION SHAFT (+6.88 m to +7.26 m = 380 mm above roof)
+                siteBuilder.addBoxMm(14115, 6880, 6450, 15015, 7220, 7400, [0.85, 0.88, 0.92], 1.0, upperOffsetM);
+                jambBuilder.addBoxMm(14065, 7220, 6400, 15065, 7260, 7450, ralCol, 1.0, upperOffsetM);
+                addEdgeBoxMm(edges, 14115, 6880, 6450, 15015, 7260, 7400, [0.10, 0.12, 0.16], upperOffsetM);
+            }
+
+            // Upload opaque and transparent batches
+            const opaque = [
+                siteBuilder.toBatch(glCtx, null, false, 1.0),
+                terraceBuilder.toBatch(glCtx, textures.terrace, true, 1.0),
+                brickBuilder.toBatch(glCtx, textures.brick, true, 1.0),
+                woodBuilder.toBatch(glCtx, textures.wood, true, 1.0),
+                fasciaBuilder.toBatch(glCtx, textures.fascia, true, 1.0),
+                garageBuilder.toBatch(glCtx, textures.garage, true, 1.0),
+                jambBuilder.toBatch(glCtx, null, false, 1.0),
+                glassBuilder.toBatch(glCtx, textures.glass, true, 0.76)
+            ];
+            sceneBatches = opaque.filter(Boolean);
+
+            // Upload CAD edge wireframe buffer
+            if (!edgeBuffer) edgeBuffer = glCtx.createBuffer();
+            const interleaved = [];
+            const count = edges.positions.length / 3;
+            for (let i = 0; i < count; i++) {
+                interleaved.push(
+                    edges.positions[i * 3], edges.positions[i * 3 + 1], edges.positions[i * 3 + 2],
+                    edges.colors[i * 3], edges.colors[i * 3 + 1], edges.colors[i * 3 + 2]
+                );
+            }
+            glCtx.bindBuffer(glCtx.ARRAY_BUFFER, edgeBuffer);
+            glCtx.bufferData(glCtx.ARRAY_BUFFER, new Float32Array(interleaved), glCtx.STATIC_DRAW);
+            edgeVertexCount = count;
+        }
+
+        // ============================================================================
+        // 5. 4x4 MATRIX MATH & 3D -> 2D SCREEN PROJECTION
+        // ============================================================================
+        function mat4Perspective(fovRad, aspect, near, far) {
+            const f = 1.0 / Math.tan(fovRad / 2);
+            const nf = 1 / (near - far);
+            return new Float32Array([
+                f / aspect, 0, 0, 0,
+                0, f, 0, 0,
+                0, 0, (far + near) * nf, -1,
+                0, 0, (2 * far * near) * nf, 0
+            ]);
+        }
+
+        function mat4Ortho(left, right, bottom, top, near, far) {
+            const lr = 1 / (left - right);
+            const bt = 1 / (bottom - top);
+            const nf = 1 / (near - far);
+            return new Float32Array([
+                -2 * lr, 0, 0, 0,
+                0, -2 * bt, 0, 0,
+                0, 0, 2 * nf, 0,
+                (left + right) * lr, (top + bottom) * bt, (far + near) * nf, 1
+            ]);
+        }
+
+        function mat4LookAt(eye, target, up) {
+            let zx = eye.x - target.x, zy = eye.y - target.y, zz = eye.z - target.z;
+            let len = Math.hypot(zx, zy, zz) || 1;
+            zx /= len; zy /= len; zz /= len;
+
+            // Left-handed building coordinate system (+X = West, +Y = Up, +Z = South):
+            // Camera Right = normalize(z_cam × up) so that:
+            // - Looking East at West Facade: North (Garage) is on the LEFT, South wing is on the RIGHT
+            // - Looking South at North Facade: East is on the LEFT, West (Garage) is on the RIGHT
+            // - Looking North at South Facade: West is on the LEFT, East is on the RIGHT
+            // - Looking West at East Facade: South is on the LEFT, North is on the RIGHT
+            let xx = zy * up[2] - zz * up[1];
+            let xy = zz * up[0] - zx * up[2];
+            let xz = zx * up[1] - zy * up[0];
+            len = Math.hypot(xx, xy, xz) || 1;
+            xx /= len; xy /= len; xz /= len;
+
+            const yx = xy * zz - xz * zy;
+            const yy = xz * zx - xx * zz;
+            const yz = xx * zy - xy * zx;
+
+            return new Float32Array([
+                xx, yx, zx, 0,
+                xy, yy, zy, 0,
+                xz, yz, zz, 0,
+                -(xx * eye.x + xy * eye.y + xz * eye.z),
+                -(yx * eye.x + yy * eye.y + yz * eye.z),
+                -(zx * eye.x + zy * eye.y + zz * eye.z),
+                1
+            ]);
+        }
+
+        function getCameraEye() {
+            const d = state.distance / state.zoom;
+            const cosP = Math.cos(state.pitch);
+            return {
+                x: state.target.x + d * cosP * Math.sin(state.yaw),
+                y: state.target.y + d * Math.sin(state.pitch),
+                z: state.target.z + d * cosP * Math.cos(state.yaw)
+            };
+        }
+
+        function projectPoint3D(ptMeters, projMat, viewMat, widthPx, heightPx) {
+            const x = ptMeters[0], y = ptMeters[1], z = ptMeters[2];
+            // view * pos
+            const vx = viewMat[0] * x + viewMat[4] * y + viewMat[8] * z + viewMat[12];
+            const vy = viewMat[1] * x + viewMat[5] * y + viewMat[9] * z + viewMat[13];
+            const vz = viewMat[2] * x + viewMat[6] * y + viewMat[10] * z + viewMat[14];
+            const vw = viewMat[3] * x + viewMat[7] * y + viewMat[11] * z + viewMat[15];
+
+            // proj * v
+            const cx = projMat[0] * vx + projMat[4] * vy + projMat[8] * vz + projMat[12] * vw;
+            const cy = projMat[1] * vx + projMat[5] * vy + projMat[9] * vz + projMat[13] * vw;
+            const cz = projMat[2] * vx + projMat[6] * vy + projMat[10] * vz + projMat[14] * vw;
+            const cw = projMat[3] * vx + projMat[7] * vy + projMat[11] * vz + projMat[15] * vw;
+
+            if (cw <= 0.05) return null;
+            const ndcX = cx / cw;
+            const ndcY = cy / cw;
+            const ndcZ = cz / cw;
+            if (ndcZ < -1 || ndcZ > 1) return null;
+
+            return {
+                x: (ndcX * 0.5 + 0.5) * widthPx,
+                y: (1.0 - (ndcY * 0.5 + 0.5)) * heightPx,
+                depth: -vz
+            };
+        }
+
+        // ============================================================================
+        // 6. MAIN RENDER LOOP (WEBGL + 2D HUD OVERLAY)
+        // ============================================================================
+        function renderFrame() {
+            const webglCanvas = document.getElementById('webgl-canvas');
+            const hudCanvas = document.getElementById('hud-canvas');
+            if (!webglCanvas || !hudCanvas || !gl) return;
+
+            const rect = webglCanvas.parentElement.getBoundingClientRect();
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            const w = Math.max(1, Math.floor(rect.width));
+            const h = Math.max(1, Math.floor(rect.height));
+
+            if (webglCanvas.width !== w * dpr || webglCanvas.height !== h * dpr) {
+                webglCanvas.width = w * dpr;
+                webglCanvas.height = h * dpr;
+                hudCanvas.width = w * dpr;
+                hudCanvas.height = h * dpr;
+            }
+
+            gl.viewport(0, 0, webglCanvas.width, webglCanvas.height);
+            gl.clearColor(0.06, 0.09, 0.15, 1.0);
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+            gl.enable(gl.DEPTH_TEST);
+            gl.enable(gl.BLEND);
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+            const aspect = w / h;
+            let projMat;
+            if (state.projection === 'orthographic') {
+                const halfH = (14.5 / state.zoom);
+                const halfW = halfH * aspect;
+                projMat = mat4Ortho(-halfW, halfW, -halfH, halfH, -100, 150);
+            } else {
+                projMat = mat4Perspective(38 * Math.PI / 180, aspect, 0.5, 220.0);
+            }
+
+            const eye = getCameraEye();
+            const viewMat = mat4LookAt(eye, state.target, [0, 1, 0]);
+
+            // Sun direction vector
+            const sunRad = state.sunAzimuthDeg * Math.PI / 180;
+            const sunElev = 42 * Math.PI / 180;
+            const sunDir = [
+                Math.cos(sunElev) * Math.sin(sunRad),
+                Math.sin(sunElev),
+                Math.cos(sunElev) * Math.cos(sunRad)
+            ];
+
+            gl.useProgram(program);
+            gl.uniformMatrix4fv(gl.getUniformLocation(program, 'uProj'), false, projMat);
+            gl.uniformMatrix4fv(gl.getUniformLocation(program, 'uView'), false, viewMat);
+            gl.uniform3fv(gl.getUniformLocation(program, 'uSunDir'), sunDir);
+
+            const aPos = gl.getAttribLocation(program, 'aPos');
+            const aNormal = gl.getAttribLocation(program, 'aNormal');
+            const aUV = gl.getAttribLocation(program, 'aUV');
+            const aColor = gl.getAttribLocation(program, 'aColor');
+
+            gl.enableVertexAttribArray(aPos);
+            gl.enableVertexAttribArray(aNormal);
+            gl.enableVertexAttribArray(aUV);
+            gl.enableVertexAttribArray(aColor);
+
+            sceneBatches.forEach(batch => {
+                gl.bindBuffer(gl.ARRAY_BUFFER, batch.posBuf);
+                gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, 0, 0);
+
+                gl.bindBuffer(gl.ARRAY_BUFFER, batch.normBuf);
+                gl.vertexAttribPointer(aNormal, 3, gl.FLOAT, false, 0, 0);
+
+                gl.bindBuffer(gl.ARRAY_BUFFER, batch.uvBuf);
+                gl.vertexAttribPointer(aUV, 2, gl.FLOAT, false, 0, 0);
+
+                gl.bindBuffer(gl.ARRAY_BUFFER, batch.colBuf);
+                gl.vertexAttribPointer(aColor, 3, gl.FLOAT, false, 0, 0);
+
+                gl.uniform1i(gl.getUniformLocation(program, 'uUseTex'), batch.useTex);
+                gl.uniform1f(gl.getUniformLocation(program, 'uAlpha'), batch.alpha);
+
+                if (batch.useTex && batch.tex) {
+                    gl.activeTexture(gl.TEXTURE0);
+                    gl.bindTexture(gl.TEXTURE_2D, batch.tex);
+                    gl.uniform1i(gl.getUniformLocation(program, 'uTex'), 0);
+                }
+
+                gl.drawArrays(gl.TRIANGLES, 0, batch.vertexCount);
+            });
+
+            // Draw CAD Edge Outlines
+            if (state.layers.edges && edgeVertexCount > 0) {
+                gl.useProgram(lineProgram);
+                gl.uniformMatrix4fv(gl.getUniformLocation(lineProgram, 'uProj'), false, projMat);
+                gl.uniformMatrix4fv(gl.getUniformLocation(lineProgram, 'uView'), false, viewMat);
+
+                const lPos = gl.getAttribLocation(lineProgram, 'aPos');
+                const lCol = gl.getAttribLocation(lineProgram, 'aColor');
+                gl.enableVertexAttribArray(lPos);
+                gl.enableVertexAttribArray(lCol);
+
+                gl.bindBuffer(gl.ARRAY_BUFFER, edgeBuffer);
+                gl.vertexAttribPointer(lPos, 3, gl.FLOAT, false, 24, 0);
+                gl.vertexAttribPointer(lCol, 3, gl.FLOAT, false, 24, 12);
+                gl.drawArrays(gl.LINES, 0, edgeVertexCount);
+            }
+
+            // Render 2D HUD Overlay (Compass, 3D Dimensions, Levels, and Clickable Window Badges)
+            renderHudOverlay(hudCanvas, dpr, w, h, projMat, viewMat, eye);
+        }
+
+        function draw3DLineHud(ctx, p1, p2, projMat, viewMat, w, h, strokeStyle, lineWidth, dash = []) {
+            const s1 = projectPoint3D(p1, projMat, viewMat, w, h);
+            const s2 = projectPoint3D(p2, projMat, viewMat, w, h);
+            if (!s1 || !s2) return null;
+            ctx.save();
+            ctx.strokeStyle = strokeStyle;
+            ctx.lineWidth = lineWidth;
+            ctx.setLineDash(dash);
+            ctx.beginPath();
+            ctx.moveTo(s1.x, s1.y);
+            ctx.lineTo(s2.x, s2.y);
+            ctx.stroke();
+            ctx.restore();
+            return { x: (s1.x + s2.x) * 0.5, y: (s1.y + s2.y) * 0.5 };
+        }
+
+        function drawPillBadge(ctx, x, y, text, bg, border, textCol, font = '600 11px "JetBrains Mono", monospace') {
+            ctx.save();
+            ctx.font = font;
+            const padX = 7;
+            const tw = ctx.measureText(text).width;
+            const bw = tw + padX * 2;
+            const bh = 20;
+            const rx = x - bw / 2;
+            const ry = y - bh / 2;
+
+            ctx.fillStyle = bg;
+            ctx.strokeStyle = border;
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.roundRect(rx, ry, bw, bh, 5);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = textCol;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, x, y + 0.5);
+            ctx.restore();
+            return { x1: rx, y1: ry, x2: rx + bw, y2: ry + bh };
+        }
+
+        function renderHudOverlay(hudCanvas, dpr, w, h, projMat, viewMat, eye) {
+            const ctx = hudCanvas.getContext('2d');
+            ctx.save();
+            ctx.scale(dpr, dpr);
+            ctx.clearRect(0, 0, w, h);
+
+            const upperOffsetM = (state.floorMode === 'explode') ? 2.4 : 0.0;
+
+            // 1. 3D Overall Facade Dimension Chains on Ground Plane
+            if (state.layers.dims) {
+                const dimLines = [
+                    { p1: [-0.285, 0.05, -1.6], p2: [20.705, 0.05, -1.6], label: '🧭 NORTH: 20,590 mm Parter / 20,505 mm Piętro', color: '#38bdf8' },
+                    { p1: [-0.285, 0.05, 22.5], p2: [20.705, 0.05, 22.5], label: '☀️ SOUTH: 20,990 mm (14,980 Recessed + 6,010 SW Wing)', color: '#fbbf24' },
+                    { p1: [22.1, 0.05, -0.29], p2: [22.1, 0.05, 21.13], label: '🚪 WEST: 21,420 mm Parter / 8,790 mm Piętro', color: '#c084fc' },
+                    { p1: [-1.8, 0.05, -0.29], p2: [-1.8, 0.05, 21.13], label: '🌅 EAST: 21,415 mm (3,105 N + 8,785 Center + 9,525 S)', color: '#4ade80' }
+                ];
+                dimLines.forEach(d => {
+                    const mid = draw3DLineHud(ctx, d.p1, d.p2, projMat, viewMat, w, h, d.color, 1.6, [5, 4]);
+                    if (mid) {
+                        drawPillBadge(ctx, mid.x, mid.y, d.label, 'rgba(15, 23, 42, 0.9)', d.color, '#f8fafc', '600 10.5px "JetBrains Mono", monospace');
+                    }
+                });
+            }
+
+            // 2. Vertical Elevation Levels (+0.00, +2.80, +3.43, +6.13, +6.88, +7.26 m)
+            if (state.layers.levels) {
+                const levels = [
+                    { y: 0.0, label: '±0.00 m (Parter)', col: '#94a3b8', upper: false },
+                    { y: 2.80, label: '+2.80 m (Brick Top)', col: '#f59e0b', upper: false },
+                    { y: 3.43, label: '+3.43 m (Piętro Sill)', col: '#f59e0b', upper: true },
+                    { y: 6.13, label: '+6.13 m (Roof Soffit)', col: '#38bdf8', upper: true },
+                    { y: 6.88, label: '+6.88 m (Roof Attica)', col: '#38bdf8', upper: true },
+                    { y: 7.26, label: '+7.26 m (Chimney)', col: '#cbd5e1', upper: true }
+                ];
+                levels.forEach(lv => {
+                    if (lv.upper && state.floorMode === 'ground') return;
+                    if (!lv.upper && state.floorMode === 'upper') return;
+                    const yVal = lv.y + (lv.upper ? upperOffsetM : 0);
+                    const pt = projectPoint3D([-0.9, yVal, 2.5], projMat, viewMat, w, h);
+                    if (pt) {
+                        drawPillBadge(ctx, pt.x, pt.y, lv.label, 'rgba(15, 23, 42, 0.85)', lv.col, '#f8fafc', '600 10px "JetBrains Mono", monospace');
+                    }
+                });
+            }
+
+            // 3. Interactive Window & Door Badges
+            state.projectedLabels = [];
+            if (state.layers.labels) {
+                OPENINGS_3D.forEach(op => {
+                    if (op.floor === 'ground' && state.floorMode === 'upper') return;
+                    if (op.floor === 'first' && state.floorMode === 'ground') return;
+
+                    const yOff = (op.floor === 'first') ? upperOffsetM : 0;
+                    const cx = ((op.x1 + op.x2) * 0.5) / 1000 + op.wallNormal[0] * 0.25;
+                    const cy = ((op.y1 + op.y2) * 0.5) / 1000 + yOff;
+                    const cz = ((op.z1 + op.z2) * 0.5) / 1000 + op.wallNormal[2] * 0.25;
+
+                    // Check if wall faces toward the camera (dot product > -0.15)
+                    const vx = eye.x - cx, vy = eye.y - cy, vz = eye.z - cz;
+                    const vLen = Math.hypot(vx, vy, vz) || 1;
+                    const dot = (vx * op.wallNormal[0] + vy * op.wallNormal[1] + vz * op.wallNormal[2]) / vLen;
+                    if (dot < -0.12) return;
+
+                    const proj = projectPoint3D([cx, cy, cz], projMat, viewMat, w, h);
+                    if (!proj) return;
+
+                    const isSelected = (state.selectedOpeningId === op.id);
+                    const isHovered = (state.hoveredOpeningId === op.id);
+                    const bg = isSelected ? '#0284c7' : (isHovered ? '#1e293b' : 'rgba(15, 23, 42, 0.86)');
+                    const border = isSelected ? '#7dd3fc' : (isHovered ? '#38bdf8' : 'rgba(148, 163, 184, 0.45)');
+                    const textCol = isSelected ? '#ffffff' : '#e2e8f0';
+
+                    const box = drawPillBadge(ctx, proj.x, proj.y, op.name, bg, border, textCol, '700 11px "JetBrains Mono", monospace');
+                    state.projectedLabels.push({
+                        id: op.id,
+                        x1: box.x1, y1: box.y1, x2: box.x2, y2: box.y2,
+                        depth: proj.depth
+                    });
+                });
+            }
+
+            // 4. Interactive 3D Compass Rose (Bottom Right above HUD bar)
+            drawCompassRose(ctx, w - 72, h - 78);
+
+            ctx.restore();
+        }
+
+        function drawCompassRose(ctx, cx, cy) {
+            const r = 36;
+            ctx.save();
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.88)';
+            ctx.strokeStyle = 'rgba(148, 163, 184, 0.35)';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            const dirs = [
+                { label: 'N', dx: 0, dz: -1, col: '#ef4444' },
+                { label: 'S', dx: 0, dz: 1, col: '#fbbf24' },
+                { label: 'W', dx: 1, dz: 0, col: '#c084fc' },
+                { label: 'E', dx: -1, dz: 0, col: '#4ade80' }
+            ];
+
+            // Camera right & forward vectors in XZ plane (+X = West, +Z = South)
+            const fwdX = -Math.sin(state.yaw);
+            const fwdZ = -Math.cos(state.yaw);
+            const rightX = -Math.cos(state.yaw);
+            const rightZ = Math.sin(state.yaw);
+
+            dirs.forEach(d => {
+                const sx = (d.dx * rightX + d.dz * rightZ);
+                const sy = -(d.dx * fwdX + d.dz * fwdZ) * Math.sin(Math.max(0.35, state.pitch));
+                const px = cx + sx * (r - 12);
+                const py = cy + sy * (r - 12);
+
+                ctx.strokeStyle = d.col;
+                ctx.lineWidth = (d.label === 'N') ? 2.5 : 1.5;
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                ctx.lineTo(px, py);
+                ctx.stroke();
+
+                ctx.fillStyle = d.col;
+                ctx.font = '800 10.5px "JetBrains Mono", monospace';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(d.label, cx + sx * (r - 7), cy + sy * (r - 7));
+            });
+            ctx.restore();
+        }
+
+        // ============================================================================
+        // 7. UI CONTROLS, CAMERA PRESETS, INTERACTION & INSPECTOR PANEL
+        // ============================================================================
+        function updateInspectorPanel(openingId) {
+            const op = OPENINGS_3D.find(o => o.id === openingId) || OPENINGS_3D[0];
+            if (!op) return;
+
+            const titleEl = document.getElementById('insp-title');
+            const subEl = document.getElementById('insp-subtitle');
+            const badgeEl = document.getElementById('insp-badge');
+            const listEl = document.getElementById('insp-kv-list');
+
+            titleEl.textContent = 'Opening ' + op.name + ' — ' + op.room;
+            subEl.textContent = op.facade + ' • ' + (op.floor === 'ground' ? 'Lower Floor (Parter)' : 'Upper Floor (Piętro)');
+            badgeEl.textContent = op.widthMm.toLocaleString() + ' × ' + op.heightMm.toLocaleString() + ' mm';
+
+            const rowsData = [
+                ['Facade Side', op.facade],
+                ['Dimensions (W × H)', op.widthMm.toLocaleString() + ' × ' + op.heightMm.toLocaleString() + ' mm'],
+                ['Opening Area', ((op.widthMm * op.heightMm) / 1e6).toFixed(2) + ' m²'],
+                ['Sill Height (hp)', op.sillMm.toLocaleString() + ' mm (' + (op.y1 / 1000).toFixed(2) + ' m datum)'],
+                ['Head Elevation', '+' + (op.y2 / 1000).toFixed(2) + ' m'],
+                ['Sashes / Pillars', op.sashes + (op.pillarMm ? ' panes (' + op.pillarMm + ' mm inner pillars)' : ' sash(es)')],
+                ['Window Jambs (20cm)', op.jambs.length > 0 ? op.jambs.join(', ').toUpperCase() + ' (RAL 7021)' : 'Recessed Entrance Nook'],
+                ['Specification', op.specs]
+            ];
+
+            const fragmentNodes = rowsData.map(([k, v]) => {
+                const row = document.createElement('div');
+                row.className = 'kv-row';
+                const kSpan = document.createElement('span');
+                kSpan.className = 'kv-key';
+                kSpan.textContent = k;
+                const vSpan = document.createElement('span');
+                vSpan.className = 'kv-val';
+                vSpan.textContent = v;
+                row.appendChild(kSpan);
+                row.appendChild(vSpan);
+                return row;
+            });
+
+            listEl.replaceChildren(...fragmentNodes);
+        }
+
+        function clearCameraActiveButtons() {
+            ['cam-ne', 'cam-se', 'cam-nw', 'cam-sw', 'cam-n', 'cam-s', 'cam-w', 'cam-e', 'cam-top'].forEach(id => {
+                const b = document.getElementById(id);
+                if (b) b.classList.remove('active');
+            });
+        }
+
+        function setCameraPreset(preset, btn) {
+            clearCameraActiveButtons();
+            if (btn) btn.classList.add('active');
+            state.target = { x: BUILDING_CENTER.x, y: 2.6, z: BUILDING_CENTER.z };
+
+            const deg = Math.PI / 180;
+            switch (preset) {
+                case 'ne': // North-East (matches north_facade_render.png)
+                    state.yaw = -150 * deg;
+                    state.pitch = 16 * deg;
+                    break;
+                case 'se': // South-East (Garden & Living Room glazing)
+                    state.yaw = -42 * deg;
+                    state.pitch = 20 * deg;
+                    break;
+                case 'nw': // North-West (Garage & Corner Window O13a/b)
+                    state.yaw = 138 * deg;
+                    state.pitch = 22 * deg;
+                    break;
+                case 'sw': // South-West (Driveway, Entrance Z1 & South-West wing)
+                    state.yaw = 45 * deg;
+                    state.pitch = 22 * deg;
+                    break;
+                case 'n': // Direct North Elevation (looking South)
+                    state.yaw = 180 * deg;
+                    state.pitch = 6 * deg;
+                    break;
+                case 's': // Direct South Elevation (looking North)
+                    state.yaw = 0 * deg;
+                    state.pitch = 6 * deg;
+                    break;
+                case 'w': // Direct West Elevation (looking East)
+                    state.yaw = 90 * deg;
+                    state.pitch = 6 * deg;
+                    break;
+                case 'e': // Direct East Elevation (looking West)
+                    state.yaw = -90 * deg;
+                    state.pitch = 6 * deg;
+                    break;
+                case 'top': // Top-down roof & footprint plan
+                    state.yaw = 180 * deg;
+                    state.pitch = 88 * deg;
+                    break;
+            }
+            renderFrame();
+        }
+
+        function resetCamera() {
+            state.zoom = 1.0;
+            const slider = document.getElementById('zoom-slider');
+            const label = document.getElementById('zoom-label');
+            if (slider) slider.value = '100';
+            if (label) label.textContent = '100%';
+            setCameraPreset('ne', document.getElementById('cam-ne'));
+        }
+
+        function setProjectionMode(mode) {
+            state.projection = (mode === 'orthographic') ? 'orthographic' : 'perspective';
+            document.getElementById('proj-persp').classList.toggle('active', state.projection === 'perspective');
+            document.getElementById('proj-ortho').classList.toggle('active', state.projection === 'orthographic');
+            renderFrame();
+        }
+
+        function onZoomSliderChange(val) {
+            state.zoom = Math.max(0.25, Math.min(3.0, Number(val) / 100));
+            document.getElementById('zoom-label').textContent = Math.round(state.zoom * 100) + '%';
+            renderFrame();
+        }
+
+        function zoomByFactor(factor) {
+            state.zoom = Math.max(0.25, Math.min(2.8, state.zoom * factor));
+            const pct = Math.round(state.zoom * 100);
+            const slider = document.getElementById('zoom-slider');
+            const label = document.getElementById('zoom-label');
+            if (slider) slider.value = String(pct);
+            if (label) label.textContent = pct + '%';
+            renderFrame();
+        }
+
+        function setFloorMode(mode) {
+            state.floorMode = mode;
+            ['all', 'explode', 'ground', 'upper'].forEach(m => {
+                const b = document.getElementById('floor-' + m);
+                if (b) b.classList.toggle('active', m === mode);
+            });
+            buildSceneGeometry(gl);
+            renderFrame();
+        }
+
+        function toggle3DLayer(layerKey, btn) {
+            state.layers[layerKey] = !state.layers[layerKey];
+            if (btn) btn.classList.toggle('active', state.layers[layerKey]);
+            if (layerKey === 'trees') {
+                buildSceneGeometry(gl);
+            }
+            renderFrame();
+        }
+
+        function toggleJambMaterial(btn) {
+            state.jambMaterial = (state.jambMaterial === 'ral7021') ? 'floor' : 'ral7021';
+            if (btn) {
+                btn.classList.toggle('active', state.jambMaterial === 'ral7021');
+                btn.textContent = (state.jambMaterial === 'ral7021') ? '⬛ Jambs: RAL 7021' : '🧱 Jambs: Floor Mat.';
+            }
+            buildSceneGeometry(gl);
+            renderFrame();
+        }
+
+        function onSunSliderChange(val) {
+            state.sunAzimuthDeg = Number(val);
+            document.getElementById('sun-label').textContent = Math.round(state.sunAzimuthDeg) + '°';
+            renderFrame();
+        }
+
+        function panCameraScreen(dxPx, dyPx) {
+            const panScale = (0.022 / state.zoom);
+            const rightX = -Math.cos(state.yaw);
+            const rightZ = Math.sin(state.yaw);
+            const fwdX = -Math.sin(state.yaw);
+            const fwdZ = -Math.cos(state.yaw);
+
+            state.target.x -= dxPx * rightX * panScale;
+            state.target.z -= dxPx * rightZ * panScale;
+
+            if (state.pitch > 0.65) {
+                state.target.x += dyPx * fwdX * panScale;
+                state.target.z += dyPx * fwdZ * panScale;
+            } else {
+                state.target.y += dyPx * panScale * 0.85;
+            }
+            renderFrame();
+        }
+
+        function setupMouseAndKeyboardControls() {
+            const canvas = document.getElementById('webgl-canvas');
+            if (!canvas) return;
+
+            let isDragging = false;
+            let dragMode = 'orbit'; // 'orbit' | 'pan'
+            let startX = 0, startY = 0;
+            let movedDist = 0;
+
+            canvas.addEventListener('contextmenu', e => e.preventDefault());
+
+            canvas.addEventListener('pointerdown', e => {
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                movedDist = 0;
+                dragMode = (e.button === 2 || e.button === 1 || e.shiftKey) ? 'pan' : 'orbit';
+                canvas.setPointerCapture(e.pointerId);
+            });
+
+            canvas.addEventListener('pointermove', e => {
+                const rect = canvas.getBoundingClientRect();
+                const mx = e.clientX - rect.left;
+                const my = e.clientY - rect.top;
+
+                if (!isDragging) {
+                    // Check hover over projected window badges
+                    let hit = null;
+                    for (let i = state.projectedLabels.length - 1; i >= 0; i--) {
+                        const b = state.projectedLabels[i];
+                        if (mx >= b.x1 && mx <= b.x2 && my >= b.y1 && my <= b.y2) {
+                            hit = b.id;
+                            break;
+                        }
+                    }
+                    if (hit !== state.hoveredOpeningId) {
+                        state.hoveredOpeningId = hit;
+                        canvas.style.cursor = hit ? 'pointer' : 'grab';
+                        buildSceneGeometry(gl);
+                        renderFrame();
+                    }
+                    return;
+                }
+
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                startX = e.clientX;
+                startY = e.clientY;
+                movedDist += Math.hypot(dx, dy);
+
+                if (dragMode === 'orbit') {
+                    clearCameraActiveButtons();
+                    state.yaw += dx * 0.0065;
+                    state.pitch = Math.max(-0.08, Math.min(Math.PI * 0.49, state.pitch + dy * 0.0055));
+                    renderFrame();
+                } else {
+                    panCameraScreen(dx, dy);
+                }
+            });
+
+            canvas.addEventListener('pointerup', e => {
+                if (!isDragging) return;
+                isDragging = false;
+                canvas.releasePointerCapture(e.pointerId);
+
+                // If click without drag, check if user clicked a window badge
+                if (movedDist < 6) {
+                    const rect = canvas.getBoundingClientRect();
+                    const mx = e.clientX - rect.left;
+                    const my = e.clientY - rect.top;
+                    for (let i = state.projectedLabels.length - 1; i >= 0; i--) {
+                        const b = state.projectedLabels[i];
+                        if (mx >= b.x1 && mx <= b.x2 && my >= b.y1 && my <= b.y2) {
+                            state.selectedOpeningId = b.id;
+                            updateInspectorPanel(b.id);
+                            buildSceneGeometry(gl);
+                            renderFrame();
+                            break;
+                        }
+                    }
+                }
+            });
+
+            canvas.addEventListener('wheel', e => {
+                e.preventDefault();
+                const factor = (e.deltaY < 0) ? 1.1 : (1 / 1.1);
+                zoomByFactor(factor);
+            }, { passive: false });
+
+            window.addEventListener('keydown', e => {
+                if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+                const step = 28;
+                switch (e.key.toLowerCase()) {
+                    case 'w':
+                    case 'arrowup':
+                        panCameraScreen(0, step);
+                        break;
+                    case 's':
+                    case 'arrowdown':
+                        panCameraScreen(0, -step);
+                        break;
+                    case 'a':
+                    case 'arrowleft':
+                        panCameraScreen(-step, 0);
+                        break;
+                    case 'd':
+                    case 'arrowright':
+                        panCameraScreen(step, 0);
+                        break;
+                    case '+':
+                    case '=':
+                        zoomByFactor(1.14);
+                        break;
+                    case '-':
+                    case '_':
+                        zoomByFactor(1 / 1.14);
+                        break;
+                    case 'r':
+                        resetCamera();
+                        break;
+                }
+            });
+
+            window.addEventListener('resize', () => renderFrame());
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            applyDefaultFacadeOptions();
+
+            const canvas = document.getElementById('webgl-canvas');
+            gl = canvas.getContext('webgl', { antialias: true, alpha: false });
+            if (!gl) {
+                return;
+            }
+
+            program = createProgram(gl, VS_SOURCE, FS_SOURCE);
+            lineProgram = createProgram(gl, LINE_VS_SOURCE, LINE_FS_SOURCE);
+            initProceduralTextures(gl);
+            buildSceneGeometry(gl);
+            updateInspectorPanel(state.selectedOpeningId);
+            setupMouseAndKeyboardControls();
+            setCameraPreset('ne', document.getElementById('cam-ne'));
+        });
+    </script>
+</body>
+
+</html>
