@@ -1,0 +1,2310 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2D Architectural Floor Plans (Parter &amp; Piętro)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0b0f19;
+            --panel-bg: rgba(15, 23, 42, 0.88);
+            --panel-border: rgba(148, 163, 184, 0.18);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-blue: #38bdf8;
+            --accent-amber: #f59e0b;
+            --accent-emerald: #10b981;
+            --accent-rose: #f43f5e;
+            --Blueprint-bg: #0f172a;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* Top Navigation Header (consistent with Facade & 3D pages) */
+        .top-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 12px 20px;
+            background: rgba(15, 23, 42, 0.95);
+            border-bottom: 1px solid var(--panel-border);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 40;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 13px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.14);
+            transform: translateY(-1px);
+        }
+
+        .header-title-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-title-group h1 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            color: #ffffff;
+        }
+
+        .tech-pill {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 9px;
+            border-radius: 999px;
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            white-space: nowrap;
+        }
+
+        /* Main Workspace Layout */
+        .workspace {
+            display: grid;
+            grid-template-columns: 295px 1fr 315px;
+            gap: 14px;
+            padding: 14px 18px 24px;
+            flex: 1;
+            align-items: start;
+        }
+
+        @media (max-width: 1320px) {
+            .workspace {
+                grid-template-columns: 270px 1fr;
+            }
+            .right-sidebar {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (max-width: 920px) {
+            .workspace {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Sidebars */
+        .sidebar-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 14px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            position: sticky;
+            top: 68px;
+            max-height: calc(100vh - 84px);
+            overflow-y: auto;
+        }
+
+        .section-block {
+            border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+            padding-bottom: 12px;
+        }
+
+        .section-block:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            margin: 0 0 9px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .btn-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .btn-grid.three-cols {
+            grid-template-columns: 1fr 1fr 1fr;
+        }
+
+        .ctrl-btn {
+            font-family: 'Outfit', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 7px 10px;
+            border-radius: 7px;
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            background: rgba(30, 41, 59, 0.78);
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            text-align: center;
+        }
+
+        .ctrl-btn:hover {
+            background: rgba(51, 65, 85, 0.92);
+            border-color: rgba(148, 163, 184, 0.45);
+            color: #ffffff;
+        }
+
+        .ctrl-btn.active {
+            background: linear-gradient(135deg, #0284c7, #0369a1);
+            border-color: #38bdf8;
+            color: #ffffff;
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.28);
+        }
+
+        .ctrl-btn.tool-btn {
+            justify-content: flex-start;
+            padding: 8px 10px;
+        }
+
+        .ctrl-btn.tool-btn.active {
+            background: linear-gradient(135deg, #d97706, #b45309);
+            border-color: #fbbf24;
+            box-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
+        }
+
+        .ctrl-btn.danger {
+            background: rgba(159, 18, 57, 0.35);
+            border-color: rgba(244, 63, 94, 0.45);
+            color: #fda4af;
+        }
+
+        .ctrl-btn.danger:hover {
+            background: rgba(190, 18, 60, 0.55);
+            color: #ffffff;
+        }
+
+        .slider-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .slider-row label {
+            font-size: 11.5px;
+            color: var(--text-muted);
+            min-width: 65px;
+        }
+
+        .slider-row input[type="range"] {
+            flex: 1;
+            accent-color: var(--accent-blue);
+            cursor: pointer;
+        }
+
+        .slider-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11.5px;
+            color: var(--accent-blue);
+            min-width: 44px;
+            text-align: right;
+        }
+
+        /* Center Floor Plans Container */
+        .plans-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            width: 100%;
+        }
+
+        .plans-container.side-by-side {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .floor-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 14px 36px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .floor-card.hidden {
+            display: none;
+        }
+
+        .floor-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 11px 16px;
+            background: rgba(15, 23, 42, 0.95);
+            border-bottom: 1px solid var(--panel-border);
+        }
+
+        .floor-title-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .floor-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: rgba(56, 189, 248, 0.16);
+            color: #38bdf8;
+            border: 1px solid rgba(56, 189, 248, 0.35);
+        }
+
+        .floor-badge.upper {
+            background: rgba(245, 158, 11, 0.16);
+            color: #fbbf24;
+            border-color: rgba(245, 158, 11, 0.35);
+        }
+
+        .floor-card-header h2 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 700;
+            color: #f8fafc;
+        }
+
+        .floor-metrics {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11.5px;
+            color: var(--text-muted);
+        }
+
+        .floor-metrics strong {
+            color: #e2e8f0;
+        }
+
+        .svg-viewport {
+            position: relative;
+            width: 100%;
+            height: 540px;
+            background: radial-gradient(circle at 50% 50%, #131c31 0%, #0b1120 100%);
+            overflow: hidden;
+            user-select: none;
+            cursor: grab;
+        }
+
+        .svg-viewport.placing-mode {
+            cursor: crosshair;
+        }
+
+        .svg-viewport.dragging {
+            cursor: grabbing;
+        }
+
+        .plan-svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .coord-hud {
+            position: absolute;
+            bottom: 10px;
+            left: 12px;
+            padding: 5px 10px;
+            border-radius: 7px;
+            background: rgba(15, 23, 42, 0.88);
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: #cbd5e1;
+            pointer-events: none;
+            display: flex;
+            gap: 12px;
+        }
+
+        .compass-badge {
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            background: rgba(15, 23, 42, 0.88);
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10.5px;
+            color: #e2e8f0;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Inspector & Form Controls */
+        .kv-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .kv-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 8px;
+            font-size: 12px;
+            padding: 4px 0;
+            border-bottom: 1px dashed rgba(148, 163, 184, 0.12);
+        }
+
+        .kv-row:last-child {
+            border-bottom: none;
+        }
+
+        .kv-key {
+            color: var(--text-muted);
+        }
+
+        .kv-val {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11.5px;
+            color: #f1f5f9;
+            text-align: right;
+            font-weight: 500;
+        }
+
+        .form-row {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+
+        .form-row label {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .form-input {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            padding: 6px 9px;
+            border-radius: 6px;
+            border: 1px solid rgba(148, 163, 184, 0.28);
+            background: rgba(15, 23, 42, 0.9);
+            color: #f8fafc;
+            width: 100%;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+
+        .legend-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: #cbd5e1;
+            margin-bottom: 6px;
+        }
+
+        .swatch {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            flex-shrink: 0;
+        }
+
+        .hint-box {
+            font-size: 11.5px;
+            line-height: 1.45;
+            color: #94a3b8;
+            background: rgba(30, 41, 59, 0.55);
+            border: 1px solid rgba(148, 163, 184, 0.16);
+            border-radius: 8px;
+            padding: 9px 11px;
+        }
+
+        /* SVG interactive element hover effects */
+        .opening-hit:hover {
+            stroke: #38bdf8;
+            stroke-width: 40px;
+            cursor: pointer;
+        }
+
+        .placed-object-group {
+            cursor: grab;
+        }
+
+        .placed-object-group:active {
+            cursor: grabbing;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- TOP HEADER BAR -->
+    <header class="top-header">
+        <div class="nav-links">
+            <a href="index.html" class="nav-btn">
+                <span>🏠</span> Dashboard
+            </a>
+            <a href="north_facade.html" class="nav-btn" style="background: rgba(56, 189, 248, 0.12); color: #38bdf8; border-color: rgba(56, 189, 248, 0.3);">
+                <span>🧭</span> North
+            </a>
+            <a href="south_facade.html" class="nav-btn" style="background: rgba(245, 158, 11, 0.12); color: #fbbf24; border-color: rgba(245, 158, 11, 0.3);">
+                <span>☀️</span> South
+            </a>
+            <a href="west_facade.html" class="nav-btn" style="background: rgba(168, 85, 247, 0.12); color: #c084fc; border-color: rgba(168, 85, 247, 0.3);">
+                <span>📐</span> West
+            </a>
+            <a href="east_facade.html" class="nav-btn" style="background: rgba(16, 185, 129, 0.12); color: #4ade80; border-color: rgba(16, 185, 129, 0.3);">
+                <span>🌅</span> East
+            </a>
+            <a href="facade_summary.html" class="nav-btn" style="background: rgba(248, 250, 252, 0.1); color: #f8fafc; border-color: rgba(248, 250, 252, 0.25);">
+                <span>📊</span> Summary
+            </a>
+            <a href="building_3d.html" class="nav-btn" style="background: rgba(2, 132, 199, 0.18); color: #38bdf8; border-color: rgba(56, 189, 248, 0.35);">
+                <span>🧊</span> 3D Building View
+            </a>
+            <a href="floor_plan.html" class="nav-btn" style="background: #059669; color: #ffffff; border-color: #34d399;">
+                <span>🗺️</span> 2D Floor Plans
+            </a>
+        </div>
+
+        <div class="header-title-group">
+            <h1>2D Top-Down Architectural Floor Plans (Parter &amp; Piętro)</h1>
+            <span class="tech-pill">1:1 Millimeter CAD + Object Layer Engine</span>
+        </div>
+    </header>
+
+    <!-- MAIN 3-COLUMN WORKSPACE -->
+    <main class="workspace">
+        <!-- LEFT SIDEBAR: ZOOM, VIEW LAYOUT, LAYERS & OBJECT PALETTE -->
+        <aside class="sidebar-card">
+            <!-- 1. Zoom & View Controls -->
+            <div class="section-block">
+                <div class="section-title">
+                    <span>🔍 Zoom &amp; Pan Controls</span>
+                    <button class="ctrl-btn" style="padding: 2px 8px; font-size: 11px;" onclick="resetPlanView()">Reset (R)</button>
+                </div>
+                <div class="btn-grid three-cols">
+                    <button class="ctrl-btn" onclick="zoomPlanBy(1.22)">➕ Zoom In</button>
+                    <button class="ctrl-btn" onclick="zoomPlanBy(1/1.22)">➖ Zoom Out</button>
+                    <button class="ctrl-btn" onclick="resetPlanView()">🎯 Fit All</button>
+                </div>
+                <div class="slider-row">
+                    <label for="zoom-slider">Zoom Scale</label>
+                    <input type="range" id="zoom-slider" min="40" max="400" value="100" oninput="onZoomSliderInput(this.value)">
+                    <span class="slider-val" id="zoom-val-label">100%</span>
+                </div>
+                <div class="btn-grid" style="margin-top: 8px;">
+                    <button class="ctrl-btn active" id="btn-sync-views" onclick="toggleSyncViews(this)">🔗 Sync Both Floors</button>
+                    <button class="ctrl-btn" id="btn-flip-x" onclick="toggleHorizontalOrientation(this)">🧭 West on Left</button>
+                </div>
+            </div>
+
+            <!-- 2. Page Layout (Stacked vs Side-by-Side) -->
+            <div class="section-block">
+                <div class="section-title">
+                    <span>📑 Floor Display Layout</span>
+                </div>
+                <div class="btn-grid">
+                    <button class="ctrl-btn active" id="layout-stacked" onclick="setPlanLayout('stacked')">⬇️ Stacked (Both)</button>
+                    <button class="ctrl-btn" id="layout-side" onclick="setPlanLayout('side')">↔️ Side-by-Side</button>
+                    <button class="ctrl-btn" id="layout-ground" onclick="setPlanLayout('ground')">Parter Only</button>
+                    <button class="ctrl-btn" id="layout-first" onclick="setPlanLayout('first')">Piętro Only</button>
+                </div>
+            </div>
+
+            <!-- 3. CAD Display Layers -->
+            <div class="section-block">
+                <div class="section-title">
+                    <span>🎛️ 2D CAD Layers</span>
+                </div>
+                <div class="btn-grid">
+                    <button class="ctrl-btn active" id="layer-grid" onclick="togglePlanLayer('grid', this)">📏 1m / 0.5m Grid</button>
+                    <button class="ctrl-btn active" id="layer-dims" onclick="togglePlanLayer('dims', this)">📐 Outer Dimensions</button>
+                    <button class="ctrl-btn active" id="layer-openings" onclick="togglePlanLayer('openings', this)">🏷️ Window Tags</button>
+                    <button class="ctrl-btn active" id="layer-jambs" onclick="togglePlanLayer('jambs', this)">⬛ 200mm Jambs</button>
+                    <button class="ctrl-btn active" id="layer-roofs" onclick="togglePlanLayer('roofs', this)">🏠 Overhangs / Roofs</button>
+                    <button class="ctrl-btn active" id="layer-objects" onclick="togglePlanLayer('objects', this)">🔌 Placed Objects</button>
+                </div>
+            </div>
+
+            <!-- 4. Object Placement Palette (Ready for Sockets, Switches & Equipment) -->
+            <div class="section-block">
+                <div class="section-title">
+                    <span>🧰 Object Tool Palette</span>
+                    <span id="snap-badge" style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #38bdf8;">Snap: 50mm + Wall</span>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 6px;">
+                    <button class="ctrl-btn tool-btn active" id="tool-select" onclick="setActiveTool('select')">
+                        <span>🖐️</span> Select / Pan / Drag Objects
+                    </button>
+                    <button class="ctrl-btn tool-btn" id="tool-socket_pe" onclick="setActiveTool('socket_pe')">
+                        <svg width="20" height="20" viewBox="-340 -430 680 470" style="flex-shrink:0;">
+                            <line x1="0" y1="0" x2="0" y2="-190" stroke="#ef4444" stroke-width="46" stroke-linecap="butt"/>
+                            <line x1="-200" y1="-190" x2="200" y2="-190" stroke="#ef4444" stroke-width="46" stroke-linecap="butt"/>
+                            <path d="M -190 -380 A 190 190 0 0 0 190 -380" fill="none" stroke="#ef4444" stroke-width="46" stroke-linecap="butt"/>
+                        </svg>
+                        Gniazdo ze stykiem ochronnym
+                    </button>
+                    <button class="ctrl-btn tool-btn" id="tool-socket_pe_shutter" onclick="setActiveTool('socket_pe_shutter')">
+                        <svg width="20" height="20" viewBox="-340 -430 680 470" style="flex-shrink:0;">
+                            <line x1="0" y1="0" x2="0" y2="-190" stroke="#ef4444" stroke-width="46" stroke-linecap="butt"/>
+                            <line x1="-200" y1="-190" x2="200" y2="-190" stroke="#ef4444" stroke-width="46" stroke-linecap="butt"/>
+                            <path d="M -310 -380 L -190 -380 A 190 190 0 0 0 190 -380 L 310 -380" fill="none" stroke="#ef4444" stroke-width="46" stroke-linecap="butt" stroke-linejoin="miter"/>
+                        </svg>
+                        Gniazdo ze stykiem ochr. i zaślepką
+                    </button>
+                    <button class="ctrl-btn tool-btn" id="tool-socket_floor" onclick="setActiveTool('socket_floor')">
+                        <svg width="20" height="20" viewBox="-240 -240 480 480" style="flex-shrink:0;">
+                            <rect x="-200" y="-200" width="400" height="400" fill="none" stroke="#ef4444" stroke-width="42"/>
+                            <line x1="-200" y1="0" x2="200" y2="0" stroke="#ef4444" stroke-width="42" stroke-linecap="butt"/>
+                            <line x1="0" y1="-200" x2="0" y2="0" stroke="#ef4444" stroke-width="42" stroke-linecap="butt"/>
+                            <path d="M -200 200 A 200 200 0 0 1 200 200" fill="none" stroke="#ef4444" stroke-width="42" stroke-linecap="butt"/>
+                        </svg>
+                        Gniazdo podłogowe
+                    </button>
+                </div>
+                <div class="hint-box" style="margin-top: 8px;">
+                    <strong>Tip:</strong> In <em>Select / Pan</em> mode, drag empty space to pan, scroll wheel to zoom, click any window or placed socket to inspect it, or drag placed sockets to reposition them along walls.
+                </div>
+            </div>
+        </aside>
+
+        <!-- CENTER: LOWER FLOOR (PARTER) & UPPER FLOOR (PIĘTRO) 2D SVG VIEWS -->
+        <section class="plans-container" id="plans-container">
+            <!-- 1. LOWER FLOOR (PARTER) -->
+            <div class="floor-card" id="card-ground">
+                <div class="floor-card-header">
+                    <div class="floor-title-wrap">
+                        <span class="floor-badge">PARTER • ±0.00 m</span>
+                        <h2>Lower Floor Plan (Ground Floor — Exterior Shell &amp; 10 Openings)</h2>
+                    </div>
+                    <div class="floor-metrics">
+                        <span>Max Span: <strong>20,990 × 21,420 mm</strong></span>
+                        <span>Footprint Area: <strong>258.4 m² gross</strong></span>
+                        <span>Internal Walls: <strong>None (Open Shell)</strong></span>
+                    </div>
+                </div>
+                <div class="svg-viewport" id="viewport-ground" data-floor="ground">
+                    <svg class="plan-svg" id="svg-ground" xmlns="http://www.w3.org/2000/svg"></svg>
+                    <div class="compass-badge" id="compass-ground">
+                        <span style="color:#ef4444;font-weight:700;">▲ N</span>
+                        <span style="color:#fbbf24;">▼ S</span>
+                        <span id="compass-lr-ground">◀ W (Entry) • E (Garden) ▶</span>
+                    </div>
+                    <div class="coord-hud" id="hud-ground">
+                        <span>Floor: <strong>Parter (±0.00m)</strong></span>
+                        <span id="cursor-ground">X: — mm, Z: — mm</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. UPPER FLOOR (PIĘTRO) -->
+            <div class="floor-card" id="card-first">
+                <div class="floor-card-header">
+                    <div class="floor-title-wrap">
+                        <span class="floor-badge upper">PIĘTRO • +3.43 m</span>
+                        <h2>Upper Floor Plan (First Floor — Exterior Shell, NE Terrace &amp; 9 Openings)</h2>
+                    </div>
+                    <div class="floor-metrics">
+                        <span>Core Span: <strong>20,990 × 8,790 mm</strong></span>
+                        <span>Enclosed + NE Terrace: <strong>164.0 m² + 20.5 m²</strong></span>
+                        <span>Internal Walls: <strong>None (Open Shell)</strong></span>
+                    </div>
+                </div>
+                <div class="svg-viewport" id="viewport-first" data-floor="first">
+                    <svg class="plan-svg" id="svg-first" xmlns="http://www.w3.org/2000/svg"></svg>
+                    <div class="compass-badge" id="compass-first">
+                        <span style="color:#ef4444;font-weight:700;">▲ N</span>
+                        <span style="color:#fbbf24;">▼ S</span>
+                        <span id="compass-lr-first">◀ W (Entry) • E (Garden) ▶</span>
+                    </div>
+                    <div class="coord-hud" id="hud-first">
+                        <span>Floor: <strong>Piętro (+3.43m)</strong></span>
+                        <span id="cursor-first">X: — mm, Z: — mm</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RIGHT SIDEBAR: ELEMENT INSPECTOR, OBJECT PROPERTIES & LEGEND -->
+        <aside class="sidebar-card right-sidebar">
+            <!-- 1. Selected Window or Placed Object Inspector -->
+            <div class="section-block">
+                <div class="section-title">
+                    <span>🔎 Element Inspector</span>
+                    <span class="tech-pill" id="insp-type-pill">Window Opening</span>
+                </div>
+                <h3 id="insp-title" style="margin: 0 0 4px 0; font-size: 15px; color: #ffffff;">Click Any Window or Object</h3>
+                <p id="insp-subtitle" style="margin: 0 0 10px 0; font-size: 12px; color: var(--text-muted);">19 Canonical Facade Openings + Custom Plan Objects</p>
+                <div class="kv-list" id="insp-kv-list"></div>
+
+                <!-- Editable form shown when a placed object (e.g. socket) is selected -->
+                <div id="object-edit-panel" style="display: none; margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(148,163,184,0.18);">
+                    <div class="form-row">
+                        <label for="obj-label-input">Object Label / Circuit Code</label>
+                        <input type="text" class="form-input" id="obj-label-input" maxlength="40" oninput="onSelectedObjectFieldChange()">
+                    </div>
+                    <div class="btn-grid">
+                        <div class="form-row">
+                            <label for="obj-x-input">Plan X (E→W mm)</label>
+                            <input type="number" class="form-input" id="obj-x-input" step="10" oninput="onSelectedObjectFieldChange()">
+                        </div>
+                        <div class="form-row">
+                            <label for="obj-z-input">Plan Z (N→S mm)</label>
+                            <input type="number" class="form-input" id="obj-z-input" step="10" oninput="onSelectedObjectFieldChange()">
+                        </div>
+                    </div>
+                    <div class="btn-grid">
+                        <div class="form-row">
+                            <label for="obj-h-input">Mount Height (mm)</label>
+                            <input type="number" class="form-input" id="obj-h-input" step="50" oninput="onSelectedObjectFieldChange()">
+                        </div>
+                        <div class="form-row">
+                            <label for="obj-rot-input">Rotation (deg)</label>
+                            <input type="number" class="form-input" id="obj-rot-input" step="45" oninput="onSelectedObjectFieldChange()">
+                        </div>
+                    </div>
+                    <div class="btn-grid" style="margin-top: 6px;">
+                        <button class="ctrl-btn" onclick="rotateSelectedObject(90)">🔄 Rotate 90° (R)</button>
+                        <button class="ctrl-btn danger" onclick="deleteSelectedObject()">🗑️ Delete (Del)</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Placed Objects Summary List -->
+            <div class="section-block">
+                <div class="section-title">
+                    <span>📋 Placed Plan Objects (<span id="obj-count-label">0</span>)</span>
+                    <button class="ctrl-btn danger" style="padding: 2px 7px; font-size: 10.5px;" onclick="clearAllPlacedObjects()">Clear All</button>
+                </div>
+                <div id="placed-objects-list" style="display: flex; flex-direction: column; gap: 5px; max-height: 170px; overflow-y: auto;"></div>
+            </div>
+
+            <!-- 3. Architectural Plan Legend -->
+            <div class="section-block">
+                <div class="section-title">
+                    <span>📐 2D Plan Legend</span>
+                </div>
+                <div class="legend-row">
+                    <span class="swatch" style="background: #334155; border-color: #94a3b8;"></span>
+                    <span><strong>Exterior Structural Wall (400 mm):</strong> Outer 200 mm facade zone + 200 mm inner structural shell</span>
+                </div>
+                <div class="legend-row">
+                    <span class="swatch" style="background: #1f2421; border-color: #475569;"></span>
+                    <span><strong>Window Jambs (Ościeża):</strong> 200 mm setback from outer facade in RAL 7021 (#1f2421)</span>
+                </div>
+                <div class="legend-row">
+                    <span class="swatch" style="background: rgba(56, 189, 248, 0.35); border-color: #38bdf8;"></span>
+                    <span><strong>Glazing &amp; 90 mm Pillars:</strong> Recessed 200 mm from outer wall face (including corner joins)</span>
+                </div>
+                <div class="legend-row">
+                    <span class="swatch" style="background: transparent; border: 1.5px dashed #fbbf24;"></span>
+                    <span><strong>Roof Overhang / Balcony:</strong> SW wing roof (+1,960 mm East) &amp; NE upper covered terrace</span>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <!-- Canonical Window & Coordinate Scripts -->
+    <script src="data/windows.js"></script>
+    <script src="js/window-store.js"></script>
+    <script src="js/coordinate-service.js"></script>
+
+    <script>
+        /**
+         * ============================================================================
+         * 2D TOP-DOWN ARCHITECTURAL FLOOR PLAN ENGINE (PARTER & PIĘTRO)
+         * ============================================================================
+         * - Uses the exact millimeter coordinate system (X = East->West, Z = North->South)
+         *   from building_3d.html and the 4 facade views.
+         * - Exterior shell only (internalWalls array is pre-wired and empty for now).
+         * - Built-in extensible object layer (sockets, switches, floor boxes, RJ45)
+         *   supporting click-to-add, drag-to-move, wall-snapping, and localStorage.
+         * ============================================================================
+         */
+        const SVG_NS = 'http://www.w3.org/2000/svg';
+        const STORAGE_KEY_OBJECTS = 'home_design_floor_objects_v1';
+
+        // Canonical world bounds in millimeters:
+        // X: -285 mm (East outer face) to 20,705 mm (West outer face) -> 20,990 mm width
+        // Z: -290 mm (North garage face) to 21,130 mm (South wing face) -> 21,420 mm length
+        const WORLD_BOUNDS = {
+            minX: -285,
+            maxX: 20705,
+            minZ: -290,
+            maxZ: 21130,
+            width: 20990,
+            height: 21420
+        };
+
+        const WALL_THICKNESS = 400; // 200 mm outer jamb reveal zone + 200 mm inner structural wall
+
+        // Outer clockwise vertices of Lower Floor (Parter) in [X, Z] millimeters
+        const GROUND_OUTER_POLY = [
+            [-285, 2790],     // NE corner of central block (Study O2)
+            [11740, 2790],    // Step to protruding Garage
+            [11740, -290],    // Garage NE corner
+            [20705, -290],    // Garage NW corner
+            [20705, 8560],    // West wall before recessed Entrance Alcove Z1
+            [19555, 8560],    // Entrance Alcove North inner corner (1,150 mm recessed)
+            [19555, 11020],   // Entrance Alcove South inner corner
+            [20705, 11020],   // West wall after Entrance Alcove
+            [20705, 21130],   // SW Wing SW corner
+            [14695, 21130],   // SW Wing SE corner (O7 / O6b)
+            [14695, 11580],   // Step from SW Wing to recessed South Living/Dining wall
+            [-285, 11580]     // SE corner (O4 / O3)
+        ];
+
+        // Inner clockwise vertices of Lower Floor (offset inward by WALL_THICKNESS = 400 mm)
+        const GROUND_INNER_POLY = [
+            [115, 3190],
+            [12140, 3190],
+            [12140, 110],
+            [20305, 110],
+            [20305, 8160],
+            [19155, 8160],
+            [19155, 11420],
+            [20305, 11420],
+            [20305, 20730],
+            [15095, 20730],
+            [15095, 11180],
+            [115, 11180]
+        ];
+
+        // Outer clockwise vertices of Upper Floor (Piętro) enclosed volume in [X, Z] millimeters
+        const FIRST_OUTER_POLY = [
+            [6315, 2790],     // North-East corner next to 6,315 mm covered terrace (14a)
+            [20705, 2790],    // Upper NW corner (O13a / O13b_1)
+            [20705, 11580],   // Upper SW corner (O13b_2 / O13a_2)
+            [-285, 11580],    // Upper SE corner (O10 / O9)
+            [-285, 5890],     // Upper East wall North end at terrace back wall
+            [6315, 5890]      // NE Covered Terrace inner corner (O14b + D1)
+        ];
+
+        // Inner clockwise vertices of Upper Floor (offset inward by WALL_THICKNESS = 400 mm)
+        const FIRST_INNER_POLY = [
+            [6715, 3190],
+            [20305, 3190],
+            [20305, 11180],
+            [115, 11180],
+            [115, 6290],
+            [6715, 6290]
+        ];
+
+        // Placeholder for future internal partition walls (empty right now per requirements)
+        const INTERNAL_WALLS = {
+            ground: [],
+            first: []
+        };
+
+        // Canonical 19 Openings across Ground Floor ('ground') and Upper Floor ('first')
+        const PLAN_OPENINGS = [
+            // ================= GROUND FLOOR (PARTER) =================
+            {
+                id: 'O2', name: 'O2', floor: 'ground', facade: 'North Facade', room: '0.15 Gabinet (Study)',
+                axis: 'x', fixedZ: 2790, inwardSign: 1, start: 880, end: 2680,
+                widthMm: 1800, heightMm: 1700, sillMm: 800, sashes: 2, pillarMm: 0,
+                jambStart: true, jambEnd: true,
+                specs: '1,800 × 1,700 mm (hp = 800 mm) • 2-sash study window, 1,165 mm from East outer corner'
+            },
+            {
+                id: 'O1', name: 'O1', floor: 'ground', facade: 'North Facade', room: '0.13 Kuchnia (Kitchen)',
+                axis: 'x', fixedZ: 2790, inwardSign: 1, start: 8480, end: 10580,
+                widthMm: 2100, heightMm: 1400, sillMm: 1100, sashes: 2, pillarMm: 0,
+                jambStart: true, jambEnd: true,
+                specs: '2,100 × 1,400 mm (hp = 1,100 mm) • Split 1,050 + 1,050 mm, aligned vertically with O15'
+            },
+            {
+                id: 'Z2', name: 'Z2 (Garage)', floor: 'ground', facade: 'West Facade', room: '0.01 Garaż Dwustanowiskowy',
+                axis: 'z', fixedX: 20705, inwardSign: -1, start: 690, end: 5890,
+                widthMm: 5200, heightMm: 2200, sillMm: 0, sashes: 1, pillarMm: 0, type: 'garage_door',
+                jambStart: true, jambEnd: true,
+                specs: '5,200 × 2,200 mm (hp = 0 mm) • Sectional double garage door in RAL 7021'
+            },
+            {
+                id: 'Z1', name: 'Z1 (Entry)', floor: 'ground', facade: 'West Facade', room: '0.04 Wiatrołap (Entrance)',
+                axis: 'z', fixedX: 19555, inwardSign: -1, start: 8920, end: 10620,
+                widthMm: 1700, heightMm: 2250, sillMm: 0, sashes: 2, pillarMm: 0, type: 'entrance_door',
+                jambStart: true, jambEnd: true,
+                specs: '1,700 × 2,250 mm (hp = 0 mm) • 1,100 mm door leaf + 600 mm sidelight inside 1,150 mm recessed alcove'
+            },
+            {
+                id: 'O8a', name: 'O8a', floor: 'ground', facade: 'West Facade', room: '0.11 Salon / Pokój',
+                axis: 'z', fixedX: 20705, inwardSign: -1, start: 15250, end: 20750,
+                widthMm: 5500, heightMm: 740, sillMm: 2060, sashes: 3, pillarMm: 0,
+                jambStart: true, jambEnd: true,
+                specs: '5,500 × 740 mm (hp = 2,060 mm) • 3-pane western clerestory ribbon window'
+            },
+            {
+                id: 'O7', name: 'O7', floor: 'ground', facade: 'South Facade', room: '0.09 Pokój / Siłownia (SW Wing)',
+                axis: 'x', fixedZ: 21130, inwardSign: -1, start: 14895, end: 16895,
+                widthMm: 2000, heightMm: 2800, sillMm: 0, sashes: 1, pillarMm: 0,
+                jambStart: false, jambEnd: true, cornerJoinStart: true,
+                specs: '2,000 × 2,800 mm (hp = 0 mm) • Recessed 200 mm corner window meeting O6b at (14,895, 20,930)'
+            },
+            {
+                id: 'O6b', name: 'O6b', floor: 'ground', facade: 'East Facade (SW Wing)', room: '0.10 Siłownia (SW Wing)',
+                axis: 'z', fixedX: 14695, inwardSign: 1, start: 15285, end: 20930,
+                widthMm: 5640, heightMm: 2800, sillMm: 0, sashes: 3, pillarMm: 90,
+                jambStart: true, jambEnd: false, cornerJoinEnd: true,
+                specs: '5,640 × 2,800 mm (hp = 0 mm) • 3 × 1,820 mm panes + 2 × 90 mm pillars, meeting O7 at corner'
+            },
+            {
+                id: 'O6a', name: 'O6a', floor: 'ground', facade: 'East Facade (SW Wing)', room: '0.12 Komunikacja',
+                axis: 'z', fixedX: 14695, inwardSign: 1, start: 13275, end: 15035,
+                widthMm: 1760, heightMm: 740, sillMm: 2060, sashes: 1, pillarMm: 0,
+                jambStart: true, jambEnd: true,
+                specs: '1,760 × 740 mm (hp = 2,060 mm) • Clerestory ribbon window on East wall of SW wing'
+            },
+            {
+                id: 'O5', name: 'O5', floor: 'ground', facade: 'South Facade', room: '0.12 Jadalnia / Salon',
+                axis: 'x', fixedZ: 11580, inwardSign: -1, start: 7215, end: 13695,
+                widthMm: 6480, heightMm: 2800, sillMm: 0, sashes: 3, pillarMm: 90,
+                jambStart: true, jambEnd: true,
+                specs: '6,480 × 2,800 mm (hp = 0 mm) • 3 × 2,100 mm panes + 2 × 90 mm inner pillars (HST sliding)'
+            },
+            {
+                id: 'O4', name: 'O4', floor: 'ground', facade: 'South Facade', room: '0.11 Salon (Living Room)',
+                axis: 'x', fixedZ: 11580, inwardSign: -1, start: -85, end: 6215,
+                widthMm: 6300, heightMm: 2800, sillMm: 0, sashes: 3, pillarMm: 90,
+                jambStart: false, jambEnd: true, cornerJoinStart: true,
+                specs: '6,300 × 2,800 mm (hp = 0 mm) • 3 × 2,040 mm panes + 2 × 90 mm pillars, meeting O3 at SE corner'
+            },
+            {
+                id: 'O3', name: 'O3', floor: 'ground', facade: 'East Facade', room: '0.11 Salon (Living Room)',
+                axis: 'z', fixedX: -285, inwardSign: 1, start: 6290, end: 11380,
+                widthMm: 5090, heightMm: 2800, sillMm: 0, sashes: 2, pillarMm: 90,
+                jambStart: true, jambEnd: false, cornerJoinEnd: true,
+                specs: '5,090 × 2,800 mm (hp = 0 mm) • 2 × 2,500 mm panes + 1 × 90 mm pillar, meeting O4 at SE corner'
+            },
+
+            // ================= UPPER FLOOR (PIĘTRO) =================
+            {
+                id: '14a', name: '14a', floor: 'first', facade: 'North Facade', room: '1.04 Sypialnia Wschodnia',
+                axis: 'x', fixedZ: 2790, inwardSign: 1, start: 6515, end: 7505,
+                widthMm: 1190, heightMm: 2700, sillMm: 0, sashes: 1, pillarMm: 0,
+                jambStart: false, jambEnd: true, cornerJoinStart: true,
+                specs: '1,190 × 2,700 mm (hp = 0 mm) • Full-height glazing meeting O14b at recessed NE terrace corner'
+            },
+            {
+                id: 'O14b', name: 'O14b + D1', floor: 'first', facade: 'East Facade (Terrace)', room: '1.04 Sypialnia / Taras',
+                axis: 'z', fixedX: 6315, inwardSign: 1, start: 2990, end: 5800,
+                widthMm: 2810, heightMm: 2700, sillMm: 0, sashes: 2, sashRatios: [1820 / 2720], pillarMm: 90,
+                jambStart: false, jambEnd: true, cornerJoinStart: true,
+                specs: '2,810 × 2,700 mm (hp = 0 mm) • 1,820 mm fixed pane + 90 mm pillar + 900 mm terrace door D1'
+            },
+            {
+                id: 'O15', name: 'O15', floor: 'first', facade: 'North Facade', room: '1.04 Sypialnia',
+                axis: 'x', fixedZ: 2790, inwardSign: 1, start: 8480, end: 10580,
+                widthMm: 2100, heightMm: 2700, sillMm: 0, sashes: 1, pillarMm: 0,
+                jambStart: true, jambEnd: true,
+                specs: '2,100 × 2,700 mm (hp = 0 mm) • Full-height bedroom window aligned with Kitchen O1'
+            },
+            {
+                id: 'O11_2', name: 'O11 (Bath)', floor: 'first', facade: 'North Facade', room: '1.02 Łazienka',
+                axis: 'x', fixedZ: 2790, inwardSign: 1, start: 11375, end: 12375,
+                widthMm: 1000, heightMm: 1950, sillMm: 850, sashes: 1, pillarMm: 0,
+                jambStart: true, jambEnd: true,
+                specs: '1,000 × 1,950 mm (hp = 850 mm) • North bathroom slot window'
+            },
+            {
+                id: 'O11_3', name: 'O11 (Stairs)', floor: 'first', facade: 'North Facade', room: '1.07 Schody / Komunikacja',
+                axis: 'x', fixedZ: 2790, inwardSign: 1, start: 14015, end: 15015,
+                widthMm: 1000, heightMm: 1950, sillMm: 850, sashes: 1, pillarMm: 0,
+                jambStart: true, jambEnd: true,
+                specs: '1,000 × 1,950 mm (hp = 850 mm) • Staircase daylight slot window'
+            },
+            {
+                id: 'O13a', name: 'O13a (North)', floor: 'first', facade: 'North Facade', room: '1.01 Sypialnia Master',
+                axis: 'x', fixedZ: 2790, inwardSign: 1, start: 18125, end: 20505,
+                widthMm: 2380, heightMm: 1950, sillMm: 850, sashes: 1, pillarMm: 0,
+                jambStart: true, jambEnd: false, cornerJoinEnd: true,
+                specs: '2,380 × 1,950 mm (hp = 850 mm) • Recessed 200 mm corner window meeting O13b_1 at NW corner'
+            },
+            {
+                id: 'O13b_1', name: 'O13b (NW)', floor: 'first', facade: 'West Facade', room: '1.01 Sypialnia Master',
+                axis: 'z', fixedX: 20705, inwardSign: -1, start: 2990, end: 5360,
+                widthMm: 2370, heightMm: 1950, sillMm: 850, sashes: 1, pillarMm: 0,
+                jambStart: false, jambEnd: true, cornerJoinStart: true,
+                specs: '2,370 × 1,950 mm (hp = 850 mm) • Recessed 200 mm corner window meeting O13a at NW corner'
+            },
+            {
+                id: 'O13b_2', name: 'O13b (SW)', floor: 'first', facade: 'West Facade', room: '1.05 Sypialnia Zachodnia',
+                axis: 'z', fixedX: 20705, inwardSign: -1, start: 9010, end: 11380,
+                widthMm: 2370, heightMm: 1950, sillMm: 850, sashes: 1, pillarMm: 0,
+                jambStart: true, jambEnd: false, cornerJoinEnd: true,
+                specs: '2,370 × 1,950 mm (hp = 850 mm) • Recessed 200 mm corner window meeting O13a_2 at SW corner'
+            },
+            {
+                id: 'O13a_2', name: 'O13a (South)', floor: 'first', facade: 'South Facade', room: '1.05 Sypialnia Zachodnia',
+                axis: 'x', fixedZ: 11580, inwardSign: -1, start: 18125, end: 20505,
+                widthMm: 2380, heightMm: 1950, sillMm: 850, sashes: 2, pillarMm: 0,
+                jambStart: true, jambEnd: false, cornerJoinEnd: true,
+                specs: '2,380 × 1,950 mm (hp = 850 mm) • 2-sash window meeting O13b_2 at recessed SW corner'
+            },
+            {
+                id: 'O12', name: 'O12', floor: 'first', facade: 'South Facade', room: '1.05 Sypialnia Południowa',
+                axis: 'x', fixedZ: 11580, inwardSign: -1, start: 10695, end: 14695,
+                widthMm: 4000, heightMm: 2700, sillMm: 0, sashes: 2, pillarMm: 90,
+                jambStart: true, jambEnd: true,
+                specs: '4,000 × 2,700 mm (hp = 0 mm) • 2 × 1,955 mm panes + 1 × 90 mm inner pillar'
+            },
+            {
+                id: 'SO3', name: 'SO3', floor: 'first', facade: 'South Facade', room: '1.06 Łazienka / Garderoba',
+                axis: 'x', fixedZ: 11580, inwardSign: -1, start: 7215, end: 8215,
+                widthMm: 1000, heightMm: 1950, sillMm: 850, sashes: 1, pillarMm: 0,
+                jambStart: true, jambEnd: true,
+                specs: '1,000 × 1,950 mm (hp = 850 mm) • Single-sash bathroom window'
+            },
+            {
+                id: 'O10', name: 'O10', floor: 'first', facade: 'South Facade', room: '1.04 Sypialnia Wschodnia',
+                axis: 'x', fixedZ: 11580, inwardSign: -1, start: -85, end: 6215,
+                widthMm: 6300, heightMm: 2700, sillMm: 0, sashes: 3, pillarMm: 90,
+                jambStart: false, jambEnd: true, cornerJoinStart: true,
+                specs: '6,300 × 2,700 mm (hp = 0 mm) • 3 × 2,040 mm panes + 2 × 90 mm pillars, meeting O9 at SE corner'
+            },
+            {
+                id: 'O9', name: 'O9', floor: 'first', facade: 'East Facade', room: '1.04 Sypialnia Wschodnia',
+                axis: 'z', fixedX: -285, inwardSign: 1, start: 6290, end: 11380,
+                widthMm: 5090, heightMm: 2700, sillMm: 0, sashes: 2, pillarMm: 90,
+                jambStart: true, jambEnd: false, cornerJoinEnd: true,
+                specs: '5,090 × 2,700 mm (hp = 0 mm) • 2 × 2,500 mm panes + 1 × 90 mm pillar, meeting O10 at SE corner'
+            }
+        ];
+
+        // Object Type Definitions for the Extensible Object Layer (ProfiCAD / EN 60617 symbols)
+        const OBJECT_CATALOG = {
+            socket_pe: {
+                type: 'socket_pe',
+                name: 'Gniazdo ze stykiem ochronnym',
+                shortCode: 'G',
+                color: '#ef4444',
+                defaultHeightMm: 300,
+                snapToWall: true
+            },
+            socket_pe_shutter: {
+                type: 'socket_pe_shutter',
+                name: 'Gniazdo ze stykiem ochronnym i zaślepką',
+                shortCode: 'GZ',
+                color: '#ef4444',
+                defaultHeightMm: 300,
+                snapToWall: true
+            },
+            socket_floor: {
+                type: 'socket_floor',
+                name: 'Gniazdo podłogowe',
+                shortCode: 'GP',
+                color: '#ef4444',
+                defaultHeightMm: 0,
+                snapToWall: false
+            }
+        };
+
+        // Application State
+        const planState = {
+            activeFloor: 'ground',
+            views: {
+                ground: { zoom: 1.0, panX: 10210, panZ: 10420 },
+                first: { zoom: 1.0, panX: 10210, panZ: 10420 }
+            },
+            syncFloors: true,
+            westOnLeft: true,                // Default true: West (Entrance/Garage/SW Wing) on Left, East on Right, North on Top, South on Bottom
+            layout: 'stacked',               // 'stacked' | 'side' | 'ground' | 'first'
+            activeTool: 'select',            // 'select' | object catalog key
+            layers: {
+                grid: true,
+                dims: true,
+                openings: true,
+                jambs: true,
+                roofs: true,
+                objects: true
+            },
+            selectedItem: { kind: 'opening', id: 'O4' }, // { kind: 'opening'|'object', id: string }
+            placedObjects: [],
+            nextObjectSeq: 1
+        };
+
+        // Convert world X (mm) to SVG horizontal coordinate (mm) based on orientation
+        // When westOnLeft is true, X = 20,705 mm (West) is on the left and X = -285 mm (East) is on the right:
+        // svgX = 20420 - worldX (so [ -285 .. 20705 ] maps to [ 20705 .. -285 ])
+        function toSvgX(worldX) {
+            return planState.westOnLeft ? (20420 - worldX) : worldX;
+        }
+
+        function fromSvgX(svgX) {
+            return planState.westOnLeft ? (20420 - svgX) : svgX;
+        }
+
+        function toSvgZ(worldZ) {
+            return worldZ;
+        }
+
+        function fromSvgZ(svgZ) {
+            return svgZ;
+        }
+
+        // Helper to create SVG elements safely without innerHTML
+        function svgEl(tag, attrs = {}, text = null) {
+            const el = document.createElementNS(SVG_NS, tag);
+            for (const [k, v] of Object.entries(attrs)) {
+                if (v !== undefined && v !== null) {
+                    el.setAttribute(k, String(v));
+                }
+            }
+            if (text !== null) {
+                el.textContent = text;
+            }
+            return el;
+        }
+
+        function polyToPointsAttr(poly) {
+            return poly.map(([x, z]) => `${toSvgX(x)},${toSvgZ(z)}`).join(' ');
+        }
+
+        function loadPlacedObjects() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY_OBJECTS);
+                if (!raw) return;
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed)) {
+                    planState.placedObjects = parsed.map(o => {
+                        if (!o || typeof o !== 'object') return null;
+                        // Migrate legacy socket type keys if present
+                        if (o.type === 'socket_1' || o.type === 'socket_2') {
+                            o.type = 'socket_pe';
+                        } else if (o.type === 'socket_ip44') {
+                            o.type = 'socket_pe_shutter';
+                        } else if (o.type === 'floor_box') {
+                            o.type = 'socket_floor';
+                        }
+                        return o;
+                    }).filter(o =>
+                        o && typeof o.id === 'string' &&
+                        (o.floor === 'ground' || o.floor === 'first') &&
+                        OBJECT_CATALOG[o.type] &&
+                        typeof o.x === 'number' && typeof o.z === 'number'
+                    );
+                    planState.nextObjectSeq = planState.placedObjects.length + 1;
+                }
+            } catch (e) {
+                // Ignore storage parse issues
+            }
+        }
+
+        function savePlacedObjects() {
+            try {
+                localStorage.setItem(STORAGE_KEY_OBJECTS, JSON.stringify(planState.placedObjects));
+            } catch (e) {
+                // Ignore storage quota issues
+            }
+        }
+
+        // Snap a world coordinate (x, z) to nearest inner wall face if within thresholdMm
+        function snapToFloorWalls(floor, x, z, thresholdMm = 450) {
+            const innerPoly = (floor === 'ground') ? GROUND_INNER_POLY : FIRST_INNER_POLY;
+            let bestDist = thresholdMm;
+            let snapped = {
+                x: Math.round(x / 50) * 50,
+                z: Math.round(z / 50) * 50,
+                rot: 0,
+                snappedToWall: false
+            };
+
+            for (let i = 0; i < innerPoly.length; i++) {
+                const [x1, z1] = innerPoly[i];
+                const [x2, z2] = innerPoly[(i + 1) % innerPoly.length];
+                const dx = x2 - x1;
+                const dz = z2 - z1;
+                const lenSq = dx * dx + dz * dz;
+                if (lenSq === 0) continue;
+                let t = ((x - x1) * dx + (z - z1) * dz) / lenSq;
+                t = Math.max(0.02, Math.min(0.98, t));
+                const projX = x1 + t * dx;
+                const projZ = z1 + t * dz;
+                const dist = Math.hypot(x - projX, z - projZ);
+                if (dist < bestDist) {
+                    bestDist = dist;
+                    // Clockwise polygon in (X=West, Z=South):
+                    // dx < 0: South wall -> faces North (-Z, 0°)
+                    // dx > 0: North wall -> faces South (+Z, 180°)
+                    // dz > 0: West wall  -> faces East  (-X, 90°)
+                    // dz < 0: East wall  -> faces West  (+X, 270°)
+                    let wallRot = 0;
+                    if (Math.abs(dx) >= Math.abs(dz)) {
+                        wallRot = (dx < 0) ? 0 : 180;
+                    } else {
+                        wallRot = (dz > 0) ? 90 : 270;
+                    }
+                    snapped = {
+                        x: Math.round(projX / 10) * 10,
+                        z: Math.round(projZ / 10) * 10,
+                        rot: wallRot,
+                        snappedToWall: true
+                    };
+                }
+            }
+            return snapped;
+        }
+
+        // Compute SVG viewBox string for current zoom & pan of a given floor
+        function computeViewBoxString(viewportEl, floor) {
+            const v = planState.views[floor] || planState.views.ground;
+            const rect = viewportEl.getBoundingClientRect();
+            const aspect = (rect.width > 0 && rect.height > 0) ? (rect.width / rect.height) : 1.45;
+            const baseSpanZ = 26800; // Full building height + dimension margins in mm
+            const spanZ = baseSpanZ / v.zoom;
+            const spanX = spanZ * aspect;
+
+            const centerSvgX = toSvgX(v.panX);
+            const centerSvgZ = toSvgZ(v.panZ);
+            const minX = centerSvgX - spanX / 2;
+            const minZ = centerSvgZ - spanZ / 2;
+            return `${minX.toFixed(1)} ${minZ.toFixed(1)} ${spanX.toFixed(1)} ${spanZ.toFixed(1)}`;
+        }
+
+        function updateAllViewBoxes() {
+            ['ground', 'first'].forEach(floor => {
+                const vp = document.getElementById('viewport-' + floor);
+                const svg = document.getElementById('svg-' + floor);
+                if (vp && svg) {
+                    svg.setAttribute('viewBox', computeViewBoxString(vp, floor));
+                }
+            });
+        }
+
+        // Draw dimension line with arrows and millimeter label in SVG space
+        function drawDimensionMm(group, x1, z1, x2, z2, offsetSvgX, offsetSvgZ, labelText, color = '#94a3b8') {
+            const sx1 = toSvgX(x1) + offsetSvgX;
+            const sz1 = toSvgZ(z1) + offsetSvgZ;
+            const sx2 = toSvgX(x2) + offsetSvgX;
+            const sz2 = toSvgZ(z2) + offsetSvgZ;
+
+            // Witness lines
+            group.appendChild(svgEl('line', {
+                x1: toSvgX(x1), y1: toSvgZ(z1), x2: sx1, y2: sz1,
+                stroke: color, 'stroke-width': 22, 'stroke-dasharray': '70,70', opacity: 0.5
+            }));
+            group.appendChild(svgEl('line', {
+                x1: toSvgX(x2), y1: toSvgZ(z2), x2: sx2, y2: sz2,
+                stroke: color, 'stroke-width': 22, 'stroke-dasharray': '70,70', opacity: 0.5
+            }));
+
+            // Main dimension line
+            group.appendChild(svgEl('line', {
+                x1: sx1, y1: sz1, x2: sx2, y2: sz2,
+                stroke: color, 'stroke-width': 32
+            }));
+
+            // Tick marks at ends
+            const isHoriz = Math.abs(sx2 - sx1) >= Math.abs(sz2 - sz1);
+            const tick = 140;
+            if (isHoriz) {
+                group.appendChild(svgEl('line', { x1: sx1, y1: sz1 - tick, x2: sx1, y2: sz1 + tick, stroke: color, 'stroke-width': 36 }));
+                group.appendChild(svgEl('line', { x1: sx2, y1: sz2 - tick, x2: sx2, y2: sz2 + tick, stroke: color, 'stroke-width': 36 }));
+            } else {
+                group.appendChild(svgEl('line', { x1: sx1 - tick, y1: sz1, x2: sx1 + tick, y2: sz1, stroke: color, 'stroke-width': 36 }));
+                group.appendChild(svgEl('line', { x1: sx2 - tick, y1: sz2, x2: sx2 + tick, y2: sz2, stroke: color, 'stroke-width': 36 }));
+            }
+
+            const mx = (sx1 + sx2) / 2;
+            const mz = (sz1 + sz2) / 2;
+            const pillW = Math.max(1350, labelText.length * 185);
+            const pillH = 420;
+
+            const labelGroup = svgEl('g', {
+                transform: isHoriz ? `translate(${mx}, ${mz})` : `translate(${mx}, ${mz}) rotate(-90)`
+            });
+            labelGroup.appendChild(svgEl('rect', {
+                x: -pillW / 2, y: -pillH / 2, width: pillW, height: pillH, rx: 90,
+                fill: '#0f172a', stroke: color, 'stroke-width': 24
+            }));
+            labelGroup.appendChild(svgEl('text', {
+                x: 0, y: 110,
+                fill: '#f8fafc',
+                'font-family': 'JetBrains Mono, monospace',
+                'font-size': 280,
+                'font-weight': 700,
+                'text-anchor': 'middle'
+            }, labelText));
+            group.appendChild(labelGroup);
+        }
+
+        // Render an opening (window, HST sliding door, garage door, entrance door) in top-down 2D plan
+        function renderOpening2D(op, openingsGroup, jambsGroup) {
+            const isSelected = (planState.selectedItem && planState.selectedItem.kind === 'opening' && planState.selectedItem.id === op.id);
+            const jambDepth = 200; // 200 mm outer reveal setback
+            const wallT = WALL_THICKNESS;
+
+            let x1, x2, z1, z2;
+            let frameX1, frameX2, frameZ1, frameZ2;
+
+            if (op.axis === 'x') {
+                const outerZ = op.fixedZ;
+                const innerZ = outerZ + op.inwardSign * wallT;
+                const jambZ = outerZ + op.inwardSign * jambDepth;
+                const cutStart = op.cornerJoinStart ? (op.start - 200) : op.start;
+                const cutEnd = op.cornerJoinEnd ? (op.end + 200) : op.end;
+
+                x1 = cutStart;
+                x2 = cutEnd;
+                z1 = Math.min(outerZ, innerZ);
+                z2 = Math.max(outerZ, innerZ);
+
+                frameX1 = op.start;
+                frameX2 = op.end;
+                frameZ1 = Math.min(jambZ, jambZ + op.inwardSign * 90);
+                frameZ2 = Math.max(jambZ, jambZ + op.inwardSign * 90);
+            } else {
+                const outerX = op.fixedX;
+                const innerX = outerX + op.inwardSign * wallT;
+                const jambX = outerX + op.inwardSign * jambDepth;
+                const cutStart = op.cornerJoinStart ? (op.start - 200) : op.start;
+                const cutEnd = op.cornerJoinEnd ? (op.end + 200) : op.end;
+
+                x1 = Math.min(outerX, innerX);
+                x2 = Math.max(outerX, innerX);
+                z1 = cutStart;
+                z2 = cutEnd;
+
+                frameX1 = Math.min(jambX, jambX + op.inwardSign * 90);
+                frameX2 = Math.max(jambX, jambX + op.inwardSign * 90);
+                frameZ1 = op.start;
+                frameZ2 = op.end;
+            }
+
+            // 1. Clear the wall cutout with floor slab fill so the opening cuts through the 400 mm wall
+            const rx = Math.min(toSvgX(x1), toSvgX(x2));
+            const rz = Math.min(toSvgZ(z1), toSvgZ(z2));
+            const rw = Math.abs(toSvgX(x2) - toSvgX(x1));
+            const rh = Math.abs(toSvgZ(z2) - toSvgZ(z1));
+
+            openingsGroup.appendChild(svgEl('rect', {
+                x: rx, y: rz, width: rw, height: rh,
+                fill: '#162033', stroke: '#334155', 'stroke-width': 16
+            }));
+
+            // 2. Draw 200 mm Window Jambs (Ościeża in RAL 7021 #1f2421) at the non-corner ends of the opening
+            if (planState.layers.jambs) {
+                const jambThickness = 36;
+                if (op.axis === 'x') {
+                    const jzMin = Math.min(op.fixedZ, op.fixedZ + op.inwardSign * jambDepth);
+                    if (op.jambStart) {
+                        const jx = Math.min(toSvgX(op.start), toSvgX(op.start + jambThickness));
+                        jambsGroup.appendChild(svgEl('rect', {
+                            x: jx, y: jzMin, width: jambThickness, height: jambDepth,
+                            fill: '#1f2421', stroke: '#94a3b8', 'stroke-width': 12
+                        }));
+                    }
+                    if (op.jambEnd) {
+                        const jx = Math.min(toSvgX(op.end - jambThickness), toSvgX(op.end));
+                        jambsGroup.appendChild(svgEl('rect', {
+                            x: jx, y: jzMin, width: jambThickness, height: jambDepth,
+                            fill: '#1f2421', stroke: '#94a3b8', 'stroke-width': 12
+                        }));
+                    }
+                } else {
+                    const jxMin = Math.min(toSvgX(op.fixedX), toSvgX(op.fixedX + op.inwardSign * jambDepth));
+                    if (op.jambStart) {
+                        jambsGroup.appendChild(svgEl('rect', {
+                            x: jxMin, y: op.start, width: jambDepth, height: jambThickness,
+                            fill: '#1f2421', stroke: '#94a3b8', 'stroke-width': 12
+                        }));
+                    }
+                    if (op.jambEnd) {
+                        jambsGroup.appendChild(svgEl('rect', {
+                            x: jxMin, y: op.end - jambThickness, width: jambDepth, height: jambThickness,
+                            fill: '#1f2421', stroke: '#94a3b8', 'stroke-width': 12
+                        }));
+                    }
+                }
+            }
+
+            // 3. Draw recessed Window Glazing / Frame / 90 mm Inner Pillars at 200 mm depth
+            const fx = Math.min(toSvgX(frameX1), toSvgX(frameX2));
+            const fz = Math.min(toSvgZ(frameZ1), toSvgZ(frameZ2));
+            const fw = Math.abs(toSvgX(frameX2) - toSvgX(frameX1));
+            const fh = Math.abs(toSvgZ(frameZ2) - toSvgZ(frameZ1));
+
+            const fillCol = op.type === 'garage_door'
+                ? '#334155'
+                : (op.type === 'entrance_door' ? '#b45309' : (isSelected ? '#0284c7' : 'rgba(56, 189, 248, 0.35)'));
+            const strokeCol = isSelected ? '#ffffff' : (op.type === 'garage_door' ? '#94a3b8' : '#38bdf8');
+
+            const hitRect = svgEl('rect', {
+                x: fx, y: fz, width: fw, height: fh,
+                fill: fillCol,
+                stroke: strokeCol,
+                'stroke-width': isSelected ? 34 : 22,
+                class: 'opening-hit'
+            });
+            hitRect.addEventListener('click', (e) => {
+                if (planState.activeTool !== 'select') return;
+                e.stopPropagation();
+                selectOpening(op.id);
+            });
+            openingsGroup.appendChild(hitRect);
+
+            // Entrance door Z1 inward swing arc on Ground Floor
+            if (op.type === 'entrance_door') {
+                const doorLeafMm = 1100;
+                const hingeZ = op.start;
+                const latchZ = op.start + doorLeafMm;
+                const doorPlaneX = op.fixedX + op.inwardSign * 220;
+                const openX = doorPlaneX + op.inwardSign * doorLeafMm;
+                // Leaf in open 90 deg position
+                openingsGroup.appendChild(svgEl('line', {
+                    x1: toSvgX(doorPlaneX), y1: toSvgZ(hingeZ),
+                    x2: toSvgX(openX), y2: toSvgZ(hingeZ),
+                    stroke: '#fbbf24', 'stroke-width': 32
+                }));
+                // Dashed swing arc
+                const sx0 = toSvgX(doorPlaneX);
+                const sy0 = toSvgZ(latchZ);
+                const sx1 = toSvgX(openX);
+                const sy1 = toSvgZ(hingeZ);
+                const sweep = planState.westOnLeft ? 0 : 1;
+                openingsGroup.appendChild(svgEl('path', {
+                    d: `M ${sx0} ${sy0} A ${doorLeafMm} ${doorLeafMm} 0 0 ${sweep} ${sx1} ${sy1}`,
+                    fill: 'none', stroke: '#fbbf24', 'stroke-width': 20, 'stroke-dasharray': '80,60'
+                }));
+            }
+
+            // Inner 90 mm pillars / mullions
+            if (op.sashes > 1) {
+                const pW = op.pillarMm || 60;
+                for (let s = 1; s < op.sashes; s++) {
+                    const ratio = (Array.isArray(op.sashRatios) && op.sashRatios[s - 1]) ? op.sashRatios[s - 1] : (s / op.sashes);
+                    const pos = op.start + (op.end - op.start) * ratio;
+                    if (op.axis === 'x') {
+                        const px = Math.min(toSvgX(pos - pW / 2), toSvgX(pos + pW / 2));
+                        openingsGroup.appendChild(svgEl('rect', {
+                            x: px, y: fz - 15, width: pW, height: fh + 30,
+                            fill: '#0f172a', stroke: '#e2e8f0', 'stroke-width': 14
+                        }));
+                    } else {
+                        openingsGroup.appendChild(svgEl('rect', {
+                            x: fx - 15, y: pos - pW / 2, width: fw + 30, height: pW,
+                            fill: '#0f172a', stroke: '#e2e8f0', 'stroke-width': 14
+                        }));
+                    }
+                }
+            }
+
+            // 4. Opening Callout Tag (O1..O15, Z1, Z2)
+            if (planState.layers.openings) {
+                const midSpan = (op.start + op.end) / 2;
+                let tx, tz;
+                const labelOffset = 680; // Offset outside wall in mm
+                if (op.axis === 'x') {
+                    tx = toSvgX(midSpan);
+                    tz = toSvgZ(op.fixedZ - op.inwardSign * labelOffset);
+                } else {
+                    tx = toSvgX(op.fixedX - op.inwardSign * labelOffset);
+                    tz = toSvgZ(midSpan);
+                }
+
+                const tagG = svgEl('g', {
+                    transform: `translate(${tx}, ${tz})`,
+                    style: 'cursor: pointer;'
+                });
+                tagG.addEventListener('click', (e) => {
+                    if (planState.activeTool !== 'select') return;
+                    e.stopPropagation();
+                    selectOpening(op.id);
+                });
+
+                const tagW = Math.max(760, op.name.length * 165 + 240);
+                const tagH = 380;
+                tagG.appendChild(svgEl('rect', {
+                    x: -tagW / 2, y: -tagH / 2, width: tagW, height: tagH, rx: 90,
+                    fill: isSelected ? '#0284c7' : '#0f172a',
+                    stroke: isSelected ? '#ffffff' : '#38bdf8',
+                    'stroke-width': isSelected ? 30 : 20
+                }));
+                tagG.appendChild(svgEl('text', {
+                    x: 0, y: 95,
+                    fill: '#ffffff',
+                    'font-family': 'JetBrains Mono, monospace',
+                    'font-size': 250,
+                    'font-weight': 700,
+                    'text-anchor': 'middle'
+                }, op.name));
+                openingsGroup.appendChild(tagG);
+            }
+        }
+
+        // Render user-placed sockets on a floor using ProfiCAD / EN 60617 technical CAD symbols
+        function renderPlacedObjectsForFloor(floor, objectsGroup) {
+            if (!planState.layers.objects) return;
+            const list = planState.placedObjects.filter(o => o.floor === floor);
+
+            list.forEach(obj => {
+                const def = OBJECT_CATALOG[obj.type] || OBJECT_CATALOG.socket_pe;
+                const isSelected = (planState.selectedItem && planState.selectedItem.kind === 'object' && planState.selectedItem.id === obj.id);
+                const sx = toSvgX(obj.x);
+                const sz = toSvgZ(obj.z);
+
+                // Convert world rotation (0=N, 90=E, 180=S, 270=W) to SVG rotation accounting for West/East flip
+                const rawRot = obj.rotation || 0;
+                const svgRot = planState.westOnLeft ? rawRot : ((360 - rawRot) % 360);
+
+                const g = svgEl('g', {
+                    transform: `translate(${sx}, ${sz})`,
+                    class: 'placed-object-group',
+                    'data-obj-id': obj.id
+                });
+
+                // Rotated technical symbol group (canonical 0° has wall at (0,0) and symbol extending into room along -Y)
+                const symG = svgEl('g', {
+                    transform: `rotate(${svgRot})`
+                });
+
+                const isFloorSocket = (obj.type === 'socket_floor');
+                const centerY = isFloorSocket ? 0 : -220;
+
+                // Transparent hit target for easy clicking and dragging of stroke-based CAD icons
+                symG.appendChild(svgEl('circle', {
+                    cx: 0,
+                    cy: centerY,
+                    r: 310,
+                    fill: 'rgba(0, 0, 0, 0.001)',
+                    stroke: 'none'
+                }));
+
+                // Selection halo around the technical symbol
+                if (isSelected) {
+                    symG.appendChild(svgEl('circle', {
+                        cx: 0,
+                        cy: centerY,
+                        r: 340,
+                        fill: 'rgba(56, 189, 248, 0.16)',
+                        stroke: '#38bdf8',
+                        'stroke-width': 24,
+                        'stroke-dasharray': '65,45'
+                    }));
+                }
+
+                const strokeColor = def.color || '#ef4444';
+                const sw = 36;
+
+                if (isFloorSocket) {
+                    // Single-cell 'Gniazdo podłogowe' technical CAD symbol (matching reference graphic):
+                    // 1. Outer square frame (-200,-200) to (200,200)
+                    // 2. Horizontal protective-contact bar across middle (-200,0) -> (200,0)
+                    // 3. Vertical stem in upper half (0,-200) -> (0,0)
+                    // 4. Semicircle in lower half tangent at (0,0) to corners (-200,200) and (200,200)
+                    symG.appendChild(svgEl('rect', {
+                        x: -200, y: -200, width: 400, height: 400,
+                        fill: 'none', stroke: strokeColor, 'stroke-width': sw
+                    }));
+                    symG.appendChild(svgEl('line', {
+                        x1: -200, y1: 0, x2: 200, y2: 0,
+                        stroke: strokeColor, 'stroke-width': sw, 'stroke-linecap': 'butt'
+                    }));
+                    symG.appendChild(svgEl('line', {
+                        x1: 0, y1: -200, x2: 0, y2: 0,
+                        stroke: strokeColor, 'stroke-width': sw, 'stroke-linecap': 'butt'
+                    }));
+                    symG.appendChild(svgEl('path', {
+                        d: 'M -200 200 A 200 200 0 0 1 200 200',
+                        fill: 'none',
+                        stroke: strokeColor,
+                        'stroke-width': sw,
+                        'stroke-linecap': 'butt'
+                    }));
+                } else {
+                    // 1. Perpendicular stem from wall (0,0) -> (0,-190)
+                    symG.appendChild(svgEl('line', {
+                        x1: 0, y1: 0, x2: 0, y2: -190,
+                        stroke: strokeColor, 'stroke-width': sw, 'stroke-linecap': 'butt'
+                    }));
+
+                    // 2. Horizontal protective-contact bar (-200,-190) -> (200,-190) tangent to semicircle dome
+                    symG.appendChild(svgEl('line', {
+                        x1: -200, y1: -190, x2: 200, y2: -190,
+                        stroke: strokeColor, 'stroke-width': sw, 'stroke-linecap': 'butt'
+                    }));
+
+                    if (obj.type === 'socket_pe_shutter') {
+                        // ProfiCAD 'gniazdo ze stykiem ochronnym i zaślepką':
+                        // Semicircle bowl opening into the room with outward horizontal shutter flanges at both open ends
+                        symG.appendChild(svgEl('path', {
+                            d: 'M -310 -380 L -190 -380 A 190 190 0 0 0 190 -380 L 310 -380',
+                            fill: 'none',
+                            stroke: strokeColor,
+                            'stroke-width': sw,
+                            'stroke-linecap': 'butt',
+                            'stroke-linejoin': 'miter'
+                        }));
+                    } else {
+                        // ProfiCAD 'gniazdo ze stykiem ochronnym' (EN 60617: 11-13-04):
+                        // Semicircle bowl opening into the room
+                        symG.appendChild(svgEl('path', {
+                            d: 'M -190 -380 A 190 190 0 0 0 190 -380',
+                            fill: 'none',
+                            stroke: strokeColor,
+                            'stroke-width': sw,
+                            'stroke-linecap': 'butt'
+                        }));
+                    }
+                }
+
+                g.appendChild(symG);
+
+                // Upright label tag positioned cleanly inside the room beyond the technical icon
+                if (obj.label) {
+                    const rad = (svgRot * Math.PI) / 180;
+                    const dist = isFloorSocket ? 410 : 590;
+                    const lx = isFloorSocket ? 0 : Math.round(Math.sin(rad) * dist);
+                    const ly = isFloorSocket ? dist : Math.round(-Math.cos(rad) * dist) + 60;
+
+                    g.appendChild(svgEl('text', {
+                        x: lx, y: ly,
+                        fill: isSelected ? '#38bdf8' : '#cbd5e1',
+                        'font-family': 'JetBrains Mono, monospace',
+                        'font-size': 175,
+                        'font-weight': 600,
+                        'text-anchor': 'middle'
+                    }, obj.label));
+                }
+
+                g.addEventListener('mousedown', (e) => {
+                    if (e.button !== 0 || planState.activeTool !== 'select') return;
+                    e.stopPropagation();
+                    selectPlacedObject(obj.id);
+                    startDraggingPlacedObject(e, obj);
+                });
+
+                objectsGroup.appendChild(g);
+            });
+        }
+
+        // Render a complete 2D Floor Plan SVG ('ground' or 'first')
+        function renderFloorPlanSVG(floor) {
+            const svg = document.getElementById('svg-' + floor);
+            if (!svg) return;
+            svg.replaceChildren();
+
+            // 1. Background 1,000 mm & 500 mm CAD Grid Layer
+            if (planState.layers.grid) {
+                const gridG = svgEl('g', { class: 'layer-grid' });
+                for (let x = -2000; x <= 23000; x += 500) {
+                    const isMajor = (x % 1000 === 0);
+                    const sx = toSvgX(x);
+                    gridG.appendChild(svgEl('line', {
+                        x1: sx, y1: -2500, x2: sx, y2: 23500,
+                        stroke: isMajor ? 'rgba(148, 163, 184, 0.13)' : 'rgba(148, 163, 184, 0.05)',
+                        'stroke-width': isMajor ? 18 : 10
+                    }));
+                }
+                for (let z = -2000; z <= 23000; z += 500) {
+                    const isMajor = (z % 1000 === 0);
+                    const sz = toSvgZ(z);
+                    gridG.appendChild(svgEl('line', {
+                        x1: -2500, y1: sz, x2: 23500, y2: sz,
+                        stroke: isMajor ? 'rgba(148, 163, 184, 0.13)' : 'rgba(148, 163, 184, 0.05)',
+                        'stroke-width': isMajor ? 18 : 10
+                    }));
+                }
+                // Canonical Axis 6 (X = 0 mm) and Axis A (Z = 0 mm) reference datum lines
+                gridG.appendChild(svgEl('line', {
+                    x1: toSvgX(0), y1: -1800, x2: toSvgX(0), y2: 22500,
+                    stroke: 'rgba(56, 189, 248, 0.28)', 'stroke-width': 20, 'stroke-dasharray': '140,100'
+                }));
+                gridG.appendChild(svgEl('line', {
+                    x1: -1800, y1: toSvgZ(0), x2: 22500, y2: toSvgZ(0),
+                    stroke: 'rgba(56, 189, 248, 0.28)', 'stroke-width': 20, 'stroke-dasharray': '140,100'
+                }));
+                svg.appendChild(gridG);
+            }
+
+            // 2. Context Roofs / Overhangs / Terraces Layer
+            const roofsG = svgEl('g', { class: 'layer-roofs' });
+            if (planState.layers.roofs) {
+                if (floor === 'ground') {
+                    // South-West Wing Roof Overhang extending 1,960 mm East (X = 12,735..14,695 mm, Z = 11,580..21,130 mm)
+                    const rx = Math.min(toSvgX(12735), toSvgX(14695));
+                    roofsG.appendChild(svgEl('rect', {
+                        x: rx, y: 11580, width: 1960, height: 9550,
+                        fill: 'rgba(245, 158, 11, 0.08)',
+                        stroke: '#f59e0b',
+                        'stroke-width': 26,
+                        'stroke-dasharray': '140,90'
+                    }));
+                    roofsG.appendChild(svgEl('text', {
+                        x: rx + 980, y: 16400,
+                        fill: '#fbbf24',
+                        'font-family': 'JetBrains Mono, monospace',
+                        'font-size': 230,
+                        'font-weight': 600,
+                        'text-anchor': 'middle',
+                        transform: `rotate(-90, ${rx + 980}, ${16400})`
+                    }, 'SW Wing Roof Overhang (+1,960 mm East)'));
+
+                    // Recessed West Entrance Alcove Porch (X = 19,555..20,705 mm, Z = 8,560..11,020 mm)
+                    const ex = Math.min(toSvgX(19555), toSvgX(20705));
+                    roofsG.appendChild(svgEl('rect', {
+                        x: ex, y: 8560, width: 1150, height: 2460,
+                        fill: 'rgba(56, 189, 248, 0.08)',
+                        stroke: '#38bdf8',
+                        'stroke-width': 22,
+                        'stroke-dasharray': '90,70'
+                    }));
+                } else {
+                    // On Upper Floor: Show adjacent Ground-Floor Flat Roofs & NE Covered Terrace
+                    // 1) North-West Garage Flat Roof (X = 11,740..20,705 mm, Z = -290..2,790 mm)
+                    const gx = Math.min(toSvgX(11740), toSvgX(20705));
+                    roofsG.appendChild(svgEl('rect', {
+                        x: gx, y: -290, width: 8965, height: 3080,
+                        fill: 'rgba(30, 41, 59, 0.55)',
+                        stroke: '#64748b',
+                        'stroke-width': 24,
+                        'stroke-dasharray': '120,80'
+                    }));
+                    roofsG.appendChild(svgEl('text', {
+                        x: gx + 4482, y: 1320,
+                        fill: '#94a3b8',
+                        'font-family': 'JetBrains Mono, monospace',
+                        'font-size': 250,
+                        'text-anchor': 'middle'
+                    }, 'Garage Flat Roof (+3.43 m • 8,965 × 3,080 mm)'));
+
+                    // 2) South-West Wing Flat Roof + 1,960 mm East Overhang (X = 12,735..20,705 mm, Z = 11,580..21,130 mm)
+                    const wx = Math.min(toSvgX(12735), toSvgX(20705));
+                    roofsG.appendChild(svgEl('rect', {
+                        x: wx, y: 11580, width: 7970, height: 9550,
+                        fill: 'rgba(30, 41, 59, 0.55)',
+                        stroke: '#f59e0b',
+                        'stroke-width': 24,
+                        'stroke-dasharray': '120,80'
+                    }));
+                    // Dashed line showing the 14,695 mm wall below vs 12,735 mm roof edge
+                    roofsG.appendChild(svgEl('line', {
+                        x1: toSvgX(14695), y1: 11580, x2: toSvgX(14695), y2: 21130,
+                        stroke: 'rgba(245, 158, 11, 0.45)', 'stroke-width': 20, 'stroke-dasharray': '80,80'
+                    }));
+                    roofsG.appendChild(svgEl('text', {
+                        x: wx + 3985, y: 16200,
+                        fill: '#fbbf24',
+                        'font-family': 'JetBrains Mono, monospace',
+                        'font-size': 250,
+                        'text-anchor': 'middle'
+                    }, 'SW Wing Flat Roof (+3.43 m • Includes 1,960 mm East Overhang)'));
+
+                    // 3) North-East Covered Upper Terrace (X = -285..6,315 mm, Z = 2,790..5,890 mm)
+                    const tx = Math.min(toSvgX(-285), toSvgX(6315));
+                    roofsG.appendChild(svgEl('rect', {
+                        x: tx, y: 2790, width: 6600, height: 3100,
+                        fill: 'rgba(16, 185, 129, 0.12)',
+                        stroke: '#34d399',
+                        'stroke-width': 28
+                    }));
+                    roofsG.appendChild(svgEl('text', {
+                        x: tx + 3300, y: 4400,
+                        fill: '#6ee7b7',
+                        'font-family': 'JetBrains Mono, monospace',
+                        'font-size': 250,
+                        'font-weight': 600,
+                        'text-anchor': 'middle'
+                    }, 'NE Covered Terrace (6,315 × 3,100 mm)'));
+                }
+            }
+            svg.appendChild(roofsG);
+
+            // 3. Exterior Wall Shell & Open Interior Floor Slab Layer
+            const outerPoly = (floor === 'ground') ? GROUND_OUTER_POLY : FIRST_OUTER_POLY;
+            const innerPoly = (floor === 'ground') ? GROUND_INNER_POLY : FIRST_INNER_POLY;
+
+            const shellG = svgEl('g', { class: 'layer-shell' });
+            // Outer structural wall polygon
+            shellG.appendChild(svgEl('polygon', {
+                points: polyToPointsAttr(outerPoly),
+                fill: '#334155',
+                stroke: '#94a3b8',
+                'stroke-width': 28
+            }));
+            // Open interior floor slab polygon (400 mm inside outer facade)
+            shellG.appendChild(svgEl('polygon', {
+                points: polyToPointsAttr(innerPoly),
+                fill: '#162033',
+                stroke: '#64748b',
+                'stroke-width': 20
+            }));
+            // Subtle 200 mm jamb-depth reference line inside the 400 mm wall
+            svg.appendChild(shellG);
+
+            // 4. Pre-wired Internal Partition Walls Layer (empty right now per user instruction)
+            const internalWallsG = svgEl('g', { class: 'layer-internal-walls' });
+            svg.appendChild(internalWallsG);
+
+            // 5. Canonical Facade Openings & 200 mm Jambs Layer
+            const openingsG = svgEl('g', { class: 'layer-openings' });
+            const jambsG = svgEl('g', { class: 'layer-jambs' });
+            PLAN_OPENINGS.filter(o => o.floor === floor).forEach(op => {
+                renderOpening2D(op, openingsG, jambsG);
+            });
+            svg.appendChild(openingsG);
+            svg.appendChild(jambsG);
+
+            // 6. Exterior Architectural Dimensions Layer
+            if (planState.layers.dims) {
+                const dimsG = svgEl('g', { class: 'layer-dimensions' });
+                const dirSign = planState.westOnLeft ? 1 : -1;
+
+                if (floor === 'ground') {
+                    // Top (North) dimensions
+                    drawDimensionMm(dimsG, 11740, -290, 20705, -290, 0, -1100, '8,965 mm (Garage N)', '#38bdf8');
+                    drawDimensionMm(dimsG, -285, 2790, 11740, 2790, 0, -1100, '12,025 mm (North Recessed)', '#38bdf8');
+                    // Bottom (South) dimensions
+                    drawDimensionMm(dimsG, 14695, 21130, 20705, 21130, 0, 1150, '6,010 mm (SW Wing)', '#fbbf24');
+                    drawDimensionMm(dimsG, 12735, 21130, 14695, 21130, 0, 1150, '1,960 mm (Roof)', '#f59e0b');
+                    drawDimensionMm(dimsG, -285, 11580, 14695, 11580, 0, 1150, '14,980 mm (South Living)', '#fbbf24');
+                    // West total length
+                    drawDimensionMm(dimsG, 20705, -290, 20705, 21130, -1350 * dirSign, 0, '21,420 mm (West Total)', '#c084fc');
+                    // East projecting block length
+                    drawDimensionMm(dimsG, -285, 2790, -285, 11580, 1350 * dirSign, 0, '8,790 mm (East Core)', '#4ade80');
+                } else {
+                    // Upper Floor dimensions
+                    drawDimensionMm(dimsG, 6315, 2790, 20705, 2790, 0, -1100, '14,390 mm (Upper North Wall)', '#38bdf8');
+                    drawDimensionMm(dimsG, -285, 2790, 6315, 2790, 0, -1100, '6,600 mm (NE Terrace)', '#34d399');
+                    drawDimensionMm(dimsG, -285, 11580, 20705, 11580, 0, 1150, '20,990 mm (Upper South Wall)', '#fbbf24');
+                    drawDimensionMm(dimsG, 20705, 2790, 20705, 11580, -1350 * dirSign, 0, '8,790 mm (Upper West)', '#c084fc');
+                    drawDimensionMm(dimsG, -285, 5890, -285, 11580, 1350 * dirSign, 0, '5,690 mm (Upper East)', '#4ade80');
+                }
+                svg.appendChild(dimsG);
+            }
+
+            // 7. Interactive Placed Objects Layer (Sockets, Switches, Floor Boxes, etc.)
+            const objectsG = svgEl('g', { class: 'layer-objects' });
+            renderPlacedObjectsForFloor(floor, objectsG);
+            svg.appendChild(objectsG);
+        }
+
+        function renderAllPlans() {
+            renderFloorPlanSVG('ground');
+            renderFloorPlanSVG('first');
+            updateAllViewBoxes();
+            renderPlacedObjectsList();
+        }
+
+        // Convert client mouse event to world (X, Z) millimeter coordinates
+        function clientToWorldMm(svg, clientX, clientY) {
+            const pt = svg.createSVGPoint();
+            pt.x = clientX;
+            pt.y = clientY;
+            const ctm = svg.getScreenCTM();
+            if (!ctm) return { x: 0, z: 0 };
+            const svgPt = pt.matrixTransform(ctm.inverse());
+            return {
+                x: Math.round(fromSvgX(svgPt.x)),
+                z: Math.round(fromSvgZ(svgPt.y))
+            };
+        }
+
+        // Inspector & Selection Management
+        function selectOpening(openingId) {
+            planState.selectedItem = { kind: 'opening', id: openingId };
+            updateInspectorUI();
+            renderAllPlans();
+        }
+
+        function selectPlacedObject(objId) {
+            planState.selectedItem = { kind: 'object', id: objId };
+            updateInspectorUI();
+            renderAllPlans();
+        }
+
+        function updateInspectorUI() {
+            const pillEl = document.getElementById('insp-type-pill');
+            const titleEl = document.getElementById('insp-title');
+            const subEl = document.getElementById('insp-subtitle');
+            const kvListEl = document.getElementById('insp-kv-list');
+            const editPanelEl = document.getElementById('object-edit-panel');
+
+            if (!planState.selectedItem) return;
+
+            if (planState.selectedItem.kind === 'opening') {
+                const op = PLAN_OPENINGS.find(o => o.id === planState.selectedItem.id) || PLAN_OPENINGS[0];
+                editPanelEl.style.display = 'none';
+                pillEl.textContent = 'Window / Door';
+                titleEl.textContent = `${op.name} — ${op.room}`;
+                subEl.textContent = `${op.facade} • ${op.floor === 'ground' ? 'Lower Floor (Parter)' : 'Upper Floor (Piętro)'}`;
+
+                const coordStr = (op.axis === 'x')
+                    ? `X = ${op.start.toLocaleString()}..${op.end.toLocaleString()} mm, Z = ${op.fixedZ.toLocaleString()} mm`
+                    : `X = ${op.fixedX.toLocaleString()} mm, Z = ${op.start.toLocaleString()}..${op.end.toLocaleString()} mm`;
+
+                const rows = [
+                    ['Floor Level', op.floor === 'ground' ? 'Parter (±0.00 m)' : 'Piętro (+3.43 m)'],
+                    ['Plan Coordinates', coordStr],
+                    ['Width × Height', `${op.widthMm.toLocaleString()} × ${op.heightMm.toLocaleString()} mm`],
+                    ['Sill Height (hp)', `${op.sillMm.toLocaleString()} mm`],
+                    ['Sashes / Pillars', op.sashes + (op.pillarMm ? ` panes (${op.pillarMm} mm pillars)` : ' sash(es)')],
+                    ['200mm Jambs', [op.jambStart ? 'Start' : null, op.jambEnd ? 'End' : null].filter(Boolean).join(' & ') || 'Corner Join'],
+                    ['Notes', op.specs]
+                ];
+                populateKvRows(kvListEl, rows);
+            } else {
+                const obj = planState.placedObjects.find(o => o.id === planState.selectedItem.id);
+                if (!obj) {
+                    selectOpening('O4');
+                    return;
+                }
+                const def = OBJECT_CATALOG[obj.type] || OBJECT_CATALOG.socket_pe;
+                editPanelEl.style.display = 'block';
+                pillEl.textContent = def.shortCode;
+                titleEl.textContent = `${obj.label} — ${def.name}`;
+                subEl.textContent = `${obj.floor === 'ground' ? 'Lower Floor (Parter)' : 'Upper Floor (Piętro)'} • Interactive Plan Object`;
+
+                const rows = [
+                    ['Object ID', obj.id],
+                    ['Type', def.name],
+                    ['Floor', obj.floor === 'ground' ? 'Parter (±0.00 m)' : 'Piętro (+3.43 m)'],
+                    ['Position (X, Z)', `X = ${obj.x.toLocaleString()} mm, Z = ${obj.z.toLocaleString()} mm`],
+                    ['Mount Height', `${obj.heightMm.toLocaleString()} mm`],
+                    ['Wall Snapped', obj.snappedToWall ? 'Yes (Inner Wall Face)' : 'Free / Grid (50 mm)']
+                ];
+                populateKvRows(kvListEl, rows);
+
+                document.getElementById('obj-label-input').value = obj.label;
+                document.getElementById('obj-x-input').value = String(obj.x);
+                document.getElementById('obj-z-input').value = String(obj.z);
+                document.getElementById('obj-h-input').value = String(obj.heightMm);
+                document.getElementById('obj-rot-input').value = String(obj.rotation || 0);
+            }
+        }
+
+        function populateKvRows(container, rows) {
+            const nodes = rows.map(([k, v]) => {
+                const row = document.createElement('div');
+                row.className = 'kv-row';
+                const kEl = document.createElement('span');
+                kEl.className = 'kv-key';
+                kEl.textContent = k;
+                const vEl = document.createElement('span');
+                vEl.className = 'kv-val';
+                vEl.textContent = v;
+                row.appendChild(kEl);
+                row.appendChild(vEl);
+                return row;
+            });
+            container.replaceChildren(...nodes);
+        }
+
+        function renderPlacedObjectsList() {
+            const countEl = document.getElementById('obj-count-label');
+            const listEl = document.getElementById('placed-objects-list');
+            countEl.textContent = String(planState.placedObjects.length);
+
+            if (planState.placedObjects.length === 0) {
+                const emptyMsg = document.createElement('div');
+                emptyMsg.style.fontSize = '11.5px';
+                emptyMsg.style.color = '#64748b';
+                emptyMsg.textContent = 'No sockets placed yet. Select a socket type on the left and click on either floor plan.';
+                listEl.replaceChildren(emptyMsg);
+                return;
+            }
+
+            const items = planState.placedObjects.map(obj => {
+                const def = OBJECT_CATALOG[obj.type] || OBJECT_CATALOG.socket_pe;
+                const isSel = (planState.selectedItem && planState.selectedItem.kind === 'object' && planState.selectedItem.id === obj.id);
+                const btn = document.createElement('button');
+                btn.className = 'ctrl-btn' + (isSel ? ' active' : '');
+                btn.style.justifyContent = 'space-between';
+                btn.style.fontSize = '11.5px';
+                btn.style.padding = '5px 8px';
+
+                const leftSpan = document.createElement('span');
+                leftSpan.textContent = `${obj.label} (${def.shortCode})`;
+                const rightSpan = document.createElement('span');
+                rightSpan.style.fontFamily = 'JetBrains Mono, monospace';
+                rightSpan.style.fontSize = '10.5px';
+                rightSpan.textContent = `${obj.floor === 'ground' ? 'P0' : 'P1'} • ${obj.x},${obj.z}`;
+
+                btn.appendChild(leftSpan);
+                btn.appendChild(rightSpan);
+                btn.addEventListener('click', () => selectPlacedObject(obj.id));
+                return btn;
+            });
+            listEl.replaceChildren(...items);
+        }
+
+        function onSelectedObjectFieldChange() {
+            if (!planState.selectedItem || planState.selectedItem.kind !== 'object') return;
+            const obj = planState.placedObjects.find(o => o.id === planState.selectedItem.id);
+            if (!obj) return;
+
+            const labelVal = document.getElementById('obj-label-input').value.trim();
+            const xVal = parseInt(document.getElementById('obj-x-input').value, 10);
+            const zVal = parseInt(document.getElementById('obj-z-input').value, 10);
+            const hVal = parseInt(document.getElementById('obj-h-input').value, 10);
+            const rVal = parseInt(document.getElementById('obj-rot-input').value, 10);
+
+            if (labelVal) obj.label = labelVal.slice(0, 40);
+            if (!Number.isNaN(xVal)) obj.x = xVal;
+            if (!Number.isNaN(zVal)) obj.z = zVal;
+            if (!Number.isNaN(hVal)) obj.heightMm = hVal;
+            if (!Number.isNaN(rVal)) obj.rotation = ((rVal % 360) + 360) % 360;
+
+            savePlacedObjects();
+            updateInspectorUI();
+            renderAllPlans();
+        }
+
+        function rotateSelectedObject(deltaDeg) {
+            if (!planState.selectedItem || planState.selectedItem.kind !== 'object') return;
+            const obj = planState.placedObjects.find(o => o.id === planState.selectedItem.id);
+            if (!obj) return;
+            obj.rotation = (((obj.rotation || 0) + deltaDeg) % 360 + 360) % 360;
+            savePlacedObjects();
+            updateInspectorUI();
+            renderAllPlans();
+        }
+
+        function deleteSelectedObject() {
+            if (!planState.selectedItem || planState.selectedItem.kind !== 'object') return;
+            const targetId = planState.selectedItem.id;
+            planState.placedObjects = planState.placedObjects.filter(o => o.id !== targetId);
+            savePlacedObjects();
+            selectOpening('O4');
+        }
+
+        function clearAllPlacedObjects() {
+            planState.placedObjects = [];
+            savePlacedObjects();
+            selectOpening('O4');
+        }
+
+        // Dragging an existing placed object in real time
+        let draggingObjectState = null;
+
+        function startDraggingPlacedObject(e, obj) {
+            const svg = document.getElementById('svg-' + obj.floor);
+            if (!svg) return;
+            draggingObjectState = { obj, svg };
+        }
+
+        // Toolbar Controls
+        function getTargetFloors(targetFloor) {
+            if (planState.syncFloors || !targetFloor) return ['ground', 'first'];
+            return [targetFloor];
+        }
+
+        function zoomPlanBy(factor, pivotWorld = null, targetFloor = null) {
+            const floors = getTargetFloors(targetFloor || planState.activeFloor);
+            let displayZoom = 1.0;
+
+            floors.forEach(f => {
+                const v = planState.views[f];
+                const oldZoom = v.zoom;
+                const newZoom = Math.max(0.4, Math.min(4.0, oldZoom * factor));
+                if (pivotWorld) {
+                    const ratio = 1 - (oldZoom / newZoom);
+                    v.panX += (pivotWorld.x - v.panX) * ratio;
+                    v.panZ += (pivotWorld.z - v.panZ) * ratio;
+                }
+                v.zoom = newZoom;
+                displayZoom = newZoom;
+            });
+
+            const pct = Math.round(displayZoom * 100);
+            document.getElementById('zoom-slider').value = String(pct);
+            document.getElementById('zoom-val-label').textContent = pct + '%';
+            updateAllViewBoxes();
+        }
+
+        function onZoomSliderInput(val) {
+            const pct = Math.max(40, Math.min(400, parseInt(val, 10) || 100));
+            const newZoom = pct / 100;
+            const floors = getTargetFloors(planState.activeFloor);
+            floors.forEach(f => {
+                planState.views[f].zoom = newZoom;
+            });
+            document.getElementById('zoom-val-label').textContent = pct + '%';
+            updateAllViewBoxes();
+        }
+
+        function resetPlanView() {
+            ['ground', 'first'].forEach(f => {
+                planState.views[f].zoom = 1.0;
+                planState.views[f].panX = 10210;
+                planState.views[f].panZ = 10420;
+            });
+            document.getElementById('zoom-slider').value = '100';
+            document.getElementById('zoom-val-label').textContent = '100%';
+            updateAllViewBoxes();
+        }
+
+        function toggleSyncViews(btn) {
+            planState.syncFloors = !planState.syncFloors;
+            btn.classList.toggle('active', planState.syncFloors);
+            if (planState.syncFloors) {
+                const src = planState.views[planState.activeFloor] || planState.views.ground;
+                ['ground', 'first'].forEach(f => {
+                    planState.views[f].zoom = src.zoom;
+                    planState.views[f].panX = src.panX;
+                    planState.views[f].panZ = src.panZ;
+                });
+                updateAllViewBoxes();
+            }
+        }
+
+        function toggleHorizontalOrientation(btn) {
+            planState.westOnLeft = !planState.westOnLeft;
+            btn.textContent = planState.westOnLeft ? '🧭 West on Left' : '🧭 East on Left';
+            btn.classList.toggle('active', !planState.westOnLeft);
+            const lrText = planState.westOnLeft
+                ? '◀ W (Entry) • E (Garden) ▶'
+                : '◀ E (Garden) • W (Entry) ▶';
+            document.getElementById('compass-lr-ground').textContent = lrText;
+            document.getElementById('compass-lr-first').textContent = lrText;
+            renderAllPlans();
+        }
+
+        function setPlanLayout(mode) {
+            planState.layout = mode;
+            ['stacked', 'side', 'ground', 'first'].forEach(m => {
+                const b = document.getElementById('layout-' + m);
+                if (b) b.classList.toggle('active', m === mode);
+            });
+            const container = document.getElementById('plans-container');
+            const cardGround = document.getElementById('card-ground');
+            const cardFirst = document.getElementById('card-first');
+
+            container.classList.toggle('side-by-side', mode === 'side');
+            cardGround.classList.toggle('hidden', mode === 'first');
+            cardFirst.classList.toggle('hidden', mode === 'ground');
+            updateAllViewBoxes();
+        }
+
+        function togglePlanLayer(layerKey, btn) {
+            planState.layers[layerKey] = !planState.layers[layerKey];
+            btn.classList.toggle('active', planState.layers[layerKey]);
+            renderAllPlans();
+        }
+
+        function setActiveTool(toolKey) {
+            planState.activeTool = toolKey;
+            ['select', 'socket_pe', 'socket_pe_shutter', 'socket_floor'].forEach(k => {
+                const b = document.getElementById('tool-' + k);
+                if (b) b.classList.toggle('active', k === toolKey);
+            });
+            ['ground', 'first'].forEach(f => {
+                const vp = document.getElementById('viewport-' + f);
+                if (vp) vp.classList.toggle('placing-mode', toolKey !== 'select');
+            });
+        }
+
+        // Attach Mouse Wheel Zoom, Pan, Cursor Readout, and Click-to-Place on both Floor Viewports
+        function initViewportInteractions() {
+            let panDrag = null;
+
+            ['ground', 'first'].forEach(floor => {
+                const vp = document.getElementById('viewport-' + floor);
+                const svg = document.getElementById('svg-' + floor);
+                const cursorEl = document.getElementById('cursor-' + floor);
+
+                vp.addEventListener('wheel', (e) => {
+                    e.preventDefault();
+                    planState.activeFloor = floor;
+                    const worldPt = clientToWorldMm(svg, e.clientX, e.clientY);
+                    const factor = (e.deltaY < 0) ? 1.14 : (1 / 1.14);
+                    zoomPlanBy(factor, worldPt, floor);
+                }, { passive: false });
+
+                vp.addEventListener('mousedown', (e) => {
+                    if (e.button !== 0) return;
+                    planState.activeFloor = floor;
+                    const worldPt = clientToWorldMm(svg, e.clientX, e.clientY);
+
+                    if (planState.activeTool !== 'select') {
+                        // Place new object on this floor
+                        const def = OBJECT_CATALOG[planState.activeTool];
+                        if (!def) return;
+                        const snap = def.snapToWall
+                            ? snapToFloorWalls(floor, worldPt.x, worldPt.z, 550)
+                            : { x: Math.round(worldPt.x / 50) * 50, z: Math.round(worldPt.z / 50) * 50, rot: 0, snappedToWall: false };
+
+                        const newObj = {
+                            id: 'OBJ_' + Date.now() + '_' + (planState.nextObjectSeq++),
+                            floor,
+                            type: def.type,
+                            label: `${def.shortCode}-${planState.placedObjects.filter(o => o.floor === floor).length + 1}`,
+                            x: snap.x,
+                            z: snap.z,
+                            heightMm: def.defaultHeightMm,
+                            rotation: snap.rot,
+                            snappedToWall: snap.snappedToWall
+                        };
+                        planState.placedObjects.push(newObj);
+                        savePlacedObjects();
+                        setActiveTool('select');
+                        selectPlacedObject(newObj.id);
+                        return;
+                    }
+
+                    // Otherwise start panning the floor plan
+                    vp.classList.add('dragging');
+                    const v = planState.views[floor];
+                    panDrag = {
+                        floor,
+                        vp,
+                        svg,
+                        startClientX: e.clientX,
+                        startClientY: e.clientY,
+                        startPanX: v.panX,
+                        startPanZ: v.panZ
+                    };
+                });
+
+                vp.addEventListener('mousemove', (e) => {
+                    const worldPt = clientToWorldMm(svg, e.clientX, e.clientY);
+                    cursorEl.textContent = `X: ${worldPt.x.toLocaleString()} mm, Z: ${worldPt.z.toLocaleString()} mm`;
+                });
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                if (draggingObjectState) {
+                    const { obj, svg } = draggingObjectState;
+                    const def = OBJECT_CATALOG[obj.type] || OBJECT_CATALOG.socket_pe;
+                    const worldPt = clientToWorldMm(svg, e.clientX, e.clientY);
+                    const snap = def.snapToWall
+                        ? snapToFloorWalls(obj.floor, worldPt.x, worldPt.z, 450)
+                        : { x: Math.round(worldPt.x / 50) * 50, z: Math.round(worldPt.z / 50) * 50, rot: obj.rotation || 0, snappedToWall: false };
+
+                    obj.x = snap.x;
+                    obj.z = snap.z;
+                    obj.snappedToWall = snap.snappedToWall;
+                    if (snap.snappedToWall) obj.rotation = snap.rot;
+                    updateInspectorUI();
+                    renderAllPlans();
+                    return;
+                }
+
+                if (panDrag) {
+                    const rect = panDrag.vp.getBoundingClientRect();
+                    const activeView = planState.views[panDrag.floor];
+                    const baseSpanZ = 26800 / activeView.zoom;
+                    const mmPerPx = baseSpanZ / Math.max(1, rect.height);
+                    const dxPx = e.clientX - panDrag.startClientX;
+                    const dzPx = e.clientY - panDrag.startClientY;
+                    const signX = planState.westOnLeft ? 1 : -1;
+
+                    const newPanX = panDrag.startPanX + dxPx * mmPerPx * signX;
+                    const newPanZ = panDrag.startPanZ - dzPx * mmPerPx;
+
+                    getTargetFloors(panDrag.floor).forEach(f => {
+                        planState.views[f].panX = newPanX;
+                        planState.views[f].panZ = newPanZ;
+                    });
+                    updateAllViewBoxes();
+                }
+            });
+
+            window.addEventListener('mouseup', () => {
+                if (draggingObjectState) {
+                    savePlacedObjects();
+                    draggingObjectState = null;
+                }
+                if (panDrag) {
+                    panDrag.vp.classList.remove('dragging');
+                    panDrag = null;
+                }
+            });
+
+            window.addEventListener('resize', () => updateAllViewBoxes());
+
+            window.addEventListener('keydown', (e) => {
+                if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT')) return;
+                if (e.key === 'r' || e.key === 'R') {
+                    if (planState.selectedItem && planState.selectedItem.kind === 'object') {
+                        rotateSelectedObject(90);
+                    } else {
+                        resetPlanView();
+                    }
+                } else if (e.key === 'Escape') {
+                    setActiveTool('select');
+                } else if (e.key === 'Delete' || e.key === 'Backspace') {
+                    if (planState.selectedItem && planState.selectedItem.kind === 'object') {
+                        deleteSelectedObject();
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPlacedObjects();
+            initViewportInteractions();
+            selectOpening('O4');
+            renderAllPlans();
+        });
+    </script>
+</body>
+
+</html>
