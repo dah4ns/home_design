@@ -559,6 +559,8 @@
                             <option value="default">Default (Graphite Clinker)</option>
                             <option value="gloom_long">Gloom Long (380×40 mm)</option>
                             <option value="moso_bamboo_rhombos">MOSO Bamboo Rhombos (double)</option>
+                            <option value="thermory_ash_natural">Thermory Thermo Ash (width: 95 mm, color: natural)</option>
+                            <option value="thermory_ash_ebony">Thermory Thermo Ash (width: 95 mm, color: ebony)</option>
                         </select>
                     </div>
                     <div class="mat-select-group">
@@ -567,7 +569,10 @@
                         </label>
                         <select class="mat-select" id="upper-mat-select" onchange="onUpperMaterialChange(this.value)">
                             <option value="default">Default (Vertical Timber Slats)</option>
+                            <option value="gloom_long">Gloom Long (380×40 mm)</option>
                             <option value="moso_bamboo_rhombos">MOSO Bamboo Rhombos (double)</option>
+                            <option value="thermory_ash_natural">Thermory Thermo Ash (width: 95 mm, color: natural)</option>
+                            <option value="thermory_ash_ebony">Thermory Thermo Ash (width: 95 mm, color: ebony)</option>
                         </select>
                     </div>
                 </div>
@@ -581,7 +586,7 @@
                         <button class="ctrl-btn active" id="toggle-labels" onclick="toggle3DLayer('labels', this)">🏷️ Window Tags</button>
                         <button class="ctrl-btn" id="toggle-dims" onclick="toggle3DLayer('dims', this)">📏 3D Dimensions</button>
                         <button class="ctrl-btn" id="toggle-levels" onclick="toggle3DLayer('levels', this)">📐 Height Levels</button>
-                        <button class="ctrl-btn active" id="toggle-edges" onclick="toggle3DLayer('edges', this)">✏️ CAD Outlines</button>
+                        <button class="ctrl-btn" id="toggle-edges" onclick="toggle3DLayer('edges', this)">✏️ CAD Outlines</button>
                         <button class="ctrl-btn active" id="toggle-trees" onclick="toggle3DLayer('trees', this)">🌲 Pine Trees</button>
                         <button class="ctrl-btn active" id="toggle-jambs" onclick="toggleJambMaterial(this)">⬛ Jambs: RAL 7021</button>
                     </div>
@@ -751,7 +756,7 @@
                 labels: true,
                 dims: false,
                 levels: false,
-                edges: true,
+                edges: false,
                 trees: true
             },
             selectedOpeningId: 'O3',
@@ -783,6 +788,22 @@
                 uvScale: { u: 1 / 0.72, v: 1 / 2.80 }, // 720 mm width (12 × 60 mm strips) × 2,800 mm full-floor single-plank height
                 swatchStyle: 'background: #674a34; background-image: url("textures/moso_bamboo_rhombos.png"); background-size: cover;',
                 legendDesc: 'MOSO Bamboo Rhombos (double) — 50 mm strip + 10 mm gap (137.18 m² net)'
+            },
+            thermory_ash_natural: {
+                id: 'thermory_ash_natural',
+                label: 'Thermory Thermo Ash (width: 95 mm, color: natural)',
+                textureKey: 'thermoryAshNatural',
+                uvScale: { u: 1 / 0.824, v: 1 / 2.80 }, // 824 mm width (8 × 103 mm pitch: 95 mm plank + 8 mm gap) × 2,800 mm full-floor height
+                swatchStyle: 'background: #7d5a3e; background-image: url("textures/thermory_thermo_ash.png"); background-size: cover;',
+                legendDesc: 'Thermory Thermo Ash (natural) — 95 mm plank + 8 mm gap (137.18 m² net)'
+            },
+            thermory_ash_ebony: {
+                id: 'thermory_ash_ebony',
+                label: 'Thermory Thermo Ash (width: 95 mm, color: ebony)',
+                textureKey: 'thermoryAshEbony',
+                uvScale: { u: 1 / 0.824, v: 1 / 2.80 }, // 824 mm width (8 × 103 mm pitch: 95 mm plank + 8 mm gap) × 2,800 mm full-floor height
+                swatchStyle: 'background: #262422;',
+                legendDesc: 'Thermory Thermo Ash (ebony) — 95 mm plank + 8 mm gap (137.18 m² net)'
             }
         };
 
@@ -795,6 +816,14 @@
                 swatchStyle: 'background: #cbb497;',
                 legendDesc: 'Vertical Thermo-Timber Slats (75.23 m² net)'
             },
+            gloom_long: {
+                id: 'gloom_long',
+                label: 'Gloom Long (380×40 mm)',
+                textureKey: 'brickGloomLong',
+                uvScale: 1.28, // ~0.78m per tile repeat -> 56 courses in 2,800 mm height
+                swatchStyle: 'background: #cfc8c0; background-image: url("textures/gloom_long.jpg"); background-size: cover;',
+                legendDesc: 'Gloom Long 380×40 mm Brick (75.23 m² net, 56 courses)'
+            },
             moso_bamboo_rhombos: {
                 id: 'moso_bamboo_rhombos',
                 label: 'MOSO Bamboo Rhombos (double)',
@@ -802,6 +831,22 @@
                 uvScale: { u: 1 / 0.72, v: 1 / 2.80 }, // 720 mm width (12 × 60 mm strips) × 2,800 mm full-floor single-plank height
                 swatchStyle: 'background: #674a34; background-image: url("textures/moso_bamboo_rhombos.png"); background-size: cover;',
                 legendDesc: 'MOSO Bamboo Rhombos (double) — 50 mm strip + 10 mm gap (75.23 m² net)'
+            },
+            thermory_ash_natural: {
+                id: 'thermory_ash_natural',
+                label: 'Thermory Thermo Ash (width: 95 mm, color: natural)',
+                textureKey: 'thermoryAshNatural',
+                uvScale: { u: 1 / 0.824, v: 1 / 2.80 }, // 824 mm width (8 × 103 mm pitch: 95 mm plank + 8 mm gap) × 2,800 mm full-floor height
+                swatchStyle: 'background: #7d5a3e; background-image: url("textures/thermory_thermo_ash.png"); background-size: cover;',
+                legendDesc: 'Thermory Thermo Ash (natural) — 95 mm plank + 8 mm gap (75.23 m² net)'
+            },
+            thermory_ash_ebony: {
+                id: 'thermory_ash_ebony',
+                label: 'Thermory Thermo Ash (width: 95 mm, color: ebony)',
+                textureKey: 'thermoryAshEbony',
+                uvScale: { u: 1 / 0.824, v: 1 / 2.80 }, // 824 mm width (8 × 103 mm pitch: 95 mm plank + 8 mm gap) × 2,800 mm full-floor height
+                swatchStyle: 'background: #262422;',
+                legendDesc: 'Thermory Thermo Ash (ebony) — 95 mm plank + 8 mm gap (75.23 m² net)'
             }
         };
 
@@ -1437,6 +1482,188 @@
             mosoImg.src = (window.FACADE_TEXTURES && window.FACADE_TEXTURES.moso_bamboo_rhombos)
                 ? window.FACADE_TEXTURES.moso_bamboo_rhombos
                 : 'textures/moso_bamboo_rhombos.png';
+
+            // 2c. Thermory Thermo Ash — 95 mm vertical plank + 8 mm shadow gap (103 mm pitch)
+            // 8 planks across 512 px width -> 64 px pitch (59 px plank = 95 mm, 5 px gap = 8 mm) = 824 mm per repeat.
+            // Both 'natural' and 'ebony' retain the exact same Ash tree growth rings from thermory_thermo_ash.png.
+            const paintThermoryThermoAshPlanks = (ctx, w, h, srcImg, variant) => {
+                // Dark recessed shadow gap background (8 mm open joint)
+                ctx.fillStyle = '#090706';
+                ctx.fillRect(0, 0, w, h);
+
+                const numPlanks = 8;
+                const pitchPx = w / numPlanks; // 64 px = 103 mm
+                const gapW = 5;                // 5 px  ≈ 8.05 mm
+                const plankW = pitchPx - gapW; // 59 px ≈ 94.95 mm
+
+                let srcData = null;
+                let sw = 0, sh = 0;
+                let cropLeft = 0, cropW = 1, cropTop = 0, cropH = 1;
+                let srcColMean = null;
+
+                if (srcImg) {
+                    sw = srcImg.naturalWidth || srcImg.width;
+                    sh = srcImg.naturalHeight || srcImg.height;
+                    const off = document.createElement('canvas');
+                    off.width = sw;
+                    off.height = sh;
+                    const octx = off.getContext('2d');
+                    octx.drawImage(srcImg, 0, 0);
+                    srcData = octx.getImageData(0, 0, sw, sh).data;
+
+                    // Crop inside the plank face to exclude 1px screenshot border and right-edge photo shadow
+                    cropLeft = Math.min(14, Math.floor(sw * 0.07));
+                    const cropRight = Math.max(cropLeft + 16, Math.min(186, Math.floor(sw * 0.85)));
+                    cropW = cropRight - cropLeft;
+                    cropTop = Math.min(8, Math.floor(sh * 0.01));
+                    const cropBottom = Math.max(cropTop + 32, sh - 9);
+                    cropH = cropBottom - cropTop;
+
+                    // Compute per-column average RGB so photo shading is removed while preserving 100% of Ash growth rings
+                    srcColMean = new Float32Array(cropW * 3);
+                    for (let cx = 0; cx < cropW; cx++) {
+                        let sumR = 0, sumG = 0, sumB = 0;
+                        const sx = cropLeft + cx;
+                        for (let cy = 0; cy < cropH; cy++) {
+                            const sy = cropTop + cy;
+                            const idx = (sy * sw + sx) * 4;
+                            sumR += srcData[idx];
+                            sumG += srcData[idx + 1];
+                            sumB += srcData[idx + 2];
+                        }
+                        srcColMean[cx * 3] = sumR / cropH;
+                        srcColMean[cx * 3 + 1] = sumG / cropH;
+                        srcColMean[cx * 3 + 2] = sumB / cropH;
+                    }
+                }
+
+                const outImg = ctx.getImageData(0, 0, w, h);
+                const dst = outImg.data;
+
+                // Deterministic per-plank variations (vertical shift, horizontal mirror, subtle board-to-board tone)
+                const plankShifts = [0, 389, 743, 197, 611, 887, 313, 521];
+                const plankFlips = [0, 1, 0, 1, 1, 0, 1, 0];
+                const plankTones = [0, -4, 3, -2, 4, -3, 2, -1];
+
+                const isEbony = (variant === 'ebony');
+                const baseR = isEbony ? 38 : 125;
+                const baseG = isEbony ? 36 : 90;
+                const baseB = isEbony ? 34 : 62;
+
+                for (let s = 0; s < numPlanks; s++) {
+                    const sx0 = s * pitchPx + 2; // 2 px left gap + 3 px right gap = 5 px (8 mm) total gap
+                    const yShift = plankShifts[s % plankShifts.length];
+                    const flipX = plankFlips[s % plankFlips.length];
+                    const toneOffset = plankTones[s % plankTones.length];
+
+                    for (let py = 0; py < h; py++) {
+                        for (let px = 0; px < plankW; px++) {
+                            const u = px / (plankW - 1);
+                            let dR = 0, dG = 0, dB = 0;
+
+                            if (srcData) {
+                                const srcU = flipX ? (1 - u) : u;
+                                const cx = Math.min(cropW - 1, Math.max(0, Math.round(srcU * (cropW - 1))));
+                                const sx = cropLeft + cx;
+
+                                // Seamless vertical ping-pong sampling along the full-height Ash plank
+                                const rawV = ((py + yShift) % (cropH * 2)) / cropH;
+                                const v = rawV <= 1.0 ? rawV : (2.0 - rawV);
+                                const sy = cropTop + Math.min(cropH - 1, Math.max(0, Math.floor(v * (cropH - 1))));
+
+                                const sIdx = (sy * sw + sx) * 4;
+                                dR = (srcData[sIdx] - srcColMean[cx * 3]) * 1.22;
+                                dG = (srcData[sIdx + 1] - srcColMean[cx * 3 + 1]) * 1.22;
+                                dB = (srcData[sIdx + 2] - srcColMean[cx * 3 + 2]) * 1.22;
+                            } else {
+                                // Procedural cathedral Ash ring fallback before image loads
+                                const xNorm = (u - 0.5) * 2.0;
+                                const arch = Math.sin((py + yShift) * 0.018 + s * 1.1) * 0.35;
+                                const ringDist = Math.abs(xNorm * 3.8 + arch);
+                                const ringWave = Math.sin(ringDist * 6.28318);
+                                const ringGrain = ringWave < -0.55 ? -18 : (ringWave * 6);
+                                dR = ringGrain;
+                                dG = ringGrain * 0.82;
+                                dB = ringGrain * 0.65;
+                            }
+
+                            let r, g, b;
+                            if (isEbony) {
+                                // Ebony stain: deep charcoal-ebony paint while preserving Ash growth ring relief
+                                const ringLum = 0.35 * dR + 0.50 * dG + 0.15 * dB;
+                                r = baseR + toneOffset * 0.5 + ringLum * 0.70 + dR * 0.12;
+                                g = baseG + toneOffset * 0.5 + ringLum * 0.68 + dG * 0.10;
+                                b = baseB + toneOffset * 0.5 + ringLum * 0.65 + dB * 0.08;
+                            } else {
+                                // Natural thermally modified Ash
+                                r = baseR + toneOffset + dR;
+                                g = baseG + toneOffset * 0.8 + dG;
+                                b = baseB + toneOffset * 0.6 + dB;
+                            }
+
+                            // Subtle 1.5 mm micro-chamfer on left & right plank edges next to the 8 mm gap
+                            if (px === 0) {
+                                r *= 0.65; g *= 0.65; b *= 0.65;
+                            } else if (px === 1) {
+                                r *= 1.05; g *= 1.05; b *= 1.05;
+                            } else if (px === plankW - 2) {
+                                r *= 0.90; g *= 0.90; b *= 0.90;
+                            } else if (px === plankW - 1) {
+                                r *= 0.55; g *= 0.55; b *= 0.55;
+                            }
+
+                            const outIdx = (py * w + (sx0 + px)) * 4;
+                            dst[outIdx] = Math.max(0, Math.min(255, Math.round(r)));
+                            dst[outIdx + 1] = Math.max(0, Math.min(255, Math.round(g)));
+                            dst[outIdx + 2] = Math.max(0, Math.min(255, Math.round(b)));
+                            dst[outIdx + 3] = 255;
+                        }
+                    }
+                }
+                ctx.putImageData(outImg, 0, 0);
+            };
+
+            textures.thermoryAshNatural = createCanvasTexture(glCtx, (ctx, w, h) => {
+                paintThermoryThermoAshPlanks(ctx, w, h, null, 'natural');
+            }, 512, 1024);
+
+            textures.thermoryAshEbony = createCanvasTexture(glCtx, (ctx, w, h) => {
+                paintThermoryThermoAshPlanks(ctx, w, h, null, 'ebony');
+            }, 512, 1024);
+
+            const ashImg = new Image();
+            ashImg.onload = () => {
+                const cNat = document.createElement('canvas');
+                cNat.width = 512;
+                cNat.height = 1024;
+                paintThermoryThermoAshPlanks(cNat.getContext('2d'), 512, 1024, ashImg, 'natural');
+
+                glCtx.bindTexture(glCtx.TEXTURE_2D, textures.thermoryAshNatural);
+                glCtx.texImage2D(glCtx.TEXTURE_2D, 0, glCtx.RGBA, glCtx.RGBA, glCtx.UNSIGNED_BYTE, cNat);
+                glCtx.generateMipmap(glCtx.TEXTURE_2D);
+                glCtx.texParameteri(glCtx.TEXTURE_2D, glCtx.TEXTURE_MIN_FILTER, glCtx.LINEAR_MIPMAP_LINEAR);
+                glCtx.texParameteri(glCtx.TEXTURE_2D, glCtx.TEXTURE_MAG_FILTER, glCtx.LINEAR);
+                glCtx.texParameteri(glCtx.TEXTURE_2D, glCtx.TEXTURE_WRAP_S, glCtx.REPEAT);
+                glCtx.texParameteri(glCtx.TEXTURE_2D, glCtx.TEXTURE_WRAP_T, glCtx.REPEAT);
+
+                const cEb = document.createElement('canvas');
+                cEb.width = 512;
+                cEb.height = 1024;
+                paintThermoryThermoAshPlanks(cEb.getContext('2d'), 512, 1024, ashImg, 'ebony');
+
+                glCtx.bindTexture(glCtx.TEXTURE_2D, textures.thermoryAshEbony);
+                glCtx.texImage2D(glCtx.TEXTURE_2D, 0, glCtx.RGBA, glCtx.RGBA, glCtx.UNSIGNED_BYTE, cEb);
+                glCtx.generateMipmap(glCtx.TEXTURE_2D);
+                glCtx.texParameteri(glCtx.TEXTURE_2D, glCtx.TEXTURE_MIN_FILTER, glCtx.LINEAR_MIPMAP_LINEAR);
+                glCtx.texParameteri(glCtx.TEXTURE_2D, glCtx.TEXTURE_MAG_FILTER, glCtx.LINEAR);
+                glCtx.texParameteri(glCtx.TEXTURE_2D, glCtx.TEXTURE_WRAP_S, glCtx.REPEAT);
+                glCtx.texParameteri(glCtx.TEXTURE_2D, glCtx.TEXTURE_WRAP_T, glCtx.REPEAT);
+
+                renderFrame();
+            };
+            ashImg.src = (window.FACADE_TEXTURES && window.FACADE_TEXTURES.thermory_thermo_ash)
+                ? window.FACADE_TEXTURES.thermory_thermo_ash
+                : 'textures/thermory_thermo_ash.png';
 
             // 3. RAL 7021 (#1f2421) Metal Cassette Fascia / Gzyms Texture (tile repeat: 0.9m width)
             textures.fascia = createCanvasTexture(glCtx, (ctx, w, h) => {
