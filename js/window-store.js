@@ -1,24 +1,40 @@
 /**
  * window-store.js
- * In-memory reactive data access layer for building views and window openings.
- * Supports subscription-based updates, localStorage caching, multi-view queries,
- * and directional coordinate shifts.
- * Version: 1.1.0
+ * Reactive data access layer for building views and window/door openings.
+ * Backed by the abstract PersistenceService (js/persistence.js) and seeded from
+ * explicit default definitions in `data/windows.js` (DEFAULT_WINDOWS_DATA) and
+ * `data/views.js` (DEFAULT_VIEWS_DATA).
+ * Version: 2.0.0
  */
 (function (root, factory) {
     if (typeof module === 'object' && typeof module.exports === 'object') {
-        module.exports = factory(require('../data/windows.js'));
+        let viewsData = null;
+        try {
+            viewsData = require('../data/views.js');
+        } catch (e) {
+            viewsData = null;
+        }
+        module.exports = factory(
+            require('./persistence.js'),
+            require('../data/windows.js'),
+            viewsData
+        );
     } else {
-        root.WindowStore = factory(root.WINDOW_DATABASE);
+        root.WindowStore = factory(
+            root.PersistenceService,
+            root.DEFAULT_WINDOWS_DATA || root.WINDOW_DATABASE,
+            root.DEFAULT_VIEWS_DATA || root.BUILDING_VIEWS_DATA
+        );
     }
-}(typeof self !== 'undefined' ? self : this, function (initialData) {
-    const STORAGE_KEY_WINDOWS = 'jetski_home_windows_db';
-    const STORAGE_KEY_VIEWS = 'jetski_home_views_db';
+}(typeof self !== 'undefined' ? self : this, function (PersistenceService, initialWindowsData, initialViewsData) {
+    'use strict';
+
+    const ENTITY_WINDOWS = 'windows';
+    const ENTITY_VIEWS = 'views';
+    const LEGACY_KEY_WINDOWS = 'jetski_home_windows_db';
+    const LEGACY_KEY_VIEWS = 'jetski_home_views_db';
+
     let subscribers = [];
-    let state = {
-        windows: {},
-        views: {}
-    };
 
     // View ID aliases for backward compatibility
     const VIEW_ALIASES = {
@@ -29,131 +45,128 @@
         return VIEW_ALIASES[viewId] || viewId;
     }
 
-    function init() {
-        const baseWindows = (initialData && initialData.windows) ? initialData.windows : {};
-        const baseViews = (initialData && initialData.views) ? initialData.views : {};
+    const defaultWindows = (initialWindowsData && (initialWindowsData.defaultWindows || initialWindowsData.windows))
+        ? (initialWindowsData.defaultWindows || initialWindowsData.windows)
+        : {};
 
-        // Deep clone base data
-        state.windows = JSON.parse(JSON.stringify(baseWindows));
-        state.views = JSON.parse(JSON.stringify(baseViews));
+    const defaultViews = (initialViewsData && (initialViewsData.defaultViews || initialViewsData.views))
+        ? (initialViewsData.defaultViews || initialViewsData.views)
+        : ((initialWindowsData && (initialWindowsData.defaultViews || initialWindowsData.views)) || {});
 
-        // Check if there are saved user modifications in localStorage (browser only)
-        if (typeof window !== 'undefined' && window.localStorage) {
-            try {
-                // Compute signature of canonical disk data
-                const currentDiskSignature = JSON.stringify({
-                    views: baseViews,
-                    windows: baseWindows
-                });
-                const savedDiskSignature = window.localStorage.getItem('jetski_db_disk_signature');
-
-                if (savedDiskSignature !== currentDiskSignature) {
-                    // Database files on disk have been edited! Purge stale localStorage so disk changes take effect
-                    window.localStorage.removeItem(STORAGE_KEY_WINDOWS);
-                    window.localStorage.removeItem(STORAGE_KEY_VIEWS);
-                    window.localStorage.setItem('jetski_db_disk_signature', currentDiskSignature);
-                } else {
-                    // Only restore cached tweaks if the underlying files have not been edited
-                    const savedWindows = window.localStorage.getItem(STORAGE_KEY_WINDOWS);
-                    if (savedWindows) {
-                        const parsed = JSON.parse(savedWindows);
-                        Object.keys(parsed).forEach(id => {
-                            if (state.windows[id]) {
-                                state.windows[id] = { ...state.windows[id], ...parsed[id] };
-                            } else {
-                                state.windows[id] = parsed[id];
-                            }
-                        });
-                    }
-
-                    const savedViews = window.localStorage.getItem(STORAGE_KEY_VIEWS);
-                    if (savedViews) {
-                        const parsedViews = JSON.parse(savedViews);
-                        Object.keys(parsedViews).forEach(id => {
-                            if (state.views[id]) {
-                                state.views[id] = { ...state.views[id], ...parsedViews[id] };
-                            } else {
-                                state.views[id] = parsedViews[id];
-                            }
-                        });
-                    }
-                }
-            } catch (err) {
-                console.warn('WindowStore: Could not load from localStorage:', err);
-            }
-        }
-
-        // Live fetch from data/windows.json if served over HTTP (e.g. live-server / local web server)
-        if (typeof window !== 'undefined' && window.fetch && window.location && window.location.protocol.startsWith('http')) {
-            fetch('data/windows.json?t=' + Date.now())
-                .then(res => res.json())
-                .then(json => {
-                    if (json && (json.views || json.windows)) {
-                        const fetchedDiskSig = JSON.stringify({
-                            views: json.views || {},
-                            windows: json.windows || {}
-                        });
-                        const savedDiskSig = window.localStorage ? window.localStorage.getItem('jetski_db_disk_signature') : null;
-
-                        if (savedDiskSig !== fetchedDiskSig) {
-                            // Underlying disk JSON has changed since last signature; update base state and clear stale cache
-                            if (json.views) state.views = JSON.parse(JSON.stringify(json.views));
-                            if (json.windows) state.windows = JSON.parse(JSON.stringify(json.windows));
-                            if (window.localStorage) {
-                                window.localStorage.removeItem(STORAGE_KEY_WINDOWS);
-                                window.localStorage.removeItem(STORAGE_KEY_VIEWS);
-                                window.localStorage.setItem('jetski_db_disk_signature', fetchedDiskSig);
-                            }
-                            subscribers.forEach(cb => cb('*', null, WindowStore.getAll()));
-                            window.dispatchEvent(new CustomEvent('window-updated', { detail: { id: '*', liveSync: true } }));
-                            window.dispatchEvent(new CustomEvent('view-updated', { detail: { id: '*', liveSync: true } }));
-                        }
-                    }
-                })
-                .catch(() => {});
-        }
+    if (!PersistenceService) {
+        throw new Error('WindowStore requires PersistenceService (js/persistence.js) to be loaded first.');
     }
 
-    init();
+    // Register 'windows' and 'views' entity types with explicit default seed values
+    PersistenceService.registerType(ENTITY_WINDOWS, {
+        collectionKind: 'map',
+        defaults: defaultWindows,
+        filePath: 'data/windows.json',
+        legacyStorageKey: LEGACY_KEY_WINDOWS,
+        metadata: (initialWindowsData && initialWindowsData.metadata) || {
+            isDefaultSeed: false,
+            entityType: ENTITY_WINDOWS
+        }
+    });
 
-    // Synchronize state across browser tabs/windows when localStorage changes
-    if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
-        window.addEventListener('storage', function (e) {
-            if (e.key === STORAGE_KEY_WINDOWS && e.newValue) {
+    PersistenceService.registerType(ENTITY_VIEWS, {
+        collectionKind: 'map',
+        defaults: defaultViews,
+        filePath: 'data/views.json',
+        legacyStorageKey: LEGACY_KEY_VIEWS,
+        metadata: (initialViewsData && initialViewsData.metadata) || {
+            isDefaultSeed: false,
+            entityType: ENTITY_VIEWS
+        }
+    });
+
+    // Forward external/cross-tab PersistenceService events to WindowStore subscribers
+    PersistenceService.subscribe(ENTITY_WINDOWS, function (id, item, allWindows, meta) {
+        if (meta && (meta.externalSync || meta.adapterChanged)) {
+            subscribers.forEach(cb => {
                 try {
-                    const parsed = JSON.parse(e.newValue);
-                    Object.keys(parsed).forEach(id => {
-                        state.windows[id] = { ...(state.windows[id] || {}), ...parsed[id] };
-                    });
-                    subscribers.forEach(cb => cb('*', null, WindowStore.getAll()));
-                    window.dispatchEvent(new CustomEvent('window-updated', { detail: { id: '*', storageSync: true } }));
+                    cb(id || '*', item, allWindows);
                 } catch (err) {
-                    console.warn('WindowStore: Failed to sync storage update:', err);
+                    console.error('WindowStore: Subscriber error:', err);
                 }
+            });
+            if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
+                window.dispatchEvent(new CustomEvent('window-updated', { detail: { id: id || '*', storageSync: true } }));
             }
-        });
-    }
+        }
+    });
+
+    PersistenceService.subscribe(ENTITY_VIEWS, function (id, item, _allViews, meta) {
+        if (meta && (meta.externalSync || meta.adapterChanged)) {
+            subscribers.forEach(cb => {
+                try {
+                    cb('view:' + (id || '*'), item, WindowStore.getAll());
+                } catch (err) {
+                    console.error('WindowStore: Subscriber error:', err);
+                }
+            });
+            if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
+                window.dispatchEvent(new CustomEvent('view-updated', { detail: { id: id || '*', storageSync: true } }));
+            }
+        }
+    });
 
     const WindowStore = {
         /**
-         * Get a single window by ID
+         * Get a single window by ID (active persisted state or default if unmodified)
          * @param {string} id
          * @returns {object|null}
          */
         get: function (id) {
-            if (!state.windows[id]) return null;
-            return JSON.parse(JSON.stringify(state.windows[id]));
+            return PersistenceService.getById(ENTITY_WINDOWS, id);
         },
         getWindow: function (id) {
             return this.get(id);
         },
 
         /**
-         * Get all windows as a dictionary
+         * Get the canonical DEFAULT value of a single window by ID (from `data/windows.js`)
+         * @param {string} id
+         * @returns {object|null}
+         */
+        getDefault: function (id) {
+            return PersistenceService.getDefaultById(ENTITY_WINDOWS, id);
+        },
+        getDefaultWindow: function (id) {
+            return this.getDefault(id);
+        },
+
+        /**
+         * Get all canonical DEFAULT windows as a dictionary
+         * @returns {object}
+         */
+        getAllDefaults: function () {
+            return PersistenceService.getDefaults(ENTITY_WINDOWS) || {};
+        },
+
+        /**
+         * Check if a specific window has been modified from its default value
+         * @param {string} id
+         * @returns {boolean}
+         */
+        isModified: function (id) {
+            return PersistenceService.isModified(ENTITY_WINDOWS, id);
+        },
+
+        /**
+         * Check if any window or view has persisted modifications
+         * @returns {boolean}
+         */
+        hasSavedChanges: function () {
+            return PersistenceService.hasModifications(ENTITY_WINDOWS) || PersistenceService.hasModifications(ENTITY_VIEWS);
+        },
+
+        /**
+         * Get all active windows as a dictionary
          * @returns {object}
          */
         getAll: function () {
-            return JSON.parse(JSON.stringify(state.windows));
+            return PersistenceService.getAll(ENTITY_WINDOWS) || {};
         },
         getAllWindows: function () {
             return this.getAll();
@@ -166,12 +179,13 @@
          */
         getByView: function (viewId) {
             const canonicalId = resolveViewId(viewId);
+            const allWindows = this.getAll();
             const list = [];
-            Object.values(state.windows).forEach(win => {
-                if (win.views) {
+            Object.values(allWindows).forEach(win => {
+                if (win && win.views) {
                     const mappedViews = win.views.map(resolveViewId);
                     if (mappedViews.includes(canonicalId) || win.views.includes(viewId)) {
-                        list.push(JSON.parse(JSON.stringify(win)));
+                        list.push(win);
                     }
                 }
             });
@@ -185,8 +199,7 @@
          */
         getView: function (viewId) {
             const canonicalId = resolveViewId(viewId);
-            if (!state.views[canonicalId]) return null;
-            return JSON.parse(JSON.stringify(state.views[canonicalId]));
+            return PersistenceService.getById(ENTITY_VIEWS, canonicalId);
         },
 
         /**
@@ -194,51 +207,37 @@
          * @returns {object}
          */
         getAllViews: function () {
-            return JSON.parse(JSON.stringify(state.views));
+            return PersistenceService.getAll(ENTITY_VIEWS) || {};
         },
 
         /**
-         * Dynamically update a view's metadata (e.g. positionOnMap, floor, direction, length)
+         * Dynamically update a view's metadata and persist via PersistenceService
          * @param {string} viewId
          * @param {object} updates
          * @returns {object} updated view
          */
         updateView: function (viewId, updates) {
             const canonicalId = resolveViewId(viewId);
-            if (!state.views[canonicalId]) {
+            const currentView = this.getView(canonicalId);
+            if (!currentView) {
                 throw new Error(`WindowStore: View with ID "${viewId}" does not exist.`);
             }
 
-            if (updates.positionOnMap !== undefined) {
-                updates.positionOnMap = Number(updates.positionOnMap);
-                updates.leftEdge = updates.positionOnMap;
-            } else if (updates.leftEdge !== undefined) {
-                updates.leftEdge = Number(updates.leftEdge);
-                updates.positionOnMap = updates.leftEdge;
+            const patch = { ...updates };
+            if (patch.positionOnMap !== undefined) {
+                patch.positionOnMap = Number(patch.positionOnMap);
+                patch.leftEdge = patch.positionOnMap;
+            } else if (patch.leftEdge !== undefined) {
+                patch.leftEdge = Number(patch.leftEdge);
+                patch.positionOnMap = patch.leftEdge;
             }
 
-            if (updates.length !== undefined) {
-                updates.length = Number(updates.length);
+            if (patch.length !== undefined) {
+                patch.length = Number(patch.length);
             }
 
-            state.views[canonicalId] = {
-                ...state.views[canonicalId],
-                ...updates,
-                id: canonicalId
-            };
+            const updatedCopy = PersistenceService.upsert(ENTITY_VIEWS, canonicalId, patch);
 
-            // Persist to localStorage
-            if (typeof window !== 'undefined' && window.localStorage) {
-                try {
-                    window.localStorage.setItem(STORAGE_KEY_VIEWS, JSON.stringify(state.views));
-                } catch (err) {
-                    console.warn('WindowStore: Could not save views to localStorage:', err);
-                }
-            }
-
-            const updatedCopy = JSON.parse(JSON.stringify(state.views[canonicalId]));
-
-            // Notify subscribers
             subscribers.forEach(callback => {
                 try {
                     callback('view:' + canonicalId, updatedCopy, WindowStore.getAll());
@@ -257,42 +256,27 @@
         },
 
         /**
-         * Dynamically update a window's properties and notify all subscribers / views
+         * Dynamically update a window's properties, persist via PersistenceService, and notify all subscribers
          * @param {string} id
          * @param {object} updates - e.g. { x: 8450, sill: 1100, width: 1950, height: 1400 }
          * @returns {object} updated window
          */
         update: function (id, updates) {
-            if (!state.windows[id]) {
+            const currentWin = this.get(id);
+            if (!currentWin) {
                 throw new Error(`WindowStore: Window with ID "${id}" does not exist.`);
             }
 
-            // Sanitize geometric numeric fields if provided
+            const patch = { ...updates };
             const numericFields = ['x', 'y', 'sill', 'width', 'height'];
             numericFields.forEach(field => {
-                if (updates[field] !== undefined) {
-                    updates[field] = Number(updates[field]);
+                if (patch[field] !== undefined) {
+                    patch[field] = Number(patch[field]);
                 }
             });
 
-            state.windows[id] = {
-                ...state.windows[id],
-                ...updates,
-                id: id // preserve ID
-            };
+            const updatedCopy = PersistenceService.upsert(ENTITY_WINDOWS, id, patch);
 
-            // Persist to localStorage
-            if (typeof window !== 'undefined' && window.localStorage) {
-                try {
-                    window.localStorage.setItem(STORAGE_KEY_WINDOWS, JSON.stringify(state.windows));
-                } catch (err) {
-                    console.warn('WindowStore: Could not save to localStorage:', err);
-                }
-            }
-
-            const updatedCopy = JSON.parse(JSON.stringify(state.windows[id]));
-
-            // Notify subscribers
             subscribers.forEach(callback => {
                 try {
                     callback(id, updatedCopy, WindowStore.getAll());
@@ -301,7 +285,6 @@
                 }
             });
 
-            // Dispatch global DOM event for multi-component synchronization
             if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
                 window.dispatchEvent(new CustomEvent('window-updated', {
                     detail: { id: id, window: updatedCopy }
@@ -332,6 +315,28 @@
         },
 
         /**
+         * Reset a single window back to its canonical default value from `data/windows.js`
+         * @param {string} id
+         * @returns {object|null}
+         */
+        resetWindowToDefault: function (id) {
+            const restored = PersistenceService.resetItemToDefault(ENTITY_WINDOWS, id);
+            if (restored) {
+                subscribers.forEach(callback => {
+                    try {
+                        callback(id, restored, WindowStore.getAll());
+                    } catch (cbErr) {
+                        console.error('WindowStore: Subscriber error:', cbErr);
+                    }
+                });
+                if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
+                    window.dispatchEvent(new CustomEvent('window-updated', { detail: { id, window: restored, reset: true } }));
+                }
+            }
+            return restored;
+        },
+
+        /**
          * Subscribe to window and view data mutations
          * @param {Function} callback (id, updatedObject, allData) => void
          * @returns {Function} unsubscribe function
@@ -344,15 +349,12 @@
         },
 
         /**
-         * Reset store back to the canonical initial database values
+         * Reset all windows and views back to their canonical default values
          */
         resetToDefaults: function () {
-            if (typeof window !== 'undefined' && window.localStorage) {
-                window.localStorage.removeItem(STORAGE_KEY_WINDOWS);
-                window.localStorage.removeItem(STORAGE_KEY_VIEWS);
-            }
-            init();
-            // Notify all subscribers of full reset
+            PersistenceService.resetToDefaults(ENTITY_WINDOWS);
+            PersistenceService.resetToDefaults(ENTITY_VIEWS);
+
             subscribers.forEach(callback => {
                 try {
                     callback('*', null, WindowStore.getAll());
@@ -367,15 +369,21 @@
         },
 
         /**
-         * Export current database state as JSON string
+         * Export current database state as JSON string matching `data/windows.json`
          * @returns {string}
          */
         toJSON: function () {
+            const windowsState = this.getAll();
+            const viewsState = this.getAllViews();
             return JSON.stringify({
+                _role: "PERSISTED_DATA_EXPORT",
+                entityType: "windows",
                 version: "2.0.0",
                 exportedAt: new Date().toISOString(),
-                views: state.views,
-                windows: state.windows
+                adapter: PersistenceService.getAdapterName(),
+                views: viewsState,
+                defaultWindows: windowsState,
+                windows: windowsState
             }, null, 2);
         }
     };

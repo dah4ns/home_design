@@ -604,11 +604,14 @@
         },
 
         resetDefaults: function () {
-            if (confirm('Reset all windows and views to canonical project defaults?')) {
-                WindowStore.resetToDefaults();
-                this._populateSelect();
-                this._renderViewsList();
+            WindowStore.resetToDefaults();
+            const sc = this._getStairComponent();
+            if (sc && typeof sc.resetToDefaults === 'function') {
+                sc.resetToDefaults();
+                this._renderStairEditor();
             }
+            this._populateSelect();
+            this._renderViewsList();
         },
 
         copyJSON: function () {

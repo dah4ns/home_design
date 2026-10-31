@@ -1310,8 +1310,10 @@
         </div>
     </div>
 
-    <!-- Building Architectural Data & Dynamic Window Components -->
+    <!-- Building Architectural Data, Abstract Persistence Layer & Dynamic Window Components -->
+    <script src="data/views.js"></script>
     <script src="data/windows.js"></script>
+    <script src="js/persistence.js"></script>
     <script src="js/window-store.js"></script>
     <script src="js/coordinate-service.js"></script>
     <script src="js/window-component.js"></script>
@@ -1766,7 +1768,14 @@
 
         window.addEventListener('DOMContentLoaded', function () {
             WindowComponent.autoMountAll();
-            setEastFacadeWindowOption('bigger');
+            const eastWindowIds = ['O9', 'O3'];
+            const hasModifiedEastWin = (typeof WindowStore.isModified === 'function')
+                && eastWindowIds.some(id => WindowStore.isModified(id));
+            if (!hasModifiedEastWin) {
+                setEastFacadeWindowOption('bigger');
+            } else {
+                updateEastFacadeDimensions();
+            }
 
             WindowStore.subscribe(function () {
                 updateEastFacadeDimensions();

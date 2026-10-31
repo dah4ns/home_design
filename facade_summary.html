@@ -656,29 +656,37 @@
         </div>
     </div>
 
-    <!-- Canonical Window & Facade Calculation Scripts -->
+    <!-- Canonical Default Seed Files, Abstract Persistence Layer & Facade Calculation Scripts -->
+    <script src="data/views.js"></script>
     <script src="data/windows.js"></script>
+    <script src="js/persistence.js"></script>
     <script src="js/window-store.js"></script>
     <script src="js/coordinate-service.js"></script>
     <script src="js/window-component.js"></script>
     <script>
         /**
          * Ensure default window options are active across all 4 facades
-         * regardless of any prior localStorage toggles in other tabs.
+         * for unmodified windows while preserving user-persisted changes.
          */
         function applyAllFacadeDefaults() {
+            const updateDefaultIfUnmodified = (id, patch) => {
+                if (typeof WindowStore.isModified === 'function' && WindowStore.isModified(id)) {
+                    return;
+                }
+                WindowStore.update(id, patch);
+            };
             // 1. North Facade defaults: Master Bedroom O15 (2100×2700, bigger), Kitchen O1 (2100×1400)
-            WindowStore.update('O15', {
+            updateDefaultIfUnmodified('O15', {
                 x: 8480,
                 width: 2100,
                 height: 2700,
                 sill: 3430,
                 views: ['north_facade']
             });
-            WindowStore.update('O11_1', {
+            updateDefaultIfUnmodified('O11_1', {
                 views: []
             });
-            WindowStore.update('O1', {
+            updateDefaultIfUnmodified('O1', {
                 x: 8480,
                 width: 2100,
                 height: 1400,
@@ -688,14 +696,14 @@
             });
 
             // 2. South Facade defaults: Bigger windows
-            WindowStore.update('O13a_2', {
+            updateDefaultIfUnmodified('O13a_2', {
                 x: 18410,
                 width: 2380,
                 height: 1950,
                 sill: 4180,
                 views: ['south_facade']
             });
-            WindowStore.update('O12', {
+            updateDefaultIfUnmodified('O12', {
                 sashes: 2,
                 pillarWidth: 90,
                 hasMullion: true,
@@ -704,7 +712,7 @@
                 sill: 3430,
                 views: ['south_facade']
             });
-            WindowStore.update('O10', {
+            updateDefaultIfUnmodified('O10', {
                 sashes: 3,
                 pillarWidth: 90,
                 hasMullion: true,
@@ -713,7 +721,7 @@
                 sill: 3430,
                 views: ['south_facade']
             });
-            WindowStore.update('O7', {
+            updateDefaultIfUnmodified('O7', {
                 x: 15180,
                 width: 2000,
                 height: 2800,
@@ -723,7 +731,7 @@
                 tiltTurnSashes: [],
                 views: ['south_facade']
             });
-            WindowStore.update('O5', {
+            updateDefaultIfUnmodified('O5', {
                 sashes: 3,
                 pillarWidth: 90,
                 hasMullion: true,
@@ -733,7 +741,7 @@
                 sill: 0,
                 views: ['south_facade']
             });
-            WindowStore.update('O4', {
+            updateDefaultIfUnmodified('O4', {
                 sashes: 3,
                 pillarWidth: 90,
                 hasMullion: true,
@@ -745,23 +753,23 @@
             });
 
             // 3. West Facade defaults: Clerestory O8a only (no O8b / O8c), O13b_1 & O13b_2 (2370×1950)
-            WindowStore.update('O8c', { views: [] });
-            WindowStore.update('O8b', { views: [] });
-            WindowStore.update('O8a', {
+            updateDefaultIfUnmodified('O8c', { views: [] });
+            updateDefaultIfUnmodified('O8b', { views: [] });
+            updateDefaultIfUnmodified('O8a', {
                 y: 15250,
                 width: 5500,
                 height: 740,
                 sill: 2060,
                 views: ['west_facade']
             });
-            WindowStore.update('O13b_1', {
+            updateDefaultIfUnmodified('O13b_1', {
                 y: 2990,
                 width: 2370,
                 height: 1950,
                 sill: 4180,
                 views: ['west_facade']
             });
-            WindowStore.update('O13b_2', {
+            updateDefaultIfUnmodified('O13b_2', {
                 y: 9010,
                 width: 2370,
                 height: 1950,
@@ -770,7 +778,7 @@
             });
 
             // 4. East Facade defaults: Bigger windows (O9 & O3: 2 sashes of 2500 mm)
-            WindowStore.update('O9', {
+            updateDefaultIfUnmodified('O9', {
                 sashes: 2,
                 pillarWidth: 90,
                 hasMullion: true,
@@ -779,7 +787,7 @@
                 sill: 3430,
                 views: ['east_facade']
             });
-            WindowStore.update('O3', {
+            updateDefaultIfUnmodified('O3', {
                 sashes: 2,
                 pillarWidth: 90,
                 hasMullion: true,

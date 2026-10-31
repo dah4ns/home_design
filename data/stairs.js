@@ -1,17 +1,64 @@
 /**
- * stairs.js
- * Browser-loadable and Node-compatible dataset for building staircases.
+ * stairs.js - Canonical Default Values for Building Staircases
+ * Separated per entity type. Runtime modifications are persisted via PersistenceService (js/persistence.js).
  */
 (function (root, factory) {
+    const data = factory();
     if (typeof module === 'object' && typeof module.exports === 'object') {
-        module.exports = factory();
+        module.exports = data;
     } else {
-        root.BUILDING_STAIRS_DATA = factory();
+        root.DEFAULT_STAIRS_DATA = data;
+        root.BUILDING_STAIRS_DATA = data;
     }
 }(typeof self !== 'undefined' ? self : this, function () {
+    const defaultStairs = {
+        "main_staircase": {
+            "id": "main_staircase",
+            "name": "Main Staircase (Schody)",
+            "room": "1.07 Komunikacja / Korytarz",
+            "viewId": "stairs_north_wall",
+            "flooring_height": 0,
+            "width": 1000,
+            "step_height": 175,
+            "step_length": 260,
+            "plank_height": 40,
+            "stair_slab": 193,
+            "x": 2549,
+            "global_x": 16361,
+            "total_risers": 19,
+            "turn_steps_count": 4,
+            "straight_risers_count": 15,
+            "straight_treads_count": 14,
+            "horizontal_gain": 3640,
+            "elevation_gain": 2625,
+            "step5_to_d3_distance": 2174,
+            "straight_flight_run": 3640,
+            "end_x": 7189,
+            "total_rise": 3325,
+            "top_floor_elevation": 3330,
+            "balustrade_height": 900,
+            "show_planks": true,
+            "line_thickness": 1.0,
+            "materials": {
+                "structure": "Reinforced concrete monolithic core (C20/25)",
+                "riserFinish": "Mineral plaster / paint matching interior wall",
+                "treadPlank": "Solid natural European oak (dąb naturalny) 40 mm",
+                "balustrade": "Brushed warm bronze / oak handrail h=90 cm",
+                "soffit": "Smooth gypsum plaster painted warm off-white"
+            },
+            "description": "Two-flight interior staircase with 4-step winder entry turn (1 straight + 3 winder) in 1000×1000 mm corner, followed by a 3,640 mm straight flight of 14 treads (260 mm) × 15 risers (175 mm) along the North Wall to finished +3,33 m."
+        }
+    };
+
     return {
+        "_role": "DEFAULT_SEED_VALUES",
+        "entityType": "stairs",
         "version": "1.0.0",
-        "description": "Canonical database of staircase structural objects and geometry specifications",
+        "metadata": {
+            "isDefaultSeed": true,
+            "persistenceNote": "This file defines the canonical DEFAULT staircase values. Runtime modifications are read from and saved to the active PersistenceService adapter (js/persistence.js)."
+        },
+        "description": "Canonical default database of staircase structural objects and geometry specifications",
         "coordinateSystem": {
             "units": "millimeters (mm)",
             "scale": 0.1,
@@ -19,43 +66,7 @@
             "viewOriginOnMap": 18910,
             "direction": "east"
         },
-        "stairs": {
-            "main_staircase": {
-                "id": "main_staircase",
-                "name": "Main Staircase (Schody)",
-                "room": "1.07 Komunikacja / Korytarz",
-                "viewId": "stairs_north_wall",
-                "flooring_height": 0,
-                "width": 1000,
-                "step_height": 175,
-                "step_length": 260,
-                "plank_height": 40,
-                "stair_slab": 193,
-                "x": 2549,
-                "global_x": 16361,
-                "total_risers": 19,
-                "turn_steps_count": 4,
-                "straight_risers_count": 15,
-                "straight_treads_count": 14,
-                "horizontal_gain": 3640,
-                "elevation_gain": 2625,
-                "step5_to_d3_distance": 2174,
-                "straight_flight_run": 3640,
-                "end_x": 7189,
-                "total_rise": 3325,
-                "top_floor_elevation": 3330,
-                "balustrade_height": 900,
-                "show_planks": true,
-                "line_thickness": 1.0,
-                "materials": {
-                    "structure": "Reinforced concrete monolithic core (C20/25)",
-                    "riserFinish": "Mineral plaster / paint matching interior wall",
-                    "treadPlank": "Solid natural European oak (dąb naturalny) 40 mm",
-                    "balustrade": "Brushed warm bronze / oak handrail h=90 cm",
-                    "soffit": "Smooth gypsum plaster painted warm off-white"
-                },
-                "description": "Two-flight interior staircase with 4-step winder entry turn (1 straight + 3 winder) in 1000×1000 mm corner, followed by a 3,640 mm straight flight of 14 treads (260 mm) × 15 risers (175 mm) along the North Wall to finished +3,33 m."
-            }
-        }
+        "defaultStairs": defaultStairs,
+        "stairs": defaultStairs
     };
 }));

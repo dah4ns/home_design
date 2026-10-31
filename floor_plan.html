@@ -735,6 +735,37 @@
                         <button class="ctrl-btn danger" onclick="deleteSelectedObject()">🗑️ Delete (Del)</button>
                     </div>
                 </div>
+
+                <!-- Editable form shown when a window/door opening is selected -->
+                <div id="opening-edit-panel" style="display: none; margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(148,163,184,0.18);">
+                    <div class="btn-grid">
+                        <div class="form-row">
+                            <label id="op-pos-label" for="op-start-input">Wall Start (mm)</label>
+                            <input type="number" class="form-input" id="op-start-input" step="10" oninput="onSelectedOpeningFieldChange()">
+                        </div>
+                        <div class="form-row">
+                            <label for="op-width-input">Width (mm)</label>
+                            <input type="number" class="form-input" id="op-width-input" step="10" oninput="onSelectedOpeningFieldChange()">
+                        </div>
+                    </div>
+                    <div class="btn-grid">
+                        <div class="form-row">
+                            <label for="op-height-input">Height (mm)</label>
+                            <input type="number" class="form-input" id="op-height-input" step="10" oninput="onSelectedOpeningFieldChange()">
+                        </div>
+                        <div class="form-row">
+                            <label for="op-sill-input">Sill hp (mm)</label>
+                            <input type="number" class="form-input" id="op-sill-input" step="10" oninput="onSelectedOpeningFieldChange()">
+                        </div>
+                    </div>
+                    <div class="btn-grid" style="margin-top: 6px;">
+                        <button class="ctrl-btn" onclick="shiftSelectedOpening(-100)">◀ -100 mm</button>
+                        <button class="ctrl-btn" onclick="shiftSelectedOpening(100)">+100 mm ▶</button>
+                    </div>
+                    <div style="margin-top: 6px;">
+                        <button class="ctrl-btn" style="width: 100%; justify-content: center;" onclick="resetSelectedOpeningToDefault()">↺ Reset Window to Default</button>
+                    </div>
+                </div>
             </div>
 
             <!-- 2. Placed Objects Summary List -->
@@ -771,9 +802,13 @@
         </aside>
     </main>
 
-    <!-- Canonical Window & Coordinate Scripts -->
+    <!-- Canonical Default Seed Files & Abstract Persistence Layer -->
+    <script src="data/views.js"></script>
     <script src="data/windows.js"></script>
+    <script src="data/sockets.js"></script>
+    <script src="js/persistence.js"></script>
     <script src="js/window-store.js"></script>
+    <script src="js/socket-store.js"></script>
     <script src="js/coordinate-service.js"></script>
 
     <script>
@@ -784,12 +819,11 @@
          * - Uses the exact millimeter coordinate system (X = East->West, Z = North->South)
          *   from building_3d.html and the 4 facade views.
          * - Exterior shell only (internalWalls array is pre-wired and empty for now).
-         * - Built-in extensible object layer (sockets, switches, floor boxes, RJ45)
-         *   supporting click-to-add, drag-to-move, wall-snapping, and localStorage.
+         * - All movable entities (windows/doors via WindowStore and electrical sockets
+         *   via SocketStore) are persisted through the abstract PersistenceService.
          * ============================================================================
          */
         const SVG_NS = 'http://www.w3.org/2000/svg';
-        const STORAGE_KEY_OBJECTS = 'home_design_floor_objects_v1';
 
         // Canonical world bounds in millimeters:
         // X: -285 mm (East outer face) to 20,705 mm (West outer face) -> 20,990 mm width
@@ -1038,33 +1072,44 @@
             }
         ];
 
-        // Object Type Definitions for the Extensible Object Layer (ProfiCAD / EN 60617 symbols)
-        const OBJECT_CATALOG = {
-            socket_pe: {
-                type: 'socket_pe',
-                name: 'Gniazdo ze stykiem ochronnym',
-                shortCode: 'G',
-                color: '#ef4444',
-                defaultHeightMm: 300,
-                snapToWall: true
-            },
-            socket_pe_shutter: {
-                type: 'socket_pe_shutter',
-                name: 'Gniazdo ze stykiem ochronnym i zaślepką',
-                shortCode: 'GZ',
-                color: '#ef4444',
-                defaultHeightMm: 300,
-                snapToWall: true
-            },
-            socket_floor: {
-                type: 'socket_floor',
-                name: 'Gniazdo podłogowe',
-                shortCode: 'GP',
-                color: '#ef4444',
-                defaultHeightMm: 0,
-                snapToWall: false
-            }
-        };
+        // Record canonical default geometry on each opening so offsets to WindowStore are exact
+        PLAN_OPENINGS.forEach(op => {
+            op.defaultStart = op.start;
+            op.defaultEnd = op.end;
+            op.defaultWidthMm = op.widthMm;
+            op.defaultHeightMm = op.heightMm;
+            op.defaultSillMm = op.sillMm;
+        });
+
+        // Object Type Definitions loaded from SocketStore (data/sockets.js)
+        const OBJECT_CATALOG = (typeof SocketStore !== 'undefined' && SocketStore.getCatalog)
+            ? SocketStore.getCatalog()
+            : {
+                socket_pe: {
+                    type: 'socket_pe',
+                    name: 'Gniazdo ze stykiem ochronnym',
+                    shortCode: 'G',
+                    color: '#ef4444',
+                    defaultHeightMm: 300,
+                    snapToWall: true
+                },
+                socket_pe_shutter: {
+                    type: 'socket_pe_shutter',
+                    name: 'Gniazdo ze stykiem ochronnym i zaślepką',
+                    shortCode: 'GZ',
+                    color: '#ef4444',
+                    defaultHeightMm: 300,
+                    snapToWall: true
+                },
+                socket_floor: {
+                    type: 'socket_floor',
+                    name: 'Gniazdo podłogowe',
+                    shortCode: 'GP',
+                    color: '#ef4444',
+                    defaultHeightMm: 0,
+                    snapToWall: false
+                }
+            };
 
         // Application State
         const planState = {
@@ -1127,42 +1172,66 @@
             return poly.map(([x, z]) => `${toSvgX(x)},${toSvgZ(z)}`).join(' ');
         }
 
-        function loadPlacedObjects() {
-            try {
-                const raw = localStorage.getItem(STORAGE_KEY_OBJECTS);
-                if (!raw) return;
-                const parsed = JSON.parse(raw);
-                if (Array.isArray(parsed)) {
-                    planState.placedObjects = parsed.map(o => {
-                        if (!o || typeof o !== 'object') return null;
-                        // Migrate legacy socket type keys if present
-                        if (o.type === 'socket_1' || o.type === 'socket_2') {
-                            o.type = 'socket_pe';
-                        } else if (o.type === 'socket_ip44') {
-                            o.type = 'socket_pe_shutter';
-                        } else if (o.type === 'floor_box') {
-                            o.type = 'socket_floor';
-                        }
-                        return o;
-                    }).filter(o =>
-                        o && typeof o.id === 'string' &&
-                        (o.floor === 'ground' || o.floor === 'first') &&
-                        OBJECT_CATALOG[o.type] &&
-                        typeof o.x === 'number' && typeof o.z === 'number'
-                    );
-                    planState.nextObjectSeq = planState.placedObjects.length + 1;
+        // Synchronize PLAN_OPENINGS positions and dimensions from WindowStore (backed by PersistenceService)
+        function syncOpeningsFromWindowStore() {
+            if (typeof WindowStore === 'undefined') return;
+            PLAN_OPENINGS.forEach(op => {
+                const win = WindowStore.get(op.id);
+                const defWin = WindowStore.getDefault ? WindowStore.getDefault(op.id) : null;
+                if (!win || !defWin) return;
+
+                const deltaPos = (op.axis === 'x')
+                    ? ((Number(win.x) || 0) - (Number(defWin.x) || 0))
+                    : ((Number(win.y) || 0) - (Number(defWin.y) || 0));
+
+                op.start = op.defaultStart + deltaPos;
+                op.widthMm = Number(win.width) || op.defaultWidthMm;
+                op.end = op.start + op.widthMm;
+                op.heightMm = Number(win.height) || op.defaultHeightMm;
+
+                if (win.sill !== undefined) {
+                    const rawSill = Number(win.sill);
+                    op.sillMm = (op.floor === 'first' && rawSill >= 3430) ? (rawSill - 3430) : rawSill;
                 }
-            } catch (e) {
-                // Ignore storage parse issues
+                if (win.sashes !== undefined) {
+                    op.sashes = Number(win.sashes) || op.sashes;
+                }
+                if (win.pillarWidth !== undefined) {
+                    op.pillarMm = Number(win.pillarWidth) || 0;
+                }
+            });
+        }
+
+        // Persist an opening's 2D plan position/dimensions back to WindowStore (and PersistenceService)
+        function persistOpeningToWindowStore(op) {
+            if (typeof WindowStore === 'undefined' || !op) return;
+            const defWin = WindowStore.getDefault ? WindowStore.getDefault(op.id) : WindowStore.get(op.id);
+            if (!defWin) return;
+
+            const deltaStart = Math.round(op.start - op.defaultStart);
+            const updates = {
+                width: Math.round(op.widthMm),
+                height: Math.round(op.heightMm),
+                sill: (op.floor === 'first') ? Math.round(op.sillMm + 3430) : Math.round(op.sillMm)
+            };
+            if (op.axis === 'x') {
+                updates.x = Math.round((Number(defWin.x) || 0) + deltaStart);
+            } else {
+                updates.y = Math.round((Number(defWin.y) || 0) + deltaStart);
             }
+            WindowStore.update(op.id, updates);
+        }
+
+        // Load and save placed sockets through SocketStore (backed by PersistenceService)
+        function loadPlacedObjects() {
+            if (typeof SocketStore === 'undefined') return;
+            planState.placedObjects = SocketStore.getAll();
+            planState.nextObjectSeq = planState.placedObjects.length + 1;
         }
 
         function savePlacedObjects() {
-            try {
-                localStorage.setItem(STORAGE_KEY_OBJECTS, JSON.stringify(planState.placedObjects));
-            } catch (e) {
-                // Ignore storage quota issues
-            }
+            if (typeof SocketStore === 'undefined') return;
+            planState.placedObjects = SocketStore.saveAll(planState.placedObjects);
         }
 
         // Snap a world coordinate (x, z) to nearest inner wall face if within thresholdMm
@@ -1403,6 +1472,12 @@
                 'stroke-width': isSelected ? 34 : 22,
                 class: 'opening-hit'
             });
+            hitRect.addEventListener('mousedown', (e) => {
+                if (planState.activeTool !== 'select' || e.button !== 0) return;
+                e.stopPropagation();
+                selectOpening(op.id);
+                startDraggingOpening(e, op);
+            });
             hitRect.addEventListener('click', (e) => {
                 if (planState.activeTool !== 'select') return;
                 e.stopPropagation();
@@ -1471,7 +1546,13 @@
 
                 const tagG = svgEl('g', {
                     transform: `translate(${tx}, ${tz})`,
-                    style: 'cursor: pointer;'
+                    style: 'cursor: grab;'
+                });
+                tagG.addEventListener('mousedown', (e) => {
+                    if (planState.activeTool !== 'select' || e.button !== 0) return;
+                    e.stopPropagation();
+                    selectOpening(op.id);
+                    startDraggingOpening(e, op);
                 });
                 tagG.addEventListener('click', (e) => {
                     if (planState.activeTool !== 'select') return;
@@ -1886,13 +1967,20 @@
             const subEl = document.getElementById('insp-subtitle');
             const kvListEl = document.getElementById('insp-kv-list');
             const editPanelEl = document.getElementById('object-edit-panel');
+            const opEditPanelEl = document.getElementById('opening-edit-panel');
 
             if (!planState.selectedItem) return;
 
             if (planState.selectedItem.kind === 'opening') {
                 const op = PLAN_OPENINGS.find(o => o.id === planState.selectedItem.id) || PLAN_OPENINGS[0];
                 editPanelEl.style.display = 'none';
-                pillEl.textContent = 'Window / Door';
+                if (opEditPanelEl) opEditPanelEl.style.display = 'block';
+
+                const isMod = (typeof WindowStore !== 'undefined' && typeof WindowStore.isModified === 'function')
+                    ? WindowStore.isModified(op.id)
+                    : (op.start !== op.defaultStart || op.widthMm !== op.defaultWidthMm || op.heightMm !== op.defaultHeightMm || op.sillMm !== op.defaultSillMm);
+
+                pillEl.textContent = isMod ? 'Window • Persisted' : 'Window • Default';
                 titleEl.textContent = `${op.name} — ${op.room}`;
                 subEl.textContent = `${op.facade} • ${op.floor === 'ground' ? 'Lower Floor (Parter)' : 'Upper Floor (Piętro)'}`;
 
@@ -1907,9 +1995,21 @@
                     ['Sill Height (hp)', `${op.sillMm.toLocaleString()} mm`],
                     ['Sashes / Pillars', op.sashes + (op.pillarMm ? ` panes (${op.pillarMm} mm pillars)` : ' sash(es)')],
                     ['200mm Jambs', [op.jambStart ? 'Start' : null, op.jambEnd ? 'End' : null].filter(Boolean).join(' & ') || 'Corner Join'],
+                    ['Persistence State', isMod ? 'Modified (LocalStorage)' : 'Default Seed Value'],
                     ['Notes', op.specs]
                 ];
                 populateKvRows(kvListEl, rows);
+
+                const axisLabelEl = document.getElementById('op-axis-label');
+                const startInputEl = document.getElementById('op-start-input');
+                const widthInputEl = document.getElementById('op-width-input');
+                const heightInputEl = document.getElementById('op-height-input');
+                const sillInputEl = document.getElementById('op-sill-input');
+                if (axisLabelEl) axisLabelEl.textContent = op.axis.toUpperCase();
+                if (startInputEl) startInputEl.value = String(op.start);
+                if (widthInputEl) widthInputEl.value = String(op.widthMm);
+                if (heightInputEl) heightInputEl.value = String(op.heightMm);
+                if (sillInputEl) sillInputEl.value = String(op.sillMm);
             } else {
                 const obj = planState.placedObjects.find(o => o.id === planState.selectedItem.id);
                 if (!obj) {
@@ -1917,6 +2017,7 @@
                     return;
                 }
                 const def = OBJECT_CATALOG[obj.type] || OBJECT_CATALOG.socket_pe;
+                if (opEditPanelEl) opEditPanelEl.style.display = 'none';
                 editPanelEl.style.display = 'block';
                 pillEl.textContent = def.shortCode;
                 titleEl.textContent = `${obj.label} — ${def.name}`;
@@ -1938,6 +2039,59 @@
                 document.getElementById('obj-h-input').value = String(obj.heightMm);
                 document.getElementById('obj-rot-input').value = String(obj.rotation || 0);
             }
+        }
+
+        function onSelectedOpeningFieldChange() {
+            if (!planState.selectedItem || planState.selectedItem.kind !== 'opening') return;
+            const op = PLAN_OPENINGS.find(o => o.id === planState.selectedItem.id);
+            if (!op) return;
+
+            const startVal = parseInt(document.getElementById('op-start-input').value, 10);
+            const widthVal = parseInt(document.getElementById('op-width-input').value, 10);
+            const heightVal = parseInt(document.getElementById('op-height-input').value, 10);
+            const sillVal = parseInt(document.getElementById('op-sill-input').value, 10);
+
+            if (!Number.isNaN(startVal)) op.start = startVal;
+            if (!Number.isNaN(widthVal) && widthVal >= 200) op.widthMm = widthVal;
+            if (!Number.isNaN(heightVal) && heightVal >= 200) op.heightMm = heightVal;
+            if (!Number.isNaN(sillVal) && sillVal >= 0) op.sillMm = sillVal;
+            op.end = op.start + op.widthMm;
+
+            persistOpeningToWindowStore(op);
+            updateInspectorUI();
+            renderAllPlans();
+        }
+
+        function shiftSelectedOpening(deltaMm) {
+            if (!planState.selectedItem || planState.selectedItem.kind !== 'opening') return;
+            const op = PLAN_OPENINGS.find(o => o.id === planState.selectedItem.id);
+            if (!op) return;
+
+            op.start = Math.round((op.start + deltaMm) / 10) * 10;
+            op.end = op.start + op.widthMm;
+
+            persistOpeningToWindowStore(op);
+            updateInspectorUI();
+            renderAllPlans();
+        }
+
+        function resetSelectedOpeningToDefault() {
+            if (!planState.selectedItem || planState.selectedItem.kind !== 'opening') return;
+            const op = PLAN_OPENINGS.find(o => o.id === planState.selectedItem.id);
+            if (!op) return;
+
+            if (typeof WindowStore !== 'undefined' && typeof WindowStore.resetWindowToDefault === 'function') {
+                WindowStore.resetWindowToDefault(op.id);
+            } else {
+                op.start = op.defaultStart;
+                op.widthMm = op.defaultWidthMm;
+                op.heightMm = op.defaultHeightMm;
+                op.sillMm = op.defaultSillMm;
+                op.end = op.start + op.widthMm;
+            }
+            syncOpeningsFromWindowStore();
+            updateInspectorUI();
+            renderAllPlans();
         }
 
         function populateKvRows(container, rows) {
@@ -2041,13 +2195,27 @@
             selectOpening('O4');
         }
 
-        // Dragging an existing placed object in real time
+        // Dragging an existing placed object or wall opening in real time
         let draggingObjectState = null;
+        let draggingOpeningState = null;
 
         function startDraggingPlacedObject(e, obj) {
             const svg = document.getElementById('svg-' + obj.floor);
             if (!svg) return;
             draggingObjectState = { obj, svg };
+        }
+
+        function startDraggingOpening(e, op) {
+            const svg = document.getElementById('svg-' + op.floor);
+            if (!svg) return;
+            const worldPt = clientToWorldMm(svg, e.clientX, e.clientY);
+            const startCoord = op.axis === 'x' ? worldPt.x : worldPt.z;
+            draggingOpeningState = {
+                op,
+                svg,
+                initialOpStart: op.start,
+                initialCursorCoord: startCoord
+            };
         }
 
         // Toolbar Controls
@@ -2230,6 +2398,18 @@
             });
 
             window.addEventListener('mousemove', (e) => {
+                if (draggingOpeningState) {
+                    const { op, svg, initialOpStart, initialCursorCoord } = draggingOpeningState;
+                    const worldPt = clientToWorldMm(svg, e.clientX, e.clientY);
+                    const curCoord = op.axis === 'x' ? worldPt.x : worldPt.z;
+                    const deltaMm = Math.round((curCoord - initialCursorCoord) / 50) * 50;
+                    op.start = initialOpStart + deltaMm;
+                    op.end = op.start + op.widthMm;
+                    updateInspectorUI();
+                    renderAllPlans();
+                    return;
+                }
+
                 if (draggingObjectState) {
                     const { obj, svg } = draggingObjectState;
                     const def = OBJECT_CATALOG[obj.type] || OBJECT_CATALOG.socket_pe;
@@ -2268,6 +2448,11 @@
             });
 
             window.addEventListener('mouseup', () => {
+                if (draggingOpeningState) {
+                    persistOpeningToWindowStore(draggingOpeningState.op);
+                    updateInspectorUI();
+                    draggingOpeningState = null;
+                }
                 if (draggingObjectState) {
                     savePlacedObjects();
                     draggingObjectState = null;
@@ -2299,10 +2484,26 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            syncOpeningsFromWindowStore();
             loadPlacedObjects();
             initViewportInteractions();
             selectOpening('O4');
             renderAllPlans();
+
+            if (typeof WindowStore !== 'undefined' && typeof WindowStore.subscribe === 'function') {
+                WindowStore.subscribe(() => {
+                    syncOpeningsFromWindowStore();
+                    updateInspectorUI();
+                    renderAllPlans();
+                });
+            }
+            if (typeof SocketStore !== 'undefined' && typeof SocketStore.subscribe === 'function') {
+                SocketStore.subscribe(() => {
+                    loadPlacedObjects();
+                    updateInspectorUI();
+                    renderAllPlans();
+                });
+            }
         });
     </script>
 </body>

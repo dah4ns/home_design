@@ -660,9 +660,11 @@
         </div>
     </div>
 
-    <!-- Canonical Window & Coordinate Scripts -->
+    <!-- Canonical Default Seed Files, Abstract Persistence Layer & Stores -->
+    <script src="data/views.js"></script>
     <script src="data/windows.js"></script>
     <script src="data/textures.js"></script>
+    <script src="js/persistence.js"></script>
     <script src="js/window-store.js"></script>
     <script src="js/coordinate-service.js"></script>
 
@@ -680,32 +682,38 @@
          * ============================================================================
          */
 
-        // 1. Apply canonical default options across all 4 facades
+        // 1. Apply canonical default options across all 4 facades only for unmodified windows
         function applyDefaultFacadeOptions() {
             if (typeof WindowStore === 'undefined') return;
+            const updateDefaultIfUnmodified = (id, patch) => {
+                if (typeof WindowStore.isModified === 'function' && WindowStore.isModified(id)) {
+                    return;
+                }
+                WindowStore.update(id, patch);
+            };
             // North defaults
-            WindowStore.update('O15', { x: 8480, width: 2100, height: 2700, sill: 3430, views: ['north_facade'] });
-            WindowStore.update('O11_1', { views: [] });
-            WindowStore.update('O1', { x: 8480, width: 2100, height: 1400, sill: 1100, sashWidths: [1050, 1050], views: ['north_facade', 'kitchen_north_wall'] });
+            updateDefaultIfUnmodified('O15', { x: 8480, width: 2100, height: 2700, sill: 3430, views: ['north_facade'] });
+            updateDefaultIfUnmodified('O11_1', { views: [] });
+            updateDefaultIfUnmodified('O1', { x: 8480, width: 2100, height: 1400, sill: 1100, sashWidths: [1050, 1050], views: ['north_facade', 'kitchen_north_wall'] });
 
             // South defaults (Bigger windows)
-            WindowStore.update('O13a_2', { x: 18410, width: 2380, height: 1950, sill: 4180, views: ['south_facade'] });
-            WindowStore.update('O12', { sashes: 2, pillarWidth: 90, hasMullion: true, width: 4000, height: 2700, sill: 3430, views: ['south_facade'] });
-            WindowStore.update('O10', { sashes: 3, pillarWidth: 90, hasMullion: true, width: 6300, height: 2700, sill: 3430, views: ['south_facade'] });
-            WindowStore.update('O7', { x: 15180, width: 2000, height: 2800, sill: 0, sashes: 1, hasMullion: false, tiltTurnSashes: [], views: ['south_facade'] });
-            WindowStore.update('O5', { sashes: 3, pillarWidth: 90, hasMullion: true, slidingArrows: false, width: 6480, height: 2800, sill: 0, views: ['south_facade'] });
-            WindowStore.update('O4', { sashes: 3, pillarWidth: 90, hasMullion: true, slidingArrows: false, width: 6300, height: 2800, sill: 0, views: ['south_facade'] });
+            updateDefaultIfUnmodified('O13a_2', { x: 18410, width: 2380, height: 1950, sill: 4180, views: ['south_facade'] });
+            updateDefaultIfUnmodified('O12', { sashes: 2, pillarWidth: 90, hasMullion: true, width: 4000, height: 2700, sill: 3430, views: ['south_facade'] });
+            updateDefaultIfUnmodified('O10', { sashes: 3, pillarWidth: 90, hasMullion: true, width: 6300, height: 2700, sill: 3430, views: ['south_facade'] });
+            updateDefaultIfUnmodified('O7', { x: 15180, width: 2000, height: 2800, sill: 0, sashes: 1, hasMullion: false, tiltTurnSashes: [], views: ['south_facade'] });
+            updateDefaultIfUnmodified('O5', { sashes: 3, pillarWidth: 90, hasMullion: true, slidingArrows: false, width: 6480, height: 2800, sill: 0, views: ['south_facade'] });
+            updateDefaultIfUnmodified('O4', { sashes: 3, pillarWidth: 90, hasMullion: true, slidingArrows: false, width: 6300, height: 2800, sill: 0, views: ['south_facade'] });
 
             // West defaults (O8a only)
-            WindowStore.update('O8c', { views: [] });
-            WindowStore.update('O8b', { views: [] });
-            WindowStore.update('O8a', { y: 15250, width: 5500, height: 740, sill: 2060, views: ['west_facade'] });
-            WindowStore.update('O13b_1', { y: 2990, width: 2370, height: 1950, sill: 4180, views: ['west_facade'] });
-            WindowStore.update('O13b_2', { y: 9010, width: 2370, height: 1950, sill: 4180, views: ['west_facade'] });
+            updateDefaultIfUnmodified('O8c', { views: [] });
+            updateDefaultIfUnmodified('O8b', { views: [] });
+            updateDefaultIfUnmodified('O8a', { y: 15250, width: 5500, height: 740, sill: 2060, views: ['west_facade'] });
+            updateDefaultIfUnmodified('O13b_1', { y: 2990, width: 2370, height: 1950, sill: 4180, views: ['west_facade'] });
+            updateDefaultIfUnmodified('O13b_2', { y: 9010, width: 2370, height: 1950, sill: 4180, views: ['west_facade'] });
 
             // East defaults (Bigger windows: O9 & O3 = 2 sashes of 2,500 mm + 90 mm pillar)
-            WindowStore.update('O9', { sashes: 2, pillarWidth: 90, hasMullion: true, width: 5090, height: 2700, sill: 3430, views: ['east_facade'] });
-            WindowStore.update('O3', { sashes: 2, pillarWidth: 90, hasMullion: true, width: 5090, height: 2800, sill: 0, views: ['east_facade'] });
+            updateDefaultIfUnmodified('O9', { sashes: 2, pillarWidth: 90, hasMullion: true, width: 5090, height: 2700, sill: 3430, views: ['east_facade'] });
+            updateDefaultIfUnmodified('O3', { sashes: 2, pillarWidth: 90, hasMullion: true, width: 5090, height: 2800, sill: 0, views: ['east_facade'] });
         }
 
         // ============================================================================
@@ -1088,6 +1096,50 @@
                 specs: '2,810 × 2,700 mm (hp = 0 mm) • 900 mm door D1 + 90 mm pillar + 1,820 mm fixed window on covered terrace'
             }
         ];
+
+        // Capture default 3D coordinates and synchronize with WindowStore (PersistenceService)
+        OPENINGS_3D.forEach(op => {
+            op.defaultX1 = op.x1;
+            op.defaultX2 = op.x2;
+            op.defaultZ1 = op.z1;
+            op.defaultZ2 = op.z2;
+            op.defaultY1 = op.y1;
+            op.defaultY2 = op.y2;
+            op.defaultWidthMm = op.widthMm;
+            op.defaultHeightMm = op.heightMm;
+            op.defaultSillMm = op.sillMm;
+        });
+
+        function syncOpenings3DFromWindowStore() {
+            if (typeof WindowStore === 'undefined') return;
+            OPENINGS_3D.forEach(op => {
+                const win = WindowStore.get(op.id);
+                const defWin = (typeof WindowStore.getDefault === 'function' ? WindowStore.getDefault(op.id) : null) || win;
+                if (!win || !defWin) return;
+
+                const newWidth = (typeof win.width === 'number') ? win.width : op.defaultWidthMm;
+                const newHeight = (typeof win.height === 'number') ? win.height : op.defaultHeightMm;
+                const deltaSill = (typeof win.sill === 'number' && typeof defWin.sill === 'number') ? (win.sill - defWin.sill) : 0;
+
+                if (op.wallNormal[2] !== 0) {
+                    const deltaX = (typeof win.x === 'number' && typeof defWin.x === 'number') ? (win.x - defWin.x) : 0;
+                    op.x1 = op.defaultX1 + deltaX;
+                    op.x2 = op.defaultX2 + deltaX + (newWidth - op.defaultWidthMm);
+                } else {
+                    const deltaZ = (typeof win.y === 'number' && typeof defWin.y === 'number') ? (win.y - defWin.y) : 0;
+                    op.z1 = op.defaultZ1 + deltaZ;
+                    op.z2 = op.defaultZ2 + deltaZ + (newWidth - op.defaultWidthMm);
+                }
+
+                op.widthMm = newWidth;
+                op.heightMm = newHeight;
+                op.y1 = op.defaultY1 + deltaSill;
+                op.y2 = op.y1 + newHeight;
+                op.sillMm = Math.max(0, op.defaultSillMm + deltaSill);
+                if (typeof win.sashes === 'number') op.sashes = win.sashes;
+                if (typeof win.pillarWidth === 'number') op.pillarMm = win.pillarWidth;
+            });
+        }
 
         // ============================================================================
         // 3. WEBGL SHADERS & PROCEDURAL ARCHITECTURAL TEXTURES
@@ -3104,6 +3156,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             applyDefaultFacadeOptions();
+            syncOpenings3DFromWindowStore();
 
             const canvas = document.getElementById('webgl-canvas');
             gl = canvas.getContext('webgl', { antialias: true, alpha: false });
@@ -3119,6 +3172,17 @@
             updateInspectorPanel(state.selectedOpeningId);
             setupMouseAndKeyboardControls();
             setCameraPreset('ne', document.getElementById('cam-ne'));
+
+            if (typeof WindowStore !== 'undefined' && typeof WindowStore.subscribe === 'function') {
+                WindowStore.subscribe(() => {
+                    syncOpenings3DFromWindowStore();
+                    if (gl) {
+                        buildSceneGeometry(gl);
+                        updateInspectorPanel(state.selectedOpeningId);
+                        renderFrame();
+                    }
+                });
+            }
         });
     </script>
 </body>

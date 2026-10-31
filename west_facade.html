@@ -1306,8 +1306,10 @@
         </div>
     </div>
 
-    <!-- Building Architectural Data & Dynamic Window Components -->
+    <!-- Building Architectural Data, Abstract Persistence Layer & Dynamic Window Components -->
+    <script src="data/views.js"></script>
     <script src="data/windows.js"></script>
+    <script src="js/persistence.js"></script>
     <script src="js/window-store.js"></script>
     <script src="js/coordinate-service.js"></script>
     <script src="js/window-component.js"></script>
@@ -1891,17 +1893,12 @@
         }
 
         window.addEventListener('DOMContentLoaded', function () {
-            ['O8c', 'O8b', 'O8a'].forEach(function (id) {
-                const w = WindowStore.get(id);
-                if (w && (w.height !== 740 || w.sill !== 2060)) {
-                    WindowStore.update(id, { height: 740, sill: 2060 });
-                }
-            });
-            const o8a = WindowStore.get('O8a');
-            if (o8a && (o8a.y !== 15250 || o8a.width !== 5500)) {
-                WindowStore.update('O8a', { y: 15250, width: 5500 });
+            const westWindowIds = ['O8c', 'O8b', 'O8a'];
+            const hasModifiedWestWin = (typeof WindowStore.isModified === 'function')
+                && westWindowIds.some(id => WindowStore.isModified(id));
+            if (!hasModifiedWestWin) {
+                setClerestoryO8Option('no_o8b_o8c');
             }
-            setClerestoryO8Option('no_o8b_o8c');
             WindowComponent.autoMountAll();
             updateWestFacadeDimensions();
 

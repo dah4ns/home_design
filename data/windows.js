@@ -1,20 +1,27 @@
 /**
- * windows.js - Universal Module Definition for Building Views and Windows Database
+ * windows.js - Canonical Default Values for Building Window & Door Openings
  * Enables local execution under file:// protocol without CORS restriction,
  * while remaining fully compatible with Node.js and ES modules.
+ * Runtime modifications are read from and saved to PersistenceService (js/persistence.js).
  * Version: 2.0.0 (2D Plan Coordinate System: X = East→West, Y = North→South)
  */
 (function (root, factory) {
+    const db = factory();
     if (typeof module === 'object' && typeof module.exports === 'object') {
-        module.exports = factory();
+        module.exports = db;
     } else {
-        root.WINDOW_DATABASE = factory();
+        root.DEFAULT_WINDOWS_DATA = db;
+        root.WINDOW_DATABASE = db;
     }
 }(typeof self !== 'undefined' ? self : this, function () {
-    return {
+    const db = {
+        "_role": "DEFAULT_SEED_VALUES",
+        "entityType": "windows",
         "metadata": {
             "version": "2.0.0",
-            "description": "Canonical 2D (X, Y) database of building views and window openings with multi-view spatial orientation",
+            "isDefaultSeed": true,
+            "persistenceNote": "This file defines the canonical DEFAULT window and door opening values. Runtime user modifications are read from and saved to the active PersistenceService adapter (js/persistence.js). Staircase defaults live in data/stairs.js and socket defaults live in data/sockets.js.",
+            "description": "Canonical 2D (X, Y) default seed database of building window openings with multi-view spatial orientation",
             "coordinateSystem": {
                 "origin": "Intersection of Axis 6 (X = 0 mm) and Axis A (Y = 0 mm) near the North-East corner",
                 "xAxis": "East-West axis (<east - west>): X = 0 mm at Axis 6 (270 mm right of lower-level wall start at X = -270 mm), increasing Westward (0 to 20,505 / 21,000 mm)",
@@ -23,100 +30,7 @@
                 "units": "millimeters (mm)"
             }
         },
-        "views": {
-            "north_facade": {
-                "id": "north_facade",
-                "name": "North Facade Elevation",
-                "axis": "x",
-                "origin": { "x": 0, "y": 0 },
-                "positionOnMap": 0,
-                "leftEdge": 0,
-                "floor": "all",
-                "direction": "west",
-                "length": 20505,
-                "scale": 0.1,
-                "wall": "north",
-                "side": "exterior",
-                "description": "Exterior architectural elevation looking South from the garden. Origin (0,0) is Point 0 / Axis 6 (beginning of upper balcony; 270 mm right of the ground-floor wall start at X = -270 mm); X grows Westward (left to right)."
-            },
-            "kitchen_north_wall": {
-                "id": "kitchen_north_wall",
-                "name": "Kitchen North Wall Elevation",
-                "axis": "x",
-                "origin": { "x": 11880, "y": 0 },
-                "positionOnMap": 11880,
-                "leftEdge": 11880,
-                "floor": "ground",
-                "direction": "east",
-                "length": 5400,
-                "scale": 0.1,
-                "wall": "north",
-                "side": "interior",
-                "description": "Interior kitchen back wall elevation looking North. Left edge is at X = 11,880 mm (12,150 mm from ground-floor wall start); X decreases Eastward (left to right)."
-            },
-            "stairs_north_wall": {
-                "id": "stairs_north_wall",
-                "name": "Stairs North Wall Elevation",
-                "axis": "x",
-                "origin": { "x": 18910, "y": 0 },
-                "positionOnMap": 18910,
-                "leftEdge": 18910,
-                "floor": "all",
-                "direction": "east",
-                "length": 9000,
-                "scale": 0.1,
-                "wall": "north",
-                "side": "interior",
-                "floorY": 640,
-                "description": "Interior staircase cross-section looking North towards the North wall. Left edge is at X = 18,910 mm; X decreases Eastward (left to right)."
-            },
-            "south_facade": {
-                "id": "south_facade",
-                "name": "South Facade Elevation",
-                "axis": "x",
-                "origin": { "x": 20990, "y": 21130 },
-                "positionOnMap": 20990,
-                "leftEdge": 20990,
-                "floor": "all",
-                "direction": "east",
-                "length": 20990,
-                "scale": 0.1,
-                "wall": "south",
-                "side": "exterior",
-                "description": "Exterior architectural elevation looking North from the southern garden. Left edge is the South-West corner (X = 20,990 mm, Y = 21,130 mm); X decreases Eastward (left to right)."
-            },
-            "west_facade": {
-                "id": "west_facade",
-                "name": "West Facade Elevation",
-                "axis": "y",
-                "origin": { "x": 20505, "y": 0 },
-                "positionOnMap": 0,
-                "leftEdge": 0,
-                "floor": "all",
-                "direction": "south",
-                "length": 21130,
-                "scale": 0.1,
-                "wall": "west",
-                "side": "exterior",
-                "description": "Exterior architectural elevation looking East towards the West facade. Point 0 / Axis A (Y = 0 mm) is 290 mm to the right of the lower-level wall start (Y = -290 mm); Y grows Southward (left to right) to 21,130 mm (total lower-level wall length = 21,420 mm)."
-            },
-            "east_facade": {
-                "id": "east_facade",
-                "name": "East Facade Elevation",
-                "axis": "y",
-                "origin": { "x": 0, "y": 21125 },
-                "positionOnMap": 21125,
-                "leftEdge": 21125,
-                "floor": "all",
-                "direction": "north",
-                "length": 21415,
-                "scale": 0.1,
-                "wall": "east",
-                "side": "exterior",
-                "description": "Exterior architectural elevation looking West towards the East facade. View direction is South to North (left to right). Point 0 / Axis A (Y = 0 mm) is 290 mm from the right edge of the wall (at Screen X = 21,125 mm; total wall length = 21,415 mm)."
-            }
-        },
-        "windows": {
+        "defaultWindows": {
             "O1": {
                 "id": "O1",
                 "name": "O1",
@@ -811,37 +725,8 @@
                     "sillInterior": "Bedroom threshold at +3.33 m"
                 }
             }
-        },
-        "stairs": {
-            "main_staircase": {
-                "id": "main_staircase",
-                "name": "Main Staircase (Schody)",
-                "room": "1.07 Komunikacja / Korytarz",
-                "viewId": "stairs_north_wall",
-                "flooring_height": 0,
-                "width": 1000,
-                "step_height": 175,
-                "step_length": 260,
-                "plank_height": 40,
-                "stair_slab": 193,
-                "x": 2549,
-                "global_x": 16361,
-                "total_risers": 19,
-                "turn_steps_count": 4,
-                "straight_risers_count": 15,
-                "straight_treads_count": 14,
-                "horizontal_gain": 3640,
-                "elevation_gain": 2625,
-                "step5_to_d3_distance": 2174,
-                "straight_flight_run": 3640,
-                "end_x": 7189,
-                "total_rise": 3325,
-                "top_floor_elevation": 3330,
-                "balustrade_height": 900,
-                "show_planks": true,
-                "line_thickness": 1.0,
-                "description": "Two-flight interior staircase with 4-step winder entry turn (1 straight + 3 winder) in 1000×1000 mm corner, followed by a 3,640 mm straight flight of 14 treads (260 mm) × 15 risers (175 mm) along the North Wall to finished +3,33 m."
-            }
         }
     };
+    db.windows = db.defaultWindows;
+    return db;
 }));

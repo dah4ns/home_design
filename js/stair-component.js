@@ -1,102 +1,214 @@
 /**
  * stair-component.js
  * Reusable SVG Staircase Component & Object Store with dynamic geometric calculation,
- * parametric reactive data-binding, and customizable architectural attributes.
+ * parametric reactive data-binding, and persistence via PersistenceService (js/persistence.js).
  */
 (function (root, factory) {
     if (typeof module === 'object' && typeof module.exports === 'object') {
+        const PersistenceService = require('./persistence.js');
         const stairsData = require('../data/stairs.js');
-        module.exports = factory(stairsData);
+        module.exports = factory(PersistenceService, stairsData);
     } else {
-        root.StairComponent = factory(root.BUILDING_STAIRS_DATA || (root.BUILDING_WINDOWS_DATA && root.BUILDING_WINDOWS_DATA.stairs));
+        root.StairComponent = factory(
+            root.PersistenceService,
+            root.DEFAULT_STAIRS_DATA || root.BUILDING_STAIRS_DATA
+        );
     }
-}(typeof self !== 'undefined' ? self : this, function (initialData) {
-
-    // Internal In-Memory Store
-    const _stairs = {};
+}(typeof self !== 'undefined' ? self : this, function (PersistenceService, initialData) {
+    const ENTITY_STAIRS = 'stairs';
     const _listeners = [];
 
-    // Load initial data if provided
-    const sourceData = (initialData && initialData.stairs) ? initialData.stairs : (initialData || {});
+    const FALLBACK_MAIN_STAIRCASE = {
+        id: 'main_staircase',
+        name: 'Main Staircase (Schody)',
+        room: '1.07 Komunikacja / Korytarz',
+        viewId: 'stairs_north_wall',
+        flooring_height: 0,
+        width: 1000,
+        step_height: 175,
+        step_length: 260,
+        plank_height: 40,
+        stair_slab: 193,
+        x: 2549,
+        global_x: 16361,
+        total_risers: 19,
+        turn_steps_count: 4,
+        straight_risers_count: 15,
+        straight_treads_count: 14,
+        horizontal_gain: 3640,
+        straight_flight_run: 3640,
+        elevation_gain: 2625,
+        step5_to_d3_distance: 2174,
+        d3_left_x: 5723,
+        end_x: 7189,
+        total_rise: 3325,
+        top_floor_elevation: 3330,
+        balustrade_height: 900,
+        show_planks: true,
+        line_thickness: 1.0
+    };
+
+    const sourceData = (initialData && (initialData.defaultStairs || initialData.stairs))
+        ? (initialData.defaultStairs || initialData.stairs)
+        : (initialData || {});
+
+    const defaultStairsMap = {};
     for (const key in sourceData) {
         if (Object.prototype.hasOwnProperty.call(sourceData, key)) {
-            _stairs[key] = JSON.parse(JSON.stringify(sourceData[key]));
+            defaultStairsMap[key] = JSON.parse(JSON.stringify(sourceData[key]));
         }
     }
-
-    // Default main staircase fallback if empty
-    if (!_stairs['main_staircase']) {
-        _stairs['main_staircase'] = {
-            id: 'main_staircase',
-            name: 'Main Staircase (Schody)',
-            room: '1.07 Komunikacja / Korytarz',
-            viewId: 'stairs_north_wall',
-            flooring_height: 0,
-            width: 1000,
-            step_height: 175,
-            step_length: 260,
-            plank_height: 40,
-            stair_slab: 193,
-            x: 2549,
-            global_x: 16361,
-            total_risers: 19,
-            turn_steps_count: 4,
-            straight_risers_count: 15,
-            straight_treads_count: 14,
-            horizontal_gain: 3640,
-            straight_flight_run: 3640,
-            elevation_gain: 2625,
-            step5_to_d3_distance: 2174,
-            d3_left_x: 5723,
-            end_x: 7189,
-            total_rise: 3325,
-            top_floor_elevation: 3330,
-            balustrade_height: 900,
-            show_planks: true,
-            line_thickness: 1.0
-        };
+    if (!defaultStairsMap['main_staircase']) {
+        defaultStairsMap['main_staircase'] = JSON.parse(JSON.stringify(FALLBACK_MAIN_STAIRCASE));
     }
+
+    function recalculateStairObject(s) {
+        if (!s) return s;
+
+        s.turn_steps_count = 4;
+        s.total_risers = (s.total_risers === 18) ? 18 : 19;
+        s.straight_risers_count = s.total_risers - s.turn_steps_count;
+        s.straight_treads_count = s.straight_risers_count - 1;
+
+        if (s.total_risers === 18) {
+            s.step_height = (typeof s.step_height === 'number' && s.step_height !== 175) ? s.step_height : 185;
+            s.total_rise = (typeof s.total_rise === 'number' && s.total_rise !== 3325) ? s.total_rise : 3330;
+            s.description = "Two-flight interior staircase with 4-step winder entry turn (1 straight + 3 winder) in 1000×1000 mm corner, followed by a straight flight of 13 treads × 14 risers (185 mm) along the North Wall to finished +3,33 m.";
+        } else {
+            s.step_height = (typeof s.step_height === 'number' && s.step_height !== 185) ? s.step_height : 175;
+            s.total_rise = (typeof s.total_rise === 'number' && s.total_rise !== 3330) ? s.total_rise : 3325;
+            s.description = "Two-flight interior staircase with 4-step winder entry turn (1 straight + 3 winder) in 1000×1000 mm corner, followed by a 3,640 mm straight flight of 14 treads (260 mm) × 15 risers (175 mm) along the North Wall to finished +3,33 m.";
+        }
+
+        if (s._use_end_x && typeof s.end_x !== 'undefined' && typeof s.x !== 'undefined') {
+            s.horizontal_gain = s.end_x - s.x - (s.width || 1000);
+            s.straight_flight_run = s.horizontal_gain;
+            s.step_length = Math.round((s.horizontal_gain / s.straight_treads_count) * 100) / 100;
+        } else if (typeof s.step_length !== 'undefined') {
+            s.horizontal_gain = s.straight_treads_count * s.step_length;
+            s.straight_flight_run = s.horizontal_gain;
+            s.end_x = s.x + (s.width || 1000) + s.horizontal_gain;
+        } else if (typeof s.end_x !== 'undefined') {
+            s.horizontal_gain = s.end_x - s.x - (s.width || 1000);
+            s.straight_flight_run = s.horizontal_gain;
+            s.step_length = Math.round((s.horizontal_gain / s.straight_treads_count) * 100) / 100;
+        } else if (typeof s.horizontal_gain !== 'undefined') {
+            s.straight_flight_run = s.horizontal_gain;
+            s.step_length = Math.round((s.horizontal_gain / s.straight_treads_count) * 100) / 100;
+            s.end_x = s.x + (s.width || 1000) + s.horizontal_gain;
+        }
+
+        s.top_floor_elevation = (s.flooring_height || 0) + (s.total_rise || 3330);
+        s.elevation_gain = s.straight_risers_count * s.step_height;
+        s.step5_to_d3_distance = Math.round((s.d3_left_x || 5723) - (s.x + (s.width || 1000)));
+        return s;
+    }
+
+    if (!PersistenceService) {
+        throw new Error('StairComponent requires PersistenceService (js/persistence.js) to be loaded first.');
+    }
+
+    PersistenceService.registerType(ENTITY_STAIRS, {
+        collectionKind: 'map',
+        defaults: defaultStairsMap,
+        filePath: 'data/stairs.json',
+        normalizeItem: recalculateStairObject,
+        metadata: (initialData && initialData.metadata) || {
+            isDefaultSeed: false,
+            entityType: ENTITY_STAIRS
+        }
+    });
+
+    PersistenceService.subscribe(ENTITY_STAIRS, function (id, item, _all, meta) {
+        if (meta && (meta.externalSync || meta.adapterChanged)) {
+            StairComponent._notify(id || 'main_staircase', item || StairComponent.get('main_staircase'));
+            StairComponent.autoMountAll();
+        }
+    });
 
     const StairComponent = {
         /**
-         * Get a staircase object by ID
+         * Get a staircase object by ID (active persisted state or default if unmodified)
          * @param {string} id
          * @returns {object|null}
          */
         get: function (id = 'main_staircase') {
-            if (!_stairs[id]) return null;
-            return JSON.parse(JSON.stringify(_stairs[id]));
+            return PersistenceService.getById(ENTITY_STAIRS, id);
         },
 
         /**
-         * Get all staircases
+         * Get canonical DEFAULT staircase object by ID (from `data/stairs.js`)
+         * @param {string} id
+         * @returns {object|null}
+         */
+        getDefault: function (id = 'main_staircase') {
+            return PersistenceService.getDefaultById(ENTITY_STAIRS, id);
+        },
+
+        /**
+         * Get all canonical DEFAULT staircases
+         * @returns {object}
+         */
+        getDefaults: function () {
+            return PersistenceService.getDefaults(ENTITY_STAIRS) || {};
+        },
+
+        /**
+         * Check if a staircase has persisted modifications
+         * @param {string} id
+         * @returns {boolean}
+         */
+        isModified: function (id = 'main_staircase') {
+            return PersistenceService.isModified(ENTITY_STAIRS, id);
+        },
+
+        /**
+         * Get all active staircases
          * @returns {object}
          */
         getAll: function () {
-            return JSON.parse(JSON.stringify(_stairs));
+            return PersistenceService.getAll(ENTITY_STAIRS) || {};
         },
 
         /**
-         * Update staircase properties and notify subscribers
+         * Update staircase properties, persist via PersistenceService, and notify subscribers
          * @param {string} id
          * @param {object} updates
          * @returns {object}
          */
         update: function (id, updates) {
-            if (!_stairs[id]) {
-                _stairs[id] = { id: id };
-            }
+            const current = this.get(id) || { id: id };
+            const merged = { ...current, ...updates, id: id };
             if (updates.step_length !== undefined && updates.end_x === undefined) {
-                delete _stairs[id]._use_end_x;
+                delete merged._use_end_x;
             }
             if (updates.end_x !== undefined) {
-                _stairs[id]._use_end_x = true;
+                merged._use_end_x = true;
             }
-            Object.assign(_stairs[id], updates);
-            this.recalculate(id);
-            this._notify(id, _stairs[id]);
+            recalculateStairObject(merged);
+            const saved = PersistenceService.upsert(ENTITY_STAIRS, id, merged);
+            this._notify(id, saved);
             this.autoMountAll();
-            return this.get(id);
+            return saved;
+        },
+
+        /**
+         * Reset staircases back to canonical defaults in `data/stairs.js`
+         */
+        resetToDefaults: function () {
+            PersistenceService.resetToDefaults(ENTITY_STAIRS);
+            const restored = this.get('main_staircase');
+            this._notify('main_staircase', restored);
+            this.autoMountAll();
+            return restored;
+        },
+
+        /**
+         * Export current staircases state as formatted JSON matching `data/stairs.json`
+         * @returns {string}
+         */
+        toJSON: function () {
+            return PersistenceService.exportJSON(ENTITY_STAIRS);
         },
 
         /**
@@ -124,45 +236,10 @@
          * @param {string} id
          */
         recalculate: function (id = 'main_staircase') {
-            const s = _stairs[id];
-            if (!s) return;
-
-            s.turn_steps_count = 4;
-            s.total_risers = (s.total_risers === 18) ? 18 : 19;
-            s.straight_risers_count = s.total_risers - s.turn_steps_count;
-            s.straight_treads_count = s.straight_risers_count - 1;
-
-            if (s.total_risers === 18) {
-                s.step_height = (typeof s.step_height === 'number' && s.step_height !== 175) ? s.step_height : 185;
-                s.total_rise = (typeof s.total_rise === 'number' && s.total_rise !== 3325) ? s.total_rise : 3330;
-                s.description = "Two-flight interior staircase with 4-step winder entry turn (1 straight + 3 winder) in 1000×1000 mm corner, followed by a straight flight of 13 treads × 14 risers (185 mm) along the North Wall to finished +3,33 m.";
-            } else {
-                s.step_height = (typeof s.step_height === 'number' && s.step_height !== 185) ? s.step_height : 175;
-                s.total_rise = (typeof s.total_rise === 'number' && s.total_rise !== 3330) ? s.total_rise : 3325;
-                s.description = "Two-flight interior staircase with 4-step winder entry turn (1 straight + 3 winder) in 1000×1000 mm corner, followed by a 3,640 mm straight flight of 14 treads (260 mm) × 15 risers (175 mm) along the North Wall to finished +3,33 m.";
-            }
-
-            if (s._use_end_x && typeof s.end_x !== 'undefined' && typeof s.x !== 'undefined') {
-                s.horizontal_gain = s.end_x - s.x - (s.width || 1000);
-                s.straight_flight_run = s.horizontal_gain;
-                s.step_length = Math.round((s.horizontal_gain / s.straight_treads_count) * 100) / 100;
-            } else if (typeof s.step_length !== 'undefined') {
-                s.horizontal_gain = s.straight_treads_count * s.step_length;
-                s.straight_flight_run = s.horizontal_gain;
-                s.end_x = s.x + (s.width || 1000) + s.horizontal_gain;
-            } else if (typeof s.end_x !== 'undefined') {
-                s.horizontal_gain = s.end_x - s.x - (s.width || 1000);
-                s.straight_flight_run = s.horizontal_gain;
-                s.step_length = Math.round((s.horizontal_gain / s.straight_treads_count) * 100) / 100;
-            } else if (typeof s.horizontal_gain !== 'undefined') {
-                s.straight_flight_run = s.horizontal_gain;
-                s.step_length = Math.round((s.horizontal_gain / s.straight_treads_count) * 100) / 100;
-                s.end_x = s.x + (s.width || 1000) + s.horizontal_gain;
-            }
-
-            s.top_floor_elevation = s.flooring_height + (s.total_rise || 3330);
-            s.elevation_gain = s.straight_risers_count * s.step_height; // Elevation gain after turn (15 risers * 175 mm or 14 risers * 185 mm)
-            s.step5_to_d3_distance = Math.round((s.d3_left_x || 5723) - (s.x + (s.width || 1000))); // Distance from Step 5 start to D3 left edge
+            const current = this.get(id);
+            if (!current) return;
+            const recalc = recalculateStairObject(current);
+            PersistenceService.upsert(ENTITY_STAIRS, id, recalc);
         },
 
         /**

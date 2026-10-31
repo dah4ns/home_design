@@ -2050,8 +2050,10 @@
             card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
     </script>
-    <!-- Building Architectural Data & Dynamic Window Components -->
+    <!-- Building Architectural Data, Abstract Persistence Layer & Dynamic Window Components -->
+    <script src="data/views.js"></script>
     <script src="data/windows.js"></script>
+    <script src="js/persistence.js"></script>
     <script src="js/window-store.js"></script>
     <script src="js/coordinate-service.js"></script>
     <script src="js/window-component.js"></script>
@@ -2282,8 +2284,12 @@
         const updateNorthFacadeO1Dimensions = updateNorthFacadeDimensions;
 
         window.addEventListener('DOMContentLoaded', function() {
-            setMasterBedroomWindowOption('bigger');
-            setKitchenWindowO1Option(2100, [1050, 1050]);
+            if (!WindowStore.isModified || (!WindowStore.isModified('O15') && !WindowStore.isModified('O11_1'))) {
+                setMasterBedroomWindowOption('bigger');
+            }
+            if (!WindowStore.isModified || !WindowStore.isModified('O1')) {
+                setKitchenWindowO1Option(2100, [1050, 1050]);
+            }
             WindowComponent.autoMountAll();
             updateNorthFacadeDimensions();
 

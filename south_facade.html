@@ -1331,8 +1331,10 @@
         </div>
     </div>
 
-    <!-- Building Architectural Data & Dynamic Window Components -->
+    <!-- Building Architectural Data, Abstract Persistence Layer & Dynamic Window Components -->
+    <script src="data/views.js"></script>
     <script src="data/windows.js"></script>
+    <script src="js/persistence.js"></script>
     <script src="js/window-store.js"></script>
     <script src="js/coordinate-service.js"></script>
     <script src="js/window-component.js"></script>
@@ -1824,7 +1826,14 @@
 
         window.addEventListener('DOMContentLoaded', function () {
             WindowComponent.autoMountAll();
-            setSouthFacadeWindowOption('bigger');
+            const southWindowIds = ['O13a_2', 'O12', 'O10', 'O7', 'O5', 'O4'];
+            const hasModifiedSouthWin = (typeof WindowStore.isModified === 'function')
+                && southWindowIds.some(id => WindowStore.isModified(id));
+            if (!hasModifiedSouthWin) {
+                setSouthFacadeWindowOption('bigger');
+            } else {
+                updateSouthFacadeDimensions();
+            }
 
             WindowStore.subscribe(function () {
                 updateSouthFacadeDimensions();

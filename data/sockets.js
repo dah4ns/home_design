@@ -1,0 +1,64 @@
+/**
+ * sockets.js - Canonical Default Values and Symbol Catalog for Electrical Sockets
+ * Separated per entity type. Runtime additions and movements are persisted via PersistenceService (js/persistence.js).
+ */
+(function (root, factory) {
+    const data = factory();
+    if (typeof module === 'object' && typeof module.exports === 'object') {
+        module.exports = data;
+    } else {
+        root.DEFAULT_SOCKETS_DATA = data;
+        root.BUILDING_SOCKETS_DATA = data;
+    }
+}(typeof self !== 'undefined' ? self : this, function () {
+    const catalog = {
+        "socket_pe": {
+            "type": "socket_pe",
+            "name": "Gniazdo ze stykiem ochronnym",
+            "shortCode": "G",
+            "color": "#ef4444",
+            "defaultHeightMm": 300,
+            "snapToWall": true,
+            "standard": "PN-EN 60617 / ProfiCAD 528"
+        },
+        "socket_pe_shutter": {
+            "type": "socket_pe_shutter",
+            "name": "Gniazdo ze stykiem ochronnym i zaślepką",
+            "shortCode": "GZ",
+            "color": "#ef4444",
+            "defaultHeightMm": 300,
+            "snapToWall": true,
+            "standard": "PN-EN 60617 / ProfiCAD 1589 (IP44)"
+        },
+        "socket_floor": {
+            "type": "socket_floor",
+            "name": "Gniazdo podłogowe",
+            "shortCode": "GP",
+            "color": "#ef4444",
+            "defaultHeightMm": 0,
+            "snapToWall": false,
+            "standard": "PN-EN 60617 Floor Box"
+        }
+    };
+
+    const defaultSockets = [];
+
+    return {
+        "_role": "DEFAULT_SEED_VALUES",
+        "entityType": "sockets",
+        "version": "1.0.0",
+        "metadata": {
+            "isDefaultSeed": true,
+            "persistenceNote": "This file defines the canonical DEFAULT electrical socket catalog and initial seed placements. Runtime additions and movements are read from and saved to the active PersistenceService adapter (js/persistence.js).",
+            "coordinateSystem": {
+                "xAxis": "East-West axis in mm (-285 to 20,705 mm)",
+                "zAxis": "North-South axis in mm (-290 to 21,130 mm)",
+                "heightMm": "Mounting height above finished floor in mm (e.g. 300 mm for wall sockets, 0 mm for floor sockets)",
+                "rotation": "Orientation angle in degrees (0 = North, 90 = East, 180 = South, 270 = West)"
+            }
+        },
+        "catalog": catalog,
+        "defaultSockets": defaultSockets,
+        "sockets": defaultSockets
+    };
+}));
