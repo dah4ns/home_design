@@ -111,7 +111,7 @@
     PersistenceService.registerType(ENTITY_STAIRS, {
         collectionKind: 'map',
         defaults: defaultStairsMap,
-        filePath: 'data/stairs.json',
+        filePath: 'data/stairs.js',
         normalizeItem: recalculateStairObject,
         metadata: (initialData && initialData.metadata) || {
             isDefaultSeed: false,

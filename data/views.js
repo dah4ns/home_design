@@ -111,7 +111,14 @@
         "metadata": {
             "version": "2.0.0",
             "isDefaultSeed": true,
-            "persistenceNote": "This file defines the canonical DEFAULT architectural view definitions. Runtime modifications are persisted via PersistenceService (js/persistence.js)."
+            "persistenceNote": "This file defines the canonical DEFAULT architectural view definitions. Runtime modifications are persisted via PersistenceService (js/persistence.js).",
+            "coordinateSystem": {
+                "origin": "Intersection of Axis 6 (X = 0 mm) and Axis A (Y = 0 mm) near the North-East corner",
+                "xAxis": "East-West axis (<east - west>): X = 0 mm at Axis 6 (270 mm right of lower-level wall start at X = -270 mm), increasing Westward (0 to 20,505 / 21,000 mm)",
+                "yAxis": "North-South axis (<north - south>): Y = 0 mm at Axis A (290 mm right of lower-level wall start at Y = -290 mm), increasing Southward (0 to 21,130 mm; total lower-level wall = 21,420 mm)",
+                "verticalAxis": "Positive sill / elevation extends upward from finished ground floor datum (+0.00 m = 0 mm)",
+                "units": "millimeters (mm)"
+            }
         },
         "defaultViews": defaultViews,
         "views": defaultViews

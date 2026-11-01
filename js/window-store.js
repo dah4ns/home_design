@@ -61,7 +61,7 @@
     PersistenceService.registerType(ENTITY_WINDOWS, {
         collectionKind: 'map',
         defaults: defaultWindows,
-        filePath: 'data/windows.json',
+        filePath: 'data/windows.js',
         legacyStorageKey: LEGACY_KEY_WINDOWS,
         metadata: (initialWindowsData && initialWindowsData.metadata) || {
             isDefaultSeed: false,
@@ -72,7 +72,7 @@
     PersistenceService.registerType(ENTITY_VIEWS, {
         collectionKind: 'map',
         defaults: defaultViews,
-        filePath: 'data/views.json',
+        filePath: 'data/views.js',
         legacyStorageKey: LEGACY_KEY_VIEWS,
         metadata: (initialViewsData && initialViewsData.metadata) || {
             isDefaultSeed: false,

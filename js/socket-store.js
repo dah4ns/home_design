@@ -92,7 +92,7 @@
     PersistenceService.registerType(ENTITY_TYPE, {
         collectionKind: 'list',
         defaults: DEFAULT_SOCKETS,
-        filePath: 'data/sockets.json',
+        filePath: 'data/sockets.js',
         legacyStorageKey: LEGACY_STORAGE_KEY,
         normalizeItem: normalizeSocketItem,
         metadata: (initialSocketsData && initialSocketsData.metadata) || {

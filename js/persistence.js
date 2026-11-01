@@ -466,7 +466,7 @@
                 entityType,
                 collectionKind,
                 defaults,
-                filePath: config.filePath || ('data/' + entityType + '.json'),
+                filePath: config.filePath || ('data/' + entityType + '.js'),
                 legacyStorageKey: config.legacyStorageKey || null,
                 normalizeItem: config.normalizeItem || null,
                 metadata: deepClone(config.metadata || {}),

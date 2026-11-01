@@ -262,8 +262,8 @@ console.log(coords.localX_mm); // 1700 mm (or 1800 mm at default position)
 
 ## 8. Verified File Manifest
 
-- [data/windows.json](file:///Users/dhans/jetski_workshop/data/windows.json): Canonical JSON database with `"views"` (`north_facade` and `kitchen_north_wall`) and `"windows"`.
-- [data/windows.js](file:///Users/dhans/jetski_workshop/data/windows.js): Universal Module Definition loader compatible with Node.js and local `file://` protocol.
+- [data/windows.js](file:///Users/dhans/jetski_workshop/data/windows.js): Canonical default window & door database (UMD module compatible with Node.js and local `file://` protocol).
+- [data/views.js](file:///Users/dhans/jetski_workshop/data/views.js): Canonical default architectural view definitions (`north_facade`, `kitchen_north_wall`, etc.).
 - [js/coordinate-service.js](file:///Users/dhans/jetski_workshop/js/coordinate-service.js): Direction-aware coordinate projection engine.
 - [js/window-store.js](file:///Users/dhans/jetski_workshop/js/window-store.js): Reactive store with view management, window updates, and `shiftWindow(id, deltaX)`.
 - [js/window-component.js](file:///Users/dhans/jetski_workshop/js/window-component.js): Reusable SVG component supporting exterior and interior kitchen elevation modes.
