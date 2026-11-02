@@ -619,7 +619,7 @@
                     </div>
                     <div class="legend-item">
                         <span class="swatch" id="legend-lower-swatch" style="background: #383d47;"></span>
-                        <span><strong>Parter (+0.00 to +2.80m):</strong> <span id="legend-lower-desc">Graphite Clinker Brick (137.18 m² net, 6 corners)</span></span>
+                        <span><strong>Parter (+0.00 to +2.80m):</strong> <span id="legend-lower-desc">Graphite Clinker Brick (138.33 m² net, 6 corners)</span></span>
                     </div>
                     <div class="legend-item">
                         <span class="swatch" id="legend-upper-swatch" style="background: #cbb497;"></span>
@@ -723,7 +723,7 @@
         //   X = -285 mm : East-most outer wall plane (Central 2-story block & South-East wall)
         //   X =    0 mm : Axis 6 / Point 0 on North Facade (beginning of 6,315 mm upper balcony)
         //   X = 6315 mm : End of upper North-East covered terrace / start of 14a & recessed O14b wall
-        //   X = 11740 mm: Step between North recessed Kitchen/Gabinet wall and protruding Garage
+        //   X = 11715 mm: Step between North recessed Kitchen/Gabinet wall and protruding Garage (8,990 mm)
         //   X = 14695 mm: Step between South-East recessed living wall and South-West protruding wing (O7 / O6b / O6a)
         //   X = 20705 mm: West-most outer wall plane (20,990 mm total width from X = -285 mm)
         //
@@ -779,7 +779,7 @@
                 textureKey: 'brick',
                 uvScale: 0.8,
                 swatchStyle: 'background: #383d47;',
-                legendDesc: 'Graphite Clinker Brick (137.18 m² net, 6 corners)'
+                legendDesc: 'Graphite Clinker Brick (138.33 m² net, 6 corners)'
             },
             gloom_long: {
                 id: 'gloom_long',
@@ -787,7 +787,7 @@
                 textureKey: 'brickGloomLong',
                 uvScale: 1.28, // ~0.78m per tile repeat -> 56 courses in 2,800 mm height
                 swatchStyle: 'background: #cfc8c0; background-image: url("textures/gloom_long.jpg"); background-size: cover;',
-                legendDesc: 'Gloom Long 380×40 mm Brick (137.18 m² net, 56 courses, 6 corners)'
+                legendDesc: 'Gloom Long 380×40 mm Brick (138.33 m² net, 56 courses, 6 corners)'
             },
             moso_bamboo_rhombos: {
                 id: 'moso_bamboo_rhombos',
@@ -795,7 +795,7 @@
                 textureKey: 'mosoBambooRhombos',
                 uvScale: { u: 1 / 0.72, v: 1 / 2.80 }, // 720 mm width (12 × 60 mm strips) × 2,800 mm full-floor single-plank height
                 swatchStyle: 'background: #674a34; background-image: url("textures/moso_bamboo_rhombos.png"); background-size: cover;',
-                legendDesc: 'MOSO Bamboo Rhombos (double) — 50 mm strip + 10 mm gap (137.18 m² net)'
+                legendDesc: 'MOSO Bamboo Rhombos (double) — 50 mm strip + 10 mm gap (138.33 m² net)'
             },
             thermory_ash_natural: {
                 id: 'thermory_ash_natural',
@@ -803,7 +803,7 @@
                 textureKey: 'thermoryAshNatural',
                 uvScale: { u: 1 / 0.824, v: 1 / 2.80 }, // 824 mm width (8 × 103 mm pitch: 95 mm plank + 8 mm gap) × 2,800 mm full-floor height
                 swatchStyle: 'background: #7d5a3e; background-image: url("textures/thermory_thermo_ash.png"); background-size: cover;',
-                legendDesc: 'Thermory Thermo Ash (natural) — 95 mm plank + 8 mm gap (137.18 m² net)'
+                legendDesc: 'Thermory Thermo Ash (natural) — 95 mm plank + 8 mm gap (138.33 m² net)'
             },
             thermory_ash_ebony: {
                 id: 'thermory_ash_ebony',
@@ -811,7 +811,7 @@
                 textureKey: 'thermoryAshEbony',
                 uvScale: { u: 1 / 0.824, v: 1 / 2.80 }, // 824 mm width (8 × 103 mm pitch: 95 mm plank + 8 mm gap) × 2,800 mm full-floor height
                 swatchStyle: 'background: #262422;',
-                legendDesc: 'Thermory Thermo Ash (ebony) — 95 mm plank + 8 mm gap (137.18 m² net)'
+                legendDesc: 'Thermory Thermo Ash (ebony) — 95 mm plank + 8 mm gap (138.33 m² net)'
             }
         };
 
@@ -2143,7 +2143,7 @@
             siteBuilder.addBoxMm(-7000, -140, -6500, 27500, -20, 27500, [0.22, 0.31, 0.23], 1.0, 0);
             // Plinth / foundation strip (-20 to 0 mm)
             siteBuilder.addBoxMm(-285, -20, 2790, 20705, 0, 11580, [0.42, 0.46, 0.52], 1.0, 0);
-            siteBuilder.addBoxMm(11740, -20, -290, 20705, 0, 2790, [0.42, 0.46, 0.52], 1.0, 0);
+            siteBuilder.addBoxMm(11715, -20, -290, 20705, 0, 2790, [0.42, 0.46, 0.52], 1.0, 0);
             siteBuilder.addBoxMm(14695, -20, 11580, 20705, 0, 21130, [0.42, 0.46, 0.52], 1.0, 0);
 
             // West Driveway to Garage Door Z2 & Walkway to Entrance Z1
@@ -2177,37 +2177,37 @@
             if (showGround) {
                 const groundOpenings = OPENINGS_3D.filter(o => o.floor === 'ground');
 
-                // 1. North Recessed Wall (Gabinet O2 & Kitchen O1: X = -285..11740, Z = 2790)
+                // 1. North Recessed Wall (Gabinet O2 & Kitchen O1: X = -285..11715, Z = 2790)
                 buildWallWithOpenings({
                     axis: 'x', fixedCoord: 2790, inwardSign: 1,
-                    spanStart: -285, spanEnd: 11740, yBottom: 0, yTop: 2800, thickness: 240,
+                    spanStart: -285, spanEnd: 11715, yBottom: 0, yTop: 2800, thickness: 240,
                     openings: groundOpenings.filter(o => o.facade === 'North Facade'),
                     wallBuilder: brickBuilder, wallColor: [1, 1, 1], uvScale: brickUv,
                     jambBuilder, glassBuilder, garageBuilder, edges, yOffset: 0
                 });
-                addEdgeBoxMm(edges, -285, 0, 2790, 11740, 2800, 2790, [0.12, 0.15, 0.20], 0);
+                addEdgeBoxMm(edges, -285, 0, 2790, 11715, 2800, 2790, [0.12, 0.15, 0.20], 0);
 
-                // 2. Garage East Step Wall (Right Recessed Wing on East Facade: Z = -290..2790, X = 11740)
+                // 2. Garage East Step Wall (Right Recessed Wing on East Facade: Z = -290..2790, X = 11715)
                 buildWallWithOpenings({
-                    axis: 'z', fixedCoord: 11740, inwardSign: 1,
+                    axis: 'z', fixedCoord: 11715, inwardSign: 1,
                     spanStart: -290, spanEnd: 2790, yBottom: 0, yTop: 2800, thickness: 240,
                     openings: [],
                     wallBuilder: brickBuilder, wallColor: [0.92, 0.92, 0.94], uvScale: brickUv,
                     jambBuilder, glassBuilder, garageBuilder, edges, yOffset: 0
                 });
                 // Technical vent box on Garage East wall (matching east_facade.html)
-                jambBuilder.addBoxMm(11710, 2390, 220, 11740, 2630, 600, [0.78, 0.82, 0.87], 1.0, 0);
-                addEdgeBoxMm(edges, 11740, 0, -290, 11740, 2800, 2790, [0.12, 0.15, 0.20], 0);
+                jambBuilder.addBoxMm(11685, 2390, 220, 11715, 2630, 600, [0.78, 0.82, 0.87], 1.0, 0);
+                addEdgeBoxMm(edges, 11715, 0, -290, 11715, 2800, 2790, [0.12, 0.15, 0.20], 0);
 
-                // 3. Garage North Protruding Blind Wall (X = 11740..20705, Z = -290)
+                // 3. Garage North Protruding Blind Wall (X = 11715..20705, Z = -290; 8,990 mm)
                 buildWallWithOpenings({
                     axis: 'x', fixedCoord: -290, inwardSign: 1,
-                    spanStart: 11740, spanEnd: 20705, yBottom: 0, yTop: 2800, thickness: 240,
+                    spanStart: 11715, spanEnd: 20705, yBottom: 0, yTop: 2800, thickness: 240,
                     openings: [],
                     wallBuilder: brickBuilder, wallColor: [1, 1, 1], uvScale: brickUv,
                     jambBuilder, glassBuilder, garageBuilder, edges, yOffset: 0
                 });
-                addEdgeBoxMm(edges, 11740, 0, -290, 20705, 2800, -290, [0.12, 0.15, 0.20], 0);
+                addEdgeBoxMm(edges, 11715, 0, -290, 20705, 2800, -290, [0.12, 0.15, 0.20], 0);
 
                 // 4. West Wall North Segment (Garage Door Z2: Z = -290..8560, X = 20705)
                 buildWallWithOpenings({
@@ -2294,9 +2294,9 @@
                 fasciaBuilder.addBoxMm(-385, 2800, 2690, 20805, 3430, 11680, [1, 1, 1], 1.1, 0);
                 addEdgeBoxMm(edges, -385, 2800, 2690, 20805, 3430, 11680, [0.06, 0.08, 0.07], 0);
                 // Protruding North-West Garage block cornice & flat roof
-                fasciaBuilder.addBoxMm(11640, 2800, -390, 20805, 3430, 2790, [1, 1, 1], 1.1, 0);
-                siteBuilder.addBoxMm(11840, 3430, -190, 20605, 3445, 2790, ralCol, 1.0, 0);
-                addEdgeBoxMm(edges, 11640, 2800, -390, 20805, 3430, 2790, [0.06, 0.08, 0.07], 0);
+                fasciaBuilder.addBoxMm(11615, 2800, -390, 20805, 3430, 2790, [1, 1, 1], 1.1, 0);
+                siteBuilder.addBoxMm(11815, 3430, -190, 20605, 3445, 2790, ralCol, 1.0, 0);
+                addEdgeBoxMm(edges, 11615, 2800, -390, 20805, 3430, 2790, [0.06, 0.08, 0.07], 0);
                 // Protruding South-West Gym block cornice & flat roof (extends 1,960 mm East of X = 14,695 mm wall -> X = 12,735 mm)
                 fasciaBuilder.addBoxMm(12735, 2800, 11580, 20805, 3430, 21230, [1, 1, 1], 1.1, 0);
                 siteBuilder.addBoxMm(12935, 3430, 11580, 20605, 3445, 21030, ralCol, 1.0, 0);
@@ -2692,7 +2692,7 @@
             // 1. 3D Overall Facade Dimension Chains on Ground Plane
             if (state.layers.dims) {
                 const dimLines = [
-                    { p1: [-0.285, 0.05, -1.6], p2: [20.705, 0.05, -1.6], label: '🧭 NORTH: 20,590 mm Parter / 20,505 mm Piętro', color: '#38bdf8' },
+                    { p1: [-0.285, 0.05, -1.6], p2: [20.705, 0.05, -1.6], label: '🧭 NORTH: 21,000 mm Parter / 20,505 mm Piętro', color: '#38bdf8' },
                     { p1: [-0.285, 0.05, 22.5], p2: [20.705, 0.05, 22.5], label: '☀️ SOUTH: 20,990 mm (14,980 Recessed + 6,010 SW Wing)', color: '#fbbf24' },
                     { p1: [12.735, 3.46, 21.23], p2: [14.695, 3.46, 21.23], label: '↔ 1,960 mm Wing Roof Overhang (East)', color: '#f97316' },
                     { p1: [22.1, 0.05, -0.29], p2: [22.1, 0.05, 21.13], label: '🚪 WEST: 21,420 mm Parter / 8,790 mm Piętro', color: '#c084fc' },

@@ -653,12 +653,12 @@
 
         FACADE_WALL_SPECS: {
             north_facade: {
-                lowerLengthMm: 20590,
+                lowerLengthMm: 21000,
                 lowerExcludedMm: 0,
                 lowerExcludedNote: '',
                 lowerBottomMm: 0,
                 lowerTopMm: 2800,
-                lowerMaterial: 'Clinker Brick (12,010 + 8,580 mm)',
+                lowerMaterial: 'Clinker Brick (12,010 + 8,990 mm)',
                 upperLengthMm: 20505,
                 upperExcludedMm: 0,
                 upperExcludedNote: '',
