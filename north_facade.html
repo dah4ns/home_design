@@ -2050,16 +2050,23 @@
             card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
     </script>
-    <!-- Building Architectural Data, Abstract Persistence Layer & Dynamic Window Components -->
+    <!-- Building Architectural Data, 3D B-Rep Wall Model, Abstract Persistence Layer & Dynamic Window Components -->
     <script src="data/views.js"></script>
     <script src="data/windows.js"></script>
+    <script src="data/walls.js"></script>
     <script src="js/persistence.js"></script>
     <script src="js/window-store.js"></script>
     <script src="js/coordinate-service.js"></script>
+    <script src="js/wall-service.js"></script>
     <script src="js/window-component.js"></script>
     <script src="js/window-editor-modal.js"></script>
     <script>
         function updateNorthFacadeDimensions() {
+            // Dynamically project 3D B-Rep North-facing wall faces (outerLoop + holes with dot(n, lookDir) < 0)
+            if (typeof WallService !== 'undefined' && typeof WallService.syncNorthFacadeSVG === 'function') {
+                WallService.syncNorthFacadeSVG(document);
+            }
+
             const o1 = WindowStore.get('O1');
             const o2 = WindowStore.get('O2');
 
@@ -2289,6 +2296,9 @@
             }
             if (!WindowStore.isModified || !WindowStore.isModified('O1')) {
                 setKitchenWindowO1Option(2100, [1050, 1050]);
+            }
+            if (typeof WallService !== 'undefined' && typeof WallService.syncNorthFacadeSVG === 'function') {
+                WallService.syncNorthFacadeSVG(document);
             }
             WindowComponent.autoMountAll();
             updateNorthFacadeDimensions();

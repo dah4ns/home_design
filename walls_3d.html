@@ -1,0 +1,1762 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- TODO(security): Enforce strict Content-Security-Policy and X-Frame-Options headers at the web server level when deployed -->
+    <title>3D Wall B-Rep Explorer — Interactive (X, Y, Z) Spatial Visualizer</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #070b14;
+            --bg-panel: rgba(15, 23, 42, 0.92);
+            --bg-card: rgba(30, 41, 59, 0.78);
+            --border-subtle: rgba(148, 163, 184, 0.22);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-blue: #38bdf8;
+            --accent-amber: #f59e0b;
+            --accent-emerald: #10b981;
+            --accent-rose: #f43f5e;
+            --axis-x: #ef4444;
+            --axis-y: #10b981;
+            --axis-z: #38bdf8;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .page-shell {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* Top Header Bar */
+        .top-header {
+            background: rgba(15, 23, 42, 0.96);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 10px 18px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            z-index: 40;
+        }
+
+        .nav-bar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 11px;
+            border-radius: 7px;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            background: rgba(30, 41, 59, 0.8);
+            color: #e2e8f0;
+            transition: all 0.16s ease;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-1px);
+            border-color: var(--accent-blue);
+            color: #ffffff;
+        }
+
+        .header-title-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .header-title-group h1 {
+            font-size: 16px;
+            font-weight: 800;
+            margin: 0;
+            color: #f8fafc;
+            letter-spacing: -0.01em;
+        }
+
+        .tech-pill {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background: rgba(56, 189, 248, 0.14);
+            color: #7dd3fc;
+            border: 1px solid rgba(56, 189, 248, 0.32);
+        }
+
+        .axis-legend-pills {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .axis-pill {
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid;
+        }
+
+        .axis-pill.x {
+            color: #fca5a5;
+            background: rgba(239, 68, 68, 0.14);
+            border-color: rgba(239, 68, 68, 0.4);
+        }
+
+        .axis-pill.y {
+            color: #6ee7b7;
+            background: rgba(16, 185, 129, 0.14);
+            border-color: rgba(16, 185, 129, 0.4);
+        }
+
+        .axis-pill.z {
+            color: #7dd3fc;
+            background: rgba(56, 189, 248, 0.14);
+            border-color: rgba(56, 189, 248, 0.4);
+        }
+
+        /* Main Workspace */
+        .viewport-wrapper {
+            position: relative;
+            flex: 1;
+            width: 100%;
+            height: calc(100vh - 54px);
+            background: radial-gradient(circle at 50% 40%, #17223b 0%, #070b14 100%);
+            overflow: hidden;
+            user-select: none;
+        }
+
+        #webgl-canvas,
+        #hud-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        #webgl-canvas {
+            cursor: grab;
+            z-index: 1;
+        }
+
+        #webgl-canvas:active {
+            cursor: grabbing;
+        }
+
+        #hud-canvas {
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        /* Left Dock: Multi-Select Wall Dropdown & Display Options */
+        .left-dock {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            width: 350px;
+            max-height: calc(100vh - 84px);
+            overflow-y: auto;
+            background: var(--bg-panel);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 14px;
+            z-index: 20;
+            box-shadow: 0 14px 36px rgba(0, 0, 0, 0.55);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Right Dock: Selected Wall(s) 3D B-Rep Inspector */
+        .right-dock {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 390px;
+            max-height: calc(100vh - 84px);
+            overflow-y: auto;
+            background: var(--bg-panel);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 14px;
+            z-index: 20;
+            box-shadow: 0 14px 36px rgba(0, 0, 0, 0.55);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .dock-section {
+            border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+            padding-bottom: 12px;
+        }
+
+        .dock-section:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .dock-title {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #94a3b8;
+            margin: 0 0 8px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Multi-Select Dropdown Component */
+        .multiselect-box {
+            position: relative;
+            width: 100%;
+        }
+
+        .multiselect-trigger {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(56, 189, 248, 0.45);
+            border-radius: 8px;
+            padding: 9px 12px;
+            color: #f8fafc;
+            font-size: 12.5px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .multiselect-trigger:hover {
+            border-color: #38bdf8;
+            background: rgba(30, 41, 59, 0.95);
+        }
+
+        .multiselect-menu {
+            margin-top: 6px;
+            background: rgba(11, 17, 30, 0.98);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            border-radius: 8px;
+            padding: 8px;
+            max-height: 255px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .multiselect-menu.collapsed {
+            display: none;
+        }
+
+        .search-input {
+            width: 100%;
+            background: rgba(30, 41, 59, 0.9);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            border-radius: 6px;
+            padding: 6px 9px;
+            color: #f8fafc;
+            font-size: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 6px;
+            outline: none;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent-blue);
+        }
+
+        .wall-group-header {
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #38bdf8;
+            padding: 6px 4px 2px 4px;
+            border-top: 1px solid rgba(148, 163, 184, 0.12);
+            margin-top: 2px;
+        }
+
+        .wall-group-header:first-of-type {
+            border-top: none;
+            margin-top: 0;
+        }
+
+        .wall-option-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 7px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.12s ease;
+        }
+
+        .wall-option-row:hover {
+            background: rgba(56, 189, 248, 0.12);
+        }
+
+        .wall-option-row.checked {
+            background: rgba(56, 189, 248, 0.18);
+            border: 1px solid rgba(56, 189, 248, 0.35);
+        }
+
+        .wall-option-row input[type="checkbox"] {
+            accent-color: #38bdf8;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .wall-option-id {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            color: #f8fafc;
+            font-size: 11.5px;
+        }
+
+        .wall-option-meta {
+            color: #94a3b8;
+            font-size: 11px;
+            margin-left: auto;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Selected Chips */
+        .selected-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 6px;
+        }
+
+        .wall-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 7px;
+            border-radius: 5px;
+            background: rgba(56, 189, 248, 0.16);
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            color: #e0f2fe;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .wall-chip:hover {
+            background: rgba(244, 63, 94, 0.22);
+            border-color: rgba(244, 63, 94, 0.5);
+        }
+
+        /* Buttons & Grids */
+        .preset-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+        }
+
+        .preset-grid.three-cols {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .ctrl-btn {
+            background: rgba(30, 41, 59, 0.85);
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            color: #e2e8f0;
+            border-radius: 7px;
+            padding: 6px 8px;
+            font-size: 11.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.14s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            text-align: center;
+        }
+
+        .ctrl-btn:hover {
+            background: rgba(51, 65, 85, 0.95);
+            border-color: rgba(56, 189, 248, 0.55);
+            color: #ffffff;
+        }
+
+        .ctrl-btn.active {
+            background: rgba(56, 189, 248, 0.22);
+            border-color: #38bdf8;
+            color: #7dd3fc;
+        }
+
+        /* Toggle Switches */
+        .toggle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+            font-size: 12px;
+            color: #cbd5e1;
+        }
+
+        .toggle-row input[type="checkbox"] {
+            accent-color: #38bdf8;
+            width: 15px;
+            height: 15px;
+            cursor: pointer;
+        }
+
+        .slider-row {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-top: 6px;
+        }
+
+        .slider-row input[type="range"] {
+            width: 100%;
+            accent-color: #f59e0b;
+            cursor: pointer;
+        }
+
+        /* Inspector Cards */
+        .inspector-wall-card {
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            border-radius: 9px;
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .inspector-wall-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+            padding-bottom: 6px;
+        }
+
+        .inspector-wall-id {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            font-weight: 800;
+            color: #38bdf8;
+        }
+
+        .inspector-wall-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #f8fafc;
+        }
+
+        .kv-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            font-size: 11.5px;
+            line-height: 1.4;
+        }
+
+        .kv-key {
+            color: #94a3b8;
+            flex-shrink: 0;
+        }
+
+        .kv-val {
+            color: #e2e8f0;
+            font-family: 'JetBrains Mono', monospace;
+            text-align: right;
+            word-break: break-word;
+        }
+
+        .coord-block {
+            background: rgba(7, 11, 20, 0.85);
+            border: 1px solid rgba(148, 163, 184, 0.16);
+            border-radius: 6px;
+            padding: 6px 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10.5px;
+            color: #cbd5e1;
+            line-height: 1.45;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+
+        /* Bottom HUD Bar */
+        .bottom-hud {
+            position: absolute;
+            bottom: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-panel);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 7px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 20;
+            font-size: 11.5px;
+            color: #cbd5e1;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45);
+        }
+
+        .key-cap {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10.5px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: rgba(51, 65, 85, 0.9);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            color: #f8fafc;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-shell">
+        <!-- TOP HEADER -->
+        <header class="top-header">
+            <div class="header-title-group">
+                <h1>🧊 3D Wall B-Rep Spatial Visualizer</h1>
+                <span class="tech-pill">outerLoop + holes [x, y, z]</span>
+                <div class="axis-legend-pills">
+                    <span class="axis-pill x">X: East → West (0..20,705 mm, Right)</span>
+                    <span class="axis-pill y">Y: North → South (-290..21,130 mm, Depth)</span>
+                    <span class="axis-pill z">Z: Vertical Height (0..6,130 mm, Up)</span>
+                </div>
+            </div>
+            <nav class="nav-bar">
+                <a href="index.html" class="nav-btn">🏠 Dashboard</a>
+                <a href="floor_plan.html" class="nav-btn">📐 2D Floor Plan</a>
+                <a href="north_facade.html" class="nav-btn">🧭 North Facade</a>
+                <a href="building_3d.html" class="nav-btn">🏢 Full 3D Building</a>
+            </nav>
+        </header>
+
+        <!-- 3D VIEWPORT -->
+        <div class="viewport-wrapper" id="viewport-wrapper">
+            <canvas id="webgl-canvas"></canvas>
+            <canvas id="hud-canvas"></canvas>
+
+            <!-- LEFT CONTROL DOCK -->
+            <aside class="left-dock">
+                <!-- 1. Multi-Select Wall Dropdown -->
+                <div class="dock-section">
+                    <div class="dock-title">
+                        <span>1. Select Wall Objects by ID</span>
+                        <span class="tech-pill" id="selected-count-badge">4 selected</span>
+                    </div>
+
+                    <div class="multiselect-box">
+                        <button type="button" class="multiselect-trigger" id="dropdown-trigger">
+                            <span id="dropdown-trigger-text">Choose Wall IDs from Database...</span>
+                            <span>▾</span>
+                        </button>
+                        <div class="multiselect-menu" id="dropdown-menu">
+                            <input type="text" class="search-input" id="wall-search-input" placeholder="Filter by ID, room, or name (e.g. GW_4, EW_GARAGE)...">
+                            <div id="wall-options-container"></div>
+                        </div>
+                    </div>
+
+                    <div class="selected-chips" id="selected-chips-container"></div>
+                </div>
+
+                <!-- 2. Quick Selection Presets -->
+                <div class="dock-section">
+                    <div class="dock-title">
+                        <span>2. Quick Wall Group Presets</span>
+                    </div>
+                    <div class="preset-grid">
+                        <button type="button" class="ctrl-btn" id="preset-garage-doors">🚗 Garage + Doors (GW_1, GW_4)</button>
+                        <button type="button" class="ctrl-btn" id="preset-north-facade">🧭 North Facade Walls</button>
+                        <button type="button" class="ctrl-btn" id="preset-ground-ext">🧱 Ground Exterior (EW_*)</button>
+                        <button type="button" class="ctrl-btn" id="preset-ground-int">🚪 Ground Internal (GW_*)</button>
+                        <button type="button" class="ctrl-btn" id="preset-ground-all">📐 All Ground Floor</button>
+                        <button type="button" class="ctrl-btn" id="preset-first-all">🪵 All Upper Floor</button>
+                        <button type="button" class="ctrl-btn" id="preset-all-walls">🏢 All 48 Walls</button>
+                        <button type="button" class="ctrl-btn" id="preset-clear">✖ Clear Selection</button>
+                    </div>
+                </div>
+
+                <!-- 3. 3D Space, Axes & B-Rep Overlays -->
+                <div class="dock-section">
+                    <div class="dock-title">
+                        <span>3. 3D Space &amp; B-Rep Visualization</span>
+                    </div>
+                    <label class="toggle-row">
+                        <span>Show (X, Y, Z) Coordinate Axes &amp; Ticks</span>
+                        <input type="checkbox" id="toggle-axes" checked>
+                    </label>
+                    <label class="toggle-row">
+                        <span>Show 3D Vertex Coordinates `[x, y, z]`</span>
+                        <input type="checkbox" id="toggle-vertices" checked>
+                    </label>
+                    <label class="toggle-row">
+                        <span>Show Outward Normal Vectors `n = [nx,ny,nz]`</span>
+                        <input type="checkbox" id="toggle-normals" checked>
+                    </label>
+                    <label class="toggle-row">
+                        <span>Show Unselected Walls Ghost Footprint</span>
+                        <input type="checkbox" id="toggle-ghost" checked>
+                    </label>
+                    <label class="toggle-row">
+                        <span>Show Horizontal Slice Plane (`Z = zSlice`)</span>
+                        <input type="checkbox" id="toggle-slice-plane">
+                    </label>
+                    <div class="slider-row" id="slice-slider-row" style="display: none;">
+                        <div class="kv-row">
+                            <span class="kv-key">Cut Plane Height `Z`:</span>
+                            <span class="kv-val" id="slice-y-label">1,200 mm</span>
+                        </div>
+                        <input type="range" id="slice-y-slider" min="0" max="6130" step="50" value="1200">
+                    </div>
+                </div>
+
+                <!-- 4. Camera Orientation Presets -->
+                <div class="dock-section">
+                    <div class="dock-title">
+                        <span>4. Camera &amp; Viewpoint</span>
+                    </div>
+                    <div class="preset-grid three-cols">
+                        <button type="button" class="ctrl-btn" id="cam-focus">🎯 Focus Selected</button>
+                        <button type="button" class="ctrl-btn" id="cam-iso-ne">📐 Iso Front-Left</button>
+                        <button type="button" class="ctrl-btn" id="cam-iso-nw">📐 Iso Front-Right</button>
+                        <button type="button" class="ctrl-btn" id="cam-north">⬆️ North (Y-)</button>
+                        <button type="button" class="ctrl-btn" id="cam-west">⬅️ West (X+)</button>
+                        <button type="button" class="ctrl-btn" id="cam-top">🔽 Top Plan</button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- RIGHT INSPECTOR DOCK -->
+            <aside class="right-dock">
+                <div class="dock-title">
+                    <span>Selected Wall 3D B-Rep Inspector</span>
+                    <span class="tech-pill" id="inspector-summary-pill">outerLoop &amp; holes</span>
+                </div>
+                <div id="inspector-cards-container" style="display: flex; flex-direction: column; gap: 10px;"></div>
+            </aside>
+
+            <!-- BOTTOM NAVIGATION HUD -->
+            <div class="bottom-hud">
+                <span><span class="key-cap">Left Drag</span> Orbit 3D</span>
+                <span><span class="key-cap">Right Drag</span> / <span class="key-cap">Shift+Drag</span> Pan</span>
+                <span><span class="key-cap">Scroll</span> Zoom</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load Canonical Architectural Data & 3D B-Rep WallService -->
+    <script src="data/views.js"></script>
+    <script src="data/windows.js"></script>
+    <script src="data/walls.js"></script>
+    <script src="js/persistence.js"></script>
+    <script src="js/window-store.js"></script>
+    <script src="js/coordinate-service.js"></script>
+    <script src="js/wall-service.js"></script>
+
+    <script>
+        (function () {
+            'use strict';
+
+            // =========================================================================
+            // 1. STATE & INITIAL SELECTION
+            // =========================================================================
+            const allWalls = WallService.getWalls();
+            const wallById = {};
+            allWalls.forEach(w => { wallById[w.id] = w; });
+
+            // Default selection: highlight the Garage West wall (with Garage Door notch Z2),
+            // Garage/Boiler East partition GW_1 (with 2 doorway notches), and North Recessed Wall (with window holes O1 & O2)
+            //
+            // Right-Handed Z-Up Coordinate System:
+            // - X axis: East -> West horizontal axis (grows to the RIGHT when looking from North)
+            // - Y axis: North -> South horizontal axis (second horizontal axis, into depth)
+            // - Z axis: Vertical height axis (0..6,130 mm, pointing UP)
+            const appState = {
+                selectedIds: new Set(['EW_GARAGE_WEST', 'GW_1', 'GW_4', 'EW_NORTH_RECESSED']),
+                searchQuery: '',
+                showAxes: true,
+                showVertices: true,
+                showNormals: true,
+                showGhost: true,
+                showSlicePlane: false,
+                sliceZMm: 1200,
+                // Camera spherical coordinates around Z-up (in meters, 1 m = 1,000 mm)
+                // yaw = -115 deg places camera in front of North wall (y < 0) slightly toward East (x < target.x),
+                // so +X grows to the RIGHT, +Y goes back into depth, and +Z points straight UP.
+                yaw: -115 * Math.PI / 180,
+                pitch: 25 * Math.PI / 180,
+                distance: 22.0,
+                target: { x: 11.0, y: 4.5, z: 1.5 }
+            };
+
+            // Distinct palette per wall category/side so multiple selected walls are easy to distinguish
+            const WALL_PALETTE = [
+                { sideA: [0.22, 0.74, 0.97], sideB: [0.12, 0.46, 0.72], edge: '#38bdf8' },
+                { sideA: [0.96, 0.62, 0.04], sideB: [0.72, 0.42, 0.04], edge: '#f59e0b' },
+                { sideA: [0.06, 0.73, 0.51], sideB: [0.04, 0.48, 0.34], edge: '#10b981' },
+                { sideA: [0.66, 0.33, 0.97], sideB: [0.46, 0.20, 0.75], edge: '#a855f7' },
+                { sideA: [0.96, 0.25, 0.37], sideB: [0.70, 0.16, 0.26], edge: '#f43f5e' },
+                { sideA: [0.92, 0.70, 0.03], sideB: [0.65, 0.48, 0.02], edge: '#eab308' }
+            ];
+
+            // =========================================================================
+            // 2. 2D RECTILINEAR CELL TRIANGULATION OF 3D (outerLoop + holes)
+            // =========================================================================
+            function pointInPolygon2D(u, v, loop2D) {
+                let inside = false;
+                for (let i = 0, j = loop2D.length - 1; i < loop2D.length; j = i++) {
+                    const ui = loop2D[i][0], vi = loop2D[i][1];
+                    const uj = loop2D[j][0], vj = loop2D[j][1];
+                    const intersect = ((vi > v) !== (vj > v)) &&
+                        (u < (uj - ui) * (v - vi) / ((vj - vi) || 1e-9) + ui);
+                    if (intersect) inside = !inside;
+                }
+                return inside;
+            }
+
+            /**
+             * Triangulate a 3D planar wall side defined by its connected `outerLoop` [[x,y,z], ...]
+             * and interior `holes` [{ loop: [[x,y,z], ...] }] into 3D triangles.
+             * Here (x, y) is the horizontal floor-plan coordinate and z is vertical height.
+             */
+            function triangulateWallSide3D(side) {
+                const origin = [side.p1[0], side.p1[1], 0];
+                const t = side.tangent; // [tx, ty, 0]
+
+                function to2D(pt3) {
+                    const dx = pt3[0] - origin[0];
+                    const dy = pt3[1] - origin[1];
+                    const u = dx * t[0] + dy * t[1];
+                    const v = pt3[2]; // Z = vertical height
+                    return [u, v];
+                }
+
+                function to3D(u, v) {
+                    return [
+                        origin[0] + u * t[0],
+                        origin[1] + u * t[1],
+                        v
+                    ];
+                }
+
+                const outer2D = (side.outerLoop || []).map(to2D);
+                const holes2D = (side.holes || []).map(h => (h.loop || []).map(to2D));
+
+                const uSet = new Set();
+                const vSet = new Set();
+                outer2D.forEach(p => {
+                    uSet.add(Math.round(p[0] * 10) / 10);
+                    vSet.add(Math.round(p[1] * 10) / 10);
+                });
+                holes2D.forEach(hLoop => {
+                    hLoop.forEach(p => {
+                        uSet.add(Math.round(p[0] * 10) / 10);
+                        vSet.add(Math.round(p[1] * 10) / 10);
+                    });
+                });
+
+                const uCoords = Array.from(uSet).sort((a, b) => a - b);
+                const vCoords = Array.from(vSet).sort((a, b) => a - b);
+
+                const triangles = [];
+                for (let i = 0; i + 1 < uCoords.length; i++) {
+                    const u0 = uCoords[i];
+                    const u1 = uCoords[i + 1];
+                    if (u1 - u0 < 0.5) continue;
+                    const uMid = (u0 + u1) / 2;
+
+                    for (let j = 0; j + 1 < vCoords.length; j++) {
+                        const v0 = vCoords[j];
+                        const v1 = vCoords[j + 1];
+                        if (v1 - v0 < 0.5) continue;
+                        const vMid = (v0 + v1) / 2;
+
+                        if (!pointInPolygon2D(uMid, vMid, outer2D)) continue;
+                        let inHole = false;
+                        for (let k = 0; k < holes2D.length; k++) {
+                            if (pointInPolygon2D(uMid, vMid, holes2D[k])) {
+                                inHole = true;
+                                break;
+                            }
+                        }
+                        if (inHole) continue;
+
+                        const p00 = to3D(u0, v0);
+                        const p10 = to3D(u1, v0);
+                        const p11 = to3D(u1, v1);
+                        const p01 = to3D(u0, v1);
+
+                        triangles.push([p00, p10, p11]);
+                        triangles.push([p00, p11, p01]);
+                    }
+                }
+
+                return triangles;
+            }
+
+            /**
+             * Build thickness reveal quads (top cap, bottom cap, mitered end caps, doorway jambs/lintels,
+             * and window hole reveals) connecting sideA and sideB so the 3D wall is a closed mitered solid.
+             */
+            function buildWallThicknessReveals3D(wall) {
+                const quads = [];
+                const sideA = wall.sideA;
+                const sideB = wall.sideB;
+                if (!sideA || !sideB) return quads;
+
+                const nA = sideA.normal; // [nx, ny, 0] pointing from sideB toward sideA
+                const thick = wall.thickness || 120;
+                const offsetToB = [-nA[0] * thick, -nA[1] * thick, 0];
+
+                const bMinX = Math.min(sideB.p1[0], sideB.p2[0]);
+                const bMaxX = Math.max(sideB.p1[0], sideB.p2[0]);
+                const bMinY = Math.min(sideB.p1[1], sideB.p2[1]);
+                const bMaxY = Math.max(sideB.p1[1], sideB.p2[1]);
+
+                // Map any 3D vertex on sideA to its corresponding 3D vertex on sideB:
+                // - Vertices at sideA.p1 map to sideB.p2 (exact mitered corner at start of wall)
+                // - Vertices at sideA.p2 map to sideB.p1 (exact mitered corner at end of wall)
+                // - Interior doorway notch / window hole vertices project across the wall thickness,
+                //   clamped to sideB's [p1, p2] span so corner-zone jambs meet the interior corner cleanly
+                function mapSideAPointToSideB(pt) {
+                    if (Math.hypot(pt[0] - sideA.p1[0], pt[1] - sideA.p1[1]) < 2) {
+                        return [sideB.p2[0], sideB.p2[1], pt[2]];
+                    }
+                    if (Math.hypot(pt[0] - sideA.p2[0], pt[1] - sideA.p2[1]) < 2) {
+                        return [sideB.p1[0], sideB.p1[1], pt[2]];
+                    }
+                    const bx = Math.max(bMinX, Math.min(bMaxX, pt[0] + offsetToB[0]));
+                    const by = Math.max(bMinY, Math.min(bMaxY, pt[1] + offsetToB[1]));
+                    return [bx, by, pt[2]];
+                }
+
+                // 1. OuterLoop perimeter caps (mitered left/right end bevels, top cap, and doorway jambs/lintels)
+                const loopA = sideA.outerLoop || [];
+                for (let i = 0; i < loopA.length; i++) {
+                    const p1 = loopA[i];
+                    const p2 = loopA[(i + 1) % loopA.length];
+                    const q1 = mapSideAPointToSideB(p1);
+                    const q2 = mapSideAPointToSideB(p2);
+                    quads.push([p1, p2, q2, q1]);
+                }
+
+                // 2. Window hole reveals (jambs, sill, head)
+                (sideA.holes || []).forEach(h => {
+                    const hLoop = h.loop || [];
+                    for (let i = 0; i < hLoop.length; i++) {
+                        const p1 = hLoop[i];
+                        const p2 = hLoop[(i + 1) % hLoop.length];
+                        const q1 = mapSideAPointToSideB(p1);
+                        const q2 = mapSideAPointToSideB(p2);
+                        quads.push([p1, p2, q2, q1]);
+                    }
+                });
+
+                return quads;
+            }
+
+            // =========================================================================
+            // 3. ZERO-DEPENDENCY WEBGL 3D ENGINE + 2D HUD LABELS
+            // =========================================================================
+            const glCanvas = document.getElementById('webgl-canvas');
+            const hudCanvas = document.getElementById('hud-canvas');
+            const gl = glCanvas.getContext('webgl', { antialias: true, alpha: false });
+            const hudCtx = hudCanvas.getContext('2d');
+
+            const vsSource = `
+                attribute vec3 aPos;
+                attribute vec3 aNormal;
+                attribute vec4 aColor;
+                uniform mat4 uViewProj;
+                varying vec3 vNormal;
+                varying vec4 vColor;
+                void main() {
+                    gl_Position = uViewProj * vec4(aPos, 1.0);
+                    vNormal = aNormal;
+                    vColor = aColor;
+                }
+            `;
+
+            const fsSource = `
+                precision mediump float;
+                varying vec3 vNormal;
+                varying vec4 vColor;
+                void main() {
+                    vec3 n = normalize(vNormal);
+                    vec3 lightDir1 = normalize(vec3(-0.55, -0.45, 0.78));
+                    vec3 lightDir2 = normalize(vec3(0.65, 0.60, 0.45));
+                    float diff1 = max(dot(n, lightDir1), 0.0);
+                    float diff2 = max(dot(n, lightDir2), 0.0);
+                    float lighting = 0.42 + 0.42 * diff1 + 0.22 * diff2;
+                    gl_FragColor = vec4(vColor.rgb * lighting, vColor.a);
+                }
+            `;
+
+            const lineVsSource = `
+                attribute vec3 aPos;
+                attribute vec4 aColor;
+                uniform mat4 uViewProj;
+                varying vec4 vColor;
+                void main() {
+                    gl_Position = uViewProj * vec4(aPos, 1.0);
+                    vColor = aColor;
+                }
+            `;
+
+            const lineFsSource = `
+                precision mediump float;
+                varying vec4 vColor;
+                void main() {
+                    gl_FragColor = vColor;
+                }
+            `;
+
+            function compileShader(type, src) {
+                const s = gl.createShader(type);
+                gl.shaderSource(s, src);
+                gl.compileShader(s);
+                return s;
+            }
+
+            function createProgram(vs, fs) {
+                const p = gl.createProgram();
+                gl.attachShader(p, compileShader(gl.VERTEX_SHADER, vs));
+                gl.attachShader(p, compileShader(gl.FRAGMENT_SHADER, fs));
+                gl.linkProgram(p);
+                return p;
+            }
+
+            const meshProg = createProgram(vsSource, fsSource);
+            const lineProg = createProgram(lineVsSource, lineFsSource);
+
+            const meshBuffer = gl.createBuffer();
+            const lineBuffer = gl.createBuffer();
+
+            // Matrix math utilities
+            function mat4Perspective(fovRad, aspect, near, far) {
+                const f = 1.0 / Math.tan(fovRad / 2);
+                const nf = 1 / (near - far);
+                return new Float32Array([
+                    f / aspect, 0, 0, 0,
+                    0, f, 0, 0,
+                    0, 0, (far + near) * nf, -1,
+                    0, 0, (2 * far * near) * nf, 0
+                ]);
+            }
+
+            function mat4LookAt(eye, center, up) {
+                let zx = eye[0] - center[0], zy = eye[1] - center[1], zz = eye[2] - center[2];
+                let len = Math.hypot(zx, zy, zz) || 1;
+                zx /= len; zy /= len; zz /= len;
+
+                let xx = up[1] * zz - up[2] * zy;
+                let xy = up[2] * zx - up[0] * zz;
+                let xz = up[0] * zy - up[1] * zx;
+                len = Math.hypot(xx, xy, xz) || 1;
+                xx /= len; xy /= len; xz /= len;
+
+                const yx = zy * xz - zz * xy;
+                const yy = zz * xx - zx * xz;
+                const yz = zx * xy - zy * xx;
+
+                return new Float32Array([
+                    xx, yx, zx, 0,
+                    xy, yy, zy, 0,
+                    xz, yz, zz, 0,
+                    -(xx * eye[0] + xy * eye[1] + xz * eye[2]),
+                    -(yx * eye[0] + yy * eye[1] + yz * eye[2]),
+                    -(zx * eye[0] + zy * eye[1] + zz * eye[2]),
+                    1
+                ]);
+            }
+
+            function mat4Multiply(a, b) {
+                const out = new Float32Array(16);
+                for (let i = 0; i < 4; i++) {
+                    for (let j = 0; j < 4; j++) {
+                        out[j * 4 + i] =
+                            a[0 * 4 + i] * b[j * 4 + 0] +
+                            a[1 * 4 + i] * b[j * 4 + 1] +
+                            a[2 * 4 + i] * b[j * 4 + 2] +
+                            a[3 * 4 + i] * b[j * 4 + 3];
+                    }
+                }
+                return out;
+            }
+
+            function project3DToScreen(ptMm, viewProj, width, height) {
+                const x = ptMm[0] / 1000;
+                const y = ptMm[1] / 1000;
+                const z = ptMm[2] / 1000;
+
+                const cx = viewProj[0] * x + viewProj[4] * y + viewProj[8] * z + viewProj[12];
+                const cy = viewProj[1] * x + viewProj[5] * y + viewProj[9] * z + viewProj[13];
+                const cz = viewProj[2] * x + viewProj[6] * y + viewProj[10] * z + viewProj[14];
+                const cw = viewProj[3] * x + viewProj[7] * y + viewProj[11] * z + viewProj[15];
+
+                if (cw <= 0.05) return null;
+                const ndcX = cx / cw;
+                const ndcY = cy / cw;
+                const ndcZ = cz / cw;
+                if (ndcX < -1.3 || ndcX > 1.3 || ndcY < -1.3 || ndcY > 1.3) return null;
+
+                return {
+                    x: (ndcX * 0.5 + 0.5) * width,
+                    y: (1.0 - (ndcY * 0.5 + 0.5)) * height,
+                    depth: ndcZ
+                };
+            }
+
+            // =========================================================================
+            // 4. BUILD SCENE GEOMETRY FROM SELECTED WALLS
+            // =========================================================================
+            function renderScene() {
+                const rect = glCanvas.parentElement.getBoundingClientRect();
+                const dpr = Math.min(window.devicePixelRatio || 1, 2);
+                const width = Math.max(1, Math.floor(rect.width));
+                const height = Math.max(1, Math.floor(rect.height));
+
+                if (glCanvas.width !== width * dpr || glCanvas.height !== height * dpr) {
+                    glCanvas.width = width * dpr;
+                    glCanvas.height = height * dpr;
+                    hudCanvas.width = width * dpr;
+                    hudCanvas.height = height * dpr;
+                }
+
+                gl.viewport(0, 0, glCanvas.width, glCanvas.height);
+                gl.clearColor(0.035, 0.055, 0.10, 1.0);
+                gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+                gl.enable(gl.DEPTH_TEST);
+                gl.enable(gl.BLEND);
+                gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+                // Z-up right-handed spherical camera:
+                // X = East-West (grows to the right), Y = North-South (depth), Z = Vertical Height (up = [0, 0, 1])
+                const eye = [
+                    appState.target.x + appState.distance * Math.cos(appState.pitch) * Math.cos(appState.yaw),
+                    appState.target.y + appState.distance * Math.cos(appState.pitch) * Math.sin(appState.yaw),
+                    appState.target.z + appState.distance * Math.sin(appState.pitch)
+                ];
+                const viewMat = mat4LookAt(eye, [appState.target.x, appState.target.y, appState.target.z], [0, 0, 1]);
+                const projMat = mat4Perspective(42 * Math.PI / 180, width / height, 0.2, 150.0);
+                const viewProj = mat4Multiply(projMat, viewMat);
+
+                const meshVerts = []; // [x,y,z, nx,ny,nz, r,g,b,a] = 10 floats per vertex
+                const lineVerts = []; // [x,y,z, r,g,b,a] = 7 floats per vertex
+                const hudLabels = [];
+
+                function pushTri(p1Mm, p2Mm, p3Mm, n, rgba) {
+                    const pts = [p1Mm, p2Mm, p3Mm];
+                    for (let i = 0; i < 3; i++) {
+                        meshVerts.push(
+                            pts[i][0] / 1000, pts[i][1] / 1000, pts[i][2] / 1000,
+                            n[0], n[1], n[2],
+                            rgba[0], rgba[1], rgba[2], rgba[3]
+                        );
+                    }
+                }
+
+                function pushLine(p1Mm, p2Mm, rgba) {
+                    lineVerts.push(
+                        p1Mm[0] / 1000, p1Mm[1] / 1000, p1Mm[2] / 1000,
+                        rgba[0], rgba[1], rgba[2], rgba[3],
+                        p2Mm[0] / 1000, p2Mm[1] / 1000, p2Mm[2] / 1000,
+                        rgba[0], rgba[1], rgba[2], rgba[3]
+                    );
+                }
+
+                function pushLoopLines(loop3D, rgba) {
+                    if (!Array.isArray(loop3D) || loop3D.length < 2) return;
+                    for (let i = 0; i < loop3D.length; i++) {
+                        pushLine(loop3D[i], loop3D[(i + 1) % loop3D.length], rgba);
+                    }
+                }
+
+                // ---------------------------------------------------------------------
+                // A. 3D REFERENCE GRID & (X, Y, Z) AXES IN MILLIMETERS (Z-UP)
+                // ---------------------------------------------------------------------
+                if (appState.showAxes) {
+                    // 1-meter ground grid on horizontal plane Z = 0 mm
+                    for (let x = 0; x <= 21000; x += 1000) {
+                        const isMajor = (x % 5000 === 0);
+                        pushLine([x, -1000, 0], [x, 22000, 0], isMajor ? [0.28, 0.36, 0.50, 0.45] : [0.18, 0.24, 0.35, 0.24]);
+                    }
+                    for (let y = 0; y <= 22000; y += 1000) {
+                        const isMajor = (y % 5000 === 0);
+                        pushLine([-1000, y, 0], [21000, y, 0], isMajor ? [0.28, 0.36, 0.50, 0.45] : [0.18, 0.24, 0.35, 0.24]);
+                    }
+
+                    // X Axis (Red: East 0 -> West 22,500 mm, growing to the RIGHT)
+                    pushLine([-1000, 0, 0], [22500, 0, 0], [0.95, 0.27, 0.27, 1.0]);
+                    for (let x = 0; x <= 20000; x += 5000) {
+                        pushLine([x, -250, 0], [x, 250, 0], [0.95, 0.27, 0.27, 1.0]);
+                        hudLabels.push({
+                            ptMm: [x, -550, 0],
+                            text: `X=${x.toLocaleString()}`,
+                            color: '#fca5a5',
+                            bg: 'rgba(127, 29, 29, 0.82)',
+                            fontSize: 10
+                        });
+                    }
+                    hudLabels.push({
+                        ptMm: [22800, 0, 0],
+                        text: '+X Axis (East→West, mm)',
+                        color: '#fecaca',
+                        bg: 'rgba(185, 28, 28, 0.92)',
+                        fontSize: 11
+                    });
+
+                    // Y Axis (Green: North 0 -> South 22,500 mm, second horizontal axis)
+                    pushLine([0, -1000, 0], [0, 22500, 0], [0.06, 0.73, 0.51, 1.0]);
+                    for (let y = 0; y <= 20000; y += 5000) {
+                        if (y === 0) continue;
+                        pushLine([-250, y, 0], [250, y, 0], [0.06, 0.73, 0.51, 1.0]);
+                        hudLabels.push({
+                            ptMm: [-650, y, 0],
+                            text: `Y=${y.toLocaleString()}`,
+                            color: '#6ee7b7',
+                            bg: 'rgba(6, 78, 59, 0.82)',
+                            fontSize: 10
+                        });
+                    }
+                    hudLabels.push({
+                        ptMm: [0, 23000, 0],
+                        text: '+Y Axis (North→South, mm)',
+                        color: '#a7f3d0',
+                        bg: 'rgba(4, 120, 87, 0.92)',
+                        fontSize: 11
+                    });
+
+                    // Z Axis (Blue: Vertical Height 0 -> 7,200 mm at origin X=0, Y=0)
+                    pushLine([0, 0, 0], [0, 0, 7200], [0.22, 0.74, 0.97, 1.0]);
+                    [
+                        { z: 0, label: 'Z=0 (±0.00m)' },
+                        { z: 2800, label: 'Z=2,800 (+2.80m Parter Top)' },
+                        { z: 3430, label: 'Z=3,430 (+3.43m Piętro Floor)' },
+                        { z: 6130, label: 'Z=6,130 (+6.13m Piętro Top)' }
+                    ].forEach(tick => {
+                        pushLine([-220, 0, tick.z], [220, 0, tick.z], [0.22, 0.74, 0.97, 1.0]);
+                        hudLabels.push({
+                            ptMm: [-500, 0, tick.z],
+                            text: tick.label,
+                            color: '#7dd3fc',
+                            bg: 'rgba(12, 74, 110, 0.85)',
+                            fontSize: 10
+                        });
+                    });
+                    hudLabels.push({
+                        ptMm: [0, 0, 7500],
+                        text: '+Z Axis (Height, mm)',
+                        color: '#bae6fd',
+                        bg: 'rgba(3, 105, 161, 0.92)',
+                        fontSize: 11
+                    });
+                }
+
+                // ---------------------------------------------------------------------
+                // B. UNSELECTED WALLS GHOST FOOTPRINT (FOR SPATIAL CONTEXT)
+                // ---------------------------------------------------------------------
+                if (appState.showGhost) {
+                    allWalls.forEach(w => {
+                        if (appState.selectedIds.has(w.id)) return;
+                        if (!Array.isArray(w.footprint2D) || w.footprint2D.length < 4) return;
+                        const zBase = w.zBottom !== undefined ? w.zBottom : (w.yBottom || 0);
+                        const loop = w.footprint2D.map(pt => [pt[0], pt[1], zBase + 5]);
+                        pushLoopLines(loop, [0.45, 0.55, 0.70, 0.25]);
+                    });
+                }
+
+                // ---------------------------------------------------------------------
+                // C. SELECTED WALLS — FULL 3D B-REP (outerLoop + holes + normals)
+                // ---------------------------------------------------------------------
+                let paletteIdx = 0;
+                allWalls.forEach(w => {
+                    if (!appState.selectedIds.has(w.id)) return;
+                    const pal = WALL_PALETTE[paletteIdx % WALL_PALETTE.length];
+                    paletteIdx++;
+
+                    const zBot = w.zBottom !== undefined ? w.zBottom : (w.yBottom || 0);
+                    const zTop = w.zTop !== undefined ? w.zTop : (w.yTop || 2800);
+
+                    // 1. Triangulate Side A and Side B faces (with doorway notches & window holes)
+                    w.sides.forEach((side, sIdx) => {
+                        const baseRgb = (sIdx === 0) ? pal.sideA : pal.sideB;
+                        const tris = triangulateWallSide3D(side);
+                        tris.forEach(tri => {
+                            pushTri(tri[0], tri[1], tri[2], side.normal, [baseRgb[0], baseRgb[1], baseRgb[2], 0.92]);
+                        });
+
+                        // Crisp outerLoop wireframe
+                        pushLoopLines(side.outerLoop, sIdx === 0 ? [0.98, 0.98, 1.0, 0.95] : [0.75, 0.85, 0.95, 0.75]);
+
+                        // Crisp window hole wireframes (in bright emerald)
+                        (side.holes || []).forEach(h => {
+                            pushLoopLines(h.loop, [0.15, 0.95, 0.65, 1.0]);
+                            if (sIdx === 0 && Array.isArray(h.loop) && h.loop.length >= 4) {
+                                const cx = (h.loop[0][0] + h.loop[2][0]) / 2;
+                                const cy = (h.loop[0][1] + h.loop[2][1]) / 2;
+                                const cz = (h.loop[0][2] + h.loop[2][2]) / 2;
+                                hudLabels.push({
+                                    ptMm: [cx, cy, cz],
+                                    text: `Hole ${h.id}`,
+                                    color: '#6ee7b7',
+                                    bg: 'rgba(6, 78, 59, 0.9)',
+                                    fontSize: 10.5
+                                });
+                            }
+                        });
+
+                        // 2. Outward Normal Vector Arrow n = [nx, ny, nz]
+                        if (appState.showNormals) {
+                            const midZ = (zBot + zTop) / 2;
+                            const startMm = [side.midpoint2D[0], side.midpoint2D[1], midZ];
+                            const arrowLen = 750;
+                            const endMm = [
+                                startMm[0] + side.normal[0] * arrowLen,
+                                startMm[1] + side.normal[1] * arrowLen,
+                                startMm[2] + side.normal[2] * arrowLen
+                            ];
+                            const nColor = sIdx === 0 ? [1.0, 0.80, 0.20, 1.0] : [0.75, 0.60, 1.0, 0.9];
+                            pushLine(startMm, endMm, nColor);
+                            if (sIdx === 0) {
+                                hudLabels.push({
+                                    ptMm: endMm,
+                                    text: `n=[${side.normal.join(',')}]`,
+                                    color: '#fde68a',
+                                    bg: 'rgba(120, 53, 15, 0.88)',
+                                    fontSize: 9.5
+                                });
+                            }
+                        }
+
+                        // 3. 3D Vertex [x, y, z] Labels on Side A
+                        if (appState.showVertices && sIdx === 0) {
+                            (side.outerLoop || []).forEach(pt => {
+                                hudLabels.push({
+                                    ptMm: pt,
+                                    text: `(${pt[0]},${pt[1]},${pt[2]})`,
+                                    color: '#e2e8f0',
+                                    bg: 'rgba(15, 23, 42, 0.84)',
+                                    fontSize: 9.5,
+                                    isVertex: true
+                                });
+                            });
+                        }
+                    });
+
+                    // 4. Thickness Reveal Quads (top cap, miter ends, doorway jambs & lintels, window reveals)
+                    const revealQuads = buildWallThicknessReveals3D(w);
+                    revealQuads.forEach(q => {
+                        pushTri(q[0], q[1], q[2], [0, 0, 1], [pal.sideB[0] * 0.85, pal.sideB[1] * 0.85, pal.sideB[2] * 0.85, 0.92]);
+                        pushTri(q[0], q[2], q[3], [0, 0, 1], [pal.sideB[0] * 0.85, pal.sideB[1] * 0.85, pal.sideB[2] * 0.85, 0.92]);
+                        pushLine(q[0], q[3], [0.82, 0.90, 0.98, 0.82]);
+                        pushLine(q[1], q[2], [0.82, 0.90, 0.98, 0.82]);
+                    });
+
+                    // 5. Wall ID Floating Badge above wall center
+                    const topCenterMm = [
+                        (w.x1 + w.x2) / 2,
+                        (w.y1 + w.y2) / 2,
+                        zTop + 260
+                    ];
+                    hudLabels.push({
+                        ptMm: topCenterMm,
+                        text: `${w.id} (${w.thickness} mm)`,
+                        color: '#ffffff',
+                        bg: 'rgba(2, 132, 199, 0.94)',
+                        fontSize: 11.5
+                    });
+
+                    // 6. Optional Horizontal Slice Highlight at Z = appState.sliceZMm
+                    if (appState.showSlicePlane && appState.sliceZMm >= zBot && appState.sliceZMm <= zTop) {
+                        const floorSlice = WallService.getFloorPlanSlice(
+                            w.floor,
+                            appState.sliceZMm - (w.floor === 'first' ? 3430 : 0)
+                        );
+                        const allSliced = floorSlice.exteriorWalls.concat(floorSlice.internalWalls);
+                        const sw = allSliced.find(item => item.id === w.id);
+                        if (sw && Array.isArray(sw.solidPolygons2D)) {
+                            sw.solidPolygons2D.forEach(poly2D => {
+                                const loop3D = poly2D.map(pt => [pt[0], pt[1], appState.sliceZMm]);
+                                pushLoopLines(loop3D, [1.0, 0.25, 0.45, 1.0]);
+                                if (loop3D.length === 4) {
+                                    pushTri(loop3D[0], loop3D[1], loop3D[2], [0, 0, 1], [1.0, 0.25, 0.45, 0.55]);
+                                    pushTri(loop3D[0], loop3D[2], loop3D[3], [0, 0, 1], [1.0, 0.25, 0.45, 0.55]);
+                                }
+                            });
+                        }
+                    }
+                });
+
+                // Translucent Horizontal Cut Plane at Z = appState.sliceZMm
+                if (appState.showSlicePlane) {
+                    const zS = appState.sliceZMm;
+                    const p0 = [-1000, -1000, zS];
+                    const p1 = [21500, -1000, zS];
+                    const p2 = [21500, 22000, zS];
+                    const p3 = [-1000, 22000, zS];
+                    pushLoopLines([p0, p1, p2, p3], [0.96, 0.62, 0.04, 0.75]);
+                    pushTri(p0, p1, p2, [0, 0, 1], [0.96, 0.62, 0.04, 0.10]);
+                    pushTri(p0, p2, p3, [0, 0, 1], [0.96, 0.62, 0.04, 0.10]);
+                }
+
+                // ---------------------------------------------------------------------
+                // D. DRAW WEBGL MESHES & LINES
+                // ---------------------------------------------------------------------
+                if (meshVerts.length > 0) {
+                    gl.useProgram(meshProg);
+                    gl.uniformMatrix4fv(gl.getUniformLocation(meshProg, 'uViewProj'), false, viewProj);
+                    gl.bindBuffer(gl.ARRAY_BUFFER, meshBuffer);
+                    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(meshVerts), gl.DYNAMIC_DRAW);
+
+                    const stride = 10 * 4;
+                    const aPos = gl.getAttribLocation(meshProg, 'aPos');
+                    const aNormal = gl.getAttribLocation(meshProg, 'aNormal');
+                    const aColor = gl.getAttribLocation(meshProg, 'aColor');
+                    gl.enableVertexAttribArray(aPos);
+                    gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, stride, 0);
+                    gl.enableVertexAttribArray(aNormal);
+                    gl.vertexAttribPointer(aNormal, 3, gl.FLOAT, false, stride, 3 * 4);
+                    gl.enableVertexAttribArray(aColor);
+                    gl.vertexAttribPointer(aColor, 4, gl.FLOAT, false, stride, 6 * 4);
+
+                    gl.drawArrays(gl.TRIANGLES, 0, meshVerts.length / 10);
+                }
+
+                if (lineVerts.length > 0) {
+                    gl.useProgram(lineProg);
+                    gl.uniformMatrix4fv(gl.getUniformLocation(lineProg, 'uViewProj'), false, viewProj);
+                    gl.bindBuffer(gl.ARRAY_BUFFER, lineBuffer);
+                    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(lineVerts), gl.DYNAMIC_DRAW);
+
+                    const stride = 7 * 4;
+                    const aPos = gl.getAttribLocation(lineProg, 'aPos');
+                    const aColor = gl.getAttribLocation(lineProg, 'aColor');
+                    gl.enableVertexAttribArray(aPos);
+                    gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, stride, 0);
+                    gl.enableVertexAttribArray(aColor);
+                    gl.vertexAttribPointer(aColor, 4, gl.FLOAT, false, stride, 3 * 4);
+
+                    gl.drawArrays(gl.LINES, 0, lineVerts.length / 7);
+                }
+
+                // ---------------------------------------------------------------------
+                // E. DRAW 2D HUD LABELS & VERTEX DOTS
+                // ---------------------------------------------------------------------
+                hudCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                hudCtx.clearRect(0, 0, width, height);
+
+                hudLabels.forEach(lbl => {
+                    const proj = project3DToScreen(lbl.ptMm, viewProj, width, height);
+                    if (!proj) return;
+
+                    if (lbl.isVertex) {
+                        hudCtx.beginPath();
+                        hudCtx.arc(proj.x, proj.y, 3.2, 0, Math.PI * 2);
+                        hudCtx.fillStyle = '#38bdf8';
+                        hudCtx.fill();
+                        hudCtx.strokeStyle = '#0f172a';
+                        hudCtx.lineWidth = 1.2;
+                        hudCtx.stroke();
+                    }
+
+                    hudCtx.font = `600 ${lbl.fontSize || 10.5}px "JetBrains Mono", monospace`;
+                    const textW = hudCtx.measureText(lbl.text).width;
+                    const padX = 5;
+                    const boxW = textW + padX * 2;
+                    const boxH = (lbl.fontSize || 10.5) + 6;
+                    const bx = proj.x - boxW / 2;
+                    const by = proj.y - boxH - (lbl.isVertex ? 5 : 2);
+
+                    hudCtx.fillStyle = lbl.bg || 'rgba(15, 23, 42, 0.85)';
+                    hudCtx.beginPath();
+                    hudCtx.roundRect(bx, by, boxW, boxH, 4);
+                    hudCtx.fill();
+
+                    hudCtx.fillStyle = lbl.color || '#f8fafc';
+                    hudCtx.textAlign = 'center';
+                    hudCtx.textBaseline = 'middle';
+                    hudCtx.fillText(lbl.text, proj.x, by + boxH / 2);
+                });
+            }
+
+            // =========================================================================
+            // 5. CAMERA FOCUS & INTERACTION CONTROLS
+            // =========================================================================
+            function focusSelectedWalls() {
+                const selected = allWalls.filter(w => appState.selectedIds.has(w.id));
+                const list = selected.length > 0 ? selected : allWalls;
+
+                let minX = Infinity, maxX = -Infinity;
+                let minY = Infinity, maxY = -Infinity;
+                let minZ = Infinity, maxZ = -Infinity;
+
+                list.forEach(w => {
+                    minX = Math.min(minX, w.x1);
+                    maxX = Math.max(maxX, w.x2);
+                    minY = Math.min(minY, w.y1);
+                    maxY = Math.max(maxY, w.y2);
+                    minZ = Math.min(minZ, w.zBottom !== undefined ? w.zBottom : (w.yBottom || 0));
+                    maxZ = Math.max(maxZ, w.zTop !== undefined ? w.zTop : (w.yTop || 2800));
+                });
+
+                appState.target.x = ((minX + maxX) / 2) / 1000;
+                appState.target.y = ((minY + maxY) / 2) / 1000;
+                appState.target.z = ((minZ + maxZ) / 2) / 1000;
+
+                const spanM = Math.max((maxX - minX) / 1000, (maxY - minY) / 1000, (maxZ - minZ) / 1000, 4.0);
+                appState.distance = Math.min(48.0, Math.max(6.5, spanM * 1.65));
+                renderScene();
+            }
+
+            let isDragging = false;
+            let dragMode = 'orbit';
+            let lastMouseX = 0;
+            let lastMouseY = 0;
+
+            glCanvas.addEventListener('mousedown', e => {
+                isDragging = true;
+                dragMode = (e.button === 2 || e.shiftKey) ? 'pan' : 'orbit';
+                lastMouseX = e.clientX;
+                lastMouseY = e.clientY;
+            });
+
+            window.addEventListener('mousemove', e => {
+                if (!isDragging) return;
+                const dx = e.clientX - lastMouseX;
+                const dy = e.clientY - lastMouseY;
+                lastMouseX = e.clientX;
+                lastMouseY = e.clientY;
+
+                if (dragMode === 'orbit') {
+                    appState.yaw -= dx * 0.0065;
+                    appState.pitch = Math.max(-Math.PI / 2 + 0.08, Math.min(Math.PI / 2 - 0.08, appState.pitch + dy * 0.0065));
+                } else {
+                    const panScale = appState.distance * 0.0014;
+                    const rightX = -Math.sin(appState.yaw);
+                    const rightY = Math.cos(appState.yaw);
+                    appState.target.x -= dx * rightX * panScale;
+                    appState.target.y -= dx * rightY * panScale;
+                    appState.target.z += dy * panScale;
+                }
+                renderScene();
+            });
+
+            window.addEventListener('mouseup', () => { isDragging = false; });
+            glCanvas.addEventListener('contextmenu', e => e.preventDefault());
+
+            glCanvas.addEventListener('wheel', e => {
+                e.preventDefault();
+                const factor = e.deltaY > 0 ? 1.1 : 0.9;
+                appState.distance = Math.max(3.0, Math.min(75.0, appState.distance * factor));
+                renderScene();
+            }, { passive: false });
+
+            window.addEventListener('resize', renderScene);
+
+            // =========================================================================
+            // 6. UI SYNCHRONIZATION (MULTI-SELECT DROPDOWN, CHIPS & INSPECTOR)
+            // =========================================================================
+            function createEl(tag, className, text) {
+                const el = document.createElement(tag);
+                if (className) el.className = className;
+                if (text !== undefined) el.textContent = text;
+                return el;
+            }
+
+            function renderDropdownAndInspector() {
+                const optionsContainer = document.getElementById('wall-options-container');
+                const chipsContainer = document.getElementById('selected-chips-container');
+                const countBadge = document.getElementById('selected-count-badge');
+                const triggerText = document.getElementById('dropdown-trigger-text');
+                const inspectorContainer = document.getElementById('inspector-cards-container');
+
+                optionsContainer.replaceChildren();
+                chipsContainer.replaceChildren();
+                inspectorContainer.replaceChildren();
+
+                const count = appState.selectedIds.size;
+                countBadge.textContent = `${count} selected`;
+                triggerText.textContent = count > 0
+                    ? `Selected: ${Array.from(appState.selectedIds).slice(0, 3).join(', ')}${count > 3 ? ` +${count - 3} more` : ''}`
+                    : 'Choose Wall IDs from Database...';
+
+                // Group walls into 4 logical sections
+                const groups = [
+                    { title: 'Ground Floor — Exterior Walls (EW_*)', filter: w => w.floor === 'ground' && w.category === 'exterior' },
+                    { title: 'Ground Floor — Internal Walls (GW_*)', filter: w => w.floor === 'ground' && w.category === 'internal' },
+                    { title: 'Upper Floor — Exterior Walls (UW_*)', filter: w => w.floor === 'first' && w.category === 'exterior' },
+                    { title: 'Upper Floor — Internal Walls (FW_*)', filter: w => w.floor === 'first' && w.category === 'internal' }
+                ];
+
+                const q = appState.searchQuery.trim().toLowerCase();
+
+                groups.forEach(grp => {
+                    const matching = allWalls.filter(w => grp.filter(w) && (
+                        !q ||
+                        w.id.toLowerCase().includes(q) ||
+                        w.name.toLowerCase().includes(q) ||
+                        (w.rooms && w.rooms.toLowerCase().includes(q))
+                    ));
+                    if (matching.length === 0) return;
+
+                    optionsContainer.appendChild(createEl('div', 'wall-group-header', grp.title));
+
+                    matching.forEach(w => {
+                        const isChecked = appState.selectedIds.has(w.id);
+                        const row = createEl('label', 'wall-option-row' + (isChecked ? ' checked' : ''));
+                        const cb = document.createElement('input');
+                        cb.type = 'checkbox';
+                        cb.checked = isChecked;
+                        cb.addEventListener('change', () => {
+                            if (cb.checked) {
+                                appState.selectedIds.add(w.id);
+                            } else {
+                                appState.selectedIds.delete(w.id);
+                            }
+                            renderDropdownAndInspector();
+                            renderScene();
+                        });
+
+                        const idSpan = createEl('span', 'wall-option-id', w.id);
+                        const nameSpan = createEl('span', '', w.name.replace(/^GW_\d+[a-c]?\s*/, '').replace(/^FW_\d+[a-c]?\s*/, ''));
+                        nameSpan.style.color = '#cbd5e1';
+                        nameSpan.style.fontSize = '11px';
+                        nameSpan.style.overflow = 'hidden';
+                        nameSpan.style.textOverflow = 'ellipsis';
+                        nameSpan.style.whiteSpace = 'nowrap';
+
+                        const holesCount = (w.sideA && w.sideA.holes) ? w.sideA.holes.length : 0;
+                        const loopVerts = (w.sideA && w.sideA.outerLoop) ? w.sideA.outerLoop.length : 4;
+                        const metaSpan = createEl('span', 'wall-option-meta', `${w.thickness}mm • ${loopVerts}v${holesCount ? ` • ${holesCount}h` : ''}`);
+
+                        row.appendChild(cb);
+                        row.appendChild(idSpan);
+                        row.appendChild(nameSpan);
+                        row.appendChild(metaSpan);
+                        optionsContainer.appendChild(row);
+                    });
+                });
+
+                // Render selected chips
+                Array.from(appState.selectedIds).forEach(id => {
+                    const chip = createEl('span', 'wall-chip', `${id} ✕`);
+                    chip.title = 'Click to remove from selection';
+                    chip.addEventListener('click', () => {
+                        appState.selectedIds.delete(id);
+                        renderDropdownAndInspector();
+                        renderScene();
+                    });
+                    chipsContainer.appendChild(chip);
+                });
+
+                // Render Inspector Cards for selected walls
+                const selectedWalls = allWalls.filter(w => appState.selectedIds.has(w.id));
+                if (selectedWalls.length === 0) {
+                    const emptyCard = createEl('div', 'inspector-wall-card');
+                    emptyCard.appendChild(createEl('div', 'inspector-wall-name', 'No walls selected. Choose one or more wall IDs from the dropdown on the left.'));
+                    inspectorContainer.appendChild(emptyCard);
+                    return;
+                }
+
+                selectedWalls.forEach(w => {
+                    const zBot = w.zBottom !== undefined ? w.zBottom : (w.yBottom || 0);
+                    const zTop = w.zTop !== undefined ? w.zTop : (w.yTop || 2800);
+                    const card = createEl('div', 'inspector-wall-card');
+                    const header = createEl('div', 'inspector-wall-header');
+                    header.appendChild(createEl('span', 'inspector-wall-id', w.id));
+                    header.appendChild(createEl('span', 'tech-pill', `${w.thickness} mm • Z=${zBot}..${zTop}`));
+                    card.appendChild(header);
+
+                    card.appendChild(createEl('div', 'inspector-wall-name', w.name));
+
+                    const addKv = (k, v) => {
+                        const r = createEl('div', 'kv-row');
+                        r.appendChild(createEl('span', 'kv-key', k));
+                        r.appendChild(createEl('span', 'kv-val', v));
+                        card.appendChild(r);
+                    };
+
+                    addKv('Floor & Category', `${w.floor} (${w.category})`);
+                    addKv('X / Y Bounds', `X: ${w.x1}..${w.x2} | Y: ${w.y1}..${w.y2}`);
+                    if (w.sideA) {
+                        addKv('Side A Normal', `n = [${w.sideA.normal.join(', ')}] (${w.sideA.materialLabel})`);
+                    }
+                    if (w.sideB) {
+                        addKv('Side B Normal', `n = [${w.sideB.normal.join(', ')}] (${w.sideB.materialLabel})`);
+                    }
+
+                    if (w.sideA && Array.isArray(w.sideA.outerLoop)) {
+                        const loopText = `outerLoop (${w.sideA.outerLoop.length} pts): ` +
+                            w.sideA.outerLoop.map(p => `[${p[0]}, ${p[1]}, ${p[2]}]`).join(' → ');
+                        card.appendChild(createEl('div', 'coord-block', loopText));
+                    }
+
+                    if (w.sideA && Array.isArray(w.sideA.holes) && w.sideA.holes.length > 0) {
+                        const holesText = w.sideA.holes.map(h =>
+                            `hole "${h.id}": ` + (h.loop || []).map(p => `[${p[0]}, ${p[1]}, ${p[2]}]`).join(' → ')
+                        ).join('\n');
+                        card.appendChild(createEl('div', 'coord-block', holesText));
+                    }
+
+                    inspectorContainer.appendChild(card);
+                });
+            }
+
+            // =========================================================================
+            // 7. WIRE UP UI CONTROLS & PRESETS
+            // =========================================================================
+            document.getElementById('dropdown-trigger').addEventListener('click', () => {
+                document.getElementById('dropdown-menu').classList.toggle('collapsed');
+            });
+
+            document.getElementById('wall-search-input').addEventListener('input', e => {
+                appState.searchQuery = e.target.value || '';
+                renderDropdownAndInspector();
+            });
+
+            function applyPreset(ids) {
+                appState.selectedIds = new Set(ids);
+                renderDropdownAndInspector();
+                focusSelectedWalls();
+            }
+
+            document.getElementById('preset-garage-doors').addEventListener('click', () => {
+                applyPreset(['EW_GARAGE_NORTH', 'EW_GARAGE_WEST', 'EW_GARAGE_EAST', 'GW_1', 'GW_2', 'GW_4']);
+            });
+            document.getElementById('preset-north-facade').addEventListener('click', () => {
+                applyPreset(['EW_NORTH_RECESSED', 'EW_GARAGE_EAST', 'EW_GARAGE_NORTH', 'UW_TERRACE_BACK', 'UW_TERRACE_EAST', 'UW_NORTH_MAIN']);
+            });
+            document.getElementById('preset-ground-ext').addEventListener('click', () => {
+                applyPreset(allWalls.filter(w => w.floor === 'ground' && w.category === 'exterior').map(w => w.id));
+            });
+            document.getElementById('preset-ground-int').addEventListener('click', () => {
+                applyPreset(allWalls.filter(w => w.floor === 'ground' && w.category === 'internal').map(w => w.id));
+            });
+            document.getElementById('preset-ground-all').addEventListener('click', () => {
+                applyPreset(allWalls.filter(w => w.floor === 'ground').map(w => w.id));
+            });
+            document.getElementById('preset-first-all').addEventListener('click', () => {
+                applyPreset(allWalls.filter(w => w.floor === 'first').map(w => w.id));
+            });
+            document.getElementById('preset-all-walls').addEventListener('click', () => {
+                applyPreset(allWalls.map(w => w.id));
+            });
+            document.getElementById('preset-clear').addEventListener('click', () => {
+                appState.selectedIds.clear();
+                renderDropdownAndInspector();
+                renderScene();
+            });
+
+            // Toggles
+            document.getElementById('toggle-axes').addEventListener('change', e => {
+                appState.showAxes = e.target.checked;
+                renderScene();
+            });
+            document.getElementById('toggle-vertices').addEventListener('change', e => {
+                appState.showVertices = e.target.checked;
+                renderScene();
+            });
+            document.getElementById('toggle-normals').addEventListener('change', e => {
+                appState.showNormals = e.target.checked;
+                renderScene();
+            });
+            document.getElementById('toggle-ghost').addEventListener('change', e => {
+                appState.showGhost = e.target.checked;
+                renderScene();
+            });
+            document.getElementById('toggle-slice-plane').addEventListener('change', e => {
+                appState.showSlicePlane = e.target.checked;
+                document.getElementById('slice-slider-row').style.display = e.target.checked ? 'flex' : 'none';
+                renderScene();
+            });
+            document.getElementById('slice-y-slider').addEventListener('input', e => {
+                appState.sliceZMm = Number(e.target.value) || 1200;
+                document.getElementById('slice-y-label').textContent = `${appState.sliceZMm.toLocaleString()} mm`;
+                renderScene();
+            });
+
+            // Camera Preset Buttons (Z-up: yaw=-90 deg is looking from North -Y toward South +Y, so +X grows right)
+            document.getElementById('cam-focus').addEventListener('click', focusSelectedWalls);
+            document.getElementById('cam-iso-ne').addEventListener('click', () => {
+                appState.yaw = -115 * Math.PI / 180;
+                appState.pitch = 25 * Math.PI / 180;
+                focusSelectedWalls();
+            });
+            document.getElementById('cam-iso-nw').addEventListener('click', () => {
+                appState.yaw = -65 * Math.PI / 180;
+                appState.pitch = 25 * Math.PI / 180;
+                focusSelectedWalls();
+            });
+            document.getElementById('cam-north').addEventListener('click', () => {
+                appState.yaw = -90 * Math.PI / 180;
+                appState.pitch = 8 * Math.PI / 180;
+                focusSelectedWalls();
+            });
+            document.getElementById('cam-west').addEventListener('click', () => {
+                appState.yaw = 0;
+                appState.pitch = 10 * Math.PI / 180;
+                focusSelectedWalls();
+            });
+            document.getElementById('cam-top').addEventListener('click', () => {
+                appState.yaw = -90 * Math.PI / 180;
+                appState.pitch = 88 * Math.PI / 180;
+                focusSelectedWalls();
+            });
+
+            // Initialize
+            renderDropdownAndInspector();
+            focusSelectedWalls();
+        })();
+    </script>
+</body>
+
+</html>

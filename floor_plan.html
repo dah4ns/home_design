@@ -531,6 +531,9 @@
             <a href="floor_plan.html" class="nav-btn" style="background: #059669; color: #ffffff; border-color: #34d399;">
                 <span>🗺️</span> 2D Floor Plans
             </a>
+            <a href="walls_3d.html" class="nav-btn" style="background: rgba(56, 189, 248, 0.16); color: #38bdf8; border-color: rgba(56, 189, 248, 0.4);">
+                <span>🧱</span> 3D Wall Space
+            </a>
         </div>
 
         <div class="header-title-group">
@@ -816,10 +819,12 @@
     <script src="data/views.js"></script>
     <script src="data/windows.js"></script>
     <script src="data/sockets.js"></script>
+    <script src="data/walls.js"></script>
     <script src="js/persistence.js"></script>
     <script src="js/window-store.js"></script>
     <script src="js/socket-store.js"></script>
     <script src="js/coordinate-service.js"></script>
+    <script src="js/wall-service.js"></script>
 
     <script>
         /**
@@ -873,9 +878,7 @@
             [12095, 3190],
             [12095, 110],
             [20325, 110],
-            [20325, 7205],
-            [20305, 7205],
-            [20305, 8160],
+            [20325, 8160],
             [19155, 8160],
             [19155, 11420],
             [20305, 11420],
@@ -2181,26 +2184,74 @@
             }
             svg.appendChild(roofsG);
 
-            // 3. Exterior Wall Shell & Open Interior Floor Slab Layer
+            // 3. Exterior Wall Shell & Open Interior Floor Slab Layer (driven by WallService two-sided B-Rep slice at y = 1,200 mm)
+            const floorSlice = (typeof WallService !== 'undefined' && WallService.getFloorPlanSlice)
+                ? WallService.getFloorPlanSlice(floor, 1200)
+                : null;
             const outerPoly = (floor === 'ground') ? GROUND_OUTER_POLY : FIRST_OUTER_POLY;
             const innerPoly = (floor === 'ground') ? GROUND_INNER_POLY : FIRST_INNER_POLY;
 
             const shellG = svgEl('g', { class: 'layer-shell' });
-            // Outer structural wall polygon
-            shellG.appendChild(svgEl('polygon', {
-                points: polyToPointsAttr(outerPoly),
-                fill: '#334155',
-                stroke: '#94a3b8',
-                'stroke-width': 28
-            }));
-            // Open interior floor slab polygon (400 mm inside outer facade)
+            // Open interior floor slab polygon
             shellG.appendChild(svgEl('polygon', {
                 points: polyToPointsAttr(innerPoly),
                 fill: '#162033',
-                stroke: '#64748b',
-                'stroke-width': 14
+                stroke: 'none'
             }));
-            // Subtle 200 mm jamb-depth reference line inside the 400 mm wall
+
+            if (floorSlice && floorSlice.exteriorWalls && floorSlice.exteriorWalls.length > 0) {
+                floorSlice.exteriorWalls.forEach(w => {
+                    const isSelected = (planState.selectedItem && planState.selectedItem.kind === 'internal_wall' && planState.selectedItem.id === w.id);
+                    const wallPoly = svgEl('polygon', {
+                        points: polyToPointsAttr(w.footprint2D),
+                        fill: isSelected ? '#0284c7' : '#334155',
+                        stroke: isSelected ? '#ffffff' : 'rgba(148, 163, 184, 0.35)',
+                        'stroke-width': isSelected ? 24 : 10,
+                        'data-wall-id': w.id,
+                        style: 'cursor: pointer;'
+                    });
+                    wallPoly.addEventListener('click', (e) => {
+                        if (planState.activeTool !== 'select') return;
+                        e.stopPropagation();
+                        selectInternalWall(floor, w.id);
+                    });
+                    shellG.appendChild(wallPoly);
+
+                    // Draw Side A (exterior face) and Side B (interior face) directed baseline segments
+                    if (w.sideA) {
+                        shellG.appendChild(svgEl('line', {
+                            x1: toSvgX(w.sideA.p1[0]), y1: toSvgZ(w.sideA.p1[1]),
+                            x2: toSvgX(w.sideA.p2[0]), y2: toSvgZ(w.sideA.p2[1]),
+                            stroke: isSelected ? '#38bdf8' : '#94a3b8',
+                            'stroke-width': isSelected ? 32 : 26,
+                            'pointer-events': 'none'
+                        }));
+                    }
+                    if (w.sideB) {
+                        shellG.appendChild(svgEl('line', {
+                            x1: toSvgX(w.sideB.p1[0]), y1: toSvgZ(w.sideB.p1[1]),
+                            x2: toSvgX(w.sideB.p2[0]), y2: toSvgZ(w.sideB.p2[1]),
+                            stroke: isSelected ? '#fde047' : '#64748b',
+                            'stroke-width': isSelected ? 24 : 14,
+                            'pointer-events': 'none'
+                        }));
+                    }
+                });
+            } else {
+                // Fallback outer/inner polygons if WallService is unavailable
+                shellG.appendChild(svgEl('polygon', {
+                    points: polyToPointsAttr(outerPoly),
+                    fill: '#334155',
+                    stroke: '#94a3b8',
+                    'stroke-width': 28
+                }));
+                shellG.appendChild(svgEl('polygon', {
+                    points: polyToPointsAttr(innerPoly),
+                    fill: '#162033',
+                    stroke: '#64748b',
+                    'stroke-width': 14
+                }));
+            }
             svg.appendChild(shellG);
 
             // 4. 120 mm (12 cm) Internal Partition Walls, Doorways & Room Labels Layer (per A.02 & A.03)
@@ -2452,156 +2503,195 @@
         }
 
         // Render comprehensive fine-line interior wall-to-wall distances & wall thicknesses for a floor
+        // dynamically derived from the 3D B-Rep walls in WallService (data/walls.js).
         function renderWallDistancesAndThicknessForFloor(floor, group) {
+            const wallMap = {};
+            if (typeof WallService !== 'undefined' && WallService.getWalls) {
+                WallService.getWalls({ floor }).forEach(w => {
+                    wallMap[w.id] = w;
+                });
+            }
+
+            // Draw a wall's thickness callout dynamically from its compiled sideA / sideB coordinates
+            function wallThick(wallId, crossCoord, offsetSign = 1, color = '#fb7185') {
+                const w = wallMap[wallId];
+                if (!w) return;
+                if (w.axis === 'y' || w.axis === 'z') {
+                    drawWallThicknessDim(group, w.x2, crossCoord, w.x1, crossCoord, offsetSign, color);
+                } else {
+                    drawWallThicknessDim(group, crossCoord, w.z1, crossCoord, w.z2, offsetSign, color);
+                }
+            }
+
+            // Draw the clear interior room span between two facing walls dynamically from WallService
+            function wallSpan(wallId1, wallId2, crossCoord, labelSide = 1, color = '#ef4444') {
+                const w1 = wallMap[wallId1];
+                const w2 = wallMap[wallId2];
+                if (!w1 || !w2) return;
+                if (w1.axis === 'y' || w1.axis === 'z') {
+                    const mid1 = (w1.x1 + w1.x2) / 2;
+                    const mid2 = (w2.x1 + w2.x2) / 2;
+                    const xStart = (mid1 >= mid2) ? w1.x1 : w1.x2;
+                    const xEnd = (mid1 >= mid2) ? w2.x2 : w2.x1;
+                    drawWallSpanDim(group, xStart, crossCoord, xEnd, crossCoord, labelSide, color);
+                } else {
+                    const mid1 = (w1.z1 + w1.z2) / 2;
+                    const mid2 = (w2.z1 + w2.z2) / 2;
+                    const zStart = (mid1 <= mid2) ? w1.z2 : w1.z1;
+                    const zEnd = (mid1 <= mid2) ? w2.z1 : w2.z2;
+                    drawWallSpanDim(group, crossCoord, zStart, crossCoord, zEnd, labelSide, color);
+                }
+            }
+
             if (floor === 'ground') {
                 // ---- A. HORIZONTAL (EAST <-> WEST) ROOM SPANS & WALL THICKNESSES ----
                 // 1) Garage & Magazyn North bay (Z = 520 mm): 38 + 605 + 18 + 200 + 38 = 899 cm
-                drawWallThicknessDim(group, 20705, 520, 20325, 520, 1);
-                drawWallSpanDim(group, 20325, 520, 14275, 520, 1);
-                drawWallThicknessDim(group, 14275, 520, 14095, 520, 1);
-                drawWallSpanDim(group, 14095, 520, 12095, 520, 1);
-                drawWallThicknessDim(group, 12095, 520, 11715, 520, 1);
+                wallThick('EW_GARAGE_WEST', 520, 1);
+                wallSpan('EW_GARAGE_WEST', 'GW_1', 520, 1);
+                wallThick('GW_1', 520, 1);
+                wallSpan('GW_1', 'EW_GARAGE_EAST', 520, 1);
+                wallThick('EW_GARAGE_EAST', 520, 1);
 
                 // 2) Kotłownia (200 cm), Kuchnia (542 cm), Spiżarnia (upper 187 cm) & Gabinet (upper) bay (Z = 3650 mm)
-                drawWallSpanDim(group, 14095, 3650, 12095, 3650, 1);
-                drawWallThicknessDim(group, 12095, 3650, 11975, 3650, 1);
-                drawWallSpanDim(group, 11975, 3650, 6555, 3650, 1);
-                drawWallThicknessDim(group, 6555, 4550, 6435, 4550, 1);
-                drawWallSpanDim(group, 6435, 3650, 4565, 3650, 1);
-                drawWallThicknessDim(group, 4565, 3650, 4445, 3650, 1);
-                drawWallSpanDim(group, 4445, 3650, 115, 3650, 1);
-                drawWallThicknessDim(group, 115, 3650, -285, 3650, 1);
+                wallSpan('GW_1', 'GW_3', 3650, 1);
+                wallThick('GW_3', 3650, 1);
+                wallSpan('GW_3', 'GW_13', 3650, 1);
+                wallThick('GW_13', 4550, 1);
+                wallSpan('GW_13', 'GW_14a', 3650, 1);
+                wallThick('GW_14a', 3650, 1);
+                wallSpan('GW_14a', 'EW_EAST_CORE', 3650, 1);
+                wallThick('EW_EAST_CORE', 3650, 1);
 
                 // 3) Spiżarnia (lower 152 cm) & Gabinet (lower) bay (Z = 5680 mm)
-                drawWallSpanDim(group, 6435, 5680, 4915, 5680, 1);
-                drawWallThicknessDim(group, 4915, 5680, 4795, 5680, 1);
-                drawWallSpanDim(group, 4795, 5680, 115, 5680, 1);
+                wallSpan('GW_13', 'GW_14c', 5680, 1);
+                wallThick('GW_14c', 5680, 1);
+                wallSpan('GW_14c', 'EW_EAST_CORE', 5680, 1);
 
                 // 4) Wiatrołap (North), Garderoba & WC bay (Z = 7680 mm)
-                drawWallSpanDim(group, 20305, 7680, 16565, 7680, 1);
-                drawWallThicknessDim(group, 16565, 7680, 16445, 7680, 1);
-                drawWallSpanDim(group, 16445, 7680, 14315, 7680, 1);
-                drawWallThicknessDim(group, 14315, 7680, 14195, 7680, 1);
-                drawWallSpanDim(group, 14195, 7680, 12095, 7680, 1);
-                drawWallThicknessDim(group, 12095, 7680, 11975, 7680, 1);
+                wallSpan('EW_GARAGE_WEST', 'GW_5', 7680, 1);
+                wallThick('GW_5', 7680, 1);
+                wallSpan('GW_5', 'GW_6', 7680, 1);
+                wallThick('GW_6', 7680, 1);
+                wallSpan('GW_6', 'GW_3', 7680, 1);
+                wallThick('GW_3', 7680, 1);
 
                 // 5) Entrance Alcove, Wiatrołap (259 cm), Komunikacja, Jadalnia & Salon bay (Z = 10720 mm)
-                drawWallThicknessDim(group, 19555, 8950, 19155, 8950, 1);
-                drawWallSpanDim(group, 19155, 10720, 16565, 10720, 1);
-                drawWallThicknessDim(group, 16565, 10720, 16445, 10720, 1);
-                drawWallSpanDim(group, 16445, 10720, 12095, 10720, 1);
-                drawWallThicknessDim(group, 12095, 11110, 11975, 11110, -1);
-                drawWallSpanDim(group, 11975, 10720, 115, 10720, -1);
+                wallThick('EW_ALCOVE_WEST', 8950, 1);
+                wallSpan('EW_ALCOVE_WEST', 'GW_5', 10720, 1);
+                wallThick('GW_5', 10720, 1);
+                wallSpan('GW_5', 'GW_3b', 10720, 1);
+                wallThick('GW_3b', 11110, -1);
+                wallSpan('GW_3b', 'EW_EAST_CORE', 10720, -1);
 
                 // 6) Pralnia (397 cm) & SW Komunikacja (112 cm) bay (Z = 11680 mm)
-                drawWallSpanDim(group, 20305, 11680, 16335, 11680, 1);
-                drawWallThicknessDim(group, 16335, 11680, 16215, 11680, 1);
-                drawWallSpanDim(group, 16215, 11680, 15095, 11680, 1);
-                drawWallThicknessDim(group, 15095, 12300, 14695, 12300, 1);
+                wallSpan('EW_WEST_SOUTH', 'GW_9', 11680, 1);
+                wallThick('GW_9', 11680, 1);
+                wallSpan('GW_9', 'EW_SW_EAST', 11680, 1);
+                wallThick('EW_SW_EAST', 12300, 1);
 
                 // 7) Łazienka (239 cm) & Sauna (146 cm) bay (Z = 14720 mm)
-                drawWallSpanDim(group, 20305, 14720, 17915, 14720, -1);
-                drawWallThicknessDim(group, 17915, 14720, 17795, 14720, -1);
-                drawWallSpanDim(group, 17795, 14720, 16335, 14720, -1);
+                wallSpan('EW_WEST_SOUTH', 'GW_11', 14720, -1);
+                wallThick('GW_11', 14720, -1);
+                wallSpan('GW_11', 'GW_9', 14720, -1);
 
                 // 8) Siłownia (521 cm) bay (Z = 19850 mm)
-                drawWallThicknessDim(group, 20705, 19850, 20305, 19850, -1);
-                drawWallSpanDim(group, 20305, 19850, 15095, 19850, -1);
+                wallThick('EW_WEST_SOUTH', 19850, -1);
+                wallSpan('EW_WEST_SOUTH', 'EW_SW_EAST', 19850, -1);
 
                 // ---- B. VERTICAL (NORTH <-> SOUTH) ROOM SPANS & WALL THICKNESSES ----
                 // 1) Garage North-South span (709.5 cm at X = 19650 mm)
-                drawWallThicknessDim(group, 19650, -290, 19650, 110, 1);
-                drawWallSpanDim(group, 19650, 110, 19650, 7205, 1);
-                drawWallThicknessDim(group, 19650, 7205, 19650, 7325, 1);
+                wallThick('EW_GARAGE_NORTH', 19650, 1);
+                wallSpan('EW_GARAGE_NORTH', 'GW_4', 19650, 1);
+                wallThick('GW_4', 19650, 1);
 
                 // 2) Magazyn (230 cm), Kotłownia (467.5 cm), WC (177 cm) & Komunikacja (X = 13800 mm)
-                drawWallSpanDim(group, 13800, 110, 13800, 2410, -1);
-                drawWallThicknessDim(group, 13800, 2410, 13800, 2530, -1);
-                drawWallSpanDim(group, 13800, 2530, 13800, 7205, -1);
-                drawWallThicknessDim(group, 13800, 7205, 13800, 7325, -1);
-                drawWallSpanDim(group, 13800, 7325, 13800, 9095, -1);
-                drawWallThicknessDim(group, 13800, 9095, 13800, 9215, -1);
-                drawWallSpanDim(group, 12450, 9215, 12450, 11180, -1);
-                drawWallThicknessDim(group, 12450, 11180, 12450, 11580, -1);
+                wallSpan('EW_GARAGE_NORTH', 'GW_2', 13800, -1);
+                wallThick('GW_2', 13800, -1);
+                wallSpan('GW_2', 'GW_4', 13800, -1);
+                wallThick('GW_4', 13800, -1);
+                wallSpan('GW_4', 'GW_7', 13800, -1);
+                wallThick('GW_7', 13800, -1);
+                wallSpan('GW_7', 'EW_SOUTH_RECESSED', 12450, -1);
+                wallThick('EW_SOUTH_RECESSED', 12450, -1);
 
                 // 3) Wiatrołap, Pralnia (176 cm), Łazienka (173 cm) & Siłownia (558 cm) (X = 19750 / 17050 mm)
-                drawWallSpanDim(group, 17050, 7325, 17050, 11300, 1);
-                drawWallThicknessDim(group, 17050, 11300, 17050, 11420, 1);
-                drawWallSpanDim(group, 19750, 11420, 19750, 13180, 1);
-                drawWallThicknessDim(group, 19750, 13180, 19750, 13300, 1);
-                drawWallSpanDim(group, 19750, 13300, 19750, 15030, 1);
-                drawWallThicknessDim(group, 19750, 15030, 19750, 15150, 1);
-                drawWallSpanDim(group, 19750, 15150, 19750, 20730, 1);
-                drawWallThicknessDim(group, 19750, 20730, 19750, 21130, 1);
+                wallSpan('GW_4', 'GW_8', 17050, 1);
+                wallThick('GW_8', 17050, 1);
+                wallSpan('GW_8', 'GW_10', 19750, 1);
+                wallThick('GW_10', 19750, 1);
+                wallSpan('GW_10', 'GW_12', 19750, 1);
+                wallThick('GW_12', 19750, 1);
+                wallSpan('GW_12', 'EW_SW_SOUTH', 19750, 1);
+                wallThick('EW_SW_SOUTH', 19750, 1);
 
                 // 4) Spiżarnia N-S step (187 cm upper + 12 cm wall + 95 cm lower = 294 cm)
-                drawWallSpanDim(group, 4705, 3190, 4705, 5060, 1);
-                drawWallThicknessDim(group, 4705, 5060, 4705, 5180, 1);
-                drawWallSpanDim(group, 5075, 5180, 5075, 6130, 1);
+                wallSpan('EW_NORTH_RECESSED', 'GW_14b', 4705, 1);
+                wallThick('GW_14b', 4705, 1);
+                wallSpan('GW_14b', 'GW_15', 5075, 1);
 
                 // 5) Gabinet (294 cm) & Salon (493 cm) along East side (X = 650 mm)
-                drawWallThicknessDim(group, 650, 2790, 650, 3190, -1);
-                drawWallSpanDim(group, 650, 3190, 650, 6130, -1);
-                drawWallThicknessDim(group, 650, 6130, 650, 6250, -1);
-                drawWallSpanDim(group, 650, 6250, 650, 11180, -1);
+                wallThick('EW_NORTH_RECESSED', 650, -1);
+                wallSpan('EW_NORTH_RECESSED', 'GW_15', 650, -1);
+                wallThick('GW_15', 650, -1);
+                wallSpan('GW_15', 'EW_SOUTH_RECESSED', 650, -1);
 
                 // 6) Kuchnia + Jadalnia total N-S span (799 cm at X = 11450 mm)
-                drawWallSpanDim(group, 11450, 3190, 11450, 11180, -1);
+                wallSpan('EW_NORTH_RECESSED', 'EW_SOUTH_RECESSED', 11450, -1);
             } else {
                 // ---- UPPER FLOOR (PIĘTRO, A.03) ----
                 // ---- A. HORIZONTAL (EAST <-> WEST) ROOM SPANS & WALL THICKNESSES ----
                 // 1) North rooms: 1.05 Pokój (477 cm), 1.03 Łazienka (148 cm), 1.02 Łazienka (244 cm), 1.01 Sypialnia (454 cm)
-                drawWallThicknessDim(group, 20705, 3650, 20305, 3650, 1);
-                drawWallSpanDim(group, 20305, 3650, 15535, 3650, 1);
-                drawWallThicknessDim(group, 15535, 3650, 15415, 3650, 1);
-                drawWallSpanDim(group, 15415, 3650, 13935, 3650, 1);
-                drawWallThicknessDim(group, 13935, 3650, 13815, 3650, 1);
-                drawWallSpanDim(group, 13815, 3650, 11375, 3650, 1);
-                drawWallThicknessDim(group, 11375, 3650, 11255, 3650, 1);
-                drawWallSpanDim(group, 11255, 3650, 6715, 3650, 1);
-                drawWallThicknessDim(group, 6715, 3650, 6315, 3650, 1);
+                wallThick('UW_WEST', 3650, 1);
+                wallSpan('UW_WEST', 'FW_1', 3650, 1);
+                wallThick('FW_1', 3650, 1);
+                wallSpan('FW_1', 'FW_3', 3650, 1);
+                wallThick('FW_3', 3650, 1);
+                wallSpan('FW_3', 'FW_5', 3650, 1);
+                wallThick('FW_5', 3650, 1);
+                wallSpan('FW_5', 'UW_TERRACE_EAST', 3650, 1);
+                wallThick('UW_TERRACE_EAST', 3650, 1);
 
                 // 2) 1.05 / 1.04 Alcove step row (292 cm + 12 cm + 173 cm at Z = 7350 mm)
-                drawWallSpanDim(group, 20305, 7350, 17385, 7350, 1);
-                drawWallThicknessDim(group, 17385, 7350, 17265, 7350, 1);
-                drawWallSpanDim(group, 17265, 7350, 15535, 7350, 1);
+                wallSpan('UW_WEST', 'FW_2b', 7350, 1);
+                wallThick('FW_2b', 7350, 1);
+                wallSpan('FW_2b', 'FW_1', 7350, 1);
 
                 // 3) South rooms: 1.04 Pokój (477 cm), 1.06 Korytarz (484 cm), 1.08 Garderoba (324 cm), Void (698 cm)
-                drawWallSpanDim(group, 20305, 10680, 15535, 10680, -1);
-                drawWallThicknessDim(group, 15535, 10680, 15415, 10680, -1);
-                drawWallSpanDim(group, 15415, 10680, 10575, 10680, -1);
-                drawWallThicknessDim(group, 10575, 10680, 10455, 10680, -1);
-                drawWallSpanDim(group, 10455, 10680, 7215, 10680, -1);
-                drawWallThicknessDim(group, 7215, 10680, 7095, 10680, -1);
-                drawWallSpanDim(group, 7095, 10680, 115, 10680, -1);
-                drawWallThicknessDim(group, 115, 10680, -285, 10680, -1);
+                wallSpan('UW_WEST', 'FW_1', 10680, -1);
+                wallThick('FW_1', 10680, -1);
+                wallSpan('FW_1', 'FW_8', 10680, -1);
+                wallThick('FW_8', 10680, -1);
+                wallSpan('FW_8', 'FW_9', 10680, -1);
+                wallThick('FW_9', 10680, -1);
+                wallSpan('FW_9', 'UW_EAST', 10680, -1);
+                wallThick('UW_EAST', 10680, -1);
 
                 // ---- B. VERTICAL (NORTH <-> SOUTH) ROOM SPANS & WALL THICKNESSES ----
                 // 1) West side: 1.05 Pokój (357 cm) + 12 cm + 1.04 Pokój (430 cm) (X = 19750 mm)
-                drawWallThicknessDim(group, 17500, 2790, 17500, 3190, 1);
-                drawWallSpanDim(group, 19750, 3190, 19750, 6760, 1);
-                drawWallThicknessDim(group, 19750, 6760, 19750, 6880, 1);
-                drawWallSpanDim(group, 19750, 6880, 19750, 11180, 1);
-                drawWallThicknessDim(group, 17500, 11180, 17500, 11580, -1);
+                wallThick('UW_NORTH_MAIN', 17500, 1);
+                wallSpan('UW_NORTH_MAIN', 'FW_2a', 19750, 1);
+                wallThick('FW_2a', 19750, 1);
+                wallSpan('FW_2a', 'UW_SOUTH', 19750, 1);
+                wallThick('UW_SOUTH', 17500, -1);
 
                 // 2) Alcove step: 119 cm + 12 cm + 299 cm (X = 16950 mm)
-                drawWallSpanDim(group, 16950, 6880, 16950, 8070, 1);
-                drawWallThicknessDim(group, 16950, 8070, 16950, 8190, 1);
-                drawWallSpanDim(group, 16950, 8190, 16950, 11180, 1);
+                wallSpan('FW_2a', 'FW_2c', 16950, 1);
+                wallThick('FW_2c', 16950, 1);
+                wallSpan('FW_2c', 'UW_SOUTH', 16950, 1);
 
                 // 3) 1.03 Łazienka (357 cm at X = 15100 mm)
-                drawWallSpanDim(group, 15100, 3190, 15100, 6760, 1);
-                drawWallThicknessDim(group, 15100, 6760, 15100, 6880, 1);
+                wallSpan('UW_NORTH_MAIN', 'FW_4', 15100, 1);
+                wallThick('FW_4', 15100, 1);
 
                 // 4) 1.02 Łazienka (282 cm) & 1.06 Korytarz (505 cm) (X = 13350 mm)
-                drawWallSpanDim(group, 13350, 3190, 13350, 6010, 1);
-                drawWallThicknessDim(group, 13350, 6010, 13350, 6130, 1);
-                drawWallSpanDim(group, 13350, 6130, 13350, 11180, 1);
+                wallSpan('UW_NORTH_MAIN', 'FW_6', 13350, 1);
+                wallThick('FW_6', 13350, 1);
+                wallSpan('FW_6', 'UW_SOUTH', 13350, 1);
 
                 // 5) 1.01 Sypialnia (294 cm) & 1.08 Garderoba (493 cm) (X = 7650 mm)
-                drawWallSpanDim(group, 7650, 3190, 7650, 6130, -1);
-                drawWallThicknessDim(group, 7650, 6130, 7650, 6250, -1);
-                drawWallSpanDim(group, 7650, 6250, 7650, 11180, -1);
+                wallSpan('UW_NORTH_MAIN', 'FW_7', 7650, -1);
+                wallThick('FW_7', 7650, -1);
+                wallSpan('FW_7', 'UW_SOUTH', 7650, -1);
             }
         }
 
@@ -2660,58 +2750,91 @@
                 }));
             }
 
-            // 2. Draw all 120 mm (12 cm) internal walls
-            const walls = INTERNAL_WALLS[floor] || [];
-            walls.forEach(w => {
+            // 2. Draw all internal partition walls from WallService (or fallback INTERNAL_WALLS)
+            const sliceInternal = (typeof WallService !== 'undefined' && WallService.getFloorPlanSlice)
+                ? WallService.getFloorPlanSlice(floor, 1200).internalWalls
+                : (INTERNAL_WALLS[floor] || []);
+
+            sliceInternal.forEach(w => {
                 const isSelected = (planState.selectedItem && planState.selectedItem.kind === 'internal_wall' && planState.selectedItem.id === w.id);
-                const rx = Math.min(toSvgX(w.x1), toSvgX(w.x2));
-                const rz = Math.min(toSvgZ(w.z1), toSvgZ(w.z2));
-                const rw = Math.abs(toSvgX(w.x2) - toSvgX(w.x1));
-                const rh = Math.abs(toSvgZ(w.z2) - toSvgZ(w.z1));
+                const solidPolys = (Array.isArray(w.solidPolygons2D) && w.solidPolygons2D.length > 0)
+                    ? w.solidPolygons2D
+                    : (Array.isArray(w.footprint2D) && w.footprint2D.length === 4 ? [w.footprint2D] : []);
 
-                const wallRect = svgEl('rect', {
-                    x: rx, y: rz, width: rw, height: rh,
-                    fill: isSelected ? '#0284c7' : '#475569',
-                    stroke: isSelected ? '#ffffff' : '#cbd5e1',
-                    'stroke-width': isSelected ? 20 : 10,
-                    style: 'cursor: pointer;'
-                });
-                wallRect.addEventListener('click', (e) => {
-                    if (planState.activeTool !== 'select') return;
-                    e.stopPropagation();
-                    selectInternalWall(floor, w.id);
-                });
-                group.appendChild(wallRect);
-
-                // Render interior doorway cutouts & threshold lines along this 120 mm wall
-                if (Array.isArray(w.doors)) {
-                    w.doors.forEach(d => {
-                        let dx1, dx2, dz1, dz2;
-                        if (w.axis === 'z') {
-                            dx1 = w.x1;
-                            dx2 = w.x2;
-                            dz1 = d.start;
-                            dz2 = d.end;
-                        } else {
-                            dx1 = d.start;
-                            dx2 = d.end;
-                            dz1 = w.z1;
-                            dz2 = w.z2;
-                        }
-                        const drx = Math.min(toSvgX(dx1), toSvgX(dx2));
-                        const drz = Math.min(toSvgZ(dz1), toSvgZ(dz2));
-                        const drw = Math.abs(toSvgX(dx2) - toSvgX(dx1));
-                        const drh = Math.abs(toSvgZ(dz2) - toSvgZ(dz1));
-
-                        group.appendChild(svgEl('rect', {
-                            x: drx, y: drz, width: drw, height: drh,
-                            fill: '#162033',
-                            stroke: 'rgba(148, 163, 184, 0.45)',
-                            'stroke-width': 8,
-                            'stroke-dasharray': '50,40'
-                        }));
+                if (solidPolys.length > 0) {
+                    solidPolys.forEach(poly => {
+                        const wallPoly = svgEl('polygon', {
+                            points: polyToPointsAttr(poly),
+                            fill: isSelected ? '#0284c7' : '#475569',
+                            stroke: isSelected ? '#ffffff' : '#cbd5e1',
+                            'stroke-width': isSelected ? 20 : 10,
+                            'data-wall-id': w.id,
+                            style: 'cursor: pointer;'
+                        });
+                        wallPoly.addEventListener('click', (e) => {
+                            if (planState.activeTool !== 'select') return;
+                            e.stopPropagation();
+                            selectInternalWall(floor, w.id);
+                        });
+                        group.appendChild(wallPoly);
                     });
+                } else {
+                    const rx = Math.min(toSvgX(w.x1), toSvgX(w.x2));
+                    const rz = Math.min(toSvgZ(w.z1), toSvgZ(w.z2));
+                    const rw = Math.abs(toSvgX(w.x2) - toSvgX(w.x1));
+                    const rh = Math.abs(toSvgZ(w.z2) - toSvgZ(w.z1));
+                    const wallRect = svgEl('rect', {
+                        x: rx, y: rz, width: rw, height: rh,
+                        fill: isSelected ? '#0284c7' : '#475569',
+                        stroke: isSelected ? '#ffffff' : '#cbd5e1',
+                        'stroke-width': isSelected ? 20 : 10,
+                        style: 'cursor: pointer;'
+                    });
+                    wallRect.addEventListener('click', (e) => {
+                        if (planState.activeTool !== 'select') return;
+                        e.stopPropagation();
+                        selectInternalWall(floor, w.id);
+                    });
+                    group.appendChild(wallRect);
                 }
+
+                // Render interior doorway threshold markers where the 3D outerLoop doorway notch is sliced at y = 1,200 mm
+                const doorList = Array.isArray(w.cutOpeningsAtSlice)
+                    ? w.cutOpeningsAtSlice
+                    : (Array.isArray(w.slicedOpenings) ? w.slicedOpenings : (Array.isArray(w.doors) ? w.doors : []));
+                doorList.forEach(d => {
+                    let dx1, dx2, dz1, dz2;
+                    if (w.axis === 'y' || w.axis === 'z') {
+                        dx1 = w.x1;
+                        dx2 = w.x2;
+                        dz1 = d.start;
+                        dz2 = d.end;
+                    } else {
+                        dx1 = d.start;
+                        dx2 = d.end;
+                        dz1 = w.z1;
+                        dz2 = w.z2;
+                    }
+                    const drx = Math.min(toSvgX(dx1), toSvgX(dx2));
+                    const drz = Math.min(toSvgZ(dz1), toSvgZ(dz2));
+                    const drw = Math.abs(toSvgX(dx2) - toSvgX(dx1));
+                    const drh = Math.abs(toSvgZ(dz2) - toSvgZ(dz1));
+
+                    const doorRect = svgEl('rect', {
+                        x: drx, y: drz, width: drw, height: drh,
+                        fill: '#162033',
+                        stroke: 'rgba(148, 163, 184, 0.45)',
+                        'stroke-width': 8,
+                        'stroke-dasharray': '50,40',
+                        style: 'cursor: pointer;'
+                    });
+                    doorRect.addEventListener('click', (e) => {
+                        if (planState.activeTool !== 'select') return;
+                        e.stopPropagation();
+                        selectInternalWall(floor, w.id);
+                    });
+                    group.appendChild(doorRect);
+                });
             });
 
             // 3. Draw room number, name & internal measurement labels from A.02 / A.03
@@ -2795,7 +2918,10 @@
 
             if (planState.selectedItem.kind === 'internal_wall') {
                 const floor = planState.selectedItem.floor || 'ground';
-                const w = (INTERNAL_WALLS[floor] || []).find(item => item.id === planState.selectedItem.id);
+                const compiledW = (typeof WallService !== 'undefined' && WallService.getWallById)
+                    ? WallService.getWallById(planState.selectedItem.id)
+                    : null;
+                const w = compiledW || (INTERNAL_WALLS[floor] || []).find(item => item.id === planState.selectedItem.id);
                 if (!w) {
                     selectOpening('O4');
                     return;
@@ -2803,20 +2929,43 @@
                 editPanelEl.style.display = 'none';
                 if (opEditPanelEl) opEditPanelEl.style.display = 'none';
 
-                const lenMm = (w.axis === 'z') ? (w.z2 - w.z1) : (w.x2 - w.x1);
-                const thickMm = (w.axis === 'z') ? (w.x2 - w.x1) : (w.z2 - w.z1);
+                const isExterior = w.category === 'exterior';
+                const lenMm = w.sideA ? Math.round(w.sideA.lengthMm) : ((w.axis === 'y' || w.axis === 'z') ? (w.z2 - w.z1) : (w.x2 - w.x1));
+                const thickMm = w.thickness || ((w.axis === 'y' || w.axis === 'z') ? (w.x2 - w.x1) : (w.z2 - w.z1));
 
-                pillEl.textContent = '12 cm Internal Wall';
+                pillEl.textContent = isExterior
+                    ? `${(thickMm / 10).toFixed(0)} cm Exterior 3D B-Rep Wall`
+                    : `${(thickMm / 10).toFixed(0)} cm Internal 3D B-Rep Wall`;
                 titleEl.textContent = w.name;
                 subEl.textContent = `${floor === 'ground' ? 'Lower Floor (A.02 Parter)' : 'Upper Floor (A.03 Piętro)'} • ${w.rooms}`;
 
+                const sideADesc = w.sideA
+                    ? `[${w.sideA.p1[0]}, ${w.sideA.p1[1]}] → [${w.sideA.p2[0]}, ${w.sideA.p2[1]}] (L=${Math.round(w.sideA.lengthMm)} mm, n=[${w.sideA.normal.join(', ')}])`
+                    : `${w.x1}..${w.x2} mm`;
+                const sideBDesc = w.sideB
+                    ? `[${w.sideB.p1[0]}, ${w.sideB.p1[1]}] → [${w.sideB.p2[0]}, ${w.sideB.p2[1]}] (L=${Math.round(w.sideB.lengthMm)} mm, n=[${w.sideB.normal.join(', ')}])`
+                    : `${w.z1}..${w.z2} mm`;
+                const outerLoopVerts = (w.sideA && Array.isArray(w.sideA.outerLoop)) ? w.sideA.outerLoop : [];
+                const outerLoopDesc = outerLoopVerts.length > 0
+                    ? `${outerLoopVerts.length} vertices: ${outerLoopVerts.slice(0, 6).map(pt => `(${pt[0]},${pt[1]},${pt[2]})`).join(' → ')}${outerLoopVerts.length > 6 ? ` … +${outerLoopVerts.length - 6} more` : ''}`
+                    : '4 vertices';
+                const holesArr = (w.sideA && Array.isArray(w.sideA.holes)) ? w.sideA.holes : [];
+                const holesDesc = holesArr.length > 0
+                    ? holesArr.map(h => `${h.id}: [${h.loop.map(pt => `(${pt[0]},${pt[1]},${pt[2]})`).join(' → ')}]`).join(' | ')
+                    : '0 interior hole loops';
+
+                const zBot = w.zBottom !== undefined ? w.zBottom : (w.yBottom || 0);
+                const zTop = w.zTop !== undefined ? w.zTop : (w.yTop || 2800);
                 const rows = [
-                    ['Floor Level', floor === 'ground' ? 'Parter (±0.00 m)' : 'Piętro (+3.43 m)'],
+                    ['Wall ID & Role', `${w.id} (${isExterior ? 'Exterior Mitered B-Rep' : 'Interior Partition B-Rep'})`],
+                    ['3D Height (Z)', `${zBot.toLocaleString()}..${zTop.toLocaleString()} mm (H = ${(w.heightMm || 2800).toLocaleString()} mm)`],
                     ['Wall Thickness', `${thickMm} mm (${(thickMm / 10).toFixed(0)} cm)`],
-                    ['Wall Length', `${lenMm.toLocaleString()} mm (${(lenMm / 10).toFixed(1)} cm)`],
-                    ['X Span (E→W)', `${w.x1.toLocaleString()}..${w.x2.toLocaleString()} mm`],
-                    ['Z Span (N→S)', `${w.z1.toLocaleString()}..${w.z2.toLocaleString()} mm`],
-                    ['Adjacent Rooms', w.rooms],
+                    ['Side A (p1 → p2, n)', sideADesc],
+                    ['Side B (p1 → p2, n)', sideBDesc],
+                    ['3D outerLoop (x,y,z)', outerLoopDesc],
+                    ['3D holes[] (x,y,z)', holesDesc],
+                    ['Side Materials', w.sideA && w.sideB ? `${w.sideA.materialLabel} / ${w.sideB.materialLabel}` : 'Gypsum Plaster'],
+                    ['Adjacent Spaces', w.rooms],
                     ['CAD Reference', w.specs]
                 ];
                 populateKvRows(kvListEl, rows);
