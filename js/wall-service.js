@@ -441,7 +441,6 @@
                 yBottom: zBottom,
                 yTop: zTop,
                 heightMm,
-                facadeBounds: s.facadeBounds || null,
                 outerLoop: outerLoop3D,
                 outerLoop3D,
                 holes: holes3D,
@@ -700,9 +699,13 @@
         },
 
         /**
-         * Project all visible 3D wall faces onto an elevation view using dot(side.normal, view.lookDir) < 0,
-         * sorted back-to-front by depth along lookDir, and generate each face's SVG <path fill-rule="evenodd">
-         * from its 3D outerLoop + 3D window holes.
+         * Project all visible 3D wall faces onto an elevation view using:
+         * 1. Back-face culling: dot(side.normal, view.lookDir) < 0
+         * 2. Direct 3D orthographic vertex projection of side.outerLoop3D + side.holes3D
+         *    onto (u, z) where u = dot([x, y, 0], rightDir) and v = -z
+         * 3. Front-to-back 3D occlusion culling: faces completely hidden behind closer
+         *    foreground walls (smaller depthMm along lookDir) are culled geometrically
+         * 4. Back-to-front painter's order sorting (depthMm descending)
          */
         getVisibleFacesForView: function (viewIdOrConfig) {
             const preset = (typeof viewIdOrConfig === 'string')
@@ -714,8 +717,15 @@
             const roleFilter = preset.role || 'exterior';
             const scale = preset.svgScale || 0.1;
 
+            const DEFAULT_SVG_GROUP_BY_WALL_ID = {
+                EW_NORTH_RECESSED: 'ground-recessed-facade',
+                EW_GARAGE_NORTH: 'ground-garage-volume',
+                UW_TERRACE_BACK: 'upper-terrace',
+                UW_NORTH_MAIN: 'upper-timber-facade'
+            };
+
             const allWalls = this.getWalls();
-            const visibleFaces = [];
+            const candidateFaces = [];
 
             allWalls.forEach(wall => {
                 wall.sides.forEach(side => {
@@ -724,54 +734,83 @@
                     const facingCos = dot3(side.normal, lookDir);
                     if (facingCos >= -1e-3) return;
 
-                    if (preset.viewId === 'north_facade' && wall.id === 'EW_ALCOVE_NORTH') {
-                        return;
-                    }
+                    if (!Array.isArray(side.outerLoop3D) || side.outerLoop3D.length < 3) return;
 
-                    const mid3D = [side.midpoint2D[0], side.midpoint2D[1], (side.zBottom + side.zTop) / 2];
-                    const depthMm = dot3(mid3D, lookDir);
+                    // Project actual 3D vertices of outerLoop3D onto (u, z) and camera depth along lookDir
+                    const uCoords = side.outerLoop3D.map(pt => dot3([pt[0], pt[1], 0], rightDir));
+                    const zCoords = side.outerLoop3D.map(pt => Number(pt[2]) || 0);
+                    const depthCoords = side.outerLoop3D.map(pt => dot3(pt, lookDir));
 
-                    const u1 = dot3([side.p1[0], side.p1[1], 0], rightDir);
-                    const u2 = dot3([side.p2[0], side.p2[1], 0], rightDir);
-                    const rawXMinMm = Math.min(u1, u2);
-                    const rawXMaxMm = Math.max(u1, u2);
+                    const xMinMm = Math.min(...uCoords);
+                    const xMaxMm = Math.max(...uCoords);
+                    const zMinMm = Math.min(...zCoords);
+                    const zMaxMm = Math.max(...zCoords);
+                    const lengthMm = Math.round(xMaxMm - xMinMm);
+                    const heightMm = Math.round(zMaxMm - zMinMm);
+                    if (lengthMm <= 0 || heightMm <= 0) return;
 
-                    const bounds = (preset.viewId === 'north_facade' && side.facadeBounds)
-                        ? side.facadeBounds
-                        : {
-                            xMinMm: rawXMinMm,
-                            xMaxMm: rawXMaxMm,
-                            lengthMm: Math.round(rawXMaxMm - rawXMinMm),
-                            svgGroupId: null
-                        };
+                    const depthMm = Math.round((depthCoords.reduce((acc, d) => acc + d, 0) / depthCoords.length) * 100) / 100;
 
-                    const svgX = bounds.xMinMm * scale;
-                    const svgY = -side.zTop * scale;
-                    const svgWidth = bounds.lengthMm * scale;
-                    const svgHeight = (side.zTop - side.zBottom) * scale;
+                    const svgX = Math.round(xMinMm * scale * 100) / 100;
+                    const svgY = Math.round(-zMaxMm * scale * 100) / 100;
+                    const svgWidth = Math.round(lengthMm * scale * 100) / 100;
+                    const svgHeight = Math.round(heightMm * scale * 100) / 100;
 
-                    // Build 3D -> 2D SVG path with outerLoop and holes (for fill-rule="evenodd")
-                    const facadeOuterLoop3D = (wall.floor === 'first' && Array.isArray(side.outerLoop3D) && side.outerLoop3D.length > 4)
-                        ? side.outerLoop3D.map(pt => [
-                            Math.max(bounds.xMinMm, Math.min(bounds.xMaxMm, pt[0])),
-                            pt[1],
-                            pt[2]
-                        ])
-                        : [
-                            [bounds.xMinMm, side.p1[1], (wall.floor === 'ground' ? -20 : side.zBottom)],
-                            [bounds.xMaxMm, side.p2[1], (wall.floor === 'ground' ? -20 : side.zBottom)],
-                            [bounds.xMaxMm, side.p2[1], side.zTop],
-                            [bounds.xMinMm, side.p1[1], side.zTop]
-                        ];
+                    // Project 3D outerLoop3D + 3D holes3D directly into SVG path (no facadeBounds overrides)
                     const svgPathD = buildElevationSvgPathFromLoops(
-                        facadeOuterLoop3D,
+                        side.outerLoop3D,
                         side.holes3D,
-                        [1, 0, 0],
+                        rightDir,
                         scale,
                         0
                     );
 
-                    visibleFaces.push({
+                    // Compute any 3D corner jamb returns exposed by corner window notches on this wall
+                    const jambReturns = [];
+                    const p1u = dot3([side.p1[0], side.p1[1], 0], rightDir);
+                    const p2u = dot3([side.p2[0], side.p2[1], 0], rightDir);
+                    const wallSpanMaxU = Math.max(p1u, p2u);
+                    const fixedY = side.p1[1];
+                    const fixedX = side.p1[0];
+                    const isHoriz = Math.abs(rightDir[0]) >= Math.abs(rightDir[1]);
+
+                    if (Array.isArray(wall.openings)) {
+                        wall.openings.forEach(op => {
+                            if (!op.active) return;
+                            // If a corner window ends inside the wall's 3D corner notch, the remaining strip
+                            // [op.end .. wallSpanMaxU] at [op.zMin .. op.zMax] is the perpendicular wall's exterior jamb return
+                            if (op.end < wallSpanMaxU - 1 && op.end >= xMaxMm - 400 && op.zMin > zMinMm && op.zMax <= zMaxMm) {
+                                const jStart = op.end;
+                                const jEnd = wallSpanMaxU;
+                                const returnLoop3D = isHoriz
+                                    ? [
+                                        [jStart, fixedY, op.zMin],
+                                        [jEnd, fixedY, op.zMin],
+                                        [jEnd, fixedY, op.zMax],
+                                        [jStart, fixedY, op.zMax]
+                                    ]
+                                    : [
+                                        [fixedX, jStart, op.zMin],
+                                        [fixedX, jEnd, op.zMin],
+                                        [fixedX, jEnd, op.zMax],
+                                        [fixedX, jStart, op.zMax]
+                                    ];
+                                jambReturns.push({
+                                    openingId: op.id,
+                                    uMinMm: jStart,
+                                    uMaxMm: jEnd,
+                                    widthMm: Math.round(jEnd - jStart),
+                                    zMinMm: op.zMin,
+                                    zMaxMm: op.zMax,
+                                    heightMm: Math.round(op.zMax - op.zMin),
+                                    loop3D: returnLoop3D,
+                                    svgPathD: buildElevationSvgPathFromLoops(returnLoop3D, [], rightDir, scale, 0)
+                                });
+                            }
+                        });
+                    }
+
+                    candidateFaces.push({
                         wallId: wall.id,
                         wallName: wall.name,
                         sideId: side.id,
@@ -784,15 +823,15 @@
                         depthMm,
                         p1: side.p1,
                         p2: side.p2,
-                        zBottom: side.zBottom,
-                        zTop: side.zTop,
-                        yBottom: side.zBottom,
-                        yTop: side.zTop,
-                        heightMm: side.heightMm,
-                        xMinMm: bounds.xMinMm,
-                        xMaxMm: bounds.xMaxMm,
-                        lengthMm: bounds.lengthMm,
-                        svgGroupId: bounds.svgGroupId || null,
+                        zBottom: zMinMm,
+                        zTop: zMaxMm,
+                        yBottom: zMinMm,
+                        yTop: zMaxMm,
+                        heightMm,
+                        xMinMm,
+                        xMaxMm,
+                        lengthMm,
+                        svgGroupId: (preset.viewId === 'north_facade' && DEFAULT_SVG_GROUP_BY_WALL_ID[wall.id]) || null,
                         svgRect: {
                             x: svgX,
                             y: svgY,
@@ -800,6 +839,7 @@
                             height: svgHeight
                         },
                         svgPathD,
+                        jambReturns,
                         outerLoop: side.outerLoop3D,
                         outerLoop3D: side.outerLoop3D,
                         holes: side.holes3D,
@@ -810,6 +850,50 @@
                 });
             });
 
+            // Sort front-to-back (smallest depthMm along lookDir is closest to viewer) for 3D occlusion culling
+            candidateFaces.sort((a, b) => {
+                if (Math.abs(a.depthMm - b.depthMm) > 1) {
+                    return a.depthMm - b.depthMm;
+                }
+                return a.xMinMm - b.xMinMm;
+            });
+
+            function isOccludedByFrontFaces(cand, frontFaces) {
+                const blockers = frontFaces.filter(f =>
+                    f.depthMm < cand.depthMm - 1 &&
+                    f.zBottom <= cand.zBottom + 1 &&
+                    f.zTop >= cand.zTop - 1 &&
+                    f.xMaxMm > cand.xMinMm &&
+                    f.xMinMm < cand.xMaxMm
+                );
+                if (blockers.length === 0) return false;
+
+                const intervals = blockers
+                    .map(f => [Math.max(cand.xMinMm, f.xMinMm), Math.min(cand.xMaxMm, f.xMaxMm)])
+                    .sort((a, b) => a[0] - b[0]);
+
+                let coveredUntil = cand.xMinMm;
+                for (let i = 0; i < intervals.length; i++) {
+                    const [start, end] = intervals[i];
+                    if (start > coveredUntil + 1) {
+                        return false;
+                    }
+                    coveredUntil = Math.max(coveredUntil, end);
+                    if (coveredUntil >= cand.xMaxMm - 1) {
+                        return true;
+                    }
+                }
+                return coveredUntil >= cand.xMaxMm - 1;
+            }
+
+            const visibleFaces = [];
+            candidateFaces.forEach(cand => {
+                if (!isOccludedByFrontFaces(cand, visibleFaces)) {
+                    visibleFaces.push(cand);
+                }
+            });
+
+            // Sort back-to-front (largest depthMm first) for SVG painter's rendering order
             visibleFaces.sort((a, b) => {
                 if (Math.abs(b.depthMm - a.depthMm) > 1) {
                     return b.depthMm - a.depthMm;
@@ -826,7 +910,7 @@
             const upperFaces = faces.filter(f => f.floor === 'first');
 
             const lowerLengthMm = lowerFaces.reduce((sum, f) => sum + f.lengthMm, 0);
-            const upperLengthMm = upperFaces.reduce((sum, f) => sum + f.lengthMm, 0);
+            const upperSolidSpanMm = upperFaces.reduce((sum, f) => sum + f.lengthMm, 0);
 
             const lowerBottomMm = lowerFaces.length ? Math.min(...lowerFaces.map(f => f.zBottom)) : 0;
             const lowerTopMm = lowerFaces.length ? Math.max(...lowerFaces.map(f => f.zTop)) : 2800;
@@ -841,7 +925,7 @@
                 lowerBottomMm,
                 lowerTopMm,
                 lowerBreakdown: lowerFaces.map(f => `${f.lengthMm.toLocaleString()} mm (${f.wallId})`).join(' + '),
-                upperLengthMm,
+                upperLengthMm: upperSolidSpanMm,
                 upperBottomMm,
                 upperTopMm,
                 upperBreakdown: upperFaces.map(f => `${f.lengthMm.toLocaleString()} mm (${f.wallId})`).join(' + ')
@@ -849,36 +933,27 @@
         },
 
         /**
-         * Synchronize North Facade SVG wall bodies using the 3D B-Rep outerLoop + holes
-         * (<path fill-rule="evenodd" d="M ... Z M ... Z">) so each wall on north_facade.html
-         * is rendered directly with its 3D window holes cut out of the wall geometry.
+         * Synchronize North Facade SVG wall bodies using true 2D orthographic projection
+         * of the 3D B-Rep outerLoop + holes (<path fill-rule="evenodd" d="M ... Z M ... Z">)
+         * and 3D corner jamb returns.
          */
         syncNorthFacadeSVG: function (doc) {
             const targetDoc = doc || (typeof document !== 'undefined' ? document : null);
             const faces = this.getVisibleFacesForView('north_facade');
             const specs = this.computeFacadeWallSpecs('north_facade');
 
-            if (typeof WindowComponent !== 'undefined' && WindowComponent.FACADE_WALL_SPECS && WindowComponent.FACADE_WALL_SPECS.north_facade) {
-                const nfSpec = WindowComponent.FACADE_WALL_SPECS.north_facade;
-                nfSpec.lowerLengthMm = specs.lowerLengthMm;
-                nfSpec.lowerBottomMm = specs.lowerBottomMm;
-                nfSpec.lowerTopMm = specs.lowerTopMm;
-                nfSpec.upperLengthMm = specs.upperLengthMm;
-                nfSpec.upperBottomMm = specs.upperBottomMm;
-                nfSpec.upperTopMm = specs.upperTopMm;
-            }
-
             if (!targetDoc) return { faces, specs };
 
             faces.forEach(face => {
-                if (!face.svgGroupId) return;
-                const groupEl = targetDoc.getElementById(face.svgGroupId);
+                const groupEl = targetDoc.querySelector(`[data-wall-id="${face.wallId}"]`)
+                    || (face.svgGroupId ? targetDoc.getElementById(face.svgGroupId) : null);
                 if (!groupEl) return;
 
                 groupEl.setAttribute('data-wall-id', face.wallId);
                 groupEl.setAttribute('data-side-id', face.sideId);
                 groupEl.setAttribute('data-normal', face.normal.join(','));
                 groupEl.setAttribute('data-depth-y', String(face.depthMm));
+                groupEl.setAttribute('data-x-range-mm', `${face.xMinMm}..${face.xMaxMm}`);
                 groupEl.setAttribute('data-holes-count', String(face.holes3D.length));
 
                 let brepPath = groupEl.querySelector('path[data-brep-wall-surface]');
@@ -902,6 +977,22 @@
 
                 if (brepPath) {
                     brepPath.setAttribute('d', face.svgPathD);
+                }
+
+                const shadowPath = groupEl.querySelector('path[data-brep-wall-shadow]');
+                if (shadowPath) {
+                    shadowPath.setAttribute('d', face.svgPathD);
+                }
+
+                // Render any 3D corner jamb returns (e.g. 200 mm right jamb of O13a from perpendicular wall UW_WEST)
+                if (Array.isArray(face.jambReturns) && face.jambReturns.length > 0) {
+                    face.jambReturns.forEach(ret => {
+                        const jambEl = groupEl.querySelector(`path[data-brep-jamb-return="${ret.openingId}"]`)
+                            || targetDoc.querySelector('path[data-brep-jamb-return]');
+                        if (jambEl) {
+                            jambEl.setAttribute('d', ret.svgPathD);
+                        }
+                    });
                 }
             });
 

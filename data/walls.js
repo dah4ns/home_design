@@ -60,7 +60,6 @@
                         normal: [0, -1, 0],
                         p1: [-285, 2790],
                         p2: [11715, 2790],
-                        facadeBounds: { xMinMm: -270, xMaxMm: 11740, lengthMm: 12010, svgGroupId: 'ground-recessed-facade' },
                         outerLoop: [
                             [-285, 2790, 0],
                             [11715, 2790, 0],
@@ -197,7 +196,6 @@
                         normal: [0, -1, 0],
                         p1: [11715, -290],
                         p2: [20705, -290],
-                        facadeBounds: { xMinMm: 11740, xMaxMm: 20730, lengthMm: 8990, svgGroupId: 'ground-garage-volume' },
                         outerLoop: [
                             [11715, -290, 0],
                             [20705, -290, 0],
@@ -725,7 +723,6 @@
                         normal: [0, -1, 0],
                         p1: [-285, 5890],
                         p2: [6315, 5890],
-                        facadeBounds: { xMinMm: 0, xMaxMm: 6315, lengthMm: 6315, svgGroupId: 'upper-terrace' },
                         outerLoop: [
                             [-285, 5890, 3430],
                             [6315, 5890, 3430],
@@ -820,7 +817,6 @@
                         normal: [0, -1, 0],
                         p1: [6315, 2790],
                         p2: [20705, 2790],
-                        facadeBounds: { xMinMm: 6315, xMaxMm: 20505, lengthMm: 14190, rightReturnJambMm: 200, svgGroupId: 'upper-timber-facade' },
                         outerLoop: [
                             [7505, 2790, 3430],
                             [20705, 2790, 3430],
