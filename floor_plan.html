@@ -861,8 +861,8 @@
             [11715, -290],    // Garage NE corner (8,990 mm Garage North width)
             [20705, -290],    // Garage NW corner
             [20705, 8560],    // West wall before recessed Entrance Alcove Z1
-            [19555, 8560],    // Entrance Alcove North inner corner (1,150 mm recessed)
-            [19555, 11020],   // Entrance Alcove South inner corner
+            [19225, 8560],    // Entrance Alcove North inner corner (1,480 mm recessed)
+            [19225, 11020],   // Entrance Alcove South inner corner
             [20705, 11020],   // West wall after Entrance Alcove
             [20705, 21130],   // SW Wing SW corner
             [14695, 21130],   // SW Wing SE corner (O7 / O6b)
@@ -878,11 +878,11 @@
             [12095, 3190],
             [12095, 110],
             [20325, 110],
-            [20325, 8160],
-            [19155, 8160],
-            [19155, 11420],
-            [20305, 11420],
-            [20305, 20730],
+            [20325, 8180],
+            [18845, 8180],
+            [18845, 11400],
+            [20325, 11400],
+            [20325, 20730],
             [15095, 20730],
             [15095, 11180],
             [115, 11180]
@@ -915,83 +915,96 @@
             ground: [
                 {
                     id: 'GW_1', name: 'GW_1 (Garaż / Magazyn & Kotłownia)',
-                    axis: 'z', x1: 14095, z1: 110, x2: 14275, z2: 7205,
-                    rooms: '0.01 Garaż (605 cm) ↔ 0.02 Magazyn & 0.03 Kotłownia (200 cm)',
-                    specs: '180 × 7,095 mm (18 cm structural wall) • 6,050 mm (605 cm) East of West inner wall (X = 20,325 mm)',
+                    axis: 'z', x1: 14095, z1: 110, x2: 14275, z2: 6310,
+                    rooms: '0.01 Garaż (605 × 620 cm) ↔ 0.02 Magazyn & 0.03 Kotłownia (200 cm)',
+                    specs: '180 × 6,200 mm (18 cm structural wall) • 150 cm + 90 cm door + 201 cm + 90 cm door + 89 cm',
                     doors: [
-                        { start: 1010, end: 1910, swingDir: -1, hingeStart: true },
-                        { start: 5600, end: 6500, swingDir: -1, hingeStart: false }
+                        { start: 1610, end: 2510, swingDir: -1, hingeStart: true },
+                        { start: 4520, end: 5420, swingDir: -1, hingeStart: false }
                     ]
                 },
                 {
                     id: 'GW_2', name: 'GW_2 (Magazyn / Kotłownia)',
-                    axis: 'x', x1: 12095, z1: 2410, x2: 14095, z2: 2530,
+                    axis: 'x', x1: 12095, z1: 3010, x2: 14095, z2: 3130,
                     rooms: '0.02 Magazyn ↔ 0.03 Kotłownia',
-                    specs: '2,000 × 120 mm • 2,300 mm (230 cm) South of Garage North inner wall (Z = 110 mm)',
+                    specs: '2,000 × 120 mm • 2,900 mm (290 cm) South of Garage North inner wall (Z = 110 mm)',
                     doors: []
                 },
                 {
                     id: 'GW_3', name: 'GW_3 (Kotłownia & WC / Kuchnia & Jadalnia)',
-                    axis: 'z', x1: 11975, z1: 3190, x2: 12095, z2: 9215,
+                    axis: 'z', x1: 11915, z1: 3190, x2: 12095, z2: 9215,
                     rooms: '0.03 Kotłownia & 0.06 WC ↔ 0.13 Kuchnia & 0.12 Jadalnia',
-                    specs: '120 × 6,025 mm • Axis 4 partition wall continuing South from Garage East inner wall (X = 12,095 mm)',
+                    specs: '180 × 6,025 mm (18 cm structural wall) • Axis 4 wall continuing South from Garage East inner wall (X = 12,095 mm)',
                     doors: []
                 },
                 {
                     id: 'GW_3b', name: 'GW_3b (Komunikacja / Jadalnia South Pier)',
-                    axis: 'z', x1: 11975, z1: 11065, x2: 12095, z2: 11180,
+                    axis: 'z', x1: 11915, z1: 11065, x2: 12095, z2: 11180,
                     rooms: '0.07 Komunikacja ↔ 0.12 Jadalnia (185 cm passage)',
-                    specs: '120 × 115 mm • South wall pier along Axis 4 defining 1,850 mm (185 cm) open passage',
+                    specs: '180 × 115 mm • South wall pier along Axis 4 defining 1,850 mm (185 cm) open passage',
                     doors: []
                 },
                 {
                     id: 'GW_4', name: 'GW_4 (Garaż & Kotłownia South Wall)',
-                    axis: 'x', x1: 12095, z1: 7205, x2: 20325, z2: 7325,
-                    rooms: '0.01 Garaż & 0.03 Kotłownia ↔ 0.04 Wiatrołap, 0.05 Garderoba & 0.06 WC',
-                    specs: '8,230 × 120 mm • 7,095 mm (709.5 cm) South of Garage North inner wall (Z = 110 mm)',
+                    axis: 'x', x1: 12095, z1: 6310, x2: 17625, z2: 6490,
+                    rooms: '0.01 Garaż & 0.03 Kotłownia ↔ 0.05 Garderoba & 0.06 WC',
+                    specs: '5,530 × 180 mm (18 cm structural wall) • 620 cm South of Garage North inner wall; 335 cm West of GW_1 + 18 cm GW_1 + 200 cm Kotłownia',
+                    doors: []
+                },
+                {
+                    id: 'GW_5a', name: 'GW_5a (Garderoba West Wall)',
+                    axis: 'z', x1: 17445, z1: 6490, x2: 17625, z2: 8360,
+                    rooms: '0.01 Garaż (Passage) ↔ 0.05 Garderoba',
+                    specs: '180 × 1,870 mm (18 cm structural wall) • Flush with West end of GW_4 (X = 17,625 mm); 317 cm West of GW_6',
+                    doors: []
+                },
+                {
+                    id: 'GW_5b', name: 'GW_5b (Garaż / Wiatrołap North Wall)',
+                    axis: 'x', x1: 17625, z1: 8180, x2: 18845, z2: 8360,
+                    rooms: '0.01 Garaż ↔ 0.04 Wiatrołap',
+                    specs: '1,220 × 180 mm (18 cm structural wall) • 17 cm West pier + 90×210 cm doorway (X=17775..18675) + 15 cm East pier',
                     doors: [
-                        { start: 17605, end: 18505, swingDir: -1, hingeStart: false },
-                        { start: 12800, end: 13700, swingDir: -1, hingeStart: true }
+                        { start: 17775, end: 18675, swingDir: 1, hingeStart: false }
                     ]
                 },
                 {
-                    id: 'GW_5', name: 'GW_5 (Wiatrołap / Garderoba & Komunikacja)',
-                    axis: 'z', x1: 16445, z1: 7325, x2: 16565, z2: 11300,
-                    rooms: '0.04 Wiatrołap ↔ 0.05 Garderoba & 0.07 Komunikacja',
-                    specs: '120 × 3,975 mm • 2,590 mm (259 cm) East of Entrance Alcove inner wall (X = 19,155 mm)',
+                    id: 'GW_5', name: 'GW_5 (Wiatrołap / Komunikacja)',
+                    axis: 'z', x1: 16225, z1: 8360, x2: 16405, z2: 11220,
+                    rooms: '0.04 Wiatrołap ↔ 0.07 Komunikacja',
+                    specs: '180 × 2,860 mm (18 cm structural wall) • 2,440 mm East of Entrance Alcove inner wall (X = 18,845 mm)',
                     doors: [
                         { start: 9600, end: 10600, swingDir: -1, hingeStart: false }
                     ]
                 },
                 {
                     id: 'GW_6', name: 'GW_6 (Garderoba / WC)',
-                    axis: 'z', x1: 14195, z1: 7325, x2: 14315, z2: 9095,
+                    axis: 'z', x1: 14095, z1: 6490, x2: 14275, z2: 8180,
                     rooms: '0.05 Garderoba ↔ 0.06 WC',
-                    specs: '120 × 1,770 mm • 2,130 mm (213 cm) East of Wiatrołap wall GW_5',
+                    specs: '180 × 1,690 mm (18 cm structural wall) • 3,170 mm (317 cm) East of Garderoba West wall GW_5a',
                     doors: []
                 },
                 {
                     id: 'GW_7', name: 'GW_7 (Garderoba & WC / Komunikacja)',
-                    axis: 'x', x1: 12095, z1: 9095, x2: 16445, z2: 9215,
-                    rooms: '0.05 Garderoba & 0.06 WC ↔ 0.07 Komunikacja (Stairs)',
-                    specs: '4,350 × 120 mm • 1,770 mm (177 cm) South of Garage/Kotłownia wall GW_4',
+                    axis: 'x', x1: 12095, z1: 8180, x2: 17445, z2: 8360,
+                    rooms: '0.05 Garderoba & 0.06 WC ↔ 0.04 Wiatrołap & 0.07 Komunikacja (Stairs)',
+                    specs: '5,350 × 180 mm (18 cm structural wall) • 1,690 mm (169 cm) South of GW_4; 90×210 cm door 14 cm East of GW_5a',
                     doors: [
-                        { start: 15000, end: 15800, swingDir: -1, hingeStart: true },
+                        { start: 16405, end: 17305, swingDir: -1, hingeStart: true },
                         { start: 12900, end: 13700, swingDir: -1, hingeStart: false }
                     ]
                 },
                 {
                     id: 'GW_8', name: 'GW_8 (Wiatrołap / Pralnia)',
-                    axis: 'x', x1: 16215, z1: 11300, x2: 19155, z2: 11420,
+                    axis: 'x', x1: 16215, z1: 11220, x2: 18845, z2: 11400,
                     rooms: '0.04 Wiatrołap ↔ 0.08 Pralnia',
-                    specs: '2,940 × 120 mm • Aligned with Entrance Alcove South inner corner (Z = 11,420 mm)',
+                    specs: '2,630 × 180 mm (18 cm structural wall) • Aligned with Entrance Alcove South inner corner (Z = 11,400 mm)',
                     doors: []
                 },
                 {
                     id: 'GW_9', name: 'GW_9 (Pralnia & Sauna / Komunikacja SW)',
-                    axis: 'z', x1: 16215, z1: 11420, x2: 16335, z2: 15030,
+                    axis: 'z', x1: 16215, z1: 11400, x2: 16335, z2: 15030,
                     rooms: '0.08 Pralnia & 0.17 Sauna ↔ 0.16 Komunikacja',
-                    specs: '120 × 3,610 mm • 3,970 mm (397 cm) from West inner wall (1,120 mm / 112 cm corridor to East wall)',
+                    specs: '120 × 3,630 mm • 3,990 mm (399 cm) from West inner wall (1,120 mm / 112 cm corridor to East wall)',
                     doors: [
                         { start: 11850, end: 12650, swingDir: 1, hingeStart: true },
                         { start: 13650, end: 14450, swingDir: -1, hingeStart: false }
@@ -999,64 +1012,64 @@
                 },
                 {
                     id: 'GW_10', name: 'GW_10 (Pralnia / Łazienka & Sauna)',
-                    axis: 'x', x1: 16335, z1: 13180, x2: 20305, z2: 13300,
+                    axis: 'x', x1: 16335, z1: 13180, x2: 20325, z2: 13300,
                     rooms: '0.08 Pralnia ↔ 0.09 Łazienka & 0.17 Sauna',
-                    specs: '3,970 × 120 mm • 1,760 mm (176 cm) South of Wiatrołap wall (Z = 11,420 mm)',
+                    specs: '3,990 × 120 mm • 1,780 mm (178 cm) South of Wiatrołap wall (Z = 11,400 mm)',
                     doors: []
                 },
                 {
                     id: 'GW_11', name: 'GW_11 (Łazienka / Sauna)',
                     axis: 'z', x1: 17795, z1: 13300, x2: 17915, z2: 15030,
-                    rooms: '0.09 Łazienka (239 cm) ↔ 0.17 Sauna (146 cm)',
-                    specs: '120 × 1,730 mm • 2,390 mm (239 cm) East of West inner wall, 1,460 mm (146 cm) West of GW_9',
+                    rooms: '0.09 Łazienka (241 cm) ↔ 0.17 Sauna (146 cm)',
+                    specs: '120 × 1,730 mm • 2,410 mm (241 cm) East of West inner wall, 1,460 mm (146 cm) West of GW_9',
                     doors: [
                         { start: 13750, end: 14550, swingDir: 1, hingeStart: true }
                     ]
                 },
                 {
                     id: 'GW_12', name: 'GW_12 (Siłownia North Wall)',
-                    axis: 'x', x1: 15095, z1: 15030, x2: 20305, z2: 15150,
+                    axis: 'x', x1: 15095, z1: 15030, x2: 20325, z2: 15150,
                     rooms: '0.09 Łazienka, 0.17 Sauna & 0.16 Komunikacja ↔ 0.10 Siłownia',
-                    specs: '5,210 × 120 mm • 5,580 mm (558 cm) North of SW Wing South inner wall (Z = 20,730 mm)',
+                    specs: '5,230 × 120 mm • 5,580 mm (558 cm) North of SW Wing South inner wall (Z = 20,730 mm)',
                     doors: [
                         { start: 15255, end: 16155, swingDir: 1, hingeStart: false }
                     ]
                 },
                 {
                     id: 'GW_13', name: 'GW_13 (Kuchnia / Spiżarnia West Wall)',
-                    axis: 'z', x1: 6435, z1: 3190, x2: 6555, z2: 6130,
+                    axis: 'z', x1: 6365, z1: 3190, x2: 6485, z2: 6130,
                     rooms: '0.13 Kuchnia (542 cm) ↔ 0.14 Spiżarnia',
-                    specs: '120 × 2,940 mm • 5,420 mm (542 cm) East of Axis 4 wall GW_3 (X = 11,975 mm)',
+                    specs: '120 × 2,940 mm • 5,420 mm (542 cm) East of Axis 4 wall GW_3',
                     doors: [
                         { start: 3370, end: 4270, swingDir: -1, hingeStart: true }
                     ]
                 },
                 {
                     id: 'GW_14a', name: 'GW_14a (Spiżarnia Upper East Wall)',
-                    axis: 'z', x1: 4445, z1: 3190, x2: 4565, z2: 5060,
-                    rooms: '0.14 Spiżarnia (187 cm upper) ↔ 0.15 Gabinet',
-                    specs: '120 × 1,870 mm • 1,870 mm (187 cm) East of Kitchen/Pantry wall GW_13',
+                    axis: 'z', x1: 4375, z1: 3190, x2: 4495, z2: 5060,
+                    rooms: '0.14 Spiżarnia (187 cm upper) ↔ 0.15 Gabinet (426 cm upper)',
+                    specs: '120 × 1,870 mm • 1,870 mm (187 cm) East of GW_13, 4,260 mm (426 cm) West of EW_EAST_CORE',
                     doors: []
                 },
                 {
-                    id: 'GW_14b', name: 'GW_14b (Spiżarnia 35 cm Wall Step)',
-                    axis: 'x', x1: 4445, z1: 5060, x2: 4915, z2: 5180,
+                    id: 'GW_14b', name: 'GW_14b (Spiżarnia / Gabinet 27 cm Wall Step)',
+                    axis: 'x', x1: 4105, z1: 5060, x2: 4495, z2: 5180,
                     rooms: '0.14 Spiżarnia ↔ 0.15 Gabinet (Step)',
-                    specs: '470 × 120 mm • 350 mm (35 cm) step between 187 cm upper and 152 cm lower Pantry width',
+                    specs: '390 × 120 mm • 270 mm (27 cm) step between 426 cm upper and 399 cm lower Gabinet width',
                     doors: []
                 },
                 {
                     id: 'GW_14c', name: 'GW_14c (Spiżarnia Lower East Wall)',
-                    axis: 'z', x1: 4795, z1: 5180, x2: 4915, z2: 6130,
-                    rooms: '0.14 Spiżarnia (152 cm lower) ↔ 0.15 Gabinet',
-                    specs: '120 × 950 mm • 1,520 mm (152 cm) East of Kitchen/Pantry wall GW_13',
+                    axis: 'z', x1: 4105, z1: 5180, x2: 4225, z2: 6130,
+                    rooms: '0.14 Spiżarnia (214 cm lower) ↔ 0.15 Gabinet (399 cm lower)',
+                    specs: '120 × 950 mm • 3,990 mm (399 cm) West of EW_EAST_CORE (X = 115 mm)',
                     doors: []
                 },
                 {
                     id: 'GW_15', name: 'GW_15 (Spiżarnia & Gabinet South Wall)',
-                    axis: 'x', x1: 115, z1: 6130, x2: 6555, z2: 6250,
+                    axis: 'x', x1: 115, z1: 6130, x2: 6485, z2: 6250,
                     rooms: '0.14 Spiżarnia & 0.15 Gabinet ↔ 0.11 Salon',
-                    specs: '6,440 × 120 mm • 2,940 mm (294 cm) South of North inner wall (Z = 3,190 mm) along Axis C',
+                    specs: '6,370 × 120 mm • 2,940 mm (294 cm) South of North inner wall (Z = 3,190 mm) along Axis C',
                     doors: [
                         { start: 1045, end: 1945, swingDir: -1, hingeStart: true }
                     ]
@@ -1158,12 +1171,12 @@
         // Room labels & dimensions from A.02 (Parter) and A.03 (Piętro)
         const FLOOR_ROOMS = {
             ground: [
-                { code: '0.01', name: 'GARAŻ', area: '42.00 m²', dims: '605 × 709.5 cm', x: 17280, z: 3650 },
-                { code: '0.02', name: 'MAGAZYN', area: '4.60 m²', dims: '200 × 230 cm', x: 13140, z: 1260 },
-                { code: '0.03', name: 'KOTŁOWNIA', area: '9.14 m²', dims: '200 × 457.5 cm', x: 13140, z: 4860 },
-                { code: '0.04', name: 'WIATROŁAP', area: '6.42 m²', dims: '259 × 299.5 cm', x: 17860, z: 9350 },
-                { code: '0.05', name: 'GARDEROBA', area: '3.77 m²', dims: '213 × 177 cm', x: 15380, z: 8210 },
-                { code: '0.06', name: 'WC', area: '3.35 m²', dims: '190 × 177 cm', x: 13160, z: 8210 },
+                { code: '0.01', name: 'GARAŻ', area: '42.00 m²', dims: '605 × 620 cm', x: 17580, z: 3350 },
+                { code: '0.02', name: 'MAGAZYN', area: '5.80 m²', dims: '200 × 290 cm', x: 13140, z: 1560 },
+                { code: '0.03', name: 'KOTŁOWNIA', area: '6.36 m²', dims: '200 × 318 cm', x: 13140, z: 4720 },
+                { code: '0.04', name: 'WIATROŁAP', area: '6.82 m²', dims: '242 × 290 cm', x: 17615, z: 9800 },
+                { code: '0.05', name: 'GARDEROBA', area: '5.19 m²', dims: '317 × 167 cm', x: 15860, z: 7325 },
+                { code: '0.06', name: 'WC', area: '3.34 m²', dims: '200 × 167 cm', x: 13095, z: 7325 },
                 { code: '0.07', name: 'KOMUNIKACJA', area: '12.25 m²', dims: 'Schody 19×17.5×26', x: 14250, z: 10250 },
                 { code: '0.08', name: 'PRALNIA', area: '6.99 m²', dims: '397 × 176 cm', x: 18320, z: 12300 },
                 { code: '0.09', name: 'ŁAZIENKA', area: '4.13 m²', dims: '239 × 173 cm', x: 19110, z: 14165 },
@@ -1171,8 +1184,8 @@
                 { code: '0.16', name: 'KOMUNIKACJA', area: '4.50 m²', dims: '112 × 361 cm', x: 15655, z: 13200 },
                 { code: '0.10', name: 'SIŁOWNIA', area: '28.86 m²', dims: '521 × 558 cm', x: 17700, z: 17940 },
                 { code: '0.13', name: 'KUCHNIA', area: '16.57 m²', dims: '542 × 294 cm', x: 9310, z: 4660 },
-                { code: '0.14', name: 'SPIŻARNIA', area: '5.30 m²', dims: '187/152 × 294 cm', x: 5600, z: 4550 },
-                { code: '0.15', name: 'GABINET', area: '12.24 m²', dims: '457 × 294 cm', x: 2350, z: 4660 },
+                { code: '0.14', name: 'SPIŻARNIA', area: '5.30 m²', dims: '187/214 × 294 cm', x: 5400, z: 4550 },
+                { code: '0.15', name: 'GABINET', area: '12.24 m²', dims: '426/399 × 294 cm', x: 2200, z: 4660 },
                 { code: '0.12', name: 'JADALNIA', area: '24.30 m²', dims: '470 × 493 cm', x: 9310, z: 8700 },
                 { code: '0.11', name: 'SALON', area: '31.08 m²', dims: '640 × 493 cm', x: 3400, z: 8700 }
             ],
@@ -1214,10 +1227,10 @@
             },
             {
                 id: 'Z1', name: 'Z1 (Entry)', floor: 'ground', facade: 'West Facade', room: '0.04 Wiatrołap (Entrance)',
-                axis: 'z', fixedX: 19555, inwardSign: -1, start: 8920, end: 10620,
+                axis: 'z', fixedX: 19225, inwardSign: -1, start: 8920, end: 10620,
                 widthMm: 1700, heightMm: 2250, sillMm: 0, sashes: 2, pillarMm: 0, type: 'entrance_door',
                 jambStart: true, jambEnd: true,
-                specs: '1,700 × 2,250 mm (hp = 0 mm) • 1,100 mm door leaf + 600 mm sidelight inside 1,150 mm recessed alcove'
+                specs: '1,700 × 2,250 mm (hp = 0 mm) • 1,100 mm door leaf + 600 mm sidelight inside 1,480 mm recessed alcove'
             },
             {
                 id: 'O8a', name: 'O8a', floor: 'ground', facade: 'West Facade', room: '0.11 Salon / Pokój',
@@ -1811,25 +1824,25 @@
             });
             openingsGroup.appendChild(hitRect);
 
-            // Entrance door Z1 inward swing arc on Ground Floor
+            // Entrance door Z1 outward swing arc on Ground Floor (opens outside to the West)
             if (op.type === 'entrance_door') {
                 const doorLeafMm = 1100;
                 const hingeZ = op.start;
                 const latchZ = op.start + doorLeafMm;
-                const doorPlaneX = op.fixedX + op.inwardSign * 220;
-                const openX = doorPlaneX + op.inwardSign * doorLeafMm;
-                // Leaf in open 90 deg position
+                const doorPlaneX = op.fixedX + op.inwardSign * 180;
+                const openX = doorPlaneX - op.inwardSign * doorLeafMm;
+                // Leaf in open 90 deg outward position
                 openingsGroup.appendChild(svgEl('line', {
                     x1: toSvgX(doorPlaneX), y1: toSvgZ(hingeZ),
                     x2: toSvgX(openX), y2: toSvgZ(hingeZ),
                     stroke: '#fbbf24', 'stroke-width': 32
                 }));
-                // Dashed swing arc
+                // Dashed outward swing arc
                 const sx0 = toSvgX(doorPlaneX);
                 const sy0 = toSvgZ(latchZ);
                 const sx1 = toSvgX(openX);
                 const sy1 = toSvgZ(hingeZ);
-                const sweep = planState.westOnLeft ? 0 : 1;
+                const sweep = planState.westOnLeft ? 1 : 0;
                 openingsGroup.appendChild(svgEl('path', {
                     d: `M ${sx0} ${sy0} A ${doorLeafMm} ${doorLeafMm} 0 0 ${sweep} ${sx1} ${sy1}`,
                     fill: 'none', stroke: '#fbbf24', 'stroke-width': 20, 'stroke-dasharray': '80,60'
@@ -2114,10 +2127,10 @@
                         transform: `rotate(-90, ${rx + 980}, ${16400})`
                     }, 'SW Wing Roof Overhang (+1,960 mm East)'));
 
-                    // Recessed West Entrance Alcove Porch (X = 19,555..20,705 mm, Z = 8,560..11,020 mm)
-                    const ex = Math.min(toSvgX(19555), toSvgX(20705));
+                    // Recessed West Entrance Alcove Porch (X = 19,225..20,705 mm, Z = 8,560..11,020 mm)
+                    const ex = Math.min(toSvgX(19225), toSvgX(20705));
                     roofsG.appendChild(svgEl('rect', {
-                        x: ex, y: 8560, width: 1150, height: 2460,
+                        x: ex, y: 8560, width: 1480, height: 2460,
                         fill: 'rgba(56, 189, 248, 0.08)',
                         stroke: '#38bdf8',
                         'stroke-width': 22,
@@ -2524,7 +2537,7 @@
             }
 
             // Draw the clear interior room span between two facing walls dynamically from WallService
-            function wallSpan(wallId1, wallId2, crossCoord, labelSide = 1, color = '#ef4444') {
+            function wallSpan(wallId1, wallId2, crossCoord, labelSide = 1, color = '#ef4444', customLabel = null) {
                 const w1 = wallMap[wallId1];
                 const w2 = wallMap[wallId2];
                 if (!w1 || !w2) return;
@@ -2533,13 +2546,13 @@
                     const mid2 = (w2.x1 + w2.x2) / 2;
                     const xStart = (mid1 >= mid2) ? w1.x1 : w1.x2;
                     const xEnd = (mid1 >= mid2) ? w2.x2 : w2.x1;
-                    drawWallSpanDim(group, xStart, crossCoord, xEnd, crossCoord, labelSide, color);
+                    drawWallSpanDim(group, xStart, crossCoord, xEnd, crossCoord, labelSide, color, customLabel);
                 } else {
                     const mid1 = (w1.z1 + w1.z2) / 2;
                     const mid2 = (w2.z1 + w2.z2) / 2;
                     const zStart = (mid1 <= mid2) ? w1.z2 : w1.z1;
                     const zEnd = (mid1 <= mid2) ? w2.z1 : w2.z2;
-                    drawWallSpanDim(group, crossCoord, zStart, crossCoord, zEnd, labelSide, color);
+                    drawWallSpanDim(group, crossCoord, zStart, crossCoord, zEnd, labelSide, color, customLabel);
                 }
             }
 
@@ -2552,30 +2565,46 @@
                 wallSpan('GW_1', 'EW_GARAGE_EAST', 520, 1);
                 wallThick('EW_GARAGE_EAST', 520, 1);
 
-                // 2) Kotłownia (200 cm), Kuchnia (542 cm), Spiżarnia (upper 187 cm) & Gabinet (upper) bay (Z = 3650 mm)
+                // 2) Kotłownia (200 cm), Kuchnia (542 cm), Spiżarnia (upper 187 cm) & Gabinet (upper 426 cm) bay (Z = 3650 mm)
                 wallSpan('GW_1', 'GW_3', 3650, 1);
                 wallThick('GW_3', 3650, 1);
-                wallSpan('GW_3', 'GW_13', 3650, 1);
+                wallSpan('GW_3', 'GW_13', 3650, 1, '#ef4444', '542 cm');
                 wallThick('GW_13', 4550, 1);
                 wallSpan('GW_13', 'GW_14a', 3650, 1);
                 wallThick('GW_14a', 3650, 1);
                 wallSpan('GW_14a', 'EW_EAST_CORE', 3650, 1);
                 wallThick('EW_EAST_CORE', 3650, 1);
 
-                // 3) Spiżarnia (lower 152 cm) & Gabinet (lower) bay (Z = 5680 mm)
+                // 3) Spiżarnia (lower 214 cm) & Gabinet (lower 399 cm) bay (Z = 5680 mm)
                 wallSpan('GW_13', 'GW_14c', 5680, 1);
                 wallThick('GW_14c', 5680, 1);
                 wallSpan('GW_14c', 'EW_EAST_CORE', 5680, 1);
 
-                // 4) Wiatrołap (North), Garderoba & WC bay (Z = 7680 mm)
-                wallSpan('EW_GARAGE_WEST', 'GW_5', 7680, 1);
-                wallThick('GW_5', 7680, 1);
-                wallSpan('GW_5', 'GW_6', 7680, 1);
-                wallThick('GW_6', 7680, 1);
-                wallSpan('GW_6', 'GW_3', 7680, 1);
-                wallThick('GW_3', 7680, 1);
+                // 3b) Garage South Wall GW_4 segment West of GW_1 (335 cm, X = 17625..14275 at Z = 6150 mm)
+                drawWallSpanDim(group, 17625, 6150, 14275, 6150, -1);
 
-                // 5) Entrance Alcove, Wiatrołap (259 cm), Komunikacja, Jadalnia & Salon bay (Z = 10720 mm)
+                // 4) Garage West passage (270 cm), Garderoba (317 cm) & WC (200 cm) bay with 18 cm walls GW_5a, GW_6, GW_3 (Z = 6850 mm)
+                wallThick('EW_GARAGE_WEST', 6850, 1);
+                wallSpan('EW_GARAGE_WEST', 'GW_5a', 6850, 1);
+                wallThick('GW_5a', 6850, 1);
+                wallSpan('GW_5a', 'GW_6', 6850, 1);
+                wallThick('GW_6', 6850, 1);
+                wallSpan('GW_6', 'GW_3', 6850, 1);
+                wallThick('GW_3', 6850, 1);
+
+                // 4b) GW_5b (18 cm wall between Garage and Wiatrołap): 17 cm left pier + 90 cm door + 15 cm right pier = 122 cm
+                wallThick('EW_ALCOVE_NORTH', 19750, 1);
+                wallThick('GW_5b', 18750, 1);
+                drawWallSpanDim(group, 18845, 7980, 18675, 7980, -1);
+                drawWallSpanDim(group, 18675, 7980, 17775, 7980, -1);
+                drawWallSpanDim(group, 17775, 7980, 17625, 7980, -1);
+
+                // 4c) GW_7 (18 cm South wall of Garderoba): 14 cm left pier + 90 cm door + 213 cm right wall = 317 cm
+                drawWallSpanDim(group, 17445, 7980, 17305, 7980, -1);
+                drawWallSpanDim(group, 17305, 7980, 16405, 7980, -1);
+                drawWallSpanDim(group, 16405, 7980, 14275, 7980, -1);
+
+                // 5) Entrance Alcove, Wiatrołap, Komunikacja, Jadalnia & Salon bay (Z = 10720 mm)
                 wallThick('EW_ALCOVE_WEST', 8950, 1);
                 wallSpan('EW_ALCOVE_WEST', 'GW_5', 10720, 1);
                 wallThick('GW_5', 10720, 1);
@@ -2583,7 +2612,9 @@
                 wallThick('GW_3b', 11110, -1);
                 wallSpan('GW_3b', 'EW_EAST_CORE', 10720, -1);
 
-                // 6) Pralnia (397 cm) & SW Komunikacja (112 cm) bay (Z = 11680 mm)
+                // 6) Pralnia & SW Komunikacja (112 cm) bay (Z = 11680 mm)
+                wallThick('EW_ALCOVE_SOUTH', 19750, 1);
+                wallThick('EW_WEST_SOUTH', 12300, 1);
                 wallSpan('EW_WEST_SOUTH', 'GW_9', 11680, 1);
                 wallThick('GW_9', 11680, 1);
                 wallSpan('GW_9', 'EW_SW_EAST', 11680, 1);
@@ -2599,12 +2630,20 @@
                 wallSpan('EW_WEST_SOUTH', 'EW_SW_EAST', 19850, -1);
 
                 // ---- B. VERTICAL (NORTH <-> SOUTH) ROOM SPANS & WALL THICKNESSES ----
-                // 1) Garage North-South span (709.5 cm at X = 19650 mm)
-                wallThick('EW_GARAGE_NORTH', 19650, 1);
-                wallSpan('EW_GARAGE_NORTH', 'GW_4', 19650, 1);
-                wallThick('GW_4', 19650, 1);
+                // 1) Garage North-South span (620 cm at X = 16000 mm)
+                wallThick('EW_GARAGE_NORTH', 16000, 1);
+                wallSpan('EW_GARAGE_NORTH', 'GW_4', 16000, 1);
+                wallThick('GW_4', 16000, 1);
 
-                // 2) Magazyn (230 cm), Kotłownia (467.5 cm), WC (177 cm) & Komunikacja (X = 13800 mm)
+                // 1b) GW_1 vertical segments & doorway openings along West face of GW_1 (X = 14550 mm):
+                //     150 cm (top wall) + 90 cm (Magazyn door) + 201 cm (middle wall) + 90 cm (Kotłownia door) + 89 cm (bottom wall) = 620 cm
+                drawWallSpanDim(group, 14550, 110, 14550, 1610, 1);
+                drawWallSpanDim(group, 14550, 1610, 14550, 2510, 1);
+                drawWallSpanDim(group, 14550, 2510, 14550, 4520, 1);
+                drawWallSpanDim(group, 14550, 4520, 14550, 5420, 1);
+                drawWallSpanDim(group, 14550, 5420, 14550, 6310, 1);
+
+                // 2) Magazyn (290 cm), Kotłownia (318 cm), WC (177 cm) & Komunikacja (X = 13800 mm)
                 wallSpan('EW_GARAGE_NORTH', 'GW_2', 13800, -1);
                 wallThick('GW_2', 13800, -1);
                 wallSpan('GW_2', 'GW_4', 13800, -1);
@@ -2614,8 +2653,8 @@
                 wallSpan('GW_7', 'EW_SOUTH_RECESSED', 12450, -1);
                 wallThick('EW_SOUTH_RECESSED', 12450, -1);
 
-                // 3) Wiatrołap, Pralnia (176 cm), Łazienka (173 cm) & Siłownia (558 cm) (X = 19750 / 17050 mm)
-                wallSpan('GW_4', 'GW_8', 17050, 1);
+                // 3) Wiatrołap (290 cm), Pralnia (176 cm), Łazienka (173 cm) & Siłownia (558 cm) (X = 19750 / 17050 mm)
+                wallSpan('GW_7', 'GW_8', 17050, 1);
                 wallThick('GW_8', 17050, 1);
                 wallSpan('GW_8', 'GW_10', 19750, 1);
                 wallThick('GW_10', 19750, 1);
@@ -2625,9 +2664,9 @@
                 wallThick('EW_SW_SOUTH', 19750, 1);
 
                 // 4) Spiżarnia N-S step (187 cm upper + 12 cm wall + 95 cm lower = 294 cm)
-                wallSpan('EW_NORTH_RECESSED', 'GW_14b', 4705, 1);
-                wallThick('GW_14b', 4705, 1);
-                wallSpan('GW_14b', 'GW_15', 5075, 1);
+                wallSpan('EW_NORTH_RECESSED', 'GW_14b', 4320, 1);
+                wallThick('GW_14b', 4320, 1);
+                wallSpan('GW_14b', 'GW_15', 4320, 1);
 
                 // 5) Gabinet (294 cm) & Salon (493 cm) along East side (X = 650 mm)
                 wallThick('EW_NORTH_RECESSED', 650, -1);
@@ -2701,11 +2740,11 @@
 
             // 1. Contextual Staircase Flight (19 x 17.5 x 26 cm) & Upper-Floor Salon Void Cross
             if (floor === 'ground') {
-                // Staircase in 0.07 Komunikacja (along South face of GW_7 at Z = 9215..10215, X = 12095..16445)
+                // Staircase in 0.07 Komunikacja (along South face of GW_7 at Z = 8380..9380, X = 12095..16405)
                 const stX1 = 12095;
-                const stX2 = 16445;
-                const stZ1 = 9215;
-                const stZ2 = 10215;
+                const stX2 = 16405;
+                const stZ1 = 8380;
+                const stZ2 = 9380;
                 const sx = Math.min(toSvgX(stX1), toSvgX(stX2));
                 const sw = Math.abs(toSvgX(stX2) - toSvgX(stX1));
                 group.appendChild(svgEl('rect', {

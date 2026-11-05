@@ -16,16 +16,18 @@
         module.exports = factory(
             require('../data/walls.js'),
             require('../data/views.js'),
-            require('./window-store.js')
+            require('./window-store.js'),
+            require('../data/windows.js')
         );
     } else {
         root.WallService = factory(
             root.DEFAULT_WALLS_DATA,
             root.BUILDING_VIEWS_DATA,
-            root.WindowStore
+            root.WindowStore,
+            root.DEFAULT_WINDOWS_DATA
         );
     }
-}(typeof self !== 'undefined' ? self : this, function (wallsData, viewsData, WindowStore) {
+}(typeof self !== 'undefined' ? self : this, function (wallsData, viewsData, WindowStore, windowsData) {
 
     const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -34,35 +36,39 @@
             viewId: 'north_facade',
             name: 'North Facade Elevation (Elewacja Północna)',
             lookDir: [0, 1, 0],      // Standing in North garden looking South (+Y)
-            rightDir: [1, 0, 0],     // East (left, X=0) -> West (right, X=20730)
+            rightDir: [1, 0, 0],     // East (left, X=0) -> West (right, X=20705)
             upDir: [0, 0, 1],        // Vertical height Z
+            uOrigin: 0,
             role: 'exterior',
             svgScale: 0.1            // 10 mm = 1 SVG unit
         },
         south_facade: {
             viewId: 'south_facade',
             name: 'South Facade Elevation (Elewacja Południowa)',
-            lookDir: [0, -1, 0],
-            rightDir: [-1, 0, 0],
+            lookDir: [0, -1, 0],     // Standing in South garden looking North (-Y)
+            rightDir: [-1, 0, 0],    // West (left, X=20705) -> East (right, X=-285)
             upDir: [0, 0, 1],
+            uOrigin: 20705,
             role: 'exterior',
             svgScale: 0.1
         },
         west_facade: {
             viewId: 'west_facade',
             name: 'West Facade Elevation (Elewacja Zachodnia)',
-            lookDir: [-1, 0, 0],
-            rightDir: [0, 1, 0],
+            lookDir: [-1, 0, 0],     // Standing in West driveway looking East (-X)
+            rightDir: [0, 1, 0],     // North (left, Y=0) -> South (right, Y=21130)
             upDir: [0, 0, 1],
+            uOrigin: 0,
             role: 'exterior',
             svgScale: 0.1
         },
         east_facade: {
             viewId: 'east_facade',
             name: 'East Facade Elevation (Elewacja Wschodnia)',
-            lookDir: [1, 0, 0],
-            rightDir: [0, -1, 0],
+            lookDir: [1, 0, 0],      // Standing in East garden looking West (+X)
+            rightDir: [0, -1, 0],    // South (left, Y=21125) -> North (right, Y=-290)
             upDir: [0, 0, 1],
+            uOrigin: 21125,
             role: 'exterior',
             svgScale: 0.1
         }
@@ -997,6 +1003,621 @@
             });
 
             return { faces, specs };
+        },
+
+        /**
+         * Compile a window/door opening into a full 3D CAD / B-Rep object in [x, y, z] coordinates,
+         * synchronizing canonical 3D attributes from data/windows.js with any live WindowStore edits.
+         *
+         * Produces:
+         * - outerLoop3D: 4 [x, y, z] vertices on the host wall's exterior plane
+         * - setbackLoop3D: 4 [x, y, z] vertices recessed by jambDepthMm (200 mm) into the wall opening
+         * - frameFace3D: 3D B-Rep face { outerLoop3D, holes3D, normal, tangent } for the RAL 7021 frame + mullions/pillars
+         * - glassPanes3D: array of 3D glass pane loops with 3D casement triangles & HST sliding arrows
+         * - jambFaces3D: array of 3D reveal quads (left, right, top) spanning the 200 mm setback + 2D reveal strip loops
+         * - sillPlate3D: optional 3D exterior sill loop
+         */
+        compileWindow3D: function (winOrId) {
+            const winId = (typeof winOrId === 'string') ? winOrId : (winOrId && winOrId.id);
+            if (!winId) return null;
+
+            const seedMap = (windowsData && (windowsData.defaultWindows || windowsData.windows)) || {};
+            const seedWin = seedMap[winId] || {};
+            const storeWin = (WindowStore && typeof WindowStore.get === 'function') ? (WindowStore.get(winId) || {}) : {};
+            const passedWin = (typeof winOrId === 'object' && winOrId) ? winOrId : {};
+            const win = Object.assign({}, seedWin, storeWin, passedWin);
+
+            const rawWallList = (wallsData && Array.isArray(wallsData.walls)) ? wallsData.walls : [];
+            const hostWall = rawWallList.find(w => w.id === win.hostWallId)
+                || rawWallList.find(w => Array.isArray(w.openings) && w.openings.includes(winId))
+                || null;
+            const hostWallId = win.hostWallId || (hostWall ? hostWall.id : null);
+            const sideA = (hostWall && Array.isArray(hostWall.sides) && hostWall.sides[0]) || null;
+
+            const normal = Array.isArray(win.normal)
+                ? win.normal.slice()
+                : (sideA && Array.isArray(sideA.normal) ? sideA.normal.slice() : [0, -1, 0]);
+            const tangent = Array.isArray(win.tangent)
+                ? win.tangent.slice()
+                : [-normal[1], normal[0], 0];
+
+            const widthMm = Math.max(0, Number(win.width) || 0);
+            const heightMm = Math.max(0, Number(win.height) || 0);
+            const zBottom = hostWall ? (Number(hostWall.zBottom) || 0) : (win.floor === 'first' ? 3430 : 0);
+            const rawSill = Number(win.sill) || 0;
+            const zMin = (win.floor === 'first' && rawSill < zBottom) ? (zBottom + rawSill) : rawSill;
+            const zMax = zMin + heightMm;
+
+            const jambDepthMm = Number(win.jambDepth) || 200;
+            const frameWidthMm = Number(win.frameWidthMm) || 50;
+            const frameDepthMm = Number(win.frameDepthMm) || 80;
+            const borderMm = 55; // 55 mm total outer + inner sash border (5.5 SVG units at scale 0.1)
+
+            // Determine 2D [x, y] start point of the window's exterior left edge (u = 0 when viewed from outside)
+            const planeX = sideA && sideA.p1 ? Number(sideA.p1[0]) : (Array.isArray(win.outerLoop) && win.outerLoop[0] ? Number(win.outerLoop[0][0]) : 0);
+            const planeY = sideA && sideA.p1 ? Number(sideA.p1[1]) : (Array.isArray(win.outerLoop) && win.outerLoop[0] ? Number(win.outerLoop[0][1]) : 0);
+
+            let baseLeft2D;
+            if (normal[1] < -0.5) {
+                // North wall (normal [0, -1, 0], tangent [1, 0, 0]): left edge is X = win.x
+                baseLeft2D = [Number(win.x) || 0, planeY];
+            } else if (normal[1] > 0.5) {
+                // South wall (normal [0, 1, 0], tangent [-1, 0, 0]): win.x is measured from East outer face X = -285
+                const xMin = (Number(win.x) || 0) - 285;
+                baseLeft2D = [xMin + widthMm, planeY];
+            } else if (normal[0] > 0.5) {
+                // West wall (normal [1, 0, 0], tangent [0, 1, 0]): left edge is Y = win.y
+                baseLeft2D = [planeX, Number(win.y) || 0];
+            } else {
+                // East wall (normal [-1, 0, 0], tangent [0, -1, 0]): left edge is Y = win.y + widthMm
+                baseLeft2D = [planeX, (Number(win.y) || 0) + widthMm];
+            }
+
+            function winPt3D(uFromLeftMm, zMm, depthInwardMm = 0) {
+                return [
+                    Math.round((baseLeft2D[0] + uFromLeftMm * tangent[0] - depthInwardMm * normal[0]) * 100) / 100,
+                    Math.round((baseLeft2D[1] + uFromLeftMm * tangent[1] - depthInwardMm * normal[1]) * 100) / 100,
+                    Math.round(zMm * 100) / 100
+                ];
+            }
+
+            const outerLoop3D = [
+                winPt3D(0, zMin, 0),
+                winPt3D(widthMm, zMin, 0),
+                winPt3D(widthMm, zMax, 0),
+                winPt3D(0, zMax, 0)
+            ];
+
+            const setbackLoop3D = [
+                winPt3D(0, zMin, jambDepthMm),
+                winPt3D(widthMm, zMin, jambDepthMm),
+                winPt3D(widthMm, zMax, jambDepthMm),
+                winPt3D(0, zMax, jambDepthMm)
+            ];
+
+            // 1. 3D Window Jamb Reveal Faces (left, right, top) spanning d = 0..jambDepthMm
+            const jambSides = Array.isArray(win.jambs) ? win.jambs : [];
+            const jambFaces3D = [];
+            const revealBandMm = 55; // 5.5 SVG units on 2D facade elevation
+
+            if (jambSides.includes('left')) {
+                jambFaces3D.push({
+                    side: 'left',
+                    normal: [tangent[0], tangent[1], 0],
+                    lengthMm: heightMm,
+                    depthMm: jambDepthMm,
+                    areaM2: Math.round(((heightMm * jambDepthMm) / 1e6 + Number.EPSILON) * 10000) / 10000,
+                    loop3D: [
+                        winPt3D(0, zMin, 0),
+                        winPt3D(0, zMin, jambDepthMm),
+                        winPt3D(0, zMax, jambDepthMm),
+                        winPt3D(0, zMax, 0)
+                    ],
+                    revealStripLoop3D: [
+                        winPt3D(0, zMin, 0),
+                        winPt3D(Math.min(widthMm, revealBandMm), zMin, 0),
+                        winPt3D(Math.min(widthMm, revealBandMm), zMax, 0),
+                        winPt3D(0, zMax, 0)
+                    ]
+                });
+            }
+
+            if (jambSides.includes('right')) {
+                jambFaces3D.push({
+                    side: 'right',
+                    normal: [-tangent[0], -tangent[1], 0],
+                    lengthMm: heightMm,
+                    depthMm: jambDepthMm,
+                    areaM2: Math.round(((heightMm * jambDepthMm) / 1e6 + Number.EPSILON) * 10000) / 10000,
+                    loop3D: [
+                        winPt3D(widthMm, zMin, jambDepthMm),
+                        winPt3D(widthMm, zMin, 0),
+                        winPt3D(widthMm, zMax, 0),
+                        winPt3D(widthMm, zMax, jambDepthMm)
+                    ],
+                    revealStripLoop3D: [
+                        winPt3D(Math.max(0, widthMm - revealBandMm), zMin, 0),
+                        winPt3D(widthMm, zMin, 0),
+                        winPt3D(widthMm, zMax, 0),
+                        winPt3D(Math.max(0, widthMm - revealBandMm), zMax, 0)
+                    ]
+                });
+            }
+
+            if (jambSides.includes('top')) {
+                jambFaces3D.push({
+                    side: 'top',
+                    normal: [0, 0, -1],
+                    lengthMm: widthMm,
+                    depthMm: jambDepthMm,
+                    areaM2: Math.round(((widthMm * jambDepthMm) / 1e6 + Number.EPSILON) * 10000) / 10000,
+                    loop3D: [
+                        winPt3D(0, zMax, 0),
+                        winPt3D(widthMm, zMax, 0),
+                        winPt3D(widthMm, zMax, jambDepthMm),
+                        winPt3D(0, zMax, jambDepthMm)
+                    ],
+                    revealStripLoop3D: [
+                        winPt3D(0, Math.max(zMin, zMax - revealBandMm), 0),
+                        winPt3D(widthMm, Math.max(zMin, zMax - revealBandMm), 0),
+                        winPt3D(widthMm, zMax, 0),
+                        winPt3D(0, zMax, 0)
+                    ]
+                });
+            }
+
+            // 2. 3D Sashes, Mullions/Pillars, Glass Panes & Casement/Sliding Lines
+            const numSashes = Math.max(1, Number(win.sashes) || 1);
+            const pillarMm = Number(win.pillarWidth) || 0;
+            const hasMullion = Boolean(win.hasMullion) && numSashes >= 2;
+            const tiltTurnSet = Array.isArray(win.tiltTurnSashes) ? win.tiltTurnSashes.map(Number) : [];
+
+            const paneSpansMm = []; // [{ sashIndex, nominalWidthMm, uNom0, uNom1, uGlass0, uGlass1, showSplitLabel }]
+            if (win.openingType === 'garage_door') {
+                // Sectional garage door has solid insulated panels (no glass holes)
+            } else if (win.openingType === 'entrance_door') {
+                // Entrance door Z1: 60% solid door leaf on left + 40% glazed sidelight on right
+                const doorW = Math.round(widthMm * 0.60);
+                paneSpansMm.push({
+                    sashIndex: 2,
+                    nominalWidthMm: widthMm - doorW,
+                    uNom0: doorW,
+                    uNom1: widthMm,
+                    uGlass0: doorW + 25,
+                    uGlass1: Math.max(doorW + 30, widthMm - borderMm),
+                    showSplitLabel: false
+                });
+            } else if (pillarMm > 0 && numSashes >= 2) {
+                const customPanes = (Array.isArray(win.sashWidths) && win.sashWidths.length === numSashes)
+                    ? win.sashWidths.map(Number)
+                    : null;
+                let paneWidthsMm;
+                if (customPanes) {
+                    const sumCustom = customPanes.reduce((a, b) => a + b, 0);
+                    const totalPillarMm = (numSashes - 1) * pillarMm;
+                    if (Math.abs(sumCustom + totalPillarMm - widthMm) < 1) {
+                        paneWidthsMm = customPanes;
+                    } else if (Math.abs(sumCustom - widthMm) < 1) {
+                        paneWidthsMm = customPanes.slice();
+                        paneWidthsMm[0] = Math.max(0, paneWidthsMm[0] - totalPillarMm);
+                    } else {
+                        paneWidthsMm = customPanes;
+                    }
+                } else {
+                    const eqPaneMm = (widthMm - (numSashes - 1) * pillarMm) / numSashes;
+                    paneWidthsMm = Array(numSashes).fill(eqPaneMm);
+                }
+
+                let cursorU = 0;
+                for (let i = 0; i < numSashes; i++) {
+                    const wPane = paneWidthsMm[i];
+                    const u0 = cursorU;
+                    const u1 = cursorU + wPane;
+                    paneSpansMm.push({
+                        sashIndex: i + 1,
+                        nominalWidthMm: wPane,
+                        uNom0: u0,
+                        uNom1: u1,
+                        uGlass0: (i === 0) ? Math.min(u1 - 10, borderMm) : u0,
+                        uGlass1: (i === numSashes - 1) ? Math.max(u0 + 10, widthMm - borderMm) : u1,
+                        showSplitLabel: true
+                    });
+                    cursorU = u1 + pillarMm;
+                }
+            } else if (hasMullion && numSashes >= 2) {
+                const customSashWidths = (Array.isArray(win.sashWidths) && win.sashWidths.length >= 2)
+                    ? win.sashWidths.map(Number)
+                    : ((win.id === 'O1' && Math.round(widthMm) === 2100)
+                        ? [1050, 1050]
+                        : ((win.id === 'O1' && Math.round(widthMm) === 2500) ? [900, 1600] : null));
+                const mullionHalfMm = 15; // 30 mm mullion bar (3 SVG units at 0.1 scale)
+                if (customSashWidths) {
+                    const totalSplit = customSashWidths.reduce((a, b) => a + (Number(b) || 0), 0) || widthMm;
+                    let accum = 0;
+                    for (let i = 0; i < customSashWidths.length; i++) {
+                        const partMm = (widthMm * Number(customSashWidths[i] || 0)) / totalSplit;
+                        const u0 = accum;
+                        const u1 = accum + partMm;
+                        accum = u1;
+                        paneSpansMm.push({
+                            sashIndex: i + 1,
+                            nominalWidthMm: Number(customSashWidths[i] || partMm),
+                            uNom0: u0,
+                            uNom1: u1,
+                            uGlass0: (i === 0) ? borderMm : (u0 + mullionHalfMm),
+                            uGlass1: (i === customSashWidths.length - 1) ? (widthMm - borderMm) : (u1 - mullionHalfMm),
+                            showSplitLabel: heightMm >= 1000
+                        });
+                    }
+                } else {
+                    const partMm = widthMm / numSashes;
+                    for (let i = 0; i < numSashes; i++) {
+                        const u0 = i * partMm;
+                        const u1 = (i + 1) * partMm;
+                        paneSpansMm.push({
+                            sashIndex: i + 1,
+                            nominalWidthMm: partMm,
+                            uNom0: u0,
+                            uNom1: u1,
+                            uGlass0: (i === 0) ? borderMm : (u0 + mullionHalfMm),
+                            uGlass1: (i === numSashes - 1) ? (widthMm - borderMm) : (u1 - mullionHalfMm),
+                            showSplitLabel: false
+                        });
+                    }
+                }
+            } else {
+                paneSpansMm.push({
+                    sashIndex: 1,
+                    nominalWidthMm: widthMm,
+                    uNom0: 0,
+                    uNom1: widthMm,
+                    uGlass0: Math.min(widthMm / 2 - 5, borderMm),
+                    uGlass1: Math.max(widthMm / 2 + 5, widthMm - borderMm),
+                    showSplitLabel: false
+                });
+            }
+
+            const zGlass0 = Math.min((zMin + zMax) / 2 - 5, zMin + borderMm);
+            const zGlass1 = Math.max((zMin + zMax) / 2 + 5, zMax - borderMm);
+
+            const frameHoles3D = [];
+            const exteriorHoles3D = [];
+            const glassPanes3D = [];
+
+            paneSpansMm.forEach(sp => {
+                const loopSetback = [
+                    winPt3D(sp.uGlass0, zGlass0, jambDepthMm),
+                    winPt3D(sp.uGlass1, zGlass0, jambDepthMm),
+                    winPt3D(sp.uGlass1, zGlass1, jambDepthMm),
+                    winPt3D(sp.uGlass0, zGlass1, jambDepthMm)
+                ];
+                const loopExt = [
+                    winPt3D(sp.uGlass0, zGlass0, 0),
+                    winPt3D(sp.uGlass1, zGlass0, 0),
+                    winPt3D(sp.uGlass1, zGlass1, 0),
+                    winPt3D(sp.uGlass0, zGlass1, 0)
+                ];
+
+                const holeId = `${win.id}_PANE_${sp.sashIndex}`;
+                frameHoles3D.push({ id: holeId, sashIndex: sp.sashIndex, loop: loopSetback, loop3D: loopSetback });
+                exteriorHoles3D.push({ id: holeId, sashIndex: sp.sashIndex, loop: loopExt, loop3D: loopExt });
+
+                const isTiltTurn = tiltTurnSet.includes(sp.sashIndex);
+                const casementLines3D = [];
+                if (isTiltTurn) {
+                    const uMid = (sp.uGlass0 + sp.uGlass1) / 2;
+                    const zMid = (zGlass0 + zGlass1) / 2;
+                    // Bottom-left -> top-center -> bottom-right (tilt triangle)
+                    casementLines3D.push([
+                        winPt3D(sp.uGlass0 + 15, zGlass0 + 15, jambDepthMm),
+                        winPt3D(uMid, zGlass1 - 15, jambDepthMm),
+                        winPt3D(sp.uGlass1 - 15, zGlass0 + 15, jambDepthMm)
+                    ]);
+                    // Top-left -> right-center -> bottom-left (turn triangle)
+                    casementLines3D.push([
+                        winPt3D(sp.uGlass0 + 15, zGlass1 - 15, jambDepthMm),
+                        winPt3D(sp.uGlass1 - 15, zMid, jambDepthMm),
+                        winPt3D(sp.uGlass0 + 15, zGlass0 + 15, jambDepthMm)
+                    ]);
+                }
+
+                let slidingArrow3D = null;
+                if (win.slidingArrows && ((numSashes >= 4 && (sp.sashIndex === 2 || sp.sashIndex === 3)) || (numSashes === 3 && sp.sashIndex === 2))) {
+                    const uMid = (sp.uNom0 + sp.uNom1) / 2;
+                    const zArrow = zMax - heightMm * 0.62;
+                    const dirSign = (sp.sashIndex === 3) ? 1 : -1; // sash 2 slides left (-1), sash 3 slides right (+1)
+                    const halfLen = 160;
+                    const headBack = 70;
+                    const headHalfH = 50;
+                    const uStart = uMid - dirSign * halfLen;
+                    const uTip = uMid + dirSign * halfLen;
+                    slidingArrow3D = {
+                        direction: dirSign < 0 ? 'left' : 'right',
+                        line3D: [
+                            winPt3D(uStart, zArrow, jambDepthMm),
+                            winPt3D(uTip, zArrow, jambDepthMm)
+                        ],
+                        head3D: [
+                            winPt3D(uTip - dirSign * headBack, zArrow + headHalfH, jambDepthMm),
+                            winPt3D(uTip, zArrow, jambDepthMm),
+                            winPt3D(uTip - dirSign * headBack, zArrow - headHalfH, jambDepthMm)
+                        ]
+                    };
+                }
+
+                const uNomMid = (sp.uNom0 + sp.uNom1) / 2;
+                glassPanes3D.push({
+                    id: holeId,
+                    sashIndex: sp.sashIndex,
+                    nominalWidthMm: sp.nominalWidthMm,
+                    clearWidthMm: Math.round((sp.uGlass1 - sp.uGlass0) * 10) / 10,
+                    clearHeightMm: Math.round((zGlass1 - zGlass0) * 10) / 10,
+                    showSplitLabel: sp.showSplitLabel,
+                    loop3D: loopSetback,
+                    exteriorLoop3D: loopExt,
+                    center3D: winPt3D(uNomMid, (zMin + zMax) / 2, jambDepthMm),
+                    labelBottom3D: winPt3D(uNomMid, zMin + 110, 0),
+                    isTiltTurn,
+                    casementLines3D,
+                    slidingArrow3D
+                });
+            });
+
+            // 3. Optional 3D Exterior Sill Plate
+            const isCorner = win.id === 'O13a' || win.id === 'O13a_2' || win.id === 'O13b' || win.id === 'O13b_1' || win.id === 'O13b_2';
+            const isFullHeight = win.id === '14a'
+                || (win.floor === 'first' && zMin <= 3430)
+                || (win.floor === 'ground' && zMin <= 0);
+            const sillPlate3D = (!isFullHeight && !isCorner && win.openingType !== 'garage_door' && win.openingType !== 'entrance_door')
+                ? [
+                    winPt3D(-20, zMin - 40, 0),
+                    winPt3D(widthMm + 20, zMin - 40, 0),
+                    winPt3D(widthMm + 20, zMin, 0),
+                    winPt3D(-20, zMin, 0)
+                ]
+                : null;
+
+            const frameFace3D = {
+                id: `${win.id}_FRAME`,
+                material: 'ral7021',
+                colorHex: '#1f2421',
+                normal,
+                tangent,
+                p1: [setbackLoop3D[0][0], setbackLoop3D[0][1]],
+                p2: [setbackLoop3D[1][0], setbackLoop3D[1][1]],
+                frameWidthMm,
+                frameDepthMm,
+                jambDepthMm,
+                outerLoop: setbackLoop3D,
+                outerLoop3D: setbackLoop3D,
+                holes: frameHoles3D,
+                holes3D: frameHoles3D,
+                exteriorOuterLoop3D: outerLoop3D,
+                exteriorHoles3D
+            };
+
+            const isInactive = Array.isArray(win.views) && win.views.length === 0;
+
+            return {
+                id: win.id,
+                name: win.name || win.id,
+                hostWallId,
+                floor: win.floor || (hostWall ? hostWall.floor : 'ground'),
+                wall: win.wall || 'north',
+                room: win.room || '',
+                openingType: win.openingType || 'window',
+                active: !isInactive,
+                views: Array.isArray(win.views) ? win.views.slice() : [],
+                normal,
+                tangent,
+                x: Number(win.x) || 0,
+                y: Number(win.y) || 0,
+                sill: rawSill,
+                width: widthMm,
+                height: heightMm,
+                widthMm,
+                heightMm,
+                zMin,
+                zMax,
+                jambs: jambSides.slice(),
+                jambDepthMm,
+                frameWidthMm,
+                frameDepthMm,
+                sashes: numSashes,
+                pillarWidth: pillarMm,
+                hasMullion,
+                tiltTurnSashes: tiltTurnSet,
+                slidingArrows: Boolean(win.slidingArrows),
+                outerLoop: outerLoop3D,
+                outerLoop3D,
+                setbackLoop3D,
+                center3D: winPt3D(widthMm / 2, (zMin + zMax) / 2, 0),
+                frameFace3D,
+                glassPanes3D,
+                jambFaces3D,
+                sillPlate3D,
+                specs: win.specs || {},
+                description: win.description || ''
+            };
+        },
+
+        /**
+         * Retrieve all compiled 3D B-Rep window/door objects, optionally filtered by
+         * { floor, hostWallId, viewId, activeOnly }.
+         */
+        getWindows3D: function (filter) {
+            const seedMap = (windowsData && (windowsData.defaultWindows || windowsData.windows)) || {};
+            const ids = Object.keys(seedMap);
+            let list = ids.map(id => this.compileWindow3D(id)).filter(Boolean);
+
+            if (filter) {
+                if (filter.floor) {
+                    list = list.filter(w => w.floor === filter.floor);
+                }
+                if (filter.hostWallId) {
+                    list = list.filter(w => w.hostWallId === filter.hostWallId);
+                }
+                if (Array.isArray(filter.hostWallIds)) {
+                    const set = new Set(filter.hostWallIds);
+                    list = list.filter(w => set.has(w.hostWallId));
+                }
+                if (filter.viewId) {
+                    list = list.filter(w => Array.isArray(w.views) && w.views.includes(filter.viewId));
+                }
+                if (filter.activeOnly) {
+                    list = list.filter(w => w.active);
+                }
+            }
+            return list;
+        },
+
+        getWindow3DById: function (winId) {
+            return this.compileWindow3D(winId);
+        },
+
+        /**
+         * Project a single 3D B-Rep Window Object onto a 2D orthographic elevation view
+         * ('north_facade', 'south_facade', 'west_facade', 'east_facade'), returning
+         * projected SVG paths for its frame + mullions (with glass holes), glass panes,
+         * 3D casement triangles, 3D HST sliding arrows, 3D jamb reveals, and sill plate.
+         */
+        projectWindowForView: function (winOrId, viewIdOrConfig) {
+            const win3D = (winOrId && winOrId.frameFace3D) ? winOrId : this.compileWindow3D(winOrId);
+            if (!win3D) return null;
+
+            const preset = (typeof viewIdOrConfig === 'string')
+                ? (VIEW_CAMERA_PRESETS[viewIdOrConfig] || VIEW_CAMERA_PRESETS.north_facade)
+                : Object.assign({}, VIEW_CAMERA_PRESETS.north_facade, viewIdOrConfig || {});
+
+            const rightDir = preset.rightDir || [1, 0, 0];
+            const lookDir = preset.lookDir || [0, 1, 0];
+            const uOrigin = Number(preset.uOrigin) || 0;
+            const scale = preset.svgScale || 0.1;
+
+            function projPt(pt3D) {
+                const uMm = dot3([pt3D[0], pt3D[1], 0], rightDir) + uOrigin;
+                return [
+                    Math.round(uMm * scale * 100) / 100,
+                    Math.round(-pt3D[2] * scale * 100) / 100
+                ];
+            }
+
+            function projPolylineSvgPoints(pts3D) {
+                return pts3D.map(p => {
+                    const [sx, sy] = projPt(p);
+                    return `${sx},${sy}`;
+                }).join(' ');
+            }
+
+            const uCoords = win3D.outerLoop3D.map(pt => dot3([pt[0], pt[1], 0], rightDir) + uOrigin);
+            const zCoords = win3D.outerLoop3D.map(pt => Number(pt[2]) || 0);
+            const depthCoords = win3D.outerLoop3D.map(pt => dot3(pt, lookDir));
+
+            const uMinMm = Math.min(...uCoords);
+            const uMaxMm = Math.max(...uCoords);
+            const zMinMm = Math.min(...zCoords);
+            const zMaxMm = Math.max(...zCoords);
+            const depthMm = Math.round((depthCoords.reduce((a, b) => a + b, 0) / depthCoords.length) * 100) / 100;
+
+            const svgRect = {
+                x: Math.round(uMinMm * scale * 100) / 100,
+                y: Math.round(-zMaxMm * scale * 100) / 100,
+                width: Math.round((uMaxMm - uMinMm) * scale * 100) / 100,
+                height: Math.round((zMaxMm - zMinMm) * scale * 100) / 100
+            };
+
+            const outerPathD = buildElevationSvgPathFromLoops(win3D.outerLoop3D, [], rightDir, scale, uOrigin);
+            const framePathD = buildElevationSvgPathFromLoops(
+                win3D.frameFace3D.exteriorOuterLoop3D,
+                win3D.frameFace3D.exteriorHoles3D,
+                rightDir,
+                scale,
+                uOrigin
+            );
+
+            const glassPanes = win3D.glassPanes3D.map(pane => {
+                const [lblX, lblY] = projPt(pane.labelBottom3D);
+                return {
+                    id: pane.id,
+                    sashIndex: pane.sashIndex,
+                    nominalWidthMm: pane.nominalWidthMm,
+                    showSplitLabel: pane.showSplitLabel,
+                    svgPathD: buildElevationSvgPathFromLoops(pane.exteriorLoop3D, [], rightDir, scale, uOrigin),
+                    labelSvgPos: { x: lblX, y: lblY },
+                    casementPolylinesSvg: pane.casementLines3D.map(poly3D => projPolylineSvgPoints(poly3D)),
+                    slidingArrowSvg: pane.slidingArrow3D
+                        ? {
+                            linePoints: projPolylineSvgPoints(pane.slidingArrow3D.line3D),
+                            headPoints: projPolylineSvgPoints(pane.slidingArrow3D.head3D)
+                        }
+                        : null
+                };
+            });
+
+            const jambReveals = win3D.jambFaces3D.map(jf => ({
+                side: jf.side,
+                lengthMm: jf.lengthMm,
+                depthMm: jf.depthMm,
+                areaM2: jf.areaM2,
+                svgPathD: buildElevationSvgPathFromLoops(jf.revealStripLoop3D, [], rightDir, scale, uOrigin)
+            }));
+
+            const sillPathD = win3D.sillPlate3D
+                ? buildElevationSvgPathFromLoops(win3D.sillPlate3D, [], rightDir, scale, uOrigin)
+                : null;
+
+            return {
+                id: win3D.id,
+                name: win3D.name,
+                hostWallId: win3D.hostWallId,
+                floor: win3D.floor,
+                openingType: win3D.openingType,
+                normal: win3D.normal,
+                depthMm,
+                uMinMm,
+                uMaxMm,
+                zMinMm,
+                zMaxMm,
+                svgRect,
+                outerPathD,
+                framePathD,
+                glassPanes,
+                jambReveals,
+                sillPathD,
+                win3D
+            };
+        },
+
+        /**
+         * Project all visible 3D B-Rep windows for a given elevation view ('north_facade', etc.)
+         * using back-face culling (dot(win.normal, lookDir) < 0) and back-to-front painter's order.
+         */
+        getVisibleWindowsForView: function (viewIdOrConfig) {
+            const viewId = (typeof viewIdOrConfig === 'string')
+                ? viewIdOrConfig
+                : (viewIdOrConfig && viewIdOrConfig.viewId) || 'north_facade';
+            const preset = (typeof viewIdOrConfig === 'string')
+                ? (VIEW_CAMERA_PRESETS[viewIdOrConfig] || VIEW_CAMERA_PRESETS.north_facade)
+                : Object.assign({}, VIEW_CAMERA_PRESETS.north_facade, viewIdOrConfig || {});
+            const lookDir = preset.lookDir || [0, 1, 0];
+
+            const wins = this.getWindows3D({ viewId, activeOnly: true });
+            const projected = [];
+
+            wins.forEach(w => {
+                if (dot3(w.normal, lookDir) >= -1e-3) return;
+                const proj = this.projectWindowForView(w, preset);
+                if (proj) projected.push(proj);
+            });
+
+            projected.sort((a, b) => {
+                if (Math.abs(b.depthMm - a.depthMm) > 1) {
+                    return b.depthMm - a.depthMm;
+                }
+                return a.uMinMm - b.uMinMm;
+            });
+
+            return projected;
         }
     };
 

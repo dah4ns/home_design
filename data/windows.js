@@ -18,14 +18,15 @@
         "_role": "DEFAULT_SEED_VALUES",
         "entityType": "windows",
         "metadata": {
-            "version": "2.0.0",
+            "version": "3.0.0",
             "isDefaultSeed": true,
             "persistenceNote": "This file defines the canonical DEFAULT window and door opening values. Runtime user modifications are read from and saved to the active PersistenceService adapter (js/persistence.js). Staircase defaults live in data/stairs.js and socket defaults live in data/sockets.js.",
-            "description": "Canonical 2D (X, Y) default seed database of building window openings with multi-view spatial orientation",
+            "description": "Canonical 3D B-Rep [x, y, z] & 2D (X, Y) default seed database of building window and door openings hosted on 3D walls",
             "coordinateSystem": {
                 "origin": "Intersection of Axis 6 (X = 0 mm) and Axis A (Y = 0 mm) near the North-East corner",
                 "xAxis": "East-West axis (<east - west>): X = 0 mm at Axis 6 (270 mm right of lower-level wall start at X = -270 mm), increasing Westward (0 to 20,505 / 21,000 mm)",
                 "yAxis": "North-South axis (<north - south>): Y = 0 mm at Axis A (290 mm right of lower-level wall start at Y = -290 mm), increasing Southward (0 to 21,130 mm; total lower-level wall = 21,420 mm)",
+                "zAxis": "Vertical height / elevation axis [x, y, z] extending upward from finished ground floor datum (+0.00 m = 0 mm; Parter = 0..2,800 mm, Piętro = 3,430..6,130 mm)",
                 "verticalAxis": "Positive sill / elevation extends upward from finished ground floor datum (+0.00 m = 0 mm)",
                 "units": "millimeters (mm)"
             }
@@ -34,6 +35,17 @@
             "O1": {
                 "id": "O1",
                 "name": "O1",
+                "hostWallId": "EW_NORTH_RECESSED",
+                "normal": [0, -1, 0],
+                "tangent": [1, 0, 0],
+                "frameWidthMm": 50,
+                "frameDepthMm": 80,
+                "outerLoop": [
+                    [8480, 2790, 1100],
+                    [10580, 2790, 1100],
+                    [10580, 2790, 2500],
+                    [8480, 2790, 2500]
+                ],
                 "x": 8480,
                 "y": 0,
                 "sill": 1100,
@@ -60,6 +72,17 @@
             "O2": {
                 "id": "O2",
                 "name": "O2",
+                "hostWallId": "EW_NORTH_RECESSED",
+                "normal": [0, -1, 0],
+                "tangent": [1, 0, 0],
+                "frameWidthMm": 50,
+                "frameDepthMm": 80,
+                "outerLoop": [
+                    [880, 2790, 800],
+                    [2680, 2790, 800],
+                    [2680, 2790, 2500],
+                    [880, 2790, 2500]
+                ],
                 "x": 880,
                 "y": 0,
                 "sill": 800,
@@ -85,6 +108,17 @@
             "14a": {
                 "id": "14a",
                 "name": "14a",
+                "hostWallId": "UW_NORTH_MAIN",
+                "normal": [0, -1, 0],
+                "tangent": [1, 0, 0],
+                "frameWidthMm": 45,
+                "frameDepthMm": 80,
+                "outerLoop": [
+                    [6315, 2790, 3430],
+                    [7505, 2790, 3430],
+                    [7505, 2790, 6130],
+                    [6315, 2790, 6130]
+                ],
                 "x": 6315,
                 "y": 0,
                 "sill": 3430,
@@ -110,6 +144,17 @@
             "O11_1": {
                 "id": "O11_1",
                 "name": "O11",
+                "hostWallId": "UW_NORTH_MAIN",
+                "normal": [0, -1, 0],
+                "tangent": [1, 0, 0],
+                "frameWidthMm": 50,
+                "frameDepthMm": 80,
+                "outerLoop": [
+                    [8675, 2790, 4180],
+                    [9675, 2790, 4180],
+                    [9675, 2790, 6130],
+                    [8675, 2790, 6130]
+                ],
                 "x": 8675,
                 "y": 0,
                 "sill": 4180,
@@ -135,6 +180,17 @@
             "O15": {
                 "id": "O15",
                 "name": "O15",
+                "hostWallId": "UW_NORTH_MAIN",
+                "normal": [0, -1, 0],
+                "tangent": [1, 0, 0],
+                "frameWidthMm": 45,
+                "frameDepthMm": 80,
+                "outerLoop": [
+                    [8480, 2790, 3430],
+                    [10580, 2790, 3430],
+                    [10580, 2790, 6130],
+                    [8480, 2790, 6130]
+                ],
                 "x": 8480,
                 "y": 0,
                 "sill": 3430,
@@ -160,6 +216,17 @@
             "O11_2": {
                 "id": "O11_2",
                 "name": "O11",
+                "hostWallId": "UW_NORTH_MAIN",
+                "normal": [0, -1, 0],
+                "tangent": [1, 0, 0],
+                "frameWidthMm": 50,
+                "frameDepthMm": 80,
+                "outerLoop": [
+                    [11375, 2790, 4180],
+                    [12375, 2790, 4180],
+                    [12375, 2790, 6130],
+                    [11375, 2790, 6130]
+                ],
                 "x": 11375,
                 "y": 0,
                 "sill": 4180,
@@ -185,6 +252,17 @@
             "O11_3": {
                 "id": "O11_3",
                 "name": "O11",
+                "hostWallId": "UW_NORTH_MAIN",
+                "normal": [0, -1, 0],
+                "tangent": [1, 0, 0],
+                "frameWidthMm": 50,
+                "frameDepthMm": 80,
+                "outerLoop": [
+                    [14015, 2790, 4180],
+                    [15015, 2790, 4180],
+                    [15015, 2790, 6130],
+                    [14015, 2790, 6130]
+                ],
                 "x": 14015,
                 "y": 0,
                 "sill": 4180,
@@ -210,6 +288,17 @@
             "O13a": {
                 "id": "O13a",
                 "name": "O13a",
+                "hostWallId": "UW_NORTH_MAIN",
+                "normal": [0, -1, 0],
+                "tangent": [1, 0, 0],
+                "frameWidthMm": 45,
+                "frameDepthMm": 80,
+                "outerLoop": [
+                    [18125, 2790, 4180],
+                    [20505, 2790, 4180],
+                    [20505, 2790, 6130],
+                    [18125, 2790, 6130]
+                ],
                 "x": 18125,
                 "y": 3100,
                 "sill": 4180,
@@ -235,6 +324,17 @@
             "O13a_2": {
                 "id": "O13a_2",
                 "name": "O13a",
+                "hostWallId": "UW_SOUTH",
+                "normal": [0, 1, 0],
+                "tangent": [-1, 0, 0],
+                "frameWidthMm": 50,
+                "frameDepthMm": 80,
+                "outerLoop": [
+                    [20505, 11580, 4180],
+                    [18125, 11580, 4180],
+                    [18125, 11580, 6130],
+                    [20505, 11580, 6130]
+                ],
                 "x": 18410,
                 "y": 21130,
                 "sill": 4180,
@@ -261,6 +361,17 @@
             "O12": {
                 "id": "O12",
                 "name": "O12",
+                "hostWallId": "UW_SOUTH",
+                "normal": [0, 1, 0],
+                "tangent": [-1, 0, 0],
+                "frameWidthMm": 45,
+                "frameDepthMm": 80,
+                "outerLoop": [
+                    [14695, 11580, 3430],
+                    [10695, 11580, 3430],
+                    [10695, 11580, 6130],
+                    [14695, 11580, 6130]
+                ],
                 "x": 10980,
                 "y": 21130,
                 "sill": 3430,
@@ -287,6 +398,17 @@
             "SO3": {
                 "id": "SO3",
                 "name": "SO3",
+                "hostWallId": "UW_SOUTH",
+                "normal": [0, 1, 0],
+                "tangent": [-1, 0, 0],
+                "frameWidthMm": 50,
+                "frameDepthMm": 80,
+                "outerLoop": [
+                    [8215, 11580, 4180],
+                    [7215, 11580, 4180],
+                    [7215, 11580, 6130],
+                    [8215, 11580, 6130]
+                ],
                 "x": 7500,
                 "y": 21130,
                 "sill": 4180,
@@ -313,6 +435,17 @@
             "O10": {
                 "id": "O10",
                 "name": "O10",
+                "hostWallId": "UW_SOUTH",
+                "normal": [0, 1, 0],
+                "tangent": [-1, 0, 0],
+                "frameWidthMm": 45,
+                "frameDepthMm": 80,
+                "outerLoop": [
+                    [6215, 11580, 3430],
+                    [-85, 11580, 3430],
+                    [-85, 11580, 6130],
+                    [6215, 11580, 6130]
+                ],
                 "x": 200,
                 "y": 21130,
                 "sill": 3430,
@@ -339,6 +472,17 @@
             "O7": {
                 "id": "O7",
                 "name": "O7",
+                "hostWallId": "EW_SW_SOUTH",
+                "normal": [0, 1, 0],
+                "tangent": [-1, 0, 0],
+                "frameWidthMm": 45,
+                "frameDepthMm": 80,
+                "outerLoop": [
+                    [16895, 21130, 0],
+                    [14895, 21130, 0],
+                    [14895, 21130, 2800],
+                    [16895, 21130, 2800]
+                ],
                 "x": 15180,
                 "y": 21130,
                 "sill": 0,
@@ -365,6 +509,17 @@
             "O5": {
                 "id": "O5",
                 "name": "O5",
+                "hostWallId": "EW_SOUTH_RECESSED",
+                "normal": [0, 1, 0],
+                "tangent": [-1, 0, 0],
+                "frameWidthMm": 45,
+                "frameDepthMm": 80,
+                "outerLoop": [
+                    [13695, 11580, 0],
+                    [7215, 11580, 0],
+                    [7215, 11580, 2800],
+                    [13695, 11580, 2800]
+                ],
                 "x": 7500,
                 "y": 21130,
                 "sill": 0,
@@ -392,6 +547,17 @@
             "O4": {
                 "id": "O4",
                 "name": "O4",
+                "hostWallId": "EW_SOUTH_RECESSED",
+                "normal": [0, 1, 0],
+                "tangent": [-1, 0, 0],
+                "frameWidthMm": 45,
+                "frameDepthMm": 80,
+                "outerLoop": [
+                    [6215, 11580, 0],
+                    [-85, 11580, 0],
+                    [-85, 11580, 2800],
+                    [6215, 11580, 2800]
+                ],
                 "x": 200,
                 "y": 21130,
                 "sill": 0,
@@ -419,6 +585,17 @@
             "O13b_1": {
                 "id": "O13b_1",
                 "name": "O13b",
+                "hostWallId": "UW_WEST",
+                "normal": [1, 0, 0],
+                "tangent": [0, 1, 0],
+                "frameWidthMm": 45,
+                "frameDepthMm": 80,
+                "outerLoop": [
+                    [20705, 2990, 4180],
+                    [20705, 5360, 4180],
+                    [20705, 5360, 6130],
+                    [20705, 2990, 6130]
+                ],
                 "x": 20505,
                 "y": 2990,
                 "sill": 4180,
@@ -444,6 +621,17 @@
             "O13b_2": {
                 "id": "O13b_2",
                 "name": "O13b",
+                "hostWallId": "UW_WEST",
+                "normal": [1, 0, 0],
+                "tangent": [0, 1, 0],
+                "frameWidthMm": 50,
+                "frameDepthMm": 80,
+                "outerLoop": [
+                    [20705, 9010, 4180],
+                    [20705, 11380, 4180],
+                    [20705, 11380, 6130],
+                    [20705, 9010, 6130]
+                ],
                 "x": 20505,
                 "y": 9010,
                 "sill": 4180,
@@ -469,6 +657,17 @@
             "Z2": {
                 "id": "Z2",
                 "name": "Z2",
+                "hostWallId": "EW_GARAGE_WEST",
+                "normal": [1, 0, 0],
+                "tangent": [0, 1, 0],
+                "frameWidthMm": 45,
+                "frameDepthMm": 80,
+                "outerLoop": [
+                    [20705, 690, 0],
+                    [20705, 5890, 0],
+                    [20705, 5890, 2200],
+                    [20705, 690, 2200]
+                ],
                 "x": 20505,
                 "y": 690,
                 "sill": 0,
@@ -495,6 +694,17 @@
             "Z1": {
                 "id": "Z1",
                 "name": "Z1",
+                "hostWallId": "EW_ALCOVE_WEST",
+                "normal": [1, 0, 0],
+                "tangent": [0, 1, 0],
+                "frameWidthMm": 50,
+                "frameDepthMm": 80,
+                "outerLoop": [
+                    [19225, 8920, 0],
+                    [19225, 10620, 0],
+                    [19225, 10620, 2250],
+                    [19225, 8920, 2250]
+                ],
                 "x": 20505,
                 "y": 8920,
                 "sill": 0,
@@ -521,6 +731,17 @@
             "O8c": {
                 "id": "O8c",
                 "name": "O8c",
+                "hostWallId": "EW_WEST_SOUTH",
+                "normal": [1, 0, 0],
+                "tangent": [0, 1, 0],
+                "frameWidthMm": 50,
+                "frameDepthMm": 80,
+                "outerLoop": [
+                    [20705, 11650, 2060],
+                    [20705, 13090, 2060],
+                    [20705, 13090, 2800],
+                    [20705, 11650, 2800]
+                ],
                 "x": 20505,
                 "y": 11650,
                 "sill": 2060,
@@ -546,6 +767,17 @@
             "O8b": {
                 "id": "O8b",
                 "name": "O8b",
+                "hostWallId": "EW_WEST_SOUTH",
+                "normal": [1, 0, 0],
+                "tangent": [0, 1, 0],
+                "frameWidthMm": 50,
+                "frameDepthMm": 80,
+                "outerLoop": [
+                    [20705, 13370, 2060],
+                    [20705, 14990, 2060],
+                    [20705, 14990, 2800],
+                    [20705, 13370, 2800]
+                ],
                 "x": 20505,
                 "y": 13370,
                 "sill": 2060,
@@ -571,6 +803,17 @@
             "O8a": {
                 "id": "O8a",
                 "name": "O8a",
+                "hostWallId": "EW_WEST_SOUTH",
+                "normal": [1, 0, 0],
+                "tangent": [0, 1, 0],
+                "frameWidthMm": 50,
+                "frameDepthMm": 80,
+                "outerLoop": [
+                    [20705, 15250, 2060],
+                    [20705, 20750, 2060],
+                    [20705, 20750, 2800],
+                    [20705, 15250, 2800]
+                ],
                 "x": 20505,
                 "y": 15250,
                 "sill": 2060,
@@ -596,6 +839,17 @@
             "O6b": {
                 "id": "O6b",
                 "name": "O6b",
+                "hostWallId": "EW_SW_EAST",
+                "normal": [-1, 0, 0],
+                "tangent": [0, -1, 0],
+                "frameWidthMm": 45,
+                "frameDepthMm": 80,
+                "outerLoop": [
+                    [14695, 20925, 0],
+                    [14695, 15285, 0],
+                    [14695, 15285, 2800],
+                    [14695, 20925, 2800]
+                ],
                 "x": 14980,
                 "y": 15285,
                 "sill": 0,
@@ -623,6 +877,17 @@
             "O6a": {
                 "id": "O6a",
                 "name": "O6a",
+                "hostWallId": "EW_SW_EAST",
+                "normal": [-1, 0, 0],
+                "tangent": [0, -1, 0],
+                "frameWidthMm": 50,
+                "frameDepthMm": 80,
+                "outerLoop": [
+                    [14695, 15035, 2060],
+                    [14695, 13275, 2060],
+                    [14695, 13275, 2800],
+                    [14695, 15035, 2800]
+                ],
                 "x": 14980,
                 "y": 13275,
                 "sill": 2060,
@@ -648,6 +913,17 @@
             "O3": {
                 "id": "O3",
                 "name": "O3",
+                "hostWallId": "EW_EAST_CORE",
+                "normal": [-1, 0, 0],
+                "tangent": [0, -1, 0],
+                "frameWidthMm": 45,
+                "frameDepthMm": 80,
+                "outerLoop": [
+                    [-285, 11400, 0],
+                    [-285, 6310, 0],
+                    [-285, 6310, 2800],
+                    [-285, 11400, 2800]
+                ],
                 "x": 0,
                 "y": 6310,
                 "sill": 0,
@@ -674,6 +950,17 @@
             "O9": {
                 "id": "O9",
                 "name": "O9",
+                "hostWallId": "UW_EAST",
+                "normal": [-1, 0, 0],
+                "tangent": [0, -1, 0],
+                "frameWidthMm": 45,
+                "frameDepthMm": 80,
+                "outerLoop": [
+                    [-285, 11400, 3430],
+                    [-285, 6310, 3430],
+                    [-285, 6310, 6130],
+                    [-285, 11400, 6130]
+                ],
                 "x": 0,
                 "y": 6310,
                 "sill": 3430,
@@ -700,6 +987,17 @@
             "O14b": {
                 "id": "O14b",
                 "name": "O14b",
+                "hostWallId": "UW_TERRACE_EAST",
+                "normal": [-1, 0, 0],
+                "tangent": [0, -1, 0],
+                "frameWidthMm": 45,
+                "frameDepthMm": 80,
+                "outerLoop": [
+                    [6315, 5825, 3430],
+                    [6315, 3015, 3430],
+                    [6315, 3015, 6130],
+                    [6315, 5825, 6130]
+                ],
                 "x": 6315,
                 "y": 3015,
                 "sill": 3430,

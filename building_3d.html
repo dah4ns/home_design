@@ -1010,7 +1010,7 @@
                 id: 'Z1', name: 'Z1 (Entrance)', facade: 'West Facade', floor: 'ground',
                 room: '0.04 Wiatrołap (Main Entrance Nook)',
                 wallNormal: [1, 0, 0],
-                x1: 19555, x2: 19555, z1: 8920, z2: 10620,
+                x1: 19225, x2: 19225, z1: 8920, z2: 10620,
                 y1: 0, y2: 2250, widthMm: 1700, heightMm: 2250, sillMm: 0,
                 sashes: 2, pillarMm: 0, hasMullion: true, openingType: 'entrance_door', jambs: [],
                 specs: '1,700 × 2,250 mm (hp = 0 mm) • Main entrance door + sidelight inside 2,460 mm recessed alcove'
@@ -2148,7 +2148,7 @@
 
             // West Driveway to Garage Door Z2 & Walkway to Entrance Z1
             siteBuilder.addBoxMm(20705, -18, 400, 26800, -2, 6200, [0.24, 0.27, 0.32], 1.0, 0);
-            siteBuilder.addBoxMm(19555, -15, 8560, 26800, 0, 11020, [0.36, 0.39, 0.44], 1.0, 0);
+            siteBuilder.addBoxMm(19225, -15, 8560, 26800, 0, 11020, [0.36, 0.39, 0.44], 1.0, 0);
 
             // South & East Garden Terrace Decking outside O4, O5, O3, O6b
             terraceBuilder.addBoxMm(-3200, -15, 6000, 14695, -2, 16200, [0.95, 0.95, 0.95], 0.5, 0);
@@ -2218,20 +2218,20 @@
                     jambBuilder, glassBuilder, garageBuilder, edges, yOffset: 0
                 });
 
-                // 5. West Recessed Entrance Alcove (Wnęka Wejściowa Z1: Z = 8560..11020, recessed to X = 19555)
-                // North return wall of alcove (Z = 8560, X = 19555..20705)
-                brickBuilder.addBoxMm(19555, 0, 8560, 20705, 2800, 8760, [0.82, 0.82, 0.86], brickUv, 0);
-                // South return wall of alcove (Z = 11020, X = 19555..20705)
-                brickBuilder.addBoxMm(19555, 0, 10820, 20705, 2800, 11020, [0.82, 0.82, 0.86], brickUv, 0);
-                // Back wall of alcove with Entrance Door Z1 (X = 19555, Z = 8560..11020)
+                // 5. West Recessed Entrance Alcove (Wnęka Wejściowa Z1: Z = 8560..11020, recessed to X = 19225)
+                // North return wall of alcove (Z = 8560, X = 19225..20705)
+                brickBuilder.addBoxMm(19225, 0, 8560, 20705, 2800, 8760, [0.82, 0.82, 0.86], brickUv, 0);
+                // South return wall of alcove (Z = 11020, X = 19225..20705)
+                brickBuilder.addBoxMm(19225, 0, 10820, 20705, 2800, 11020, [0.82, 0.82, 0.86], brickUv, 0);
+                // Back wall of alcove with Entrance Door Z1 (X = 19225, Z = 8560..11020)
                 buildWallWithOpenings({
-                    axis: 'z', fixedCoord: 19555, inwardSign: -1,
+                    axis: 'z', fixedCoord: 19225, inwardSign: -1,
                     spanStart: 8560, spanEnd: 11020, yBottom: 0, yTop: 2800, thickness: 240,
                     openings: groundOpenings.filter(o => o.id === 'Z1'),
                     wallBuilder: brickBuilder, wallColor: [0.86, 0.86, 0.90], uvScale: brickUv,
                     jambBuilder, glassBuilder, garageBuilder, edges, yOffset: 0
                 });
-                addEdgeBoxMm(edges, 19555, 0, 8560, 20705, 2800, 11020, [0.10, 0.12, 0.16], 0);
+                addEdgeBoxMm(edges, 19225, 0, 8560, 20705, 2800, 11020, [0.10, 0.12, 0.16], 0);
 
                 // 6. West Wall South Segment (Clerestory O8a: Z = 11020..21130, X = 20705)
                 buildWallWithOpenings({

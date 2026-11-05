@@ -262,17 +262,17 @@
                         material: 'plaster_white',
                         materialLabel: 'Interior Gypsum Plaster',
                         normal: [-1, 0, 0],
-                        p1: [20325, 8160],
+                        p1: [20325, 8180],
                         p2: [20325, 110],
                         outerLoop: [
-                            [20325, 8160, 0],
+                            [20325, 8180, 0],
                             [20325, 5890, 0],
                             [20325, 5890, 2200],
                             [20325, 690, 2200],
                             [20325, 690, 0],
                             [20325, 110, 0],
                             [20325, 110, 2800],
-                            [20325, 8160, 2800]
+                            [20325, 8180, 2800]
                         ],
                         holes: []
                     }
@@ -283,11 +283,11 @@
                 name: 'Entrance Alcove North Return Wall',
                 floor: 'ground',
                 category: 'exterior',
-                thickness: 400,
+                thickness: 380,
                 zBottom: 0,
                 zTop: 2800,
                 rooms: 'Covered Entrance Porch ↔ 0.04 Wiatrołap',
-                specs: '1,150 × 400 mm • North reveal of recessed main entrance',
+                specs: '1,480 × 380 mm (38 cm) • North reveal of recessed main entrance',
                 openings: [],
                 doors: [],
                 sides: [
@@ -298,11 +298,11 @@
                         materialLabel: 'Dark Graphite Clinker Brick',
                         normal: [0, 1, 0],
                         p1: [20705, 8560],
-                        p2: [19555, 8560],
+                        p2: [19225, 8560],
                         outerLoop: [
                             [20705, 8560, 0],
-                            [19555, 8560, 0],
-                            [19555, 8560, 2800],
+                            [19225, 8560, 0],
+                            [19225, 8560, 2800],
                             [20705, 8560, 2800]
                         ],
                         holes: []
@@ -313,13 +313,13 @@
                         material: 'plaster_white',
                         materialLabel: 'Interior Gypsum Plaster',
                         normal: [0, -1, 0],
-                        p1: [19155, 8160],
-                        p2: [20325, 8160],
+                        p1: [18845, 8180],
+                        p2: [20325, 8180],
                         outerLoop: [
-                            [19155, 8160, 0],
-                            [20325, 8160, 0],
-                            [20325, 8160, 2800],
-                            [19155, 8160, 2800]
+                            [18845, 8180, 0],
+                            [20325, 8180, 0],
+                            [20325, 8180, 2800],
+                            [18845, 8180, 2800]
                         ],
                         holes: []
                     }
@@ -330,11 +330,11 @@
                 name: 'Entrance Alcove Recessed Wall (with Door Z1 Notch)',
                 floor: 'ground',
                 category: 'exterior',
-                thickness: 400,
+                thickness: 380,
                 zBottom: 0,
                 zTop: 2800,
                 rooms: 'Covered Entrance Porch (W) ↔ 0.04 Wiatrołap',
-                specs: '2,460 × 400 mm • OuterLoop notches up to Z = 2,250 mm over entrance door Z1 (550 mm lintel above door)',
+                specs: '2,460 × 380 mm (38 cm) • OuterLoop notches up to Z = 2,250 mm over entrance door Z1 (550 mm lintel above door)',
                 openings: ['Z1'],
                 doors: [],
                 sides: [
@@ -344,17 +344,17 @@
                         material: 'clinker_brick',
                         materialLabel: 'Dark Graphite Clinker Brick',
                         normal: [1, 0, 0],
-                        p1: [19555, 8560],
-                        p2: [19555, 11020],
+                        p1: [19225, 8560],
+                        p2: [19225, 11020],
                         outerLoop: [
-                            [19555, 8560, 0],
-                            [19555, 8920, 0],
-                            [19555, 8920, 2250],
-                            [19555, 10620, 2250],
-                            [19555, 10620, 0],
-                            [19555, 11020, 0],
-                            [19555, 11020, 2800],
-                            [19555, 8560, 2800]
+                            [19225, 8560, 0],
+                            [19225, 8920, 0],
+                            [19225, 8920, 2250],
+                            [19225, 10620, 2250],
+                            [19225, 10620, 0],
+                            [19225, 11020, 0],
+                            [19225, 11020, 2800],
+                            [19225, 8560, 2800]
                         ],
                         holes: []
                     },
@@ -364,17 +364,17 @@
                         material: 'plaster_white',
                         materialLabel: 'Interior Gypsum Plaster',
                         normal: [-1, 0, 0],
-                        p1: [19155, 11420],
-                        p2: [19155, 8160],
+                        p1: [18845, 11400],
+                        p2: [18845, 8180],
                         outerLoop: [
-                            [19155, 11420, 0],
-                            [19155, 10620, 0],
-                            [19155, 10620, 2250],
-                            [19155, 8920, 2250],
-                            [19155, 8920, 0],
-                            [19155, 8160, 0],
-                            [19155, 8160, 2800],
-                            [19155, 11420, 2800]
+                            [18845, 11400, 0],
+                            [18845, 10620, 0],
+                            [18845, 10620, 2250],
+                            [18845, 8920, 2250],
+                            [18845, 8920, 0],
+                            [18845, 8180, 0],
+                            [18845, 8180, 2800],
+                            [18845, 11400, 2800]
                         ],
                         holes: []
                     }
@@ -385,11 +385,11 @@
                 name: 'Entrance Alcove South Return Wall',
                 floor: 'ground',
                 category: 'exterior',
-                thickness: 400,
+                thickness: 380,
                 zBottom: 0,
                 zTop: 2800,
                 rooms: 'Covered Entrance Porch ↔ 0.08 Pralnia',
-                specs: '1,150 × 400 mm • South reveal of recessed main entrance',
+                specs: '1,480 × 380 mm (38 cm) • South reveal of recessed main entrance',
                 openings: [],
                 doors: [],
                 sides: [
@@ -399,13 +399,13 @@
                         material: 'clinker_brick',
                         materialLabel: 'Dark Graphite Clinker Brick',
                         normal: [0, -1, 0],
-                        p1: [19555, 11020],
+                        p1: [19225, 11020],
                         p2: [20705, 11020],
                         outerLoop: [
-                            [19555, 11020, 0],
+                            [19225, 11020, 0],
                             [20705, 11020, 0],
                             [20705, 11020, 2800],
-                            [19555, 11020, 2800]
+                            [19225, 11020, 2800]
                         ],
                         holes: []
                     },
@@ -415,13 +415,13 @@
                         material: 'plaster_white',
                         materialLabel: 'Interior Gypsum Plaster',
                         normal: [0, 1, 0],
-                        p1: [20305, 11420],
-                        p2: [19155, 11420],
+                        p1: [20325, 11400],
+                        p2: [18845, 11400],
                         outerLoop: [
-                            [20305, 11420, 0],
-                            [19155, 11420, 0],
-                            [19155, 11420, 2800],
-                            [20305, 11420, 2800]
+                            [20325, 11400, 0],
+                            [18845, 11400, 0],
+                            [18845, 11400, 2800],
+                            [20325, 11400, 2800]
                         ],
                         holes: []
                     }
@@ -432,11 +432,11 @@
                 name: 'South-West Wing West Exterior Wall (with Clerestory O8a)',
                 floor: 'ground',
                 category: 'exterior',
-                thickness: 400,
+                thickness: 380,
                 zBottom: 0,
                 zTop: 2800,
                 rooms: 'West Garden (W) ↔ 0.08 Pralnia, 0.09 Łazienka & 0.10 Siłownia',
-                specs: '10,110 × 400 mm • Hosts high clerestory ribbon window O8a (hp = 2,060..2,800 mm, above 1,200 mm floor-plan slice)',
+                specs: '10,110 × 380 mm (38 cm) • Hosts high clerestory ribbon window O8a (hp = 2,060..2,800 mm, above 1,200 mm floor-plan slice)',
                 openings: ['O8a'],
                 doors: [],
                 sides: [
@@ -466,15 +466,15 @@
                         material: 'plaster_white',
                         materialLabel: 'Interior Gypsum Plaster',
                         normal: [-1, 0, 0],
-                        p1: [20305, 20730],
-                        p2: [20305, 11420],
+                        p1: [20325, 20730],
+                        p2: [20325, 11400],
                         outerLoop: [
-                            [20305, 20730, 0],
-                            [20305, 11420, 0],
-                            [20305, 11420, 2800],
-                            [20305, 15250, 2800],
-                            [20305, 15250, 2060],
-                            [20305, 20730, 2060]
+                            [20325, 20730, 0],
+                            [20325, 11400, 0],
+                            [20325, 11400, 2800],
+                            [20325, 15250, 2800],
+                            [20325, 15250, 2060],
+                            [20325, 20730, 2060]
                         ],
                         holes: []
                     }
@@ -516,11 +516,11 @@
                         materialLabel: 'Interior Gypsum Plaster',
                         normal: [0, -1, 0],
                         p1: [15095, 20730],
-                        p2: [20305, 20730],
+                        p2: [20325, 20730],
                         outerLoop: [
                             [16895, 20730, 0],
-                            [20305, 20730, 0],
-                            [20305, 20730, 2800],
+                            [20325, 20730, 0],
+                            [20325, 20730, 2800],
                             [16895, 20730, 2800]
                         ],
                         holes: []
@@ -1111,16 +1111,16 @@
                 floor: 'ground',
                 category: 'internal',
                 axis: 'y',
-                x1: 14095, y1: 110, x2: 14275, y2: 7205,
+                x1: 14095, y1: 110, x2: 14275, y2: 6310,
                 thickness: 180,
                 zBottom: 0,
                 zTop: 2800,
-                rooms: '0.01 Garaż (605 cm) ↔ 0.02 Magazyn & 0.03 Kotłownia (200 cm)',
-                specs: '180 × 7,095 mm (18 cm structural wall) • 2 doorway notches (Z=1010..1910 & Z=5600..6500, Y=0..2050 mm, 750 mm lintel above)',
+                rooms: '0.01 Garaż (605 × 620 cm) ↔ 0.02 Magazyn & 0.03 Kotłownia (200 cm)',
+                specs: '180 × 6,200 mm (18 cm structural wall) • 150 cm top + 90 cm door (Z=1610..2510) + 201 cm mid + 90 cm door (Z=4520..5420) + 89 cm bottom',
                 openings: [],
                 doors: [
-                    { id: 'D_GW1_1', start: 1010, end: 1910, sillMm: 0, heightMm: 2050, swingDir: -1, hingeStart: true },
-                    { id: 'D_GW1_2', start: 5600, end: 6500, sillMm: 0, heightMm: 2050, swingDir: -1, hingeStart: false }
+                    { id: 'D_GW1_1', start: 1610, end: 2510, sillMm: 0, heightMm: 2050, swingDir: -1, hingeStart: true },
+                    { id: 'D_GW1_2', start: 4520, end: 5420, sillMm: 0, heightMm: 2050, swingDir: -1, hingeStart: false }
                 ],
                 sides: [
                     {
@@ -1128,21 +1128,21 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [-1, 0, 0],
-                        p1: [14095, 7205],
+                        p1: [14095, 6310],
                         p2: [14095, 110],
                         outerLoop: [
-                            [14095, 7205, 0],
-                            [14095, 6500, 0],
-                            [14095, 6500, 2050],
-                            [14095, 5600, 2050],
-                            [14095, 5600, 0],
-                            [14095, 1910, 0],
-                            [14095, 1910, 2050],
-                            [14095, 1010, 2050],
-                            [14095, 1010, 0],
+                            [14095, 6310, 0],
+                            [14095, 5420, 0],
+                            [14095, 5420, 2050],
+                            [14095, 4520, 2050],
+                            [14095, 4520, 0],
+                            [14095, 2510, 0],
+                            [14095, 2510, 2050],
+                            [14095, 1610, 2050],
+                            [14095, 1610, 0],
                             [14095, 110, 0],
                             [14095, 110, 2800],
-                            [14095, 7205, 2800]
+                            [14095, 6310, 2800]
                         ],
                         holes: []
                     },
@@ -1152,19 +1152,19 @@
                         material: 'plaster_white',
                         normal: [1, 0, 0],
                         p1: [14275, 110],
-                        p2: [14275, 7205],
+                        p2: [14275, 6310],
                         outerLoop: [
                             [14275, 110, 0],
-                            [14275, 1010, 0],
-                            [14275, 1010, 2050],
-                            [14275, 1910, 2050],
-                            [14275, 1910, 0],
-                            [14275, 5600, 0],
-                            [14275, 5600, 2050],
-                            [14275, 6500, 2050],
-                            [14275, 6500, 0],
-                            [14275, 7205, 0],
-                            [14275, 7205, 2800],
+                            [14275, 1610, 0],
+                            [14275, 1610, 2050],
+                            [14275, 2510, 2050],
+                            [14275, 2510, 0],
+                            [14275, 4520, 0],
+                            [14275, 4520, 2050],
+                            [14275, 5420, 2050],
+                            [14275, 5420, 0],
+                            [14275, 6310, 0],
+                            [14275, 6310, 2800],
                             [14275, 110, 2800]
                         ],
                         holes: []
@@ -1177,12 +1177,12 @@
                 floor: 'ground',
                 category: 'internal',
                 axis: 'x',
-                x1: 12095, y1: 2410, x2: 14095, y2: 2530,
+                x1: 12095, y1: 3010, x2: 14095, y2: 3130,
                 thickness: 120,
                 zBottom: 0,
                 zTop: 2800,
                 rooms: '0.02 Magazyn ↔ 0.03 Kotłownia',
-                specs: '2,000 × 120 mm • 2,300 mm (230 cm) South of Garage North inner wall (Z = 110 mm)',
+                specs: '2,000 × 120 mm • 2,900 mm (290 cm) South of Garage North inner wall (Z = 110 mm)',
                 openings: [],
                 doors: [],
                 sides: [
@@ -1191,9 +1191,9 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [0, -1, 0],
-                        p1: [12095, 2410],
-                        p2: [14095, 2410],
-                        outerLoop: [[12095, 2410, 0], [14095, 2410, 0], [14095, 2410, 2800], [12095, 2410, 2800]],
+                        p1: [12095, 3010],
+                        p2: [14095, 3010],
+                        outerLoop: [[12095, 3010, 0], [14095, 3010, 0], [14095, 3010, 2800], [12095, 3010, 2800]],
                         holes: []
                     },
                     {
@@ -1201,9 +1201,9 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [0, 1, 0],
-                        p1: [14095, 2530],
-                        p2: [12095, 2530],
-                        outerLoop: [[14095, 2530, 0], [12095, 2530, 0], [12095, 2530, 2800], [14095, 2530, 2800]],
+                        p1: [14095, 3130],
+                        p2: [12095, 3130],
+                        outerLoop: [[14095, 3130, 0], [12095, 3130, 0], [12095, 3130, 2800], [14095, 3130, 2800]],
                         holes: []
                     }
                 ]
@@ -1214,12 +1214,12 @@
                 floor: 'ground',
                 category: 'internal',
                 axis: 'y',
-                x1: 11975, y1: 3190, x2: 12095, y2: 9215,
-                thickness: 120,
+                x1: 11915, y1: 3190, x2: 12095, y2: 9215,
+                thickness: 180,
                 zBottom: 0,
                 zTop: 2800,
                 rooms: '0.03 Kotłownia & 0.06 WC ↔ 0.13 Kuchnia & 0.12 Jadalnia',
-                specs: '120 × 6,025 mm • Axis 4 partition wall continuing South from Garage East inner wall (X = 12,095 mm)',
+                specs: '180 × 6,025 mm (18 cm structural wall) • Axis 4 wall continuing South from Garage East inner wall (X = 12,095 mm)',
                 openings: [],
                 doors: [],
                 sides: [
@@ -1228,9 +1228,9 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [-1, 0, 0],
-                        p1: [11975, 9215],
-                        p2: [11975, 3190],
-                        outerLoop: [[11975, 9215, 0], [11975, 3190, 0], [11975, 3190, 2800], [11975, 9215, 2800]],
+                        p1: [11915, 9215],
+                        p2: [11915, 3190],
+                        outerLoop: [[11915, 9215, 0], [11915, 3190, 0], [11915, 3190, 2800], [11915, 9215, 2800]],
                         holes: []
                     },
                     {
@@ -1251,12 +1251,12 @@
                 floor: 'ground',
                 category: 'internal',
                 axis: 'y',
-                x1: 11975, y1: 11065, x2: 12095, y2: 11180,
-                thickness: 120,
+                x1: 11915, y1: 11065, x2: 12095, y2: 11180,
+                thickness: 180,
                 zBottom: 0,
                 zTop: 2800,
                 rooms: '0.07 Komunikacja ↔ 0.12 Jadalnia (185 cm passage)',
-                specs: '120 × 115 mm • South wall pier along Axis 4 defining 1,850 mm (185 cm) open passage',
+                specs: '180 × 115 mm • South wall pier along Axis 4 defining 1,850 mm (185 cm) open passage',
                 openings: [],
                 doors: [],
                 sides: [
@@ -1265,9 +1265,9 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [-1, 0, 0],
-                        p1: [11975, 11180],
-                        p2: [11975, 11065],
-                        outerLoop: [[11975, 11180, 0], [11975, 11065, 0], [11975, 11065, 2800], [11975, 11180, 2800]],
+                        p1: [11915, 11180],
+                        p2: [11915, 11065],
+                        outerLoop: [[11915, 11180, 0], [11915, 11065, 0], [11915, 11065, 2800], [11915, 11180, 2800]],
                         holes: []
                     },
                     {
@@ -1288,38 +1288,27 @@
                 floor: 'ground',
                 category: 'internal',
                 axis: 'x',
-                x1: 12095, y1: 7205, x2: 20325, y2: 7325,
-                thickness: 120,
+                x1: 12095, y1: 6310, x2: 17625, y2: 6490,
+                thickness: 180,
                 zBottom: 0,
                 zTop: 2800,
-                rooms: '0.01 Garaż & 0.03 Kotłownia ↔ 0.04 Wiatrołap, 0.05 Garderoba & 0.06 WC',
-                specs: '8,230 × 120 mm • 2 doorway notches (X=12800..13700 & X=17605..18505, Y=0..2050 mm)',
+                rooms: '0.01 Garaż & 0.03 Kotłownia ↔ 0.05 Garderoba & 0.06 WC',
+                specs: '5,530 × 180 mm (18 cm structural wall) • 620 cm South of Garage North inner wall; 335 cm West of GW_1 + 18 cm GW_1 + 200 cm Kotłownia (no openings)',
                 openings: [],
-                doors: [
-                    { id: 'D_GW4_1', start: 17605, end: 18505, sillMm: 0, heightMm: 2050, swingDir: -1, hingeStart: false },
-                    { id: 'D_GW4_2', start: 12800, end: 13700, sillMm: 0, heightMm: 2050, swingDir: -1, hingeStart: true }
-                ],
+                doors: [],
                 sides: [
                     {
                         id: 'GW_4_NORTH',
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [0, -1, 0],
-                        p1: [12095, 7205],
-                        p2: [20325, 7205],
+                        p1: [12095, 6310],
+                        p2: [17625, 6310],
                         outerLoop: [
-                            [12095, 7205, 0],
-                            [12800, 7205, 0],
-                            [12800, 7205, 2050],
-                            [13700, 7205, 2050],
-                            [13700, 7205, 0],
-                            [17605, 7205, 0],
-                            [17605, 7205, 2050],
-                            [18505, 7205, 2050],
-                            [18505, 7205, 0],
-                            [20325, 7205, 0],
-                            [20325, 7205, 2800],
-                            [12095, 7205, 2800]
+                            [12095, 6310, 0],
+                            [17625, 6310, 0],
+                            [17625, 6310, 2800],
+                            [12095, 6310, 2800]
                         ],
                         holes: []
                     },
@@ -1328,21 +1317,117 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [0, 1, 0],
-                        p1: [20325, 7325],
-                        p2: [12095, 7325],
+                        p1: [17625, 6490],
+                        p2: [12095, 6490],
                         outerLoop: [
-                            [20325, 7325, 0],
-                            [18505, 7325, 0],
-                            [18505, 7325, 2050],
-                            [17605, 7325, 2050],
-                            [17605, 7325, 0],
-                            [13700, 7325, 0],
-                            [13700, 7325, 2050],
-                            [12800, 7325, 2050],
-                            [12800, 7325, 0],
-                            [12095, 7325, 0],
-                            [12095, 7325, 2800],
-                            [20325, 7325, 2800]
+                            [17625, 6490, 0],
+                            [12095, 6490, 0],
+                            [12095, 6490, 2800],
+                            [17625, 6490, 2800]
+                        ],
+                        holes: []
+                    }
+                ]
+            },
+            {
+                id: 'GW_5a',
+                name: 'GW_5a (Garderoba West Wall)',
+                floor: 'ground',
+                category: 'internal',
+                axis: 'y',
+                x1: 17445, y1: 6490, x2: 17625, y2: 8360,
+                thickness: 180,
+                zBottom: 0,
+                zTop: 2800,
+                rooms: '0.01 Garaż (Passage) ↔ 0.05 Garderoba',
+                specs: '180 × 1,870 mm (18 cm structural wall) • Flush with West end of GW_4 (X = 17,625 mm); 317 cm West of GW_6',
+                openings: [],
+                doors: [],
+                sides: [
+                    {
+                        id: 'GW_5a_EAST',
+                        role: 'interior',
+                        material: 'plaster_white',
+                        normal: [-1, 0, 0],
+                        p1: [17445, 8360],
+                        p2: [17445, 6490],
+                        outerLoop: [
+                            [17445, 8360, 0],
+                            [17445, 6490, 0],
+                            [17445, 6490, 2800],
+                            [17445, 8360, 2800]
+                        ],
+                        holes: []
+                    },
+                    {
+                        id: 'GW_5a_WEST',
+                        role: 'interior',
+                        material: 'plaster_white',
+                        normal: [1, 0, 0],
+                        p1: [17625, 6490],
+                        p2: [17625, 8360],
+                        outerLoop: [
+                            [17625, 6490, 0],
+                            [17625, 8360, 0],
+                            [17625, 8360, 2800],
+                            [17625, 6490, 2800]
+                        ],
+                        holes: []
+                    }
+                ]
+            },
+            {
+                id: 'GW_5b',
+                name: 'GW_5b (Garaż / Wiatrołap North Wall)',
+                floor: 'ground',
+                category: 'internal',
+                axis: 'x',
+                x1: 17625, y1: 8180, x2: 18845, y2: 8360,
+                thickness: 180,
+                zBottom: 0,
+                zTop: 2800,
+                rooms: '0.01 Garaż ↔ 0.04 Wiatrołap',
+                specs: '1,220 × 180 mm (18 cm structural wall) • 17 cm West pier + 90×210 cm doorway (X=17775..18675, Y=0..2100 mm) + 15 cm East pier',
+                openings: [],
+                doors: [
+                    { id: 'D_GW5b_1', start: 17775, end: 18675, sillMm: 0, heightMm: 2100, swingDir: 1, hingeStart: false }
+                ],
+                sides: [
+                    {
+                        id: 'GW_5b_NORTH',
+                        role: 'interior',
+                        material: 'plaster_white',
+                        normal: [0, -1, 0],
+                        p1: [17625, 8180],
+                        p2: [18845, 8180],
+                        outerLoop: [
+                            [17625, 8180, 0],
+                            [17775, 8180, 0],
+                            [17775, 8180, 2100],
+                            [18675, 8180, 2100],
+                            [18675, 8180, 0],
+                            [18845, 8180, 0],
+                            [18845, 8180, 2800],
+                            [17625, 8180, 2800]
+                        ],
+                        holes: []
+                    },
+                    {
+                        id: 'GW_5b_SOUTH',
+                        role: 'interior',
+                        material: 'plaster_white',
+                        normal: [0, 1, 0],
+                        p1: [18845, 8360],
+                        p2: [17625, 8360],
+                        outerLoop: [
+                            [18845, 8360, 0],
+                            [18675, 8360, 0],
+                            [18675, 8360, 2100],
+                            [17775, 8360, 2100],
+                            [17775, 8360, 0],
+                            [17625, 8360, 0],
+                            [17625, 8360, 2800],
+                            [18845, 8360, 2800]
                         ],
                         holes: []
                     }
@@ -1350,16 +1435,16 @@
             },
             {
                 id: 'GW_5',
-                name: 'GW_5 (Wiatrołap / Garderoba & Komunikacja)',
+                name: 'GW_5 (Wiatrołap / Komunikacja)',
                 floor: 'ground',
                 category: 'internal',
                 axis: 'y',
-                x1: 16445, y1: 7325, x2: 16565, y2: 11300,
-                thickness: 120,
+                x1: 16225, y1: 8360, x2: 16405, y2: 11220,
+                thickness: 180,
                 zBottom: 0,
                 zTop: 2800,
-                rooms: '0.04 Wiatrołap ↔ 0.05 Garderoba & 0.07 Komunikacja',
-                specs: '120 × 3,975 mm • Doorway notch Z=9600..10600, Y=0..2100 mm',
+                rooms: '0.04 Wiatrołap ↔ 0.07 Komunikacja',
+                specs: '180 × 2,860 mm (18 cm structural wall) • Doorway notch Z=9600..10600, Y=0..2100 mm',
                 openings: [],
                 doors: [
                     { id: 'D_GW5_1', start: 9600, end: 10600, sillMm: 0, heightMm: 2100, swingDir: -1, hingeStart: false }
@@ -1370,17 +1455,17 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [-1, 0, 0],
-                        p1: [16445, 11300],
-                        p2: [16445, 7325],
+                        p1: [16225, 11220],
+                        p2: [16225, 8360],
                         outerLoop: [
-                            [16445, 11300, 0],
-                            [16445, 10600, 0],
-                            [16445, 10600, 2100],
-                            [16445, 9600, 2100],
-                            [16445, 9600, 0],
-                            [16445, 7325, 0],
-                            [16445, 7325, 2800],
-                            [16445, 11300, 2800]
+                            [16225, 11220, 0],
+                            [16225, 10600, 0],
+                            [16225, 10600, 2100],
+                            [16225, 9600, 2100],
+                            [16225, 9600, 0],
+                            [16225, 8360, 0],
+                            [16225, 8360, 2800],
+                            [16225, 11220, 2800]
                         ],
                         holes: []
                     },
@@ -1389,17 +1474,17 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [1, 0, 0],
-                        p1: [16565, 7325],
-                        p2: [16565, 11300],
+                        p1: [16405, 8360],
+                        p2: [16405, 11220],
                         outerLoop: [
-                            [16565, 7325, 0],
-                            [16565, 9600, 0],
-                            [16565, 9600, 2100],
-                            [16565, 10600, 2100],
-                            [16565, 10600, 0],
-                            [16565, 11300, 0],
-                            [16565, 11300, 2800],
-                            [16565, 7325, 2800]
+                            [16405, 8360, 0],
+                            [16405, 9600, 0],
+                            [16405, 9600, 2100],
+                            [16405, 10600, 2100],
+                            [16405, 10600, 0],
+                            [16405, 11220, 0],
+                            [16405, 11220, 2800],
+                            [16405, 8360, 2800]
                         ],
                         holes: []
                     }
@@ -1411,12 +1496,12 @@
                 floor: 'ground',
                 category: 'internal',
                 axis: 'y',
-                x1: 14195, y1: 7325, x2: 14315, y2: 9095,
-                thickness: 120,
+                x1: 14095, y1: 6490, x2: 14275, y2: 8180,
+                thickness: 180,
                 zBottom: 0,
                 zTop: 2800,
                 rooms: '0.05 Garderoba ↔ 0.06 WC',
-                specs: '120 × 1,770 mm • 2,130 mm (213 cm) East of Wiatrołap wall GW_5',
+                specs: '180 × 1,690 mm (18 cm structural wall) • 3,170 mm (317 cm) East of Garderoba West wall GW_5a',
                 openings: [],
                 doors: [],
                 sides: [
@@ -1425,9 +1510,9 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [-1, 0, 0],
-                        p1: [14195, 9095],
-                        p2: [14195, 7325],
-                        outerLoop: [[14195, 9095, 0], [14195, 7325, 0], [14195, 7325, 2800], [14195, 9095, 2800]],
+                        p1: [14095, 8180],
+                        p2: [14095, 6490],
+                        outerLoop: [[14095, 8180, 0], [14095, 6490, 0], [14095, 6490, 2800], [14095, 8180, 2800]],
                         holes: []
                     },
                     {
@@ -1435,9 +1520,9 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [1, 0, 0],
-                        p1: [14315, 7325],
-                        p2: [14315, 9095],
-                        outerLoop: [[14315, 7325, 0], [14315, 9095, 0], [14315, 9095, 2800], [14315, 7325, 2800]],
+                        p1: [14275, 6490],
+                        p2: [14275, 8180],
+                        outerLoop: [[14275, 6490, 0], [14275, 8180, 0], [14275, 8180, 2800], [14275, 6490, 2800]],
                         holes: []
                     }
                 ]
@@ -1448,15 +1533,15 @@
                 floor: 'ground',
                 category: 'internal',
                 axis: 'x',
-                x1: 12095, y1: 9095, x2: 16445, y2: 9215,
-                thickness: 120,
+                x1: 12095, y1: 8180, x2: 17445, y2: 8360,
+                thickness: 180,
                 zBottom: 0,
                 zTop: 2800,
-                rooms: '0.05 Garderoba & 0.06 WC ↔ 0.07 Komunikacja (Stairs)',
-                specs: '4,350 × 120 mm • 2 doorway notches (X=12900..13700 & X=15000..15800, Y=0..2050 mm)',
+                rooms: '0.05 Garderoba & 0.06 WC ↔ 0.04 Wiatrołap & 0.07 Komunikacja (Stairs)',
+                specs: '5,350 × 180 mm (18 cm structural wall) • 1,690 mm (169 cm) South of GW_4; 90×210 cm door D_GW7_1 14 cm East of GW_5a (X = 16,405..17,305 mm)',
                 openings: [],
                 doors: [
-                    { id: 'D_GW7_1', start: 15000, end: 15800, sillMm: 0, heightMm: 2050, swingDir: -1, hingeStart: true },
+                    { id: 'D_GW7_1', start: 16405, end: 17305, sillMm: 0, heightMm: 2100, swingDir: -1, hingeStart: true },
                     { id: 'D_GW7_2', start: 12900, end: 13700, sillMm: 0, heightMm: 2050, swingDir: -1, hingeStart: false }
                 ],
                 sides: [
@@ -1465,21 +1550,21 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [0, -1, 0],
-                        p1: [12095, 9095],
-                        p2: [16445, 9095],
+                        p1: [12095, 8180],
+                        p2: [17445, 8180],
                         outerLoop: [
-                            [12095, 9095, 0],
-                            [12900, 9095, 0],
-                            [12900, 9095, 2050],
-                            [13700, 9095, 2050],
-                            [13700, 9095, 0],
-                            [15000, 9095, 0],
-                            [15000, 9095, 2050],
-                            [15800, 9095, 2050],
-                            [15800, 9095, 0],
-                            [16445, 9095, 0],
-                            [16445, 9095, 2800],
-                            [12095, 9095, 2800]
+                            [12095, 8180, 0],
+                            [12900, 8180, 0],
+                            [12900, 8180, 2050],
+                            [13700, 8180, 2050],
+                            [13700, 8180, 0],
+                            [16405, 8180, 0],
+                            [16405, 8180, 2100],
+                            [17305, 8180, 2100],
+                            [17305, 8180, 0],
+                            [17445, 8180, 0],
+                            [17445, 8180, 2800],
+                            [12095, 8180, 2800]
                         ],
                         holes: []
                     },
@@ -1488,21 +1573,21 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [0, 1, 0],
-                        p1: [16445, 9215],
-                        p2: [12095, 9215],
+                        p1: [17445, 8360],
+                        p2: [12095, 8360],
                         outerLoop: [
-                            [16445, 9215, 0],
-                            [15800, 9215, 0],
-                            [15800, 9215, 2050],
-                            [15000, 9215, 2050],
-                            [15000, 9215, 0],
-                            [13700, 9215, 0],
-                            [13700, 9215, 2050],
-                            [12900, 9215, 2050],
-                            [12900, 9215, 0],
-                            [12095, 9215, 0],
-                            [12095, 9215, 2800],
-                            [16445, 9215, 2800]
+                            [17445, 8360, 0],
+                            [17305, 8360, 0],
+                            [17305, 8360, 2100],
+                            [16405, 8360, 2100],
+                            [16405, 8360, 0],
+                            [13700, 8360, 0],
+                            [13700, 8360, 2050],
+                            [12900, 8360, 2050],
+                            [12900, 8360, 0],
+                            [12095, 8360, 0],
+                            [12095, 8360, 2800],
+                            [17445, 8360, 2800]
                         ],
                         holes: []
                     }
@@ -1514,12 +1599,12 @@
                 floor: 'ground',
                 category: 'internal',
                 axis: 'x',
-                x1: 16215, y1: 11300, x2: 19155, y2: 11420,
-                thickness: 120,
+                x1: 16215, y1: 11220, x2: 18845, y2: 11400,
+                thickness: 180,
                 zBottom: 0,
                 zTop: 2800,
                 rooms: '0.04 Wiatrołap ↔ 0.08 Pralnia',
-                specs: '2,940 × 120 mm • Aligned with Entrance Alcove South inner corner (Z = 11,420 mm)',
+                specs: '2,630 × 180 mm (18 cm structural wall) • Aligned with Entrance Alcove South inner corner (Z = 11,400 mm)',
                 openings: [],
                 doors: [],
                 sides: [
@@ -1528,9 +1613,9 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [0, -1, 0],
-                        p1: [16215, 11300],
-                        p2: [19155, 11300],
-                        outerLoop: [[16215, 11300, 0], [19155, 11300, 0], [19155, 11300, 2800], [16215, 11300, 2800]],
+                        p1: [16215, 11220],
+                        p2: [18845, 11220],
+                        outerLoop: [[16215, 11220, 0], [18845, 11220, 0], [18845, 11220, 2800], [16215, 11220, 2800]],
                         holes: []
                     },
                     {
@@ -1538,9 +1623,9 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [0, 1, 0],
-                        p1: [19155, 11420],
-                        p2: [16215, 11420],
-                        outerLoop: [[19155, 11420, 0], [16215, 11420, 0], [16215, 11420, 2800], [19155, 11420, 2800]],
+                        p1: [18845, 11400],
+                        p2: [16215, 11400],
+                        outerLoop: [[18845, 11400, 0], [16215, 11400, 0], [16215, 11400, 2800], [18845, 11400, 2800]],
                         holes: []
                     }
                 ]
@@ -1551,12 +1636,12 @@
                 floor: 'ground',
                 category: 'internal',
                 axis: 'y',
-                x1: 16215, y1: 11420, x2: 16335, y2: 15030,
+                x1: 16215, y1: 11400, x2: 16335, y2: 15030,
                 thickness: 120,
                 zBottom: 0,
                 zTop: 2800,
                 rooms: '0.08 Pralnia & 0.17 Sauna ↔ 0.16 Komunikacja',
-                specs: '120 × 3,610 mm • 2 doorway notches (Z=11850..12650 & Z=13650..14450, Y=0..2050 mm)',
+                specs: '120 × 3,630 mm • 2 doorway notches (Z=11850..12650 & Z=13650..14450, Y=0..2050 mm)',
                 openings: [],
                 doors: [
                     { id: 'D_GW9_1', start: 11850, end: 12650, sillMm: 0, heightMm: 2050, swingDir: 1, hingeStart: true },
@@ -1569,7 +1654,7 @@
                         material: 'plaster_white',
                         normal: [-1, 0, 0],
                         p1: [16215, 15030],
-                        p2: [16215, 11420],
+                        p2: [16215, 11400],
                         outerLoop: [
                             [16215, 15030, 0],
                             [16215, 14450, 0],
@@ -1580,8 +1665,8 @@
                             [16215, 12650, 2050],
                             [16215, 11850, 2050],
                             [16215, 11850, 0],
-                            [16215, 11420, 0],
-                            [16215, 11420, 2800],
+                            [16215, 11400, 0],
+                            [16215, 11400, 2800],
                             [16215, 15030, 2800]
                         ],
                         holes: []
@@ -1591,10 +1676,10 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [1, 0, 0],
-                        p1: [16335, 11420],
+                        p1: [16335, 11400],
                         p2: [16335, 15030],
                         outerLoop: [
-                            [16335, 11420, 0],
+                            [16335, 11400, 0],
                             [16335, 11850, 0],
                             [16335, 11850, 2050],
                             [16335, 12650, 2050],
@@ -1605,7 +1690,7 @@
                             [16335, 14450, 0],
                             [16335, 15030, 0],
                             [16335, 15030, 2800],
-                            [16335, 11420, 2800]
+                            [16335, 11400, 2800]
                         ],
                         holes: []
                     }
@@ -1617,12 +1702,12 @@
                 floor: 'ground',
                 category: 'internal',
                 axis: 'x',
-                x1: 16335, y1: 13180, x2: 20305, y2: 13300,
+                x1: 16335, y1: 13180, x2: 20325, y2: 13300,
                 thickness: 120,
                 zBottom: 0,
                 zTop: 2800,
                 rooms: '0.08 Pralnia ↔ 0.09 Łazienka & 0.17 Sauna',
-                specs: '3,970 × 120 mm • 1,760 mm (176 cm) South of Wiatrołap wall (Z = 11,420 mm)',
+                specs: '3,990 × 120 mm • 1,780 mm (178 cm) South of Wiatrołap wall (Z = 11,400 mm)',
                 openings: [],
                 doors: [],
                 sides: [
@@ -1632,8 +1717,8 @@
                         material: 'plaster_white',
                         normal: [0, -1, 0],
                         p1: [16335, 13180],
-                        p2: [20305, 13180],
-                        outerLoop: [[16335, 13180, 0], [20305, 13180, 0], [20305, 13180, 2800], [16335, 13180, 2800]],
+                        p2: [20325, 13180],
+                        outerLoop: [[16335, 13180, 0], [20325, 13180, 0], [20325, 13180, 2800], [16335, 13180, 2800]],
                         holes: []
                     },
                     {
@@ -1641,9 +1726,9 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [0, 1, 0],
-                        p1: [20305, 13300],
+                        p1: [20325, 13300],
                         p2: [16335, 13300],
-                        outerLoop: [[20305, 13300, 0], [16335, 13300, 0], [16335, 13300, 2800], [20305, 13300, 2800]],
+                        outerLoop: [[20325, 13300, 0], [16335, 13300, 0], [16335, 13300, 2800], [20325, 13300, 2800]],
                         holes: []
                     }
                 ]
@@ -1658,7 +1743,7 @@
                 thickness: 120,
                 zBottom: 0,
                 zTop: 2800,
-                rooms: '0.09 Łazienka (239 cm) ↔ 0.17 Sauna (146 cm)',
+                rooms: '0.09 Łazienka (241 cm) ↔ 0.17 Sauna (146 cm)',
                 specs: '120 × 1,730 mm • Doorway notch Z=13750..14550, Y=0..2050 mm',
                 openings: [],
                 doors: [
@@ -1711,12 +1796,12 @@
                 floor: 'ground',
                 category: 'internal',
                 axis: 'x',
-                x1: 15095, y1: 15030, x2: 20305, y2: 15150,
+                x1: 15095, y1: 15030, x2: 20325, y2: 15150,
                 thickness: 120,
                 zBottom: 0,
                 zTop: 2800,
                 rooms: '0.09 Łazienka, 0.17 Sauna & 0.16 Komunikacja ↔ 0.10 Siłownia',
-                specs: '5,210 × 120 mm • Doorway notch X=15255..16155, Y=0..2050 mm',
+                specs: '5,230 × 120 mm • Doorway notch X=15255..16155, Y=0..2050 mm',
                 openings: [],
                 doors: [
                     { id: 'D_GW12_1', start: 15255, end: 16155, sillMm: 0, heightMm: 2050, swingDir: 1, hingeStart: false }
@@ -1728,15 +1813,15 @@
                         material: 'plaster_white',
                         normal: [0, -1, 0],
                         p1: [15095, 15030],
-                        p2: [20305, 15030],
+                        p2: [20325, 15030],
                         outerLoop: [
                             [15095, 15030, 0],
                             [15255, 15030, 0],
                             [15255, 15030, 2050],
                             [16155, 15030, 2050],
                             [16155, 15030, 0],
-                            [20305, 15030, 0],
-                            [20305, 15030, 2800],
+                            [20325, 15030, 0],
+                            [20325, 15030, 2800],
                             [15095, 15030, 2800]
                         ],
                         holes: []
@@ -1746,17 +1831,17 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [0, 1, 0],
-                        p1: [20305, 15150],
+                        p1: [20325, 15150],
                         p2: [15095, 15150],
                         outerLoop: [
-                            [20305, 15150, 0],
+                            [20325, 15150, 0],
                             [16155, 15150, 0],
                             [16155, 15150, 2050],
                             [15255, 15150, 2050],
                             [15255, 15150, 0],
                             [15095, 15150, 0],
                             [15095, 15150, 2800],
-                            [20305, 15150, 2800]
+                            [20325, 15150, 2800]
                         ],
                         holes: []
                     }
@@ -1768,7 +1853,7 @@
                 floor: 'ground',
                 category: 'internal',
                 axis: 'y',
-                x1: 6435, y1: 3190, x2: 6555, y2: 6130,
+                x1: 6365, y1: 3190, x2: 6485, y2: 6130,
                 thickness: 120,
                 zBottom: 0,
                 zTop: 2800,
@@ -1784,17 +1869,17 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [-1, 0, 0],
-                        p1: [6435, 6130],
-                        p2: [6435, 3190],
+                        p1: [6365, 6130],
+                        p2: [6365, 3190],
                         outerLoop: [
-                            [6435, 6130, 0],
-                            [6435, 4270, 0],
-                            [6435, 4270, 2050],
-                            [6435, 3370, 2050],
-                            [6435, 3370, 0],
-                            [6435, 3190, 0],
-                            [6435, 3190, 2800],
-                            [6435, 6130, 2800]
+                            [6365, 6130, 0],
+                            [6365, 4270, 0],
+                            [6365, 4270, 2050],
+                            [6365, 3370, 2050],
+                            [6365, 3370, 0],
+                            [6365, 3190, 0],
+                            [6365, 3190, 2800],
+                            [6365, 6130, 2800]
                         ],
                         holes: []
                     },
@@ -1803,17 +1888,17 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [1, 0, 0],
-                        p1: [6555, 3190],
-                        p2: [6555, 6130],
+                        p1: [6485, 3190],
+                        p2: [6485, 6130],
                         outerLoop: [
-                            [6555, 3190, 0],
-                            [6555, 3370, 0],
-                            [6555, 3370, 2050],
-                            [6555, 4270, 2050],
-                            [6555, 4270, 0],
-                            [6555, 6130, 0],
-                            [6555, 6130, 2800],
-                            [6555, 3190, 2800]
+                            [6485, 3190, 0],
+                            [6485, 3370, 0],
+                            [6485, 3370, 2050],
+                            [6485, 4270, 2050],
+                            [6485, 4270, 0],
+                            [6485, 6130, 0],
+                            [6485, 6130, 2800],
+                            [6485, 3190, 2800]
                         ],
                         holes: []
                     }
@@ -1825,12 +1910,12 @@
                 floor: 'ground',
                 category: 'internal',
                 axis: 'y',
-                x1: 4445, y1: 3190, x2: 4565, y2: 5060,
+                x1: 4375, y1: 3190, x2: 4495, y2: 5060,
                 thickness: 120,
                 zBottom: 0,
                 zTop: 2800,
-                rooms: '0.14 Spiżarnia (187 cm upper) ↔ 0.15 Gabinet',
-                specs: '120 × 1,870 mm • 1,870 mm (187 cm) East of Kitchen/Pantry wall GW_13',
+                rooms: '0.14 Spiżarnia (187 cm upper) ↔ 0.15 Gabinet (426 cm upper)',
+                specs: '120 × 1,870 mm • 1,870 mm (187 cm) East of GW_13, 4,260 mm (426 cm) West of EW_EAST_CORE',
                 openings: [],
                 doors: [],
                 sides: [
@@ -1839,9 +1924,9 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [-1, 0, 0],
-                        p1: [4445, 5060],
-                        p2: [4445, 3190],
-                        outerLoop: [[4445, 5060, 0], [4445, 3190, 0], [4445, 3190, 2800], [4445, 5060, 2800]],
+                        p1: [4375, 5060],
+                        p2: [4375, 3190],
+                        outerLoop: [[4375, 5060, 0], [4375, 3190, 0], [4375, 3190, 2800], [4375, 5060, 2800]],
                         holes: []
                     },
                     {
@@ -1849,25 +1934,25 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [1, 0, 0],
-                        p1: [4565, 3190],
-                        p2: [4565, 5060],
-                        outerLoop: [[4565, 3190, 0], [4565, 5060, 0], [4565, 5060, 2800], [4565, 3190, 2800]],
+                        p1: [4495, 3190],
+                        p2: [4495, 5060],
+                        outerLoop: [[4495, 3190, 0], [4495, 5060, 0], [4495, 5060, 2800], [4495, 3190, 2800]],
                         holes: []
                     }
                 ]
             },
             {
                 id: 'GW_14b',
-                name: 'GW_14b (Spiżarnia 35 cm Wall Step)',
+                name: 'GW_14b (Spiżarnia / Gabinet 27 cm Wall Step)',
                 floor: 'ground',
                 category: 'internal',
                 axis: 'x',
-                x1: 4445, y1: 5060, x2: 4915, y2: 5180,
+                x1: 4105, y1: 5060, x2: 4495, y2: 5180,
                 thickness: 120,
                 zBottom: 0,
                 zTop: 2800,
                 rooms: '0.14 Spiżarnia ↔ 0.15 Gabinet (Step)',
-                specs: '470 × 120 mm • 350 mm (35 cm) step between 187 cm upper and 152 cm lower Pantry width',
+                specs: '390 × 120 mm • 270 mm (27 cm) step between 426 cm upper and 399 cm lower Gabinet width',
                 openings: [],
                 doors: [],
                 sides: [
@@ -1876,9 +1961,9 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [0, -1, 0],
-                        p1: [4445, 5060],
-                        p2: [4915, 5060],
-                        outerLoop: [[4445, 5060, 0], [4915, 5060, 0], [4915, 5060, 2800], [4445, 5060, 2800]],
+                        p1: [4105, 5060],
+                        p2: [4495, 5060],
+                        outerLoop: [[4105, 5060, 0], [4495, 5060, 0], [4495, 5060, 2800], [4105, 5060, 2800]],
                         holes: []
                     },
                     {
@@ -1886,9 +1971,9 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [0, 1, 0],
-                        p1: [4915, 5180],
-                        p2: [4445, 5180],
-                        outerLoop: [[4915, 5180, 0], [4445, 5180, 0], [4445, 5180, 2800], [4915, 5180, 2800]],
+                        p1: [4495, 5180],
+                        p2: [4105, 5180],
+                        outerLoop: [[4495, 5180, 0], [4105, 5180, 0], [4105, 5180, 2800], [4495, 5180, 2800]],
                         holes: []
                     }
                 ]
@@ -1899,12 +1984,12 @@
                 floor: 'ground',
                 category: 'internal',
                 axis: 'y',
-                x1: 4795, y1: 5180, x2: 4915, y2: 6130,
+                x1: 4105, y1: 5180, x2: 4225, y2: 6130,
                 thickness: 120,
                 zBottom: 0,
                 zTop: 2800,
-                rooms: '0.14 Spiżarnia (152 cm lower) ↔ 0.15 Gabinet',
-                specs: '120 × 950 mm • 1,520 mm (152 cm) East of Kitchen/Pantry wall GW_13',
+                rooms: '0.14 Spiżarnia (214 cm lower) ↔ 0.15 Gabinet (399 cm lower)',
+                specs: '120 × 950 mm • 3,990 mm (399 cm) West of EW_EAST_CORE (X = 115 mm)',
                 openings: [],
                 doors: [],
                 sides: [
@@ -1913,9 +1998,9 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [-1, 0, 0],
-                        p1: [4795, 6130],
-                        p2: [4795, 5180],
-                        outerLoop: [[4795, 6130, 0], [4795, 5180, 0], [4795, 5180, 2800], [4795, 6130, 2800]],
+                        p1: [4105, 6130],
+                        p2: [4105, 5180],
+                        outerLoop: [[4105, 6130, 0], [4105, 5180, 0], [4105, 5180, 2800], [4105, 6130, 2800]],
                         holes: []
                     },
                     {
@@ -1923,9 +2008,9 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [1, 0, 0],
-                        p1: [4915, 5180],
-                        p2: [4915, 6130],
-                        outerLoop: [[4915, 5180, 0], [4915, 6130, 0], [4915, 6130, 2800], [4915, 5180, 2800]],
+                        p1: [4225, 5180],
+                        p2: [4225, 6130],
+                        outerLoop: [[4225, 5180, 0], [4225, 6130, 0], [4225, 6130, 2800], [4225, 5180, 2800]],
                         holes: []
                     }
                 ]
@@ -1936,12 +2021,12 @@
                 floor: 'ground',
                 category: 'internal',
                 axis: 'x',
-                x1: 115, y1: 6130, x2: 6555, y2: 6250,
+                x1: 115, y1: 6130, x2: 6485, y2: 6250,
                 thickness: 120,
                 zBottom: 0,
                 zTop: 2800,
                 rooms: '0.14 Spiżarnia & 0.15 Gabinet ↔ 0.11 Salon',
-                specs: '6,440 × 120 mm • Doorway notch X=1045..1945, Y=0..2050 mm',
+                specs: '6,370 × 120 mm • Doorway notch X=1045..1945, Y=0..2050 mm',
                 openings: [],
                 doors: [
                     { id: 'D_GW15_1', start: 1045, end: 1945, sillMm: 0, heightMm: 2050, swingDir: -1, hingeStart: true }
@@ -1953,15 +2038,15 @@
                         material: 'plaster_white',
                         normal: [0, -1, 0],
                         p1: [115, 6130],
-                        p2: [6555, 6130],
+                        p2: [6485, 6130],
                         outerLoop: [
                             [115, 6130, 0],
                             [1045, 6130, 0],
                             [1045, 6130, 2050],
                             [1945, 6130, 2050],
                             [1945, 6130, 0],
-                            [6555, 6130, 0],
-                            [6555, 6130, 2800],
+                            [6485, 6130, 0],
+                            [6485, 6130, 2800],
                             [115, 6130, 2800]
                         ],
                         holes: []
@@ -1971,17 +2056,17 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [0, 1, 0],
-                        p1: [6555, 6250],
+                        p1: [6485, 6250],
                         p2: [115, 6250],
                         outerLoop: [
-                            [6555, 6250, 0],
+                            [6485, 6250, 0],
                             [1945, 6250, 0],
                             [1945, 6250, 2050],
                             [1045, 6250, 2050],
                             [1045, 6250, 0],
                             [115, 6250, 0],
                             [115, 6250, 2800],
-                            [6555, 6250, 2800]
+                            [6485, 6250, 2800]
                         ],
                         holes: []
                     }

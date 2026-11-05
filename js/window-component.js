@@ -7,15 +7,23 @@
     if (typeof module === 'object' && typeof module.exports === 'object') {
         module.exports = factory(
             require('./window-store.js'),
-            require('./coordinate-service.js')
+            require('./coordinate-service.js'),
+            require('./wall-service.js')
         );
     } else {
-        root.WindowComponent = factory(root.WindowStore, root.CoordinateService);
+        root.WindowComponent = factory(root.WindowStore, root.CoordinateService, root.WallService);
         root.setWindowJambOption = function (mode) {
             root.WindowComponent.setJambMaterialMode(mode);
         };
     }
-}(typeof self !== 'undefined' ? self : this, function (WindowStore, CoordinateService) {
+}(typeof self !== 'undefined' ? self : this, function (WindowStore, CoordinateService, WallService) {
+
+    function getWallService() {
+        if (WallService) return WallService;
+        if (typeof window !== 'undefined' && window.WallService) return window.WallService;
+        if (typeof globalThis !== 'undefined' && globalThis.WallService) return globalThis.WallService;
+        return null;
+    }
 
     const WindowComponent = {
         /**
@@ -77,7 +85,7 @@
                     : 'Jambs: Option 1 — Floor Material (Brick / Wood)';
             }
 
-            // Update any face-on jamb strips in the SVG (e.g. on east_facade)
+            // Update any face-on jamb strips in the SVG (e.g. on east_facade or north_facade 3D jamb returns)
             const jambStrips = document.querySelectorAll('[data-jamb-strip]');
             jambStrips.forEach(strip => {
                 const floorFill = strip.getAttribute('data-floor-fill') || 'url(#brick-pattern)';
@@ -94,9 +102,10 @@
         },
 
         /**
-         * Render SVG reveal strips for the window's defined jambs ('left', 'right', 'top')
+         * Render SVG reveal strips for the window's defined jambs ('left', 'right', 'top'),
+         * using 3D B-Rep jamb reveal paths when projected from WallService.
          */
-        _renderWindowJambReveals: function (win, x, y, w, h) {
+        _renderWindowJambReveals: function (win, x, y, w, h, brepJambReveals) {
             const jambs = Array.isArray(win.jambs) ? win.jambs : [];
             if (jambs.length === 0) return '';
 
@@ -105,8 +114,17 @@
                 ? '#1f2421'
                 : (win.floor === 'first' ? 'url(#wood-slats-pattern)' : 'url(#brick-pattern)');
             const jambStroke = isRal ? '#141816' : (win.floor === 'first' ? '#5d4c38' : '#181b20');
-            const band = 5.5;
 
+            if (Array.isArray(brepJambReveals) && brepJambReveals.length > 0) {
+                let svg = `<g class="window-jamb-reveals" data-jamb-mode="${this.jambMaterialMode}">`;
+                brepJambReveals.forEach(jr => {
+                    svg += `<path data-brep-window-jamb="${jr.side}" d="${jr.svgPathD}" fill="${jambFill}" stroke="${jambStroke}" stroke-width="0.9" />`;
+                });
+                svg += `</g>`;
+                return svg;
+            }
+
+            const band = 5.5;
             let svg = `<g class="window-jamb-reveals" data-jamb-mode="${this.jambMaterialMode}">`;
             if (jambs.includes('left')) {
                 svg += `<rect x="${x}" y="${y}" width="${band}" height="${h}" fill="${jambFill}" stroke="${jambStroke}" stroke-width="0.9" />`;
@@ -137,11 +155,11 @@
 
             if (viewId === 'north_facade' || viewId === 'south_facade' || viewId === 'west_facade' || viewId === 'east_facade') {
                 if (win.openingType === 'garage_door') {
-                    return this._renderExteriorGarageDoor(win, x, y, w, h);
+                    return this._renderExteriorGarageDoor(win, x, y, w, h, viewId);
                 } else if (win.openingType === 'entrance_door') {
-                    return this._renderExteriorEntranceDoor(win, x, y, w, h);
+                    return this._renderExteriorEntranceDoor(win, x, y, w, h, viewId);
                 }
-                return this._renderExteriorNorthFacade(win, x, y, w, h);
+                return this._renderExteriorNorthFacade(win, x, y, w, h, viewId);
             } else if (viewId === 'kitchen_back_wall' || viewId === 'kitchen_north_wall') {
                 return this._renderInteriorKitchen(win, x, y, w, h, styleType);
             } else if (viewId === 'stairs_north_wall') {
@@ -151,7 +169,11 @@
             return this._renderGeneric(win, x, y, w, h);
         },
 
-        _renderExteriorGarageDoor: function (win, x, y, w, h) {
+        _renderExteriorGarageDoor: function (win, x, y, w, h, viewId) {
+            const ws = getWallService();
+            const proj = (ws && typeof ws.projectWindowForView === 'function')
+                ? ws.projectWindowForView(win, viewId || 'west_facade')
+                : null;
             const midX = x + w / 2;
             const numPanels = 4;
             let panelsSvg = '';
@@ -162,13 +184,16 @@
                     <line x1="${x + 4}" y1="${py + 1.5}" x2="${x + w - 4}" y2="${py + 1.5}" stroke="#475569" stroke-width="0.8" opacity="0.6" />
                 `;
             }
-            const jambsSvg = this._renderWindowJambReveals(win, x, y, w, h);
+            const jambsSvg = this._renderWindowJambReveals(win, x, y, w, h, proj ? proj.jambReveals : null);
+            const outerFrameSvg = proj
+                ? `<path data-brep-window-frame="${win.id}" d="${proj.outerPathD}" fill="#1f2421" stroke="#141816" stroke-width="2.5" />`
+                : `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#1f2421" stroke="#141816" stroke-width="2.5" />`;
             return `
-                <g class="interactive-element window-component garage-door-component" data-window-id="${win.id}" onclick="showElementDetails('${win.id}')" style="cursor: pointer;">
+                <g class="interactive-element window-component garage-door-component" data-window-id="${win.id}" data-host-wall-id="${proj ? proj.hostWallId : ''}" onclick="showElementDetails('${win.id}')" style="cursor: pointer;">
                     <!-- Deep Masonry Reveal Shadow -->
                     <rect x="${x - 3}" y="${y - 3}" width="${w + 6}" height="${h + 3}" fill="#141816" opacity="0.55" />
-                    <!-- Outer Frame (RAL 7021) -->
-                    <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#1f2421" stroke="#141816" stroke-width="2.5" />
+                    <!-- 3D B-Rep Outer Frame (RAL 7021) -->
+                    ${outerFrameSvg}
                     <!-- Window Jamb Reveals (left, right, top) -->
                     ${jambsSvg}
                     <!-- Sectional Door Leaf (RAL 7021 Matte Metallic) -->
@@ -190,7 +215,11 @@
             `;
         },
 
-        _renderExteriorEntranceDoor: function (win, x, y, w, h) {
+        _renderExteriorEntranceDoor: function (win, x, y, w, h, viewId) {
+            const ws = getWallService();
+            const proj = (ws && typeof ws.projectWindowForView === 'function')
+                ? ws.projectWindowForView(win, viewId || 'west_facade')
+                : null;
             const midX = x + w / 2;
             const doorW = Math.round(w * 0.60); // ~94px (940mm door leaf)
             const sideW = w - doorW;            // ~63px (630mm glazed sidelight)
@@ -203,10 +232,14 @@
             const sy2 = y + h - 4;
             const smidY = (sy1 + sy2) / 2;
 
+            const outerFrameSvg = proj
+                ? `<path data-brep-window-frame="${win.id}" d="${proj.outerPathD}" fill="#1f2421" stroke="#141816" stroke-width="2.5" />`
+                : `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#1f2421" stroke="#141816" stroke-width="2.5" />`;
+
             return `
-                <g class="interactive-element window-component entrance-door-component" data-window-id="${win.id}" onclick="showElementDetails('${win.id}')" style="cursor: pointer;">
+                <g class="interactive-element window-component entrance-door-component" data-window-id="${win.id}" data-host-wall-id="${proj ? proj.hostWallId : ''}" onclick="showElementDetails('${win.id}')" style="cursor: pointer;">
                     <!-- Outer Frame (RAL 7021) -->
-                    <rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#1f2421" stroke="#141816" stroke-width="2.5" />
+                    ${outerFrameSvg}
                     <!-- Main Door Leaf (Left, RAL 7021 frame) -->
                     <rect x="${x + 4}" y="${y + 4}" width="${doorW - 6}" height="${h - 8}" fill="#1f2421" stroke="#141816" stroke-width="2" />
                     <!-- Vertical Decorative Groove & Stainless Pull Bar on Door Leaf -->
@@ -229,7 +262,7 @@
             `;
         },
 
-        _renderExteriorNorthFacade: function (win, x, y, w, h) {
+        _renderExteriorNorthFacade: function (win, x, y, w, h, viewId) {
             const isCorner = win.id === 'O13a' || win.id === 'O13a_2' || win.id === 'O13b' || win.id === 'O13b_1' || win.id === 'O13b_2';
             const isFullHeight = win.id === '14a'
                 || (win.floor === 'first' && win.sill <= 3430)
@@ -238,11 +271,92 @@
             const midX = x + w / 2;
             const numSashes = Math.max(1, Number(win.sashes) || 1);
             const pillarMm = Number(win.pillarWidth) || 0;
-            const jambsSvg = this._renderWindowJambReveals(win, x, y, w, h);
 
             const hpVal = (win.floor === 'first')
                 ? (win.sill <= 3430 ? 0 : Math.round((win.sill - 3330) / 10))
                 : Math.round(win.sill / 10);
+
+            // True 3D B-Rep Orthographic Projection path when WallService is loaded
+            const ws = getWallService();
+            if (ws && typeof ws.projectWindowForView === 'function') {
+                const proj = ws.projectWindowForView(win, viewId || 'north_facade');
+                if (proj) {
+                    const jambsSvg = this._renderWindowJambReveals(win, x, y, w, h, proj.jambReveals);
+                    const combinedGlassPathD = proj.glassPanes.map(p => p.svgPathD).join(' ');
+                    const glassSvg = combinedGlassPathD
+                        ? `<path data-brep-glass-pane="${win.id}" d="${combinedGlassPathD}" fill="url(#glass-glare)" />`
+                        : '';
+                    let casementSvg = '';
+                    let slidingSvg = '';
+                    let splitLabelsSvg = '';
+
+                    proj.glassPanes.forEach(pane => {
+                        pane.casementPolylinesSvg.forEach(pts => {
+                            casementSvg += `<polyline data-brep-casement-line="${pane.id}" points="${pts}" fill="none" stroke="#cbd5e1" stroke-width="0.9" stroke-dasharray="3 2" opacity="0.65" />`;
+                        });
+
+                        if (pane.slidingArrowSvg) {
+                            slidingSvg += `
+                                <g data-brep-sliding-arrow="${pane.id}" stroke="#e2e8f0" stroke-width="1.6" fill="none" opacity="0.85">
+                                    <polyline points="${pane.slidingArrowSvg.linePoints}" />
+                                    <polyline points="${pane.slidingArrowSvg.headPoints}" />
+                                </g>
+                            `;
+                        }
+
+                        if (pane.showSplitLabel) {
+                            const paneMmLabel = (Math.abs(pane.nominalWidthMm - Math.round(pane.nominalWidthMm)) < 0.05)
+                                ? Math.round(pane.nominalWidthMm)
+                                : Number(pane.nominalWidthMm.toFixed(1));
+                            splitLabelsSvg += `
+                                <text x="${pane.labelSvgPos.x}" y="${pane.labelSvgPos.y}" font-family="'JetBrains Mono', monospace" font-size="8" fill="#cbd5e1" font-weight="600" text-anchor="middle" opacity="0.9">
+                                    ${paneMmLabel}
+                                </text>
+                            `;
+                        }
+                    });
+
+                    const sillSvg = proj.sillPathD
+                        ? `<path data-brep-window-sill="${win.id}" d="${proj.sillPathD}" fill="#1f2421" />`
+                        : '';
+
+                    const labelSvg = isCompactRibbon
+                        ? `
+                            <text x="${midX}" y="${y + h / 2 + 3.5}" font-family="'JetBrains Mono', monospace" font-size="${w < 180 ? 8.5 : 10}" fill="#ffffff" font-weight="700" text-anchor="middle" filter="drop-shadow(0 1px 2px black)">
+                                ${win.name} (${Math.round(win.width / 10)}×${Math.round(win.height / 10)}) • hp=${hpVal}
+                            </text>
+                        `
+                        : `
+                            <text x="${midX}" y="${y + h / 2 - 5}" font-family="'JetBrains Mono', monospace" font-size="${w > 150 ? 11 : 9.5}" fill="#ffffff" font-weight="700" text-anchor="middle" filter="drop-shadow(0 1px 2px black)">
+                                ${win.name} (${Math.round(win.width / 10)}×${Math.round(win.height / 10)})
+                            </text>
+                            <text x="${midX}" y="${y + h / 2 + 12}" font-family="'JetBrains Mono', monospace" font-size="8.5" fill="#93c5fd" font-weight="600" text-anchor="middle">
+                                hp=${hpVal}
+                            </text>
+                        `;
+
+                    return `
+                        <g class="interactive-element window-component" data-window-id="${win.id}" data-host-wall-id="${proj.hostWallId || ''}" data-normal="${proj.normal.join(',')}" data-depth-mm="${proj.depthMm}" onclick="showElementDetails('${win.id}')" style="cursor: pointer;">
+                            <!-- 3D B-Rep Outer Reveal / Interior Backing (RAL 7021, so semi-transparent #glass-glare blends over #1f2421 as before) -->
+                            <path data-brep-window-backing="${win.id}" d="${proj.outerPathD}" fill="#1f2421" stroke="#141816" stroke-width="2" />
+                            <!-- 3D B-Rep Projected Glass Panes (${proj.glassPanes.length} pane(s)) -->
+                            ${glassSvg}
+                            ${casementSvg}
+                            <!-- 3D B-Rep Window Frame & Mullions/Pillars with Glass Holes (RAL 7021, fill-rule="evenodd") -->
+                            <path data-brep-window-frame="${win.id}" fill-rule="evenodd" d="${proj.framePathD}" fill="#1f2421" stroke="#141816" stroke-width="1.2" />
+                            <!-- 3D B-Rep Window Jamb Reveals -->
+                            ${jambsSvg}
+                            ${slidingSvg}
+                            ${sillSvg}
+                            ${splitLabelsSvg}
+                            <!-- Dimension Label Badge -->
+                            ${labelSvg}
+                        </g>
+                    `;
+                }
+            }
+
+            const jambsSvg = this._renderWindowJambReveals(win, x, y, w, h);
 
             // Windows with inner window pillars/mullions (e.g. 90 mm or 100 mm, part of the window itself)
             if (pillarMm > 0 && numSashes >= 2) {
@@ -808,10 +922,34 @@
                         }
                     }
 
-                    // Calculate window jambs for this window (only jambs defined on w.jambs)
+                    // Calculate window jambs from 3D B-Rep jambFaces3D when WallService is loaded (or fallback to w.jambs)
+                    const ws = getWallService();
+                    const win3D = (ws && typeof ws.compileWindow3D === 'function')
+                        ? ws.compileWindow3D(w)
+                        : null;
                     const wJambs = Array.isArray(w.jambs) ? w.jambs : [];
                     const wDepth = Number(w.jambDepth) || jambDepthMm;
-                    if (wJambs.length > 0) {
+                    if (win3D && Array.isArray(win3D.jambFaces3D) && win3D.jambFaces3D.length > 0) {
+                        let wJambLenMm = 0;
+                        let wJambArea = 0;
+                        const sideLabels = [];
+                        win3D.jambFaces3D.forEach(jf => {
+                            wJambLenMm += jf.lengthMm;
+                            wJambArea += jf.areaM2;
+                            const prefix = jf.side === 'left' ? 'L' : (jf.side === 'right' ? 'R' : 'T');
+                            sideLabels.push(`${prefix}:${Math.round(jf.lengthMm)}`);
+                        });
+                        jambLengthMm += wJambLenMm;
+                        jambAreaM2 += wJambArea;
+                        jambItems.push({
+                            id: w.id,
+                            name: w.name,
+                            jambs: wJambs.slice(),
+                            lengthMm: Math.round(wJambLenMm),
+                            areaM2: round2(wJambArea),
+                            summary: `${w.name} (${sideLabels.join('+')} mm = ${round2(wJambArea).toFixed(2)} m²)`
+                        });
+                    } else if (wJambs.length > 0) {
                         let wJambLenMm = 0;
                         const sideLabels = [];
                         if (wJambs.includes('left')) {

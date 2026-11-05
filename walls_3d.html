@@ -630,6 +630,10 @@
                         <span>3. 3D Space &amp; B-Rep Visualization</span>
                     </div>
                     <label class="toggle-row">
+                        <span>Show 3D CAD Windows (Frame + Glass + Jambs)</span>
+                        <input type="checkbox" id="toggle-windows" checked>
+                    </label>
+                    <label class="toggle-row">
                         <span>Show (X, Y, Z) Coordinate Axes &amp; Ticks</span>
                         <input type="checkbox" id="toggle-axes" checked>
                     </label>
@@ -677,7 +681,7 @@
             <!-- RIGHT INSPECTOR DOCK -->
             <aside class="right-dock">
                 <div class="dock-title">
-                    <span>Selected Wall 3D B-Rep Inspector</span>
+                    <span>Selected Wall &amp; Window 3D B-Rep Inspector</span>
                     <span class="tech-pill" id="inspector-summary-pill">outerLoop &amp; holes</span>
                 </div>
                 <div id="inspector-cards-container" style="display: flex; flex-direction: column; gap: 10px;"></div>
@@ -722,6 +726,7 @@
             const appState = {
                 selectedIds: new Set(['EW_GARAGE_WEST', 'GW_1', 'GW_4', 'EW_NORTH_RECESSED']),
                 searchQuery: '',
+                showWindows: true,
                 showAxes: true,
                 showVertices: true,
                 showNormals: true,
@@ -1089,14 +1094,16 @@
                 const projMat = mat4Perspective(42 * Math.PI / 180, width / height, 0.2, 150.0);
                 const viewProj = mat4Multiply(projMat, viewMat);
 
-                const meshVerts = []; // [x,y,z, nx,ny,nz, r,g,b,a] = 10 floats per vertex
-                const lineVerts = []; // [x,y,z, r,g,b,a] = 7 floats per vertex
+                const meshVerts = [];  // [x,y,z, nx,ny,nz, r,g,b,a] = 10 floats per vertex (opaque)
+                const glassVerts = []; // [x,y,z, nx,ny,nz, r,g,b,a] = 10 floats per vertex (translucent glass)
+                const lineVerts = [];  // [x,y,z, r,g,b,a] = 7 floats per vertex
                 const hudLabels = [];
 
-                function pushTri(p1Mm, p2Mm, p3Mm, n, rgba) {
+                function pushTri(p1Mm, p2Mm, p3Mm, n, rgba, targetArr) {
+                    const arr = targetArr || meshVerts;
                     const pts = [p1Mm, p2Mm, p3Mm];
                     for (let i = 0; i < 3; i++) {
-                        meshVerts.push(
+                        arr.push(
                             pts[i][0] / 1000, pts[i][1] / 1000, pts[i][2] / 1000,
                             n[0], n[1], n[2],
                             rgba[0], rgba[1], rgba[2], rgba[3]
@@ -1240,7 +1247,7 @@
                         // Crisp window hole wireframes (in bright emerald)
                         (side.holes || []).forEach(h => {
                             pushLoopLines(h.loop, [0.15, 0.95, 0.65, 1.0]);
-                            if (sIdx === 0 && Array.isArray(h.loop) && h.loop.length >= 4) {
+                            if (!appState.showWindows && sIdx === 0 && Array.isArray(h.loop) && h.loop.length >= 4) {
                                 const cx = (h.loop[0][0] + h.loop[2][0]) / 2;
                                 const cy = (h.loop[0][1] + h.loop[2][1]) / 2;
                                 const cz = (h.loop[0][2] + h.loop[2][2]) / 2;
@@ -1301,7 +1308,86 @@
                         pushLine(q[1], q[2], [0.82, 0.90, 0.98, 0.82]);
                     });
 
-                    // 5. Wall ID Floating Badge above wall center
+                    // 5. Hosted 3D CAD B-Rep Windows & Doors (Frame + Mullions + Glass Panes + 200mm Jambs)
+                    if (appState.showWindows && typeof WallService.getWindows3D === 'function') {
+                        const hostedWins = WallService.getWindows3D({ hostWallId: w.id, activeOnly: true });
+                        hostedWins.forEach(win3D => {
+                            // 5a. 3D Jamb Reveal Faces (200 mm exterior recess into wall opening)
+                            (win3D.jambFaces3D || []).forEach(jamb => {
+                                if (Array.isArray(jamb.loop3D) && jamb.loop3D.length >= 4) {
+                                    const q = jamb.loop3D;
+                                    pushTri(q[0], q[1], q[2], jamb.normal || [0, 0, 1], [0.15, 0.18, 0.17, 0.95]);
+                                    pushTri(q[0], q[2], q[3], jamb.normal || [0, 0, 1], [0.15, 0.18, 0.17, 0.95]);
+                                    pushLoopLines(q, [0.40, 0.48, 0.58, 0.85]);
+                                }
+                            });
+
+                            // 5b. 3D RAL 7021 Frame + Inner Mullions Face (triangulated with glass cutouts)
+                            if (win3D.frameFace3D && Array.isArray(win3D.frameFace3D.outerLoop3D)) {
+                                const frameTris = triangulateWallSide3D(win3D.frameFace3D);
+                                frameTris.forEach(tri => {
+                                    pushTri(tri[0], tri[1], tri[2], win3D.normal || [0, -1, 0], [0.12, 0.14, 0.13, 0.98]);
+                                });
+                                pushLoopLines(win3D.frameFace3D.outerLoop3D, [0.58, 0.68, 0.82, 0.92]);
+                                (win3D.frameFace3D.holes3D || []).forEach(hole => {
+                                    pushLoopLines(hole.loop, [0.56, 0.82, 0.98, 0.95]);
+                                });
+                            }
+
+                            // 5c. 3D Exterior Sill Plate
+                            if (Array.isArray(win3D.sillPlate3D) && win3D.sillPlate3D.length >= 4) {
+                                const sq = win3D.sillPlate3D;
+                                pushTri(sq[0], sq[1], sq[2], win3D.normal || [0, -1, 0], [0.20, 0.25, 0.33, 0.96]);
+                                pushTri(sq[0], sq[2], sq[3], win3D.normal || [0, -1, 0], [0.20, 0.25, 0.33, 0.96]);
+                                pushLoopLines(sq, [0.65, 0.75, 0.88, 0.9]);
+                            }
+
+                            // 5d. 3D Glass Panes + Casement / Sliding Lines
+                            (win3D.glassPanes3D || []).forEach(pane => {
+                                if (Array.isArray(pane.loop3D) && pane.loop3D.length >= 4) {
+                                    const gq = pane.loop3D;
+                                    const isDoorPanel = win3D.openingType === 'garage_door' || win3D.openingType === 'entrance_door';
+                                    if (isDoorPanel) {
+                                        // Solid dark anthracite panel for garage/entrance doors
+                                        pushTri(gq[0], gq[1], gq[2], win3D.normal || [0, -1, 0], [0.17, 0.20, 0.22, 0.96]);
+                                        pushTri(gq[0], gq[2], gq[3], win3D.normal || [0, -1, 0], [0.17, 0.20, 0.22, 0.96]);
+                                    } else {
+                                        // Translucent architectural sky-blue glass pane
+                                        pushTri(gq[0], gq[1], gq[2], win3D.normal || [0, -1, 0], [0.35, 0.78, 0.98, 0.38], glassVerts);
+                                        pushTri(gq[0], gq[2], gq[3], win3D.normal || [0, -1, 0], [0.35, 0.78, 0.98, 0.38], glassVerts);
+                                    }
+                                }
+                                (pane.casementLines3D || []).forEach(poly3D => {
+                                    for (let i = 0; i + 1 < poly3D.length; i++) {
+                                        pushLine(poly3D[i], poly3D[i + 1], [0.85, 0.95, 1.0, 0.92]);
+                                    }
+                                });
+                                if (pane.slidingArrow3D) {
+                                    const line3D = pane.slidingArrow3D.line3D || [];
+                                    for (let i = 0; i + 1 < line3D.length; i++) {
+                                        pushLine(line3D[i], line3D[i + 1], [0.98, 0.98, 1.0, 0.95]);
+                                    }
+                                    const head3D = pane.slidingArrow3D.head3D || [];
+                                    for (let i = 0; i + 1 < head3D.length; i++) {
+                                        pushLine(head3D[i], head3D[i + 1], [0.98, 0.98, 1.0, 0.95]);
+                                    }
+                                }
+                            });
+
+                            // 5e. Floating 3D Window Badge
+                            if (Array.isArray(win3D.center3D)) {
+                                hudLabels.push({
+                                    ptMm: win3D.center3D,
+                                    text: `🪟 ${win3D.id} (${Math.round(win3D.widthMm / 10)}×${Math.round(win3D.heightMm / 10)})`,
+                                    color: '#bae6fd',
+                                    bg: 'rgba(15, 23, 42, 0.92)',
+                                    fontSize: 10.5
+                                });
+                            }
+                        });
+                    }
+
+                    // 6. Wall ID Floating Badge above wall center
                     const topCenterMm = [
                         (w.x1 + w.x2) / 2,
                         (w.y1 + w.y2) / 2,
@@ -1315,7 +1401,7 @@
                         fontSize: 11.5
                     });
 
-                    // 6. Optional Horizontal Slice Highlight at Z = appState.sliceZMm
+                    // 7. Optional Horizontal Slice Highlight at Z = appState.sliceZMm
                     if (appState.showSlicePlane && appState.sliceZMm >= zBot && appState.sliceZMm <= zTop) {
                         const floorSlice = WallService.getFloorPlanSlice(
                             w.floor,
@@ -1344,12 +1430,12 @@
                     const p2 = [21500, 22000, zS];
                     const p3 = [-1000, 22000, zS];
                     pushLoopLines([p0, p1, p2, p3], [0.96, 0.62, 0.04, 0.75]);
-                    pushTri(p0, p1, p2, [0, 0, 1], [0.96, 0.62, 0.04, 0.10]);
-                    pushTri(p0, p2, p3, [0, 0, 1], [0.96, 0.62, 0.04, 0.10]);
+                    pushTri(p0, p1, p2, [0, 0, 1], [0.96, 0.62, 0.04, 0.10], glassVerts);
+                    pushTri(p0, p2, p3, [0, 0, 1], [0.96, 0.62, 0.04, 0.10], glassVerts);
                 }
 
                 // ---------------------------------------------------------------------
-                // D. DRAW WEBGL MESHES & LINES
+                // D. DRAW WEBGL MESHES, LINES & TRANSLUCENT GLASS
                 // ---------------------------------------------------------------------
                 if (meshVerts.length > 0) {
                     gl.useProgram(meshProg);
@@ -1386,6 +1472,28 @@
                     gl.vertexAttribPointer(aColor, 4, gl.FLOAT, false, stride, 3 * 4);
 
                     gl.drawArrays(gl.LINES, 0, lineVerts.length / 7);
+                }
+
+                if (glassVerts.length > 0) {
+                    gl.depthMask(false);
+                    gl.useProgram(meshProg);
+                    gl.uniformMatrix4fv(gl.getUniformLocation(meshProg, 'uViewProj'), false, viewProj);
+                    gl.bindBuffer(gl.ARRAY_BUFFER, meshBuffer);
+                    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(glassVerts), gl.DYNAMIC_DRAW);
+
+                    const stride = 10 * 4;
+                    const aPos = gl.getAttribLocation(meshProg, 'aPos');
+                    const aNormal = gl.getAttribLocation(meshProg, 'aNormal');
+                    const aColor = gl.getAttribLocation(meshProg, 'aColor');
+                    gl.enableVertexAttribArray(aPos);
+                    gl.vertexAttribPointer(aPos, 3, gl.FLOAT, false, stride, 0);
+                    gl.enableVertexAttribArray(aNormal);
+                    gl.vertexAttribPointer(aNormal, 3, gl.FLOAT, false, stride, 3 * 4);
+                    gl.enableVertexAttribArray(aColor);
+                    gl.vertexAttribPointer(aColor, 4, gl.FLOAT, false, stride, 6 * 4);
+
+                    gl.drawArrays(gl.TRIANGLES, 0, glassVerts.length / 10);
+                    gl.depthMask(true);
                 }
 
                 // ---------------------------------------------------------------------
@@ -1647,6 +1755,19 @@
                         card.appendChild(createEl('div', 'coord-block', holesText));
                     }
 
+                    if (typeof WallService.getWindows3D === 'function') {
+                        const hostedWins = WallService.getWindows3D({ hostWallId: w.id, activeOnly: true });
+                        if (hostedWins.length > 0) {
+                            addKv('Hosted 3D Windows', `${hostedWins.length} (${hostedWins.map(hw => hw.id).join(', ')})`);
+                            const winDetailsText = hostedWins.map(hw => {
+                                const jambSummary = (hw.jambFaces3D || []).map(j => `${j.side}:${j.areaM2}m²`).join(', ') || 'none';
+                                return `🪟 ${hw.id} (${hw.widthMm}×${hw.heightMm}mm, ${hw.glassPanes3D.length} panes, jambs: ${jambSummary})\n` +
+                                    `  outerLoop3D: ` + (hw.outerLoop3D || []).map(p => `[${p[0]}, ${p[1]}, ${p[2]}]`).join(' → ');
+                            }).join('\n');
+                            card.appendChild(createEl('div', 'coord-block', winDetailsText));
+                        }
+                    }
+
                     inspectorContainer.appendChild(card);
                 });
             }
@@ -1697,6 +1818,10 @@
             });
 
             // Toggles
+            document.getElementById('toggle-windows').addEventListener('change', e => {
+                appState.showWindows = e.target.checked;
+                renderScene();
+            });
             document.getElementById('toggle-axes').addEventListener('change', e => {
                 appState.showAxes = e.target.checked;
                 renderScene();
