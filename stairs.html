@@ -1443,8 +1443,8 @@
                               * Balustrade at h = 90 cm (balustrada h=90)
                         -->
 
-                        <!-- Stair Slab: Vertical height = 193 mm (parallel to soffit line) -->
-                        <polygon points="354.9,574.0 718.9,328.5 718.9,347.8 354.9,593.3" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
+                        <!-- Stair Slab: Vertical height = 160 mm (parallel to soffit line) -->
+                        <polygon points="354.9,574.0 718.9,328.5 718.9,344.5 354.9,590.0" fill="#fdfbf7" stroke="#4a3f35" stroke-width="1.0" />
 
                         <!-- Stair Underside Soffit Line (Strictly adjacent to all step corners) -->
                         <line x1="354.9" y1="574.0" x2="718.9" y2="328.5" stroke="#4a3f35" stroke-width="1.0" />
@@ -2033,7 +2033,7 @@
                         <div class="spec-item"><div class="spec-label">plank_height</div><div class="spec-value">40 mm (40 mm oak tread plank)</div></div>
                         <div class="spec-item">
                             <div class="spec-label">stair_slab</div>
-                            <div class="spec-value">193 mm (vertical height of slab under stairs)</div>
+                            <div class="spec-value">160 mm (vertical height of slab under stairs)</div>
                         </div>
                         <div class="spec-item"><div class="spec-label">x (start position)</div><div class="spec-value">X = 2,549 mm (post-brick)</div></div>
                         <div class="spec-item"><div class="spec-label">turn_steps_count</div><div class="spec-value">4 steps (1 Straight + 3 Zabieg)</div></div>
@@ -2117,7 +2117,7 @@
                     { label: 'step_height', value: '175 mm (17.5 cm riser)' },
                     { label: 'step_length', value: '260 mm (26.0 cm tread, steps 5–19)' },
                     { label: 'plank_height', value: '40 mm (finish oak tread plank)' },
-                    { label: 'stair_slab', value: '193 mm (vertical height of slab under stairs)' },
+                    { label: 'stair_slab', value: '160 mm (vertical height of slab under stairs)' },
                     { label: 'x (start position)', value: 'X = 2,549 mm (Post-Brick datum)' },
                     { label: 'global_x', value: 'X = 16,361 mm on North Facade map' },
                     { label: 'total_risers', value: '19 risers (4 turn + 15 straight flight)' },
@@ -4227,7 +4227,7 @@
                         <div class="spec-item"><div class="spec-label">plank_height</div><div class="spec-value" style="display:flex;align-items:center;gap:6px;"><input id="quick-plank-h" type="number" min="0" max="80" step="5" value="${stair.plank_height || 40}" oninput="onQuickPlankChange(this.value)" onchange="onQuickPlankChange(this.value)" style="width:55px;padding:2px 4px;border:1px solid #cbd5e1;border-radius:4px;color:#b45309;font-weight:bold;"> mm</div></div>
                         <div class="spec-item"><div class="spec-label">first_step_concrete</div><div class="spec-value">${stair.step_height - stair.plank_height} mm (step_height - plank_height)</div></div>
                         <div class="spec-item"><div class="spec-label">last_horizontal_step</div><div class="spec-value">${(stair.top_floor_elevation || 3330) - stair.step_height - stair.plank_height} mm (${stair.top_floor_elevation || 3330} - ${stair.step_height} - ${stair.plank_height || 40})</div></div>
-                        <div class="spec-item"><div class="spec-label">stair_slab</div><div class="spec-value">${stair.stair_slab || 193} mm (vertical height of slab under stairs)</div></div>
+                        <div class="spec-item"><div class="spec-label">stair_slab</div><div class="spec-value">${stair.stair_slab || 160} mm (vertical height of slab under stairs)</div></div>
                         <div class="spec-item"><div class="spec-label">x (start position)</div><div class="spec-value">X = ${Math.round(stair.x)} mm (post-brick wall)</div></div>
                         <div class="spec-item"><div class="spec-label">global_x</div><div class="spec-value">X = ${stair.global_x} mm on North Facade map</div></div>
                         <div class="spec-item"><div class="spec-label">turn_steps_count</div><div class="spec-value">${stair.turn_steps_count} steps (1 Straight + 3 Zabieg)</div></div>

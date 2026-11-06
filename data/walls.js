@@ -1501,11 +1501,11 @@
                 zBottom: 0,
                 zTop: 2800,
                 rooms: '0.05 Garderoba & 0.06 WC ↔ 0.04 Wiatrołap & 0.07 Komunikacja (Stairs)',
-                specs: '5,350 × 180 mm (18 cm structural wall) • Garderoba: 14 cm + 90×210 cm door (X=16405..17305) + 213 cm; WC: 104 cm + 86×210 cm door (X=12195..13055) + 10 cm',
+                specs: '5,350 × 180 mm (18 cm structural wall) • Garderoba: 14 cm + 90×210 cm door (X=16405..17305) + 213 cm; WC: 104 cm + 86×207 cm door (X=12195..13055) + 10 cm',
                 openings: [],
                 doors: [
                     { id: 'D_GW7_1', start: 16405, end: 17305, sillMm: 0, heightMm: 2100, swingDir: -1, hingeStart: true },
-                    { id: 'D_GW7_2', start: 12195, end: 13055, sillMm: 0, heightMm: 2100, swingDir: -1, hingeStart: false }
+                    { id: 'D_GW7_2', start: 12195, end: 13055, sillMm: 0, heightMm: 2070, swingDir: -1, hingeStart: false }
                 ],
                 sides: [
                     {
@@ -1518,8 +1518,8 @@
                         outerLoop: [
                             [12095, 8180, 0],
                             [12195, 8180, 0],
-                            [12195, 8180, 2100],
-                            [13055, 8180, 2100],
+                            [12195, 8180, 2070],
+                            [13055, 8180, 2070],
                             [13055, 8180, 0],
                             [16405, 8180, 0],
                             [16405, 8180, 2100],
@@ -1545,8 +1545,8 @@
                             [16405, 8360, 2100],
                             [16405, 8360, 0],
                             [13055, 8360, 0],
-                            [13055, 8360, 2100],
-                            [12195, 8360, 2100],
+                            [13055, 8360, 2070],
+                            [12195, 8360, 2070],
                             [12195, 8360, 0],
                             [12095, 8360, 0],
                             [12095, 8360, 2800],

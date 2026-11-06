@@ -980,10 +980,10 @@
                     id: 'GW_7', name: 'GW_7 (Garderoba & WC / Komunikacja)',
                     axis: 'x', x1: 12095, z1: 8180, x2: 17445, z2: 8360,
                     rooms: '0.05 Garderoba & 0.06 WC ↔ 0.04 Wiatrołap & 0.07 Komunikacja (Stairs)',
-                    specs: '5,350 × 180 mm (18 cm structural wall) • Garderoba: 14 cm + 90×210 cm door + 213 cm; WC: 104 cm + 86×210 cm door (X=12195..13055) + 10 cm',
+                    specs: '5,350 × 180 mm (18 cm structural wall) • Garderoba: 14 cm + 90×210 cm door + 213 cm; WC: 104 cm + 86×207 cm door (X=12195..13055) + 10 cm',
                     doors: [
-                        { start: 16405, end: 17305, swingDir: -1, hingeStart: true },
-                        { start: 12195, end: 13055, swingDir: -1, hingeStart: false }
+                        { start: 16405, end: 17305, heightMm: 2100, swingDir: -1, hingeStart: true },
+                        { start: 12195, end: 13055, heightMm: 2070, swingDir: -1, hingeStart: false }
                     ]
                 },
                 {
@@ -2822,6 +2822,9 @@
                 drawWallSpanDim(group, 17185, 8160, 16285, 8160, -1);
                 drawWallSpanDim(group, 16285, 8160, 15535, 8160, -1);
 
+                // 2c) Staircase top landing clearance to FW_8: 121.5 cm (X = 11,910..10,695 mm at Z = 8,620 mm)
+                drawWallSpanDim(group, 11910, 8620, 10695, 8620, -1);
+
                 // 3) South rooms: 1.04 Pokój (467 cm), FW_1b (12 cm), 1.06 Korytarz (484 cm), 1.08 Garderoba (408 cm), FW_9 (18 cm), Void (622 cm)
                 wallSpan('UW_WEST', 'FW_1b', 10680, -1);
                 wallThick('FW_1b', 10680, -1);
@@ -2849,10 +2852,10 @@
                 wallSpan('UW_NORTH_MAIN', 'FW_2a', 15000, 1);
                 wallThick('FW_2a', 15000, 1);
 
-                // 4) 1.02 Łazienka (377 cm) + 18 cm FW_2a + 1.06 Korytarz (408 cm) (X = 11875 mm)
-                wallSpan('UW_NORTH_MAIN', 'FW_2a', 11875, 1);
-                wallThick('FW_2a', 11875, 1);
-                wallSpan('FW_2a', 'UW_SOUTH', 11875, 1);
+                // 4) 1.02 Łazienka (377 cm) + 18 cm FW_2a + 1.06 Korytarz (408 cm) (X = 12350 mm)
+                wallSpan('UW_NORTH_MAIN', 'FW_2a', 12350, 1);
+                wallThick('FW_2a', 12350, 1);
+                wallSpan('FW_2a', 'UW_SOUTH', 12350, 1);
 
                 // 4b) FW_5 vertical segments (139 cm + 90 cm door + 148 cm = 377 cm) & FW_8 vertical segments (15 cm + 90 cm door + 303 cm = 408 cm)
                 drawWallSpanDim(group, 10410, 3170, 10410, 4560, 1);
@@ -3035,15 +3038,15 @@
                     'stroke-linejoin': 'round'
                 }));
 
-                // H. Step Numbers (1, 2, 3, 4 in winder turn + 5, 9, 18 along flight) & CAD Callout Labels
+                // H. Step Numbers (1, 2, 3, 4 in winder turn + 5, 9, 17 along flight; 18th riser is upper floor) & CAD Callout Labels
                 [
                     { num: '1', x: 15950, z: 9515 },
                     { num: '2', x: 15920, z: 9160 },
                     { num: '3', x: 15880, z: 8590 },
                     { num: '4', x: 15380, z: 8620 },
-                    { num: '5', x: 15040, z: 8620 },
-                    { num: '9', x: 13960, z: 8620 },
-                    { num: '18', x: 11800, z: 8620 }
+                    { num: '5', x: 15050, z: 8620 },
+                    { num: '9', x: 14045, z: 8620 },
+                    { num: '17', x: 12035, z: 8620 }
                 ].forEach(stLbl => {
                     const tEl = svgEl('text', {
                         x: toSvgX(stLbl.x),

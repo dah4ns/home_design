@@ -28,7 +28,7 @@
         step_height: 175,
         step_length: 260,
         plank_height: 40,
-        stair_slab: 193,
+        stair_slab: 160,
         x: 2549,
         global_x: 16361,
         total_risers: 19,
@@ -259,7 +259,7 @@
             const stepHSvg = s.step_height * scale;
             const stepLSvg = s.step_length * scale;
             const plankHSvg = (s.plank_height || 40) * scale;
-            const stairSlabSvg = ((typeof s.stair_slab !== 'undefined') ? s.stair_slab : 193) * scale;
+            const stairSlabSvg = ((typeof s.stair_slab !== 'undefined') ? s.stair_slab : 160) * scale;
             // Architectural Rule for Stair Concrete Skeleton with Finished Wood Planks:
             // 1. First step has concrete height: (step_height - plank_height)
             //    so that in total the first step will have step_height together with the plank.
@@ -372,7 +372,7 @@
 
             // 0. Stair Slab (Structural slab under flight, parallel to soffit, vertical height = stair_slab)
             const slabSvg = `
-                <!-- Stair Slab (Vertical height = ${stair.stair_slab || 193} mm, parallel to soffit) -->
+                <!-- Stair Slab (Vertical height = ${stair.stair_slab || 160} mm, parallel to soffit) -->
                 <polygon points="${geom.slab.p1.x.toFixed(1)},${geom.slab.p1.y.toFixed(1)} ${geom.slab.p2.x.toFixed(1)},${geom.slab.p2.y.toFixed(1)} ${geom.slab.p3.x.toFixed(1)},${geom.slab.p3.y.toFixed(1)} ${geom.slab.p4.x.toFixed(1)},${geom.slab.p4.y.toFixed(1)}" 
                          fill="#fdfbf7" stroke="${strokeColor}" stroke-width="${lineWidth}" />
             `;

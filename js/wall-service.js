@@ -1651,7 +1651,7 @@
                 northWallId: 'GW_7',
                 westWallId: 'GW_5',
                 underStairDoorId: 'D_GW7_2',
-                xMin: 11665,
+                xMin: 11910,
                 xPivot: 15175,
                 xTurnMid: 15675,
                 xMax: 16175,
@@ -1669,12 +1669,12 @@
                 straightTreadsCount: 13,
                 straightRisersCount: 14,
                 riserHeightMm: 185,
-                treadDepthMm: 270,
+                treadDepthMm: 251.15,
                 plankThicknessMm: 40,
-                waistSlabThicknessMm: 193,
+                waistSlabThicknessMm: 160,
                 balustradeHeightMm: 900,
                 balustradeThicknessMm: 60,
-                planCutLine2D: [[13690, 8360], [13420, 9370]],
+                planCutLine2D: [[13919, 8360], [13668, 9370]],
                 turnSteps2D: [
                     {
                         stepNumber: 1,
@@ -1718,14 +1718,15 @@
                     [15675, 9505, 185],
                     [15675, 8865, 555],
                     [15175, 8865, 740],
-                    [11665, 8865, 3330]
+                    [11910, 8865, 3330]
                 ]
             };
 
             const plankH = Number(spec.plankThicknessMm) || 40;
             const riserH = Number(spec.riserHeightMm) || 185;
-            const treadD = Number(spec.treadDepthMm) || 270;
-            const waistH = Number(spec.waistSlabThicknessMm) || 193;
+            const exactTreadD = (spec.xPivot - spec.xMin) / (spec.straightTreadsCount || 13);
+            const treadD = Math.round(exactTreadD * 100) / 100;
+            const waistH = Number(spec.waistSlabThicknessMm) || 160;
             const balH = Number(spec.balustradeHeightMm) || 900;
             const balThick = Number(spec.balustradeThicknessMm) || 60;
 
@@ -1804,13 +1805,15 @@
                 });
             });
 
-            // B. 13 Straight Flight Treads (Steps 5 to 17) going East (-X) from X = 15,175 to X = 11,665 mm
+            // B. 13 Straight Flight Treads (Steps 5 to 17) going East (-X) from X = 15,175 to X = 11,910 mm
             const yNorth = spec.yMin; // 8360
             const ySouth = spec.yPivot; // 9370
             for (let k = 0; k < spec.straightTreadsCount; k++) {
                 const stepNum = 5 + k;
-                const xWest = spec.xPivot - k * treadD;
-                const xEast = xWest - treadD;
+                const xWest = Math.round((spec.xPivot - k * exactTreadD) * 10) / 10;
+                const xEast = (k === spec.straightTreadsCount - 1)
+                    ? spec.xMin
+                    : Math.round((spec.xPivot - (k + 1) * exactTreadD) * 10) / 10;
                 const zBottom = (stepNum - 1) * riserH;
                 const zTop = stepNum * riserH;
                 const zConcreteBottom = zBottom - plankH;

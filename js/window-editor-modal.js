@@ -223,7 +223,7 @@
                                     <div>
                                         <label style="display: block; font-size: 11px; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 3px;">6) stair_slab (mm)</label>
                                         <input id="we-stair-slab" type="number" step="1" oninput="WindowEditorModal.applyStairLiveChange()" style="width: 100%; box-sizing: border-box; padding: 7px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: monospace; font-size: 13px; font-weight: 700; color: #b45309;" />
-                                        <span style="font-size: 10px; color: #94a3b8;">Slab vertical height under stairs (193 mm)</span>
+                                        <span style="font-size: 10px; color: #94a3b8;">Slab vertical height under stairs (160 mm)</span>
                                     </div>
 
                                     <div>
@@ -353,7 +353,7 @@
             if (elStepH) elStepH.value = s.step_height;
             if (elStepL) elStepL.value = s.step_length;
             if (elPlankH) elPlankH.value = s.plank_height;
-            if (elSlab) elSlab.value = (typeof s.stair_slab !== 'undefined') ? s.stair_slab : 193;
+            if (elSlab) elSlab.value = (typeof s.stair_slab !== 'undefined') ? s.stair_slab : 160;
             if (elX) elX.value = s.x;
 
             if (btnPlanks) {
@@ -387,7 +387,7 @@
                 </div>
                 <div style="background: white; padding: 6px 8px; border-radius: 4px; border: 1px solid #e2e8f0;">
                     <span style="color: #64748b; font-size: 10px; text-transform: uppercase; display: block;">Stair Slab</span>
-                    <strong style="color: #0f172a;">${s.stair_slab || 193} mm</strong> (slab height)
+                    <strong style="color: #0f172a;">${s.stair_slab || 160} mm</strong> (slab height)
                 </div>
                 <div style="background: white; padding: 6px 8px; border-radius: 4px; border: 1px solid #e2e8f0;">
                     <span style="color: #64748b; font-size: 10px; text-transform: uppercase; display: block;">End X</span>
@@ -414,7 +414,7 @@
                 step_height: Number(document.getElementById('we-stair-step-h').value) || 175,
                 step_length: Number(document.getElementById('we-stair-step-l').value) || 260,
                 plank_height: Number(document.getElementById('we-stair-plank-h').value) || 40,
-                stair_slab: Number(document.getElementById('we-stair-slab').value) || 193,
+                stair_slab: Number(document.getElementById('we-stair-slab').value) || 160,
                 x: Number(document.getElementById('we-stair-x').value) || 2549
             };
 

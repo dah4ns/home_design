@@ -22,7 +22,7 @@
             "step_height": 175,
             "step_length": 260,
             "plank_height": 40,
-            "stair_slab": 193,
+            "stair_slab": 160,
             "x": 2549,
             "global_x": 16361,
             "total_risers": 19,
@@ -59,7 +59,7 @@
                 "northWallId": "GW_7",
                 "westWallId": "GW_5",
                 "underStairDoorId": "D_GW7_2",
-                "xMin": 11665,
+                "xMin": 11910,
                 "xPivot": 15175,
                 "xTurnMid": 15675,
                 "xMax": 16175,
@@ -77,14 +77,14 @@
                 "straightTreadsCount": 13,
                 "straightRisersCount": 14,
                 "riserHeightMm": 185,
-                "treadDepthMm": 270,
+                "treadDepthMm": 251.15,
                 "plankThicknessMm": 40,
-                "waistSlabThicknessMm": 193,
+                "waistSlabThicknessMm": 160,
                 "balustradeHeightMm": 900,
                 "balustradeThicknessMm": 60,
                 "planCutLine2D": [
-                    [13690, 8360],
-                    [13420, 9370]
+                    [13919, 8360],
+                    [13668, 9370]
                 ],
                 "turnSteps2D": [
                     {
@@ -129,7 +129,7 @@
                     [15675, 9505, 185],
                     [15675, 8865, 555],
                     [15175, 8865, 740],
-                    [11665, 8865, 3330]
+                    [11910, 8865, 3330]
                 ]
             }
         }
