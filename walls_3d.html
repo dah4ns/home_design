@@ -589,17 +589,17 @@
                 <!-- 1. Multi-Select Wall Dropdown -->
                 <div class="dock-section">
                     <div class="dock-title">
-                        <span>1. Select Wall Objects by ID</span>
+                        <span>1. Select Wall &amp; Stair Objects by ID</span>
                         <span class="tech-pill" id="selected-count-badge">4 selected</span>
                     </div>
 
                     <div class="multiselect-box">
                         <button type="button" class="multiselect-trigger" id="dropdown-trigger">
-                            <span id="dropdown-trigger-text">Choose Wall IDs from Database...</span>
+                            <span id="dropdown-trigger-text">Choose Wall / Stair IDs from Database...</span>
                             <span>▾</span>
                         </button>
                         <div class="multiselect-menu" id="dropdown-menu">
-                            <input type="text" class="search-input" id="wall-search-input" placeholder="Filter by ID, room, or name (e.g. GW_4, EW_GARAGE)...">
+                            <input type="text" class="search-input" id="wall-search-input" placeholder="Filter by ID, room, or name (e.g. STAIRS_1, GW_5, GW_7)...">
                             <div id="wall-options-container"></div>
                         </div>
                     </div>
@@ -610,17 +610,18 @@
                 <!-- 2. Quick Selection Presets -->
                 <div class="dock-section">
                     <div class="dock-title">
-                        <span>2. Quick Wall Group Presets</span>
+                        <span>2. Quick Wall &amp; Stair Presets</span>
                     </div>
                     <div class="preset-grid">
+                        <button type="button" class="ctrl-btn" id="preset-stairs-hall">🪜 Stairs + Hall (STAIRS_1, GW_5, GW_7)</button>
                         <button type="button" class="ctrl-btn" id="preset-garage-doors">🚗 Garage + Doors (GW_1, GW_4)</button>
                         <button type="button" class="ctrl-btn" id="preset-north-facade">🧭 North Facade Walls</button>
                         <button type="button" class="ctrl-btn" id="preset-ground-ext">🧱 Ground Exterior (EW_*)</button>
                         <button type="button" class="ctrl-btn" id="preset-ground-int">🚪 Ground Internal (GW_*)</button>
-                        <button type="button" class="ctrl-btn" id="preset-ground-all">📐 All Ground Floor</button>
+                        <button type="button" class="ctrl-btn" id="preset-ground-all">📐 All Ground + Stairs</button>
                         <button type="button" class="ctrl-btn" id="preset-first-all">🪵 All Upper Floor</button>
-                        <button type="button" class="ctrl-btn" id="preset-all-walls">🏢 All 48 Walls</button>
-                        <button type="button" class="ctrl-btn" id="preset-clear">✖ Clear Selection</button>
+                        <button type="button" class="ctrl-btn" id="preset-all-walls">🏢 All 48 Walls + Stairs</button>
+                        <button type="button" class="ctrl-btn" id="preset-clear" style="grid-column: span 2;">✖ Clear Selection</button>
                     </div>
                 </div>
 
@@ -681,8 +682,8 @@
             <!-- RIGHT INSPECTOR DOCK -->
             <aside class="right-dock">
                 <div class="dock-title">
-                    <span>Selected Wall &amp; Window 3D B-Rep Inspector</span>
-                    <span class="tech-pill" id="inspector-summary-pill">outerLoop &amp; holes</span>
+                    <span>Selected Wall, Stair &amp; Window 3D B-Rep Inspector</span>
+                    <span class="tech-pill" id="inspector-summary-pill">outerLoop &amp; 3D steps</span>
                 </div>
                 <div id="inspector-cards-container" style="display: flex; flex-direction: column; gap: 10px;"></div>
             </aside>
@@ -700,6 +701,7 @@
     <script src="data/views.js"></script>
     <script src="data/windows.js"></script>
     <script src="data/walls.js"></script>
+    <script src="data/stairs.js"></script>
     <script src="js/persistence.js"></script>
     <script src="js/window-store.js"></script>
     <script src="js/coordinate-service.js"></script>
@@ -716,15 +718,22 @@
             const wallById = {};
             allWalls.forEach(w => { wallById[w.id] = w; });
 
-            // Default selection: highlight the Garage West wall (with Garage Door notch Z2),
-            // Garage/Boiler East partition GW_1 (with 2 doorway notches), and North Recessed Wall (with window holes O1 & O2)
+            const allStairs = (typeof WallService.getStairs3D === 'function') ? WallService.getStairs3D() : [];
+            const stairById = {};
+            allStairs.forEach(s => {
+                stairById[s.id] = s;
+                if (s.stairId) stairById[s.stairId] = s;
+            });
+
+            // Default selection: highlight the 3D Winder Staircase STAIRS_1 and its adjacent
+            // hallway walls GW_5 (with Wiatrołap door D_GW5_1) and GW_7 (with WC door D_GW7_2 under the stairs)
             //
             // Right-Handed Z-Up Coordinate System:
             // - X axis: East -> West horizontal axis (grows to the RIGHT when looking from North)
             // - Y axis: North -> South horizontal axis (second horizontal axis, into depth)
             // - Z axis: Vertical height axis (0..6,130 mm, pointing UP)
             const appState = {
-                selectedIds: new Set(['EW_GARAGE_WEST', 'GW_1', 'GW_4', 'EW_NORTH_RECESSED']),
+                selectedIds: new Set(['STAIRS_1', 'GW_5', 'GW_7', 'GW_3']),
                 searchQuery: '',
                 showWindows: true,
                 showAxes: true,
@@ -734,12 +743,10 @@
                 showSlicePlane: false,
                 sliceZMm: 1200,
                 // Camera spherical coordinates around Z-up (in meters, 1 m = 1,000 mm)
-                // yaw = -115 deg places camera in front of North wall (y < 0) slightly toward East (x < target.x),
-                // so +X grows to the RIGHT, +Y goes back into depth, and +Z points straight UP.
-                yaw: -115 * Math.PI / 180,
-                pitch: 25 * Math.PI / 180,
-                distance: 22.0,
-                target: { x: 11.0, y: 4.5, z: 1.5 }
+                yaw: 65 * Math.PI / 180,
+                pitch: 28 * Math.PI / 180,
+                distance: 11.5,
+                target: { x: 13.9, y: 9.0, z: 1.6 }
             };
 
             // Distinct palette per wall category/side so multiple selected walls are easy to distinguish
@@ -1422,6 +1429,170 @@
                     }
                 });
 
+                // ---------------------------------------------------------------------
+                // C2. SELECTED 3D STAIRCASE OBJECTS (STAIRS_1 — Winder Turn + Flight)
+                // ---------------------------------------------------------------------
+                function pushConvexLoop3D(loop3D, normal, rgba, targetArr) {
+                    if (!Array.isArray(loop3D) || loop3D.length < 3) return;
+                    for (let i = 1; i + 1 < loop3D.length; i++) {
+                        pushTri(loop3D[0], loop3D[i], loop3D[i + 1], normal, rgba, targetArr);
+                    }
+                }
+
+                allStairs.forEach(st => {
+                    const isSelected = appState.selectedIds.has(st.id) || appState.selectedIds.has(st.stairId);
+                    if (!isSelected) {
+                        if (appState.showGhost && Array.isArray(st.footprint2D)) {
+                            pushLoopLines(st.footprint2D.map(p => [p[0], p[1], 6]), [0.65, 0.55, 0.35, 0.35]);
+                        }
+                        return;
+                    }
+
+                    // 1. Sloped Monolithic Reinforced Concrete Waist Slab (193 mm vertical thickness)
+                    if (st.waistSlab3D && Array.isArray(st.waistSlab3D.faces3D)) {
+                        st.waistSlab3D.faces3D.forEach(face => {
+                            pushConvexLoop3D(face.loop3D, face.normal || [0, 0, 1], [0.80, 0.78, 0.74, 0.96]);
+                            pushLoopLines(face.loop3D, [0.55, 0.53, 0.49, 0.85]);
+                        });
+                    }
+
+                    // 2. All 17 Steps (4 Turn Steps + 13 Straight Flight Steps): Concrete Core + Riser + 40mm Oak Plank
+                    (st.steps3D || []).forEach(step => {
+                        // 2a. Concrete step wedge / turn block
+                        (step.concreteFaces3D || []).forEach(cf => {
+                            pushConvexLoop3D(cf.loop3D, cf.normal || [0, 0, 1], [0.88, 0.86, 0.82, 0.96]);
+                        });
+
+                        // 2b. Vertical riser face (warm off-white plaster)
+                        if (step.riserQuad3D && Array.isArray(step.riserQuad3D.loop3D)) {
+                            pushConvexLoop3D(step.riserQuad3D.loop3D, step.riserQuad3D.normal || [1, 0, 0], [0.95, 0.93, 0.89, 0.98]);
+                            pushLoopLines(step.riserQuad3D.loop3D, [0.45, 0.38, 0.30, 0.90]);
+                        }
+
+                        // 2c. 40 mm Solid European Oak Tread Plank (top + bottom + perimeter edges)
+                        const isWinder = step.kind === 'winder';
+                        const oakTopColor = isWinder ? [0.82, 0.53, 0.22, 0.99] : [0.75, 0.47, 0.19, 0.99];
+                        const oakSideColor = [0.60, 0.36, 0.14, 0.99];
+                        pushConvexLoop3D(step.treadLoop3D, [0, 0, 1], oakTopColor);
+                        pushConvexLoop3D(step.plankBottomLoop3D, [0, 0, -1], oakSideColor);
+                        (step.plankSideQuads3D || []).forEach(sq => {
+                            pushConvexLoop3D(sq.loop3D, sq.normal || [0, 1, 0], oakSideColor);
+                        });
+                        pushLoopLines(step.treadLoop3D, [0.98, 0.84, 0.48, 0.96]);
+
+                        // Step number & elevation HUD labels on key steps (Steps 1, 2, 3, 4, 5, 9, 13, 17)
+                        if (step.stepNumber <= 5 || step.stepNumber === 9 || step.stepNumber === 13 || step.stepNumber === 17) {
+                            const poly = step.treadLoop3D;
+                            const cx = poly.reduce((s, p) => s + p[0], 0) / poly.length;
+                            const cy = poly.reduce((s, p) => s + p[1], 0) / poly.length;
+                            const cz = step.zTop + 35;
+                            hudLabels.push({
+                                ptMm: [cx, cy, cz],
+                                text: `#${step.stepNumber}${isWinder ? 'W' : ''} Z=${step.zTop}`,
+                                color: isWinder ? '#fef08a' : '#fed7aa',
+                                bg: isWinder ? 'rgba(146, 64, 14, 0.92)' : 'rgba(67, 20, 7, 0.88)',
+                                fontSize: 9.5
+                            });
+                        }
+
+                        // Outward Riser Normal Arrows on Steps 1, 3 (winder), and 8 (straight)
+                        if (appState.showNormals && (step.stepNumber === 1 || step.stepNumber === 3 || step.stepNumber === 8)) {
+                            const rq = step.riserQuad3D.loop3D;
+                            const rx = (rq[0][0] + rq[1][0]) / 2;
+                            const ry = (rq[0][1] + rq[1][1]) / 2;
+                            const rz = (step.zBottom + step.zTop) / 2;
+                            const rn = step.riserNormal || [1, 0, 0];
+                            const rEnd = [rx + rn[0] * 480, ry + rn[1] * 480, rz];
+                            pushLine([rx, ry, rz], rEnd, [1.0, 0.80, 0.20, 1.0]);
+                            hudLabels.push({
+                                ptMm: rEnd,
+                                text: `R${step.stepNumber} n=[${rn.map(v => Math.round(v * 100) / 100).join(',')}]`,
+                                color: '#fde68a',
+                                bg: 'rgba(120, 53, 15, 0.88)',
+                                fontSize: 9.0
+                            });
+                        }
+                    });
+
+                    // 3. Final Arrival Riser 18 at X = 11,665 mm (Z = 3,145 -> 3,330 mm)
+                    if (st.topRiser3D && Array.isArray(st.topRiser3D.loop3D)) {
+                        pushConvexLoop3D(st.topRiser3D.loop3D, [1, 0, 0], [0.95, 0.93, 0.89, 0.98]);
+                        pushLoopLines(st.topRiser3D.loop3D, [0.98, 0.84, 0.48, 0.96]);
+                        hudLabels.push({
+                            ptMm: [st.xMin, (st.yMin + st.yPivot) / 2, st.zTop + 90],
+                            text: `#18 Arrival (+3.33m / Z=${st.zTop})`,
+                            color: '#bbf7d0',
+                            bg: 'rgba(6, 78, 59, 0.92)',
+                            fontSize: 10
+                        });
+                    }
+
+                    // 4. 3D Balustrade (h = 900 mm along South edge Y = 9,310..9,370, X = 11,665..15,175)
+                    if (st.balustrade3D) {
+                        (st.balustrade3D.handrailFaces3D || []).forEach(hf => {
+                            pushConvexLoop3D(hf.loop3D, hf.normal || [0, 0, 1], [0.48, 0.30, 0.14, 0.98]);
+                            pushLoopLines(hf.loop3D, [0.92, 0.72, 0.38, 0.95]);
+                        });
+                        (st.balustrade3D.posts3D || []).forEach(postQuads => {
+                            postQuads.forEach(pq => {
+                                pushConvexLoop3D(pq.loop3D, pq.normal || [1, 0, 0], [0.22, 0.24, 0.27, 0.98]);
+                            });
+                        });
+                        if (Array.isArray(st.balustrade3D.glassPanelLoop3D)) {
+                            pushConvexLoop3D(st.balustrade3D.glassPanelLoop3D, [0, 1, 0], [0.45, 0.82, 0.98, 0.32], glassVerts);
+                            pushLoopLines(st.balustrade3D.glassPanelLoop3D, [0.56, 0.86, 0.98, 0.85]);
+                        }
+                    }
+
+                    // 5. 3D Walking Line Trajectory (hovering 25 mm above steps)
+                    if (Array.isArray(st.walkingLine3D) && st.walkingLine3D.length >= 2) {
+                        for (let i = 0; i + 1 < st.walkingLine3D.length; i++) {
+                            const pA = st.walkingLine3D[i];
+                            const pB = st.walkingLine3D[i + 1];
+                            pushLine([pA[0], pA[1], pA[2] + 25], [pB[0], pB[1], pB[2] + 25], [0.22, 0.92, 0.75, 1.0]);
+                        }
+                    }
+
+                    // 6. Key 3D Vertex Labels on Staircase Corners
+                    if (appState.showVertices) {
+                        [
+                            [st.xMax, st.yMax, 0],
+                            [st.xPivot, st.yPivot, 740],
+                            [st.xMax, st.yMin, 555],
+                            [st.xMin, st.yMin, st.zTop],
+                            [st.xMin, st.yPivot, st.zTop]
+                        ].forEach(pt => {
+                            hudLabels.push({
+                                ptMm: pt,
+                                text: `(${pt[0]},${pt[1]},${pt[2]})`,
+                                color: '#fde68a',
+                                bg: 'rgba(15, 23, 42, 0.88)',
+                                fontSize: 9.5,
+                                isVertex: true
+                            });
+                        });
+                    }
+
+                    // 7. Floating Main Staircase Badge
+                    hudLabels.push({
+                        ptMm: [(st.xMin + st.xMax) / 2, (st.yMin + st.yPivot) / 2, st.zTop + 1050],
+                        text: `🪜 ${st.id} (${st.cadSpecLabel} • ${st.balustradeLabel})`,
+                        color: '#fef3c7',
+                        bg: 'rgba(180, 83, 9, 0.95)',
+                        fontSize: 11.5
+                    });
+
+                    // 8. Horizontal Slice Plane (Z = appState.sliceZMm) Intersection with 3D Staircase
+                    if (appState.showSlicePlane && typeof WallService.sliceStair3DAtElevation === 'function') {
+                        const stairSlice = WallService.sliceStair3DAtElevation(st, appState.sliceZMm);
+                        (stairSlice.polygons2D || []).forEach(poly2D => {
+                            const loop3D = poly2D.map(p => [p[0], p[1], appState.sliceZMm + 2]);
+                            pushLoopLines(loop3D, [1.0, 0.25, 0.45, 1.0]);
+                            pushConvexLoop3D(loop3D, [0, 0, 1], [1.0, 0.25, 0.45, 0.62]);
+                        });
+                    }
+                });
+
                 // Translucent Horizontal Cut Plane at Z = appState.sliceZMm
                 if (appState.showSlicePlane) {
                     const zS = appState.sliceZMm;
@@ -1540,8 +1711,11 @@
             // 5. CAMERA FOCUS & INTERACTION CONTROLS
             // =========================================================================
             function focusSelectedWalls() {
-                const selected = allWalls.filter(w => appState.selectedIds.has(w.id));
-                const list = selected.length > 0 ? selected : allWalls;
+                const selectedWalls = allWalls.filter(w => appState.selectedIds.has(w.id));
+                const selectedStairs = allStairs.filter(s => appState.selectedIds.has(s.id) || appState.selectedIds.has(s.stairId));
+                const list = (selectedWalls.length + selectedStairs.length > 0)
+                    ? selectedWalls.concat(selectedStairs)
+                    : allWalls;
 
                 let minX = Infinity, maxX = -Infinity;
                 let minY = Infinity, maxY = -Infinity;
@@ -1635,7 +1809,53 @@
                 countBadge.textContent = `${count} selected`;
                 triggerText.textContent = count > 0
                     ? `Selected: ${Array.from(appState.selectedIds).slice(0, 3).join(', ')}${count > 3 ? ` +${count - 3} more` : ''}`
-                    : 'Choose Wall IDs from Database...';
+                    : 'Choose Wall / Stair IDs from Database...';
+
+                const q = appState.searchQuery.trim().toLowerCase();
+
+                // 0. 3D Staircase Objects Group
+                const matchingStairs = allStairs.filter(s => (
+                    !q ||
+                    s.id.toLowerCase().includes(q) ||
+                    (s.stairId && s.stairId.toLowerCase().includes(q)) ||
+                    s.name.toLowerCase().includes(q) ||
+                    (s.rooms && s.rooms.toLowerCase().includes(q))
+                ));
+                if (matchingStairs.length > 0) {
+                    optionsContainer.appendChild(createEl('div', 'wall-group-header', '3D Staircase Objects (data/stairs.js)'));
+                    matchingStairs.forEach(s => {
+                        const isChecked = appState.selectedIds.has(s.id);
+                        const row = createEl('label', 'wall-option-row' + (isChecked ? ' checked' : ''));
+                        const cb = document.createElement('input');
+                        cb.type = 'checkbox';
+                        cb.checked = isChecked;
+                        cb.addEventListener('change', () => {
+                            if (cb.checked) {
+                                appState.selectedIds.add(s.id);
+                            } else {
+                                appState.selectedIds.delete(s.id);
+                            }
+                            renderDropdownAndInspector();
+                            renderScene();
+                        });
+
+                        const idSpan = createEl('span', 'wall-option-id', `🪜 ${s.id}`);
+                        const nameSpan = createEl('span', '', 'Main Winder Staircase (Schody)');
+                        nameSpan.style.color = '#fde68a';
+                        nameSpan.style.fontSize = '11px';
+                        nameSpan.style.overflow = 'hidden';
+                        nameSpan.style.textOverflow = 'ellipsis';
+                        nameSpan.style.whiteSpace = 'nowrap';
+
+                        const metaSpan = createEl('span', 'wall-option-meta', `${s.cadSpecLabel} • h=${s.balustradeHeightMm / 10}`);
+
+                        row.appendChild(cb);
+                        row.appendChild(idSpan);
+                        row.appendChild(nameSpan);
+                        row.appendChild(metaSpan);
+                        optionsContainer.appendChild(row);
+                    });
+                }
 
                 // Group walls into 4 logical sections
                 const groups = [
@@ -1644,8 +1864,6 @@
                     { title: 'Upper Floor — Exterior Walls (UW_*)', filter: w => w.floor === 'first' && w.category === 'exterior' },
                     { title: 'Upper Floor — Internal Walls (FW_*)', filter: w => w.floor === 'first' && w.category === 'internal' }
                 ];
-
-                const q = appState.searchQuery.trim().toLowerCase();
 
                 groups.forEach(grp => {
                     const matching = allWalls.filter(w => grp.filter(w) && (
@@ -1706,14 +1924,47 @@
                     chipsContainer.appendChild(chip);
                 });
 
-                // Render Inspector Cards for selected walls
+                // Render Inspector Cards for selected stairs & walls
+                const selectedStairs = allStairs.filter(s => appState.selectedIds.has(s.id) || appState.selectedIds.has(s.stairId));
                 const selectedWalls = allWalls.filter(w => appState.selectedIds.has(w.id));
-                if (selectedWalls.length === 0) {
+                if (selectedStairs.length === 0 && selectedWalls.length === 0) {
                     const emptyCard = createEl('div', 'inspector-wall-card');
-                    emptyCard.appendChild(createEl('div', 'inspector-wall-name', 'No walls selected. Choose one or more wall IDs from the dropdown on the left.'));
+                    emptyCard.appendChild(createEl('div', 'inspector-wall-name', 'No objects selected. Choose STAIRS_1 or wall IDs from the dropdown on the left.'));
                     inspectorContainer.appendChild(emptyCard);
                     return;
                 }
+
+                selectedStairs.forEach(s => {
+                    const card = createEl('div', 'inspector-wall-card');
+                    const header = createEl('div', 'inspector-wall-header');
+                    header.appendChild(createEl('span', 'inspector-wall-id', `🪜 ${s.id} (${s.stairId})`));
+                    header.appendChild(createEl('span', 'tech-pill', `${s.cadSpecLabel} • Z=${s.zBottom}..${s.zTop}`));
+                    card.appendChild(header);
+
+                    card.appendChild(createEl('div', 'inspector-wall-name', s.name));
+
+                    const addKv = (k, v) => {
+                        const r = createEl('div', 'kv-row');
+                        r.appendChild(createEl('span', 'kv-key', k));
+                        r.appendChild(createEl('span', 'kv-val', v));
+                        card.appendChild(r);
+                    };
+
+                    addKv('Rooms Connected', s.rooms);
+                    addKv('X / Y Bounds', `X: ${s.xMin}..${s.xMax} | Y: ${s.yMin}..${s.yMax} mm`);
+                    addKv('Risers & Treads', `${s.riserCount} × ${s.riserHeightMm} mm | ${s.treadCount} treads (${s.treadDepthMm} mm)`);
+                    addKv('West Winder Turn', `${s.turnWidthMm} × ${s.yMax - s.yMin} mm (1 straight + 3 winder steps)`);
+                    addKv('Straight Flight', `${s.xPivot - s.xMin} × ${s.flightWidthMm} mm (13 treads along ${s.northWallId})`);
+                    addKv('Structure & Finish', `${s.waistSlabThicknessMm} mm RC slab + ${s.plankThicknessMm} mm oak + h=${s.balustradeHeightMm} mm rail`);
+
+                    const stepsSummary = s.steps3D.map(stStep =>
+                        `Step ${stStep.stepNumber} (${stStep.kind}, Z=${stStep.zBottom}..${stStep.zTop}): ` +
+                        stStep.treadLoop3D.map(p => `[${p[0]},${p[1]},${p[2]}]`).join(' → ')
+                    ).join('\n');
+                    card.appendChild(createEl('div', 'coord-block', stepsSummary));
+
+                    inspectorContainer.appendChild(card);
+                });
 
                 selectedWalls.forEach(w => {
                     const zBot = w.zBottom !== undefined ? w.zBottom : (w.yBottom || 0);
@@ -1790,6 +2041,11 @@
                 focusSelectedWalls();
             }
 
+            document.getElementById('preset-stairs-hall').addEventListener('click', () => {
+                appState.yaw = 65 * Math.PI / 180;
+                appState.pitch = 28 * Math.PI / 180;
+                applyPreset(['STAIRS_1', 'GW_5', 'GW_7', 'GW_3']);
+            });
             document.getElementById('preset-garage-doors').addEventListener('click', () => {
                 applyPreset(['EW_GARAGE_NORTH', 'EW_GARAGE_WEST', 'EW_GARAGE_EAST', 'GW_1', 'GW_2', 'GW_4']);
             });
@@ -1800,16 +2056,16 @@
                 applyPreset(allWalls.filter(w => w.floor === 'ground' && w.category === 'exterior').map(w => w.id));
             });
             document.getElementById('preset-ground-int').addEventListener('click', () => {
-                applyPreset(allWalls.filter(w => w.floor === 'ground' && w.category === 'internal').map(w => w.id));
+                applyPreset(allWalls.filter(w => w.floor === 'ground' && w.category === 'internal').map(w => w.id).concat(['STAIRS_1']));
             });
             document.getElementById('preset-ground-all').addEventListener('click', () => {
-                applyPreset(allWalls.filter(w => w.floor === 'ground').map(w => w.id));
+                applyPreset(allWalls.filter(w => w.floor === 'ground').map(w => w.id).concat(['STAIRS_1']));
             });
             document.getElementById('preset-first-all').addEventListener('click', () => {
-                applyPreset(allWalls.filter(w => w.floor === 'first').map(w => w.id));
+                applyPreset(allWalls.filter(w => w.floor === 'first').map(w => w.id).concat(['STAIRS_1']));
             });
             document.getElementById('preset-all-walls').addEventListener('click', () => {
-                applyPreset(allWalls.map(w => w.id));
+                applyPreset(allWalls.map(w => w.id).concat(['STAIRS_1']));
             });
             document.getElementById('preset-clear').addEventListener('click', () => {
                 appState.selectedIds.clear();
