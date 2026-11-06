@@ -695,6 +695,18 @@
                     </span>
                 </div>
                 <div class="layer-toggles" style="border-right: 1px solid #cbd5e1; padding-right: 16px;">
+                    <span style="font-size: 13px; font-weight: 700; color: #0f172a;">Lower Window (O5):</span>
+                    <button id="btn-o5-default" class="toggle-btn active" onclick="setSouthLowerWindowO5Option('default')" style="font-weight: 600;">
+                        <span>🪟</span> 648 × 280 cm (3 × 2,100, default)
+                    </button>
+                    <button id="btn-o5-aligned-o12" class="toggle-btn" onclick="setSouthLowerWindowO5Option('aligned-o12')" style="font-weight: 600;">
+                        <span>↔️</span> 548 × 280 cm (2 × 2,695, aligned with O12 center)
+                    </button>
+                    <span id="sf-o5-opt-badge" class="badge accent" style="font-size: 11.5px; padding: 4px 10px;">
+                        O5: 6,480 × 2,800 mm (3 × 2,100 + 2 × 90 mm | X = 7,010..13,490 mm • default)
+                    </span>
+                </div>
+                <div class="layer-toggles" style="border-right: 1px solid #cbd5e1; padding-right: 16px;">
                     <span style="font-size: 13px; font-weight: 700; color: #0f172a;">Window Jambs (Ościeża):</span>
                     <button id="btn-jamb-floor" class="toggle-btn" onclick="setWindowJambOption('floor')" style="font-weight: 600;">
                         <span>🧱</span> Option 1: Floor Material (Brick / Wood)
@@ -1344,6 +1356,62 @@
     <script>
         let currentSelectedKey = null;
         let currentSouthWindowMode = 'bigger';
+        let currentSouthO5Option = 'default'; // 'default' (6,480 mm, 3x2,100) | 'aligned-o12' (5,480 mm, 2x2,695 aligned with O12 center)
+
+        const O5_ALIGNED_O12_OVERRIDE = {
+            x: 7500,
+            width: 5480,
+            height: 2800,
+            sill: 0,
+            sashes: 2,
+            pillarWidth: 90,
+            sashWidths: [2695, 2695],
+            hasMullion: true,
+            slidingArrows: false,
+            description: 'Two-panel full-height HST terrace glazing (2 equal symmetric panes of 2,695 mm with 1 × 90 mm inner pillar = 5,480 mm; left edge at Screen X = 8,010 mm aligned with center of O12, 2,000 mm left clinker brick pier)'
+        };
+
+        // Install view-local override on WindowStore so selecting the non-default O5 option on south_facade.html
+        // never mutates the persisted default O5 used by 2D floor plan (floor_plan.html) or 3D views (building_3d.html / walls_3d.html).
+        (function installSouthFacadeLocalO5Override() {
+            if (!window.WindowStore || window.WindowStore._hasSouthFacadeO5Override) return;
+            const origGet = WindowStore.get.bind(WindowStore);
+            const origGetAll = WindowStore.getAll.bind(WindowStore);
+            const origGetByView = WindowStore.getByView.bind(WindowStore);
+
+            function applyO5OverrideIfNeeded(win) {
+                if (!win || win.id !== 'O5' || currentSouthO5Option !== 'aligned-o12') {
+                    return win;
+                }
+                return Object.assign({}, win, O5_ALIGNED_O12_OVERRIDE);
+            }
+
+            WindowStore.get = function (id) {
+                return applyO5OverrideIfNeeded(origGet(id));
+            };
+            WindowStore.getWindow = WindowStore.get;
+
+            WindowStore.getAll = function () {
+                const all = origGetAll();
+                if (currentSouthO5Option !== 'aligned-o12' || !all || !all.O5) {
+                    return all;
+                }
+                return Object.assign({}, all, {
+                    O5: applyO5OverrideIfNeeded(all.O5)
+                });
+            };
+            WindowStore.getAllWindows = WindowStore.getAll;
+
+            WindowStore.getByView = function (viewId) {
+                const list = origGetByView(viewId);
+                if (currentSouthO5Option !== 'aligned-o12' || !Array.isArray(list)) {
+                    return list;
+                }
+                return list.map(w => applyO5OverrideIfNeeded(w));
+            };
+
+            WindowStore._hasSouthFacadeO5Override = true;
+        })();
 
         function openTab(evt, tabName) {
             const tabcontent = document.getElementsByClassName("tab-content");
@@ -1452,11 +1520,62 @@
             }
         };
 
+        function syncSouthO5OptionUI() {
+            const btnDefault = document.getElementById('btn-o5-default');
+            const btnAligned = document.getElementById('btn-o5-aligned-o12');
+            const o5Badge = document.getElementById('sf-o5-opt-badge');
+            const versionBadge = document.getElementById('sf-window-opt-badge');
+            const isAligned = (currentSouthO5Option === 'aligned-o12');
+
+            if (btnDefault) btnDefault.classList.toggle('active', !isAligned);
+            if (btnAligned) btnAligned.classList.toggle('active', isAligned);
+
+            if (isAligned) {
+                if (o5Badge) {
+                    o5Badge.textContent = 'O5: 5,480 × 2,800 mm (2 × 2,695 + 1 × 90 mm | X = 8,010..13,490 mm • aligned with O12 center)';
+                }
+                elementData['O5'].subtitle = 'Two-Panel Full-Height HST Terrace Glazing (2 × 2,695 mm + 1 × 90 mm Inner Pillar = 5,480 mm, Aligned with O12 Center)';
+                elementData['O5'].room = 'Ground Floor, Dining & Central Living Area (0.12). Left edge at Screen X = 8,010 mm aligns vertically with the center of upper window O12 (2,000 mm recessed clinker brick pier on left, 1,000 mm pier to O4 on right).';
+            } else {
+                if (currentSouthWindowMode === 'bigger') {
+                    if (o5Badge) {
+                        o5Badge.textContent = 'O5: 6,480 × 2,800 mm (3 × 2,100 + 2 × 90 mm | X = 7,010..13,490 mm • default)';
+                    }
+                    elementData['O5'].subtitle = 'Three-Panel Full-Height HST Terrace Glazing (3 × 2,100 mm + 2 × 90 mm Inner Pillars = 6,480 mm)';
+                } else {
+                    if (o5Badge) {
+                        o5Badge.textContent = 'O5: 6,480 × 2,800 mm (4 × 1,552.5 + 3 × 90 mm | X = 7,010..13,490 mm • default)';
+                    }
+                    elementData['O5'].subtitle = 'Four-Panel Full-Height HST Terrace Glazing (4 × 1,552.5 mm + 3 × 90 mm Inner Pillars = 6,480 mm)';
+                }
+                elementData['O5'].room = 'Ground Floor, Dining & Central Living Area (0.12). Separated from the front segment by a 1,000 mm recessed clinker brick pier and from O4 by a 1,000 mm clinker brick pier.';
+            }
+
+            if (versionBadge) {
+                const o5Summary = isAligned
+                    ? 'O5: 2×2,695 (548×280)'
+                    : (currentSouthWindowMode === 'bigger' ? 'O5: 3×2,100' : 'O5: 4×1,552.5');
+                if (currentSouthWindowMode === 'bigger') {
+                    versionBadge.textContent = `Active: Bigger windows (90 mm inner pillars | O12: 2×1,955, O10/O4: 3×2,040, ${o5Summary}, O7: 200×280)`;
+                } else {
+                    versionBadge.textContent = `Active: Smaller windows (90 mm inner pillars | O12: 3×1,273.3, O10/O4: 4×1,507.5, ${o5Summary}, O7: 300×200)`;
+                }
+            }
+        }
+
+        function setSouthLowerWindowO5Option(option) {
+            currentSouthO5Option = (option === 'aligned-o12') ? 'aligned-o12' : 'default';
+            syncSouthO5OptionUI();
+            if (typeof WindowComponent !== 'undefined' && typeof WindowComponent.autoMountAll === 'function') {
+                WindowComponent.autoMountAll();
+            }
+            updateSouthFacadeDimensions();
+        }
+
         function setSouthFacadeWindowOption(mode) {
             currentSouthWindowMode = (mode === 'bigger') ? 'bigger' : 'smaller';
             const btnSmaller = document.getElementById('btn-sf-smaller');
             const btnBigger = document.getElementById('btn-sf-bigger');
-            const badge = document.getElementById('sf-window-opt-badge');
             const levelO7Sill = document.getElementById('level-o7-sill');
 
             WindowStore.updateView('south_facade', {
@@ -1474,9 +1593,6 @@
             if (currentSouthWindowMode === 'bigger') {
                 if (btnSmaller) btnSmaller.classList.remove('active');
                 if (btnBigger) btnBigger.classList.add('active');
-                if (badge) {
-                    badge.textContent = 'Active: Bigger windows (90 mm inner pillars | O12: 2×1,955, O10/O4: 3×2,040, O5: 3×2,100, O7: 200×280)';
-                }
                 if (levelO7Sill) levelO7Sill.style.display = 'none';
 
                 WindowStore.update('O12', {
@@ -1502,8 +1618,13 @@
                     description: 'Single-pane full-height fixed window (2000×2800 mm, hp=0 mm, 1 fix window, 200 mm brick on right)'
                 });
                 WindowStore.update('O5', {
+                    x: 7500,
+                    width: 6480,
+                    height: 2800,
+                    sill: 0,
                     sashes: 3,
                     pillarWidth: 90,
+                    sashWidths: null,
                     hasMullion: true,
                     slidingArrows: false,
                     description: 'Three-panel full-height HST terrace glazing (3 equal symmetric panes of 2,100 mm with 2 × 90 mm inner pillars) in dining/living area'
@@ -1519,14 +1640,10 @@
                 elementData['O12'].subtitle = 'Two-Panel Full-Height Glazing (2 × 1,955 mm + 1 × 90 mm Inner Pillar = 4,000 mm)';
                 elementData['O10'].subtitle = 'Three-Panel Full-Height Panoramic Glazing (3 × 2,040 mm + 2 × 90 mm Inner Pillars = 6,300 mm)';
                 elementData['O7'].subtitle = 'Single Fixed Full-Height Window (2,000 × 2,800 mm, hp=0 mm)';
-                elementData['O5'].subtitle = 'Three-Panel Full-Height HST Terrace Glazing (3 × 2,100 mm + 2 × 90 mm Inner Pillars = 6,480 mm)';
                 elementData['O4'].subtitle = 'Three-Panel Full-Height HST Terrace Glazing (3 × 2,040 mm + 2 × 90 mm Inner Pillars = 6,300 mm)';
             } else {
                 if (btnSmaller) btnSmaller.classList.add('active');
                 if (btnBigger) btnBigger.classList.remove('active');
-                if (badge) {
-                    badge.textContent = 'Active: Smaller windows (90 mm inner pillars | O12: 3×1,273.3, O10/O4: 4×1,507.5, O5: 4×1,552.5, O7: 300×200)';
-                }
                 if (levelO7Sill) levelO7Sill.style.display = 'inline';
 
                 WindowStore.update('O12', {
@@ -1552,8 +1669,13 @@
                     description: 'Three-sash ground floor window (3000×2000 mm, hp=800 mm, two tilt-and-turn sashes on left, one fixed sash on right, 200 mm brick on right)'
                 });
                 WindowStore.update('O5', {
+                    x: 7500,
+                    width: 6480,
+                    height: 2800,
+                    sill: 0,
                     sashes: 4,
                     pillarWidth: 90,
+                    sashWidths: null,
                     hasMullion: true,
                     slidingArrows: true,
                     description: 'Four-panel full-height HST lift-and-slide terrace glazing (4 equal symmetric panes of 1,552.5 mm with 3 × 90 mm inner pillars, central bi-parting doors ← →) in dining/living area'
@@ -1569,10 +1691,13 @@
                 elementData['O12'].subtitle = 'Three-Panel Full-Height Glazing (3 × 1,273.3 mm + 2 × 90 mm Inner Pillars = 4,000 mm)';
                 elementData['O10'].subtitle = 'Four-Panel Full-Height Panoramic Glazing (4 × 1,507.5 mm + 3 × 90 mm Inner Pillars = 6,300 mm)';
                 elementData['O7'].subtitle = 'Three-Sash Window over Clinker Brick Parapet (3,000 × 2,000 mm, hp=800 mm)';
-                elementData['O5'].subtitle = 'Four-Panel Full-Height HST Terrace Glazing (4 × 1,552.5 mm + 3 × 90 mm Inner Pillars = 6,480 mm)';
                 elementData['O4'].subtitle = 'Four-Panel Full-Height HST Terrace Glazing (4 × 1,507.5 mm + 3 × 90 mm Inner Pillars = 6,300 mm)';
             }
 
+            syncSouthO5OptionUI();
+            if (typeof WindowComponent !== 'undefined' && typeof WindowComponent.autoMountAll === 'function') {
+                WindowComponent.autoMountAll();
+            }
             updateSouthFacadeDimensions();
         }
 
@@ -1612,6 +1737,112 @@
             const card = document.getElementById('element-detail-card');
             card.style.display = 'block';
             card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        /**
+         * Build an SVG sub-dimension chain for lower window O5 showing its individual pane widths,
+         * 90 mm inner pillar(s), height (2,800 mm), and vertical alignment with O12 center when active.
+         * Rendered inside #sf-ground-dims-group (which is translated to Y = +115).
+         */
+        function buildO5SubDimensionsSVG() {
+            const win = WindowStore.get('O5');
+            if (!win) return '';
+            const view = CoordinateService.getView('south_facade');
+            const scale = (view && view.scale) ? view.scale : 0.1;
+            const coords = CoordinateService.transform(win, 'south_facade');
+            const startSvg = coords.x;
+            const endSvg = coords.x + coords.width;
+            const numSashes = Math.max(1, Number(win.sashes) || 1);
+            const pillarMm = Number(win.pillarWidth) || 0;
+            const widthMm = Number(win.width) || 0;
+            const heightMm = Number(win.height) || 2800;
+
+            if (numSashes < 2 || pillarMm <= 0) return '';
+
+            const paneMm = (widthMm - (numSashes - 1) * pillarMm) / numSashes;
+            const subY = 44; // Y = 115 + 44 = 159 in SVG space
+            const parts = [];
+            let cursorMm = 0;
+
+            for (let i = 0; i < numSashes; i++) {
+                const p0 = startSvg + cursorMm * scale;
+                const p1 = startSvg + (cursorMm + paneMm) * scale;
+                parts.push({
+                    kind: 'pane',
+                    lenMm: paneMm,
+                    startSvg: p0,
+                    endSvg: p1
+                });
+                cursorMm += paneMm;
+                if (i < numSashes - 1) {
+                    const m0 = startSvg + cursorMm * scale;
+                    const m1 = startSvg + (cursorMm + pillarMm) * scale;
+                    parts.push({
+                        kind: 'pillar',
+                        lenMm: pillarMm,
+                        startSvg: m0,
+                        endSvg: m1
+                    });
+                    cursorMm += pillarMm;
+                }
+            }
+
+            let svgStr = `<g id="sf-o5-subdims">`;
+            svgStr += `<line x1="${startSvg}" y1="${subY}" x2="${endSvg}" y2="${subY}" stroke="#0284c7" stroke-width="1.3" />`;
+
+            const ticks = [startSvg];
+            parts.forEach(p => ticks.push(p.endSvg));
+            ticks.forEach(pt => {
+                svgStr += `<line x1="${pt}" y1="${subY}" x2="${pt}" y2="-113" stroke="#0284c7" stroke-width="0.65" stroke-dasharray="2 2" opacity="0.5" />`;
+                svgStr += `<line x1="${pt}" y1="${subY - 5}" x2="${pt}" y2="${subY + 5}" stroke="#0284c7" stroke-width="1.3" />`;
+            });
+
+            parts.forEach(p => {
+                const mid = (p.startSvg + p.endSvg) / 2;
+                const label = formatMmValue(p.lenMm);
+                if (p.kind === 'pane') {
+                    const boxW = 58;
+                    svgStr += `
+                        <rect x="${mid - boxW / 2}" y="${subY - 10}" width="${boxW}" height="16" rx="2" fill="#f0f9ff" stroke="#0284c7" stroke-width="0.8" />
+                        <text x="${mid}" y="${subY + 2}" class="dim-text" font-size="10.5" font-weight="700" fill="#0369a1">${label}</text>
+                    `;
+                } else {
+                    const boxW = 26;
+                    svgStr += `
+                        <rect x="${mid - boxW / 2}" y="${subY + 8}" width="${boxW}" height="14" rx="2" fill="#1f2421" stroke="#0284c7" stroke-width="0.7" />
+                        <text x="${mid}" y="${subY + 18}" class="dim-text" font-size="9" font-weight="700" fill="#fde68a">${label}</text>
+                    `;
+                }
+            });
+
+            // When the non-default 5,480 mm option (aligned with O12 center at Screen X = 8,010 mm) is active,
+            // highlight the vertical alignment line from O12 center (X = 801) and O5 height (2,800 mm)
+            if (currentSouthO5Option === 'aligned-o12') {
+                // Vertical alignment guide at Screen X = 8,010 mm (SVG X = 801) from O12 center (Y = -478 => y = -593) to O5 bottom (Y = 0 => y = -115)
+                svgStr += `
+                    <line x1="${startSvg}" y1="-593" x2="${startSvg}" y2="-115" stroke="#ef4444" stroke-width="1.6" stroke-dasharray="5 3" opacity="0.9" />
+                    <rect x="${startSvg - 68}" y="-304" width="136" height="18" rx="3" fill="#fef2f2" stroke="#ef4444" stroke-width="1" />
+                    <text x="${startSvg}" y="-292" class="dim-text" font-size="9.5" font-weight="800" fill="#b91c1c">X = 8,010 (oś O12)</text>
+                `;
+
+                // Vertical height dimension for O5 (2,800 mm) at SVG X = startSvg - 26 (Y = -280 to 0 => y = -395 to -115)
+                const hDimX = startSvg - 26;
+                const yTop = -395; // Y = -280
+                const yBot = -115; // Y = 0
+                const yMid = (yTop + yBot) / 2;
+                svgStr += `
+                    <line x1="${hDimX}" y1="${yTop}" x2="${startSvg}" y2="${yTop}" stroke="#ef4444" stroke-width="0.8" stroke-dasharray="2 2" />
+                    <line x1="${hDimX}" y1="${yBot}" x2="${startSvg}" y2="${yBot}" stroke="#ef4444" stroke-width="0.8" stroke-dasharray="2 2" />
+                    <line x1="${hDimX}" y1="${yTop}" x2="${hDimX}" y2="${yBot}" stroke="#ef4444" stroke-width="1.4" />
+                    <line x1="${hDimX - 5}" y1="${yTop}" x2="${hDimX + 5}" y2="${yTop}" stroke="#ef4444" stroke-width="1.4" />
+                    <line x1="${hDimX - 5}" y1="${yBot}" x2="${hDimX + 5}" y2="${yBot}" stroke="#ef4444" stroke-width="1.4" />
+                    <rect x="${hDimX - 24}" y="${yMid - 9}" width="48" height="18" rx="2" fill="#fef2f2" stroke="#ef4444" stroke-width="1" />
+                    <text x="${hDimX}" y="${yMid + 3.5}" class="dim-text" font-size="10" font-weight="800" fill="#b91c1c">${heightMm.toLocaleString()}</text>
+                `;
+            }
+
+            svgStr += `</g>`;
+            return svgStr;
         }
 
         /**
@@ -1733,6 +1964,10 @@
                 `;
             });
 
+            if (!isUpper) {
+                svgStr += buildO5SubDimensionsSVG();
+            }
+
             return svgStr;
         }
 
@@ -1827,6 +2062,7 @@
         }
 
         window.addEventListener('DOMContentLoaded', function () {
+            currentSouthO5Option = 'default';
             WindowComponent.autoMountAll();
             const southWindowIds = ['O13a_2', 'O12', 'O10', 'O7', 'O5', 'O4'];
             const hasModifiedSouthWin = (typeof WindowStore.isModified === 'function')
@@ -1834,6 +2070,7 @@
             if (!hasModifiedSouthWin) {
                 setSouthFacadeWindowOption('bigger');
             } else {
+                syncSouthO5OptionUI();
                 updateSouthFacadeDimensions();
             }
 

@@ -938,13 +938,6 @@
                     doors: []
                 },
                 {
-                    id: 'GW_3b', name: 'GW_3b (Komunikacja / Jadalnia South Pier)',
-                    axis: 'z', x1: 11915, z1: 11065, x2: 12095, z2: 11200,
-                    rooms: '0.07 Komunikacja ↔ 0.12 Jadalnia (185 cm passage)',
-                    specs: '180 × 135 mm • South wall pier along Axis 4 defining 1,850 mm (185 cm) open passage',
-                    doors: []
-                },
-                {
                     id: 'GW_4', name: 'GW_4 (Garaż & Kotłownia South Wall)',
                     axis: 'x', x1: 12095, z1: 6290, x2: 17625, z2: 6470,
                     rooms: '0.01 Garaż & 0.03 Kotłownia ↔ 0.05 Garderoba & 0.06 WC',
@@ -987,10 +980,10 @@
                     id: 'GW_7', name: 'GW_7 (Garderoba & WC / Komunikacja)',
                     axis: 'x', x1: 12095, z1: 8180, x2: 17445, z2: 8360,
                     rooms: '0.05 Garderoba & 0.06 WC ↔ 0.04 Wiatrołap & 0.07 Komunikacja (Stairs)',
-                    specs: '5,350 × 180 mm (18 cm structural wall) • Garderoba: 14 cm + 90×210 cm door + 213 cm; WC: 104 cm + 90×210 cm door (X=12155..13055) + 6 cm',
+                    specs: '5,350 × 180 mm (18 cm structural wall) • Garderoba: 14 cm + 90×210 cm door + 213 cm; WC: 104 cm + 86×210 cm door (X=12195..13055) + 10 cm',
                     doors: [
                         { start: 16405, end: 17305, swingDir: -1, hingeStart: true },
-                        { start: 12155, end: 13055, swingDir: -1, hingeStart: false }
+                        { start: 12195, end: 13055, swingDir: -1, hingeStart: false }
                     ]
                 },
                 {
@@ -1082,91 +1075,93 @@
             first: [
                 {
                     id: 'FW_1', name: 'FW_1 (1.05 & 1.04 Pokój East Wall)',
-                    axis: 'z', x1: 15415, z1: 3170, x2: 15535, z2: 11200,
-                    rooms: '1.05 Pokój & 1.04 Pokój (479 cm) ↔ 1.03 Łazienka & 1.06 Korytarz',
-                    specs: '120 × 8,030 mm • 4,790 mm (479 cm) East of West inner wall (X = 20,325 mm)',
+                    axis: 'z', x1: 15615, z1: 3170, x2: 15735, z2: 11200,
+                    rooms: '1.05 Pokój & 1.04 Pokój (459 cm) ↔ 1.03 Łazienka (224 cm) & 1.06 Korytarz (472 cm)',
+                    specs: '120 × 8,030 mm • 389 cm upper wall (Z=3170..7060) + 138 cm open alcove passage (Z=7060..8440) + 276 cm lower wall (Z=8440..11200)',
                     doors: [
-                        { start: 6950, end: 7850, swingDir: 1, hingeStart: true }
+                        { start: 7060, end: 8440, swingDir: 1, hingeStart: true }
                     ]
                 },
                 {
-                    id: 'FW_2a', name: 'FW_2a (1.05 Pokój / 1.04 Pokój West Partition)',
-                    axis: 'x', x1: 17385, z1: 6760, x2: 20325, z2: 6880,
-                    rooms: '1.05 Pokój (359 cm) ↔ 1.04 Pokój (432 cm)',
-                    specs: '2,940 × 120 mm • 3,590 mm (359 cm) South of North inner wall, 2,940 mm (294 cm) from West wall',
-                    doors: []
+                    id: 'FW_2a', name: 'FW_2a (1.05 Pokój / 1.04 Pokój & Alcove Partition)',
+                    axis: 'x', x1: 15735, z1: 6940, x2: 20325, z2: 7060,
+                    rooms: '1.05 Pokój (377 cm) ↔ Alcove & 1.04 Pokój',
+                    specs: '4,590 × 120 mm • 3,770 mm (377 cm) South of North inner wall; from right (FW_1): 70 cm wall (X=15735..16435) + 90×210 cm door (X=16435..17335) + 299 cm wall (X=17335..20325)',
+                    doors: [
+                        { start: 16435, end: 17335, swingDir: -1, hingeStart: false }
+                    ]
                 },
                 {
                     id: 'FW_2b', name: 'FW_2b (1.05 / 1.04 Alcove Step Wall)',
-                    axis: 'z', x1: 17265, z1: 6760, x2: 17385, z2: 8190,
-                    rooms: '1.05 Pokój ↔ 1.04 Pokój (Doorway Alcove)',
-                    specs: '120 × 1,430 mm • Vertical step forming entrance alcove for 1.05 Pokój',
+                    axis: 'z', x1: 17335, z1: 7060, x2: 17455, z2: 8320,
+                    rooms: '1.04 Pokój ↔ Doorway Alcove',
+                    specs: '120 × 1,260 mm • Vertical step wall immediately West of the 90×210 cm door in FW_2a (X=17335..17455)',
                     doors: []
                 },
                 {
                     id: 'FW_2c', name: 'FW_2c (1.05 / 1.04 East Partition)',
-                    axis: 'x', x1: 15535, z1: 8070, x2: 17265, z2: 8190,
-                    rooms: '1.05 Pokój Alcove ↔ 1.04 Pokój (301 cm)',
-                    specs: '1,730 × 120 mm • 3,010 mm (301 cm) North of South inner wall (Z = 11,200 mm)',
+                    axis: 'x', x1: 15735, z1: 8320, x2: 17455, z2: 8440,
+                    rooms: '1.05 Pokój Alcove ↔ 1.04 Pokój (276 cm)',
+                    specs: '1,720 × 120 mm • 2,760 mm (276 cm) North of South inner wall (Z = 11,200 mm)',
                     doors: [
-                        { start: 15800, end: 16700, swingDir: 1, hingeStart: true }
+                        { start: 16365, end: 17265, swingDir: 1, hingeStart: true }
                     ]
                 },
                 {
                     id: 'FW_3', name: 'FW_3 (1.03 Łazienka / 1.02 Łazienka)',
-                    axis: 'z', x1: 13815, z1: 3170, x2: 13935, z2: 6880,
-                    rooms: '1.03 Łazienka (148 cm) ↔ 1.02 Łazienka (242 cm)',
-                    specs: '120 × 3,710 mm • 1,480 mm (148 cm) East of FW_1 (X = 15,415 mm)',
+                    axis: 'z', x1: 13255, z1: 3170, x2: 13375, z2: 7060,
+                    rooms: '1.03 Łazienka (224 cm) ↔ 1.02 Łazienka (236 cm)',
+                    specs: '120 × 3,890 mm • 2,240 mm (224 cm) East of FW_1 (X = 15,615 mm)',
                     doors: []
                 },
                 {
                     id: 'FW_4', name: 'FW_4 (1.03 Łazienka South Wall)',
-                    axis: 'x', x1: 13935, z1: 6760, x2: 15415, z2: 6880,
-                    rooms: '1.03 Łazienka (359 cm) ↔ 1.06 Korytarz',
-                    specs: '1,480 × 120 mm • 3,590 mm (359 cm) South of North inner wall (Z = 3,170 mm)',
+                    axis: 'x', x1: 13375, z1: 6940, x2: 15615, z2: 7060,
+                    rooms: '1.03 Łazienka (224 × 377 cm) ↔ 1.06 Korytarz',
+                    specs: '2,240 × 120 mm • 3,770 mm (377 cm) South of North inner wall (Z = 3,170 mm)',
                     doors: [
-                        { start: 14100, end: 14900, swingDir: -1, hingeStart: false }
+                        { start: 14045, end: 14945, swingDir: -1, hingeStart: false }
                     ]
                 },
                 {
                     id: 'FW_5', name: 'FW_5 (1.02 Łazienka / 1.01 Sypialnia)',
-                    axis: 'z', x1: 11255, z1: 3170, x2: 11375, z2: 6250,
-                    rooms: '1.02 Łazienka (242 cm) ↔ 1.01 Sypialnia',
-                    specs: '120 × 3,080 mm • 2,440 mm East of FW_3, between O11_2 and O15',
+                    axis: 'z', x1: 10775, z1: 3170, x2: 10895, z2: 7120,
+                    rooms: '1.02 Łazienka (236 cm) ↔ 1.01 Sypialnia (408 cm)',
+                    specs: '120 × 3,950 mm • 2,360 mm (236 cm) East of FW_3, aligned with FW_8 (408 cm West of UW_TERRACE_EAST)',
                     doors: []
                 },
                 {
                     id: 'FW_6', name: 'FW_6 (1.02 Łazienka South Wall)',
-                    axis: 'x', x1: 11375, z1: 6010, x2: 13815, z2: 6130,
-                    rooms: '1.02 Łazienka (284 cm) ↔ 1.06 Korytarz',
-                    specs: '2,440 × 120 mm • 2,840 mm (284 cm) South of North inner wall (Z = 3,170 mm)',
+                    axis: 'x', x1: 10895, z1: 6010, x2: 13255, z2: 6130,
+                    rooms: '1.02 Łazienka (236 × 284 cm) ↔ 1.06 Korytarz',
+                    specs: '2,360 × 120 mm • 2,840 mm (284 cm) South of North inner wall (Z = 3,170 mm)',
                     doors: [
-                        { start: 11850, end: 12650, swingDir: -1, hingeStart: true }
+                        { start: 11625, end: 12525, swingDir: -1, hingeStart: true }
                     ]
                 },
                 {
                     id: 'FW_7', name: 'FW_7 (1.01 Sypialnia South Wall)',
-                    axis: 'x', x1: 6695, z1: 6130, x2: 11255, z2: 6250,
-                    rooms: '1.01 Sypialnia (296 cm) ↔ 1.06 Korytarz & 1.08 Garderoba',
-                    specs: '4,560 × 120 mm • 2,960 mm (296 cm) South of North inner wall (Z = 3,170 mm)',
+                    axis: 'x', x1: 6695, z1: 6940, x2: 10775, z2: 7120,
+                    rooms: '1.01 Sypialnia (408 × 377 cm) ↔ 1.08 Garderoba (408 × 408 cm)',
+                    specs: '4,080 × 180 mm (18 cm structural wall) • 3,770 mm (377 cm) South of North inner wall (Z = 3,170 mm)',
                     doors: [
-                        { start: 10200, end: 11100, swingDir: -1, hingeStart: false }
+                        { start: 9725, end: 10625, swingDir: -1, hingeStart: false }
                     ]
                 },
                 {
                     id: 'FW_8', name: 'FW_8 (1.06 Korytarz / 1.08 Garderoba West Wall)',
-                    axis: 'z', x1: 10455, z1: 6250, x2: 10575, z2: 11200,
-                    rooms: '1.06 Korytarz & Schody (484 cm) ↔ 1.08 Garderoba (322 cm)',
-                    specs: '120 × 4,950 mm • 4,840 mm (484 cm) East of FW_1, immediately East of O12',
+                    axis: 'z', x1: 10775, z1: 7120, x2: 10895, z2: 11200,
+                    rooms: '1.06 Korytarz & Schody (472 cm) ↔ 1.08 Garderoba (408 cm)',
+                    specs: '120 × 4,080 mm • Aligned with FW_5 (4,080 mm West of FW_9)',
                     doors: [
-                        { start: 6450, end: 7350, swingDir: -1, hingeStart: true }
+                        { start: 7320, end: 8220, swingDir: -1, hingeStart: true }
                     ]
                 },
                 {
                     id: 'FW_9', name: 'FW_9 (1.08 Garderoba East Wall)',
-                    axis: 'z', x1: 7095, z1: 6250, x2: 7215, z2: 11200,
-                    rooms: '1.08 Garderoba (322 × 495 cm) ↔ Pustka nad salonem (+0.00)',
-                    specs: '120 × 4,950 mm • 3,240 mm East of FW_8, immediately East of SO3',
+                    axis: 'z', x1: 6515, z1: 6270, x2: 6695, z2: 11200,
+                    rooms: '1.08 Garderoba (408 × 408 cm) ↔ Pustka nad salonem (+0.00)',
+                    specs: '180 × 4,930 mm (18 cm structural wall) • Aligned with UW_TERRACE_EAST inner face (X = 6,695 mm), 4,080 mm (408 cm) East of FW_8',
                     doors: []
                 }
             ]
@@ -1194,14 +1189,14 @@
                 { code: '0.11', name: 'SALON', area: '31.08 m²', dims: '642 × 491 cm', x: 3400, z: 8700 }
             ],
             first: [
-                { code: '1.05', name: 'POKÓJ', area: '17.64 m²', dims: '479 × 359 cm', x: 17920, z: 4975 },
-                { code: '1.04', name: 'POKÓJ', area: '16.41 m²', dims: '479 × 432/301 cm', x: 18200, z: 9650 },
-                { code: '1.03', name: 'ŁAZIENKA', area: '5.28 m²', dims: '148 × 359 cm', x: 14675, z: 4975 },
-                { code: '1.02', name: 'ŁAZIENKA', area: '6.65 m²', dims: '244 × 284 cm', x: 12595, z: 4600 },
-                { code: '1.01', name: 'SYPIALNIA', area: '15.21 m²', dims: '456 × 296 cm', x: 8985, z: 4660 },
-                { code: '1.06', name: 'KORYTARZ', area: '15.02 m²', dims: '484 cm • +3.33 m', x: 13000, z: 8600 },
-                { code: '1.08', name: 'GARDEROBA', area: '16.48 m²', dims: '324 × 495 cm', x: 8835, z: 8715 },
-                { code: '±0.00', name: 'PUSTKA NAD SALONEM', area: 'Antresola', dims: '700 × 493 cm', x: 3600, z: 8715 }
+                { code: '1.05', name: 'POKÓJ', area: '17.64 m²', dims: '459 × 377 cm', x: 18030, z: 5055 },
+                { code: '1.04', name: 'POKÓJ', area: '16.41 m²', dims: '459 × 414/276 cm', x: 18250, z: 9750 },
+                { code: '1.03', name: 'ŁAZIENKA', area: '8.28 m²', dims: '224 × 377 cm', x: 14495, z: 5055 },
+                { code: '1.02', name: 'ŁAZIENKA', area: '6.65 m²', dims: '236 × 284 cm', x: 12075, z: 4600 },
+                { code: '1.01', name: 'SYPIALNIA', area: '15.21 m²', dims: '408 × 377 cm', x: 8735, z: 5055 },
+                { code: '1.06', name: 'KORYTARZ', area: '15.02 m²', dims: '472 cm • +3.33 m', x: 13250, z: 8600 },
+                { code: '1.08', name: 'GARDEROBA', area: '16.48 m²', dims: '408 × 408 cm', x: 8735, z: 9160 },
+                { code: '±0.00', name: 'PUSTKA NAD SALONEM', area: 'Antresola', dims: '642 × 493 cm', x: 3300, z: 8715 }
             ]
         };
 
@@ -1709,56 +1704,132 @@
 
         // Render an opening (window, HST sliding door, garage door, entrance door) in top-down 2D plan
         function renderOpening2D(op, openingsGroup, jambsGroup) {
+            // Ensure ordered sub-layers exist inside openingsGroup so wall cutouts never paint over adjacent corner window frames
+            if (!openingsGroup._subLayers) {
+                const cutoutsG = svgEl('g', { class: 'openings-cutouts' });
+                const sillsG = svgEl('g', { class: 'openings-sills' });
+                const framesG = svgEl('g', { class: 'openings-frames' });
+                const mullionsG = svgEl('g', { class: 'openings-mullions' });
+                const tagsG = svgEl('g', { class: 'openings-tags' });
+                openingsGroup.appendChild(cutoutsG);
+                openingsGroup.appendChild(sillsG);
+                openingsGroup.appendChild(framesG);
+                openingsGroup.appendChild(mullionsG);
+                openingsGroup.appendChild(tagsG);
+                openingsGroup._subLayers = { cutoutsG, sillsG, framesG, mullionsG, tagsG };
+            }
+            const { cutoutsG, sillsG, framesG, mullionsG, tagsG } = openingsGroup._subLayers;
+
             const isSelected = (planState.selectedItem && planState.selectedItem.kind === 'opening' && planState.selectedItem.id === op.id);
             const jambDepth = 200; // 200 mm outer reveal setback
             const wallT = WALL_THICKNESS;
+            const innerDepth = wallT - jambDepth; // 180 mm inner structural reveal
+            const frameThick = 90; // 90 mm window frame / corner post thickness
 
             let x1, x2, z1, z2;
             let frameX1, frameX2, frameZ1, frameZ2;
+            const spanFrameStart = op.cornerJoinStart ? (op.start + frameThick) : op.start;
+            const spanFrameEnd = op.cornerJoinEnd ? (op.end - frameThick) : op.end;
 
             if (op.axis === 'x') {
                 const outerZ = op.fixedZ;
                 const innerZ = outerZ + op.inwardSign * wallT;
                 const jambZ = outerZ + op.inwardSign * jambDepth;
-                const cutStart = op.cornerJoinStart ? (op.start - 200) : op.start;
-                const cutEnd = op.cornerJoinEnd ? (op.end + 200) : op.end;
+                const cutStart = op.cornerJoinStart ? (op.start - jambDepth) : op.start;
+                const cutEnd = op.cornerJoinEnd ? (op.end + jambDepth) : op.end;
+                const innerStart = op.cornerJoinStart ? (op.start + innerDepth) : op.start;
+                const innerEnd = op.cornerJoinEnd ? (op.end - innerDepth) : op.end;
 
                 x1 = cutStart;
                 x2 = cutEnd;
                 z1 = Math.min(outerZ, innerZ);
                 z2 = Math.max(outerZ, innerZ);
 
-                frameX1 = op.start;
-                frameX2 = op.end;
-                frameZ1 = Math.min(jambZ, jambZ + op.inwardSign * 90);
-                frameZ2 = Math.max(jambZ, jambZ + op.inwardSign * 90);
+                frameX1 = spanFrameStart;
+                frameX2 = spanFrameEnd;
+                frameZ1 = Math.min(jambZ, jambZ + op.inwardSign * frameThick);
+                frameZ2 = Math.max(jambZ, jambZ + op.inwardSign * frameThick);
+
+                // Outer and inner sill/reveal lines trimmed cleanly at 90° L-corners
+                sillsG.appendChild(svgEl('line', {
+                    x1: toSvgX(cutStart), y1: toSvgZ(outerZ),
+                    x2: toSvgX(cutEnd), y2: toSvgZ(outerZ),
+                    stroke: '#334155', 'stroke-width': 16, 'stroke-linecap': 'square'
+                }));
+                sillsG.appendChild(svgEl('line', {
+                    x1: toSvgX(innerStart), y1: toSvgZ(innerZ),
+                    x2: toSvgX(innerEnd), y2: toSvgZ(innerZ),
+                    stroke: '#334155', 'stroke-width': 16, 'stroke-linecap': 'square'
+                }));
+                if (!op.cornerJoinStart) {
+                    sillsG.appendChild(svgEl('line', {
+                        x1: toSvgX(op.start), y1: toSvgZ(outerZ),
+                        x2: toSvgX(op.start), y2: toSvgZ(innerZ),
+                        stroke: '#334155', 'stroke-width': 16
+                    }));
+                }
+                if (!op.cornerJoinEnd) {
+                    sillsG.appendChild(svgEl('line', {
+                        x1: toSvgX(op.end), y1: toSvgZ(outerZ),
+                        x2: toSvgX(op.end), y2: toSvgZ(innerZ),
+                        stroke: '#334155', 'stroke-width': 16
+                    }));
+                }
             } else {
                 const outerX = op.fixedX;
                 const innerX = outerX + op.inwardSign * wallT;
                 const jambX = outerX + op.inwardSign * jambDepth;
-                const cutStart = op.cornerJoinStart ? (op.start - 200) : op.start;
-                const cutEnd = op.cornerJoinEnd ? (op.end + 200) : op.end;
+                const cutStart = op.cornerJoinStart ? (op.start - jambDepth) : op.start;
+                const cutEnd = op.cornerJoinEnd ? (op.end + jambDepth) : op.end;
+                const innerStart = op.cornerJoinStart ? (op.start + innerDepth) : op.start;
+                const innerEnd = op.cornerJoinEnd ? (op.end - innerDepth) : op.end;
 
                 x1 = Math.min(outerX, innerX);
                 x2 = Math.max(outerX, innerX);
                 z1 = cutStart;
                 z2 = cutEnd;
 
-                frameX1 = Math.min(jambX, jambX + op.inwardSign * 90);
-                frameX2 = Math.max(jambX, jambX + op.inwardSign * 90);
-                frameZ1 = op.start;
-                frameZ2 = op.end;
+                frameX1 = Math.min(jambX, jambX + op.inwardSign * frameThick);
+                frameX2 = Math.max(jambX, jambX + op.inwardSign * frameThick);
+                frameZ1 = spanFrameStart;
+                frameZ2 = spanFrameEnd;
+
+                // Outer and inner sill/reveal lines trimmed cleanly at 90° L-corners
+                sillsG.appendChild(svgEl('line', {
+                    x1: toSvgX(outerX), y1: toSvgZ(cutStart),
+                    x2: toSvgX(outerX), y2: toSvgZ(cutEnd),
+                    stroke: '#334155', 'stroke-width': 16, 'stroke-linecap': 'square'
+                }));
+                sillsG.appendChild(svgEl('line', {
+                    x1: toSvgX(innerX), y1: toSvgZ(innerStart),
+                    x2: toSvgX(innerX), y2: toSvgZ(innerEnd),
+                    stroke: '#334155', 'stroke-width': 16, 'stroke-linecap': 'square'
+                }));
+                if (!op.cornerJoinStart) {
+                    sillsG.appendChild(svgEl('line', {
+                        x1: toSvgX(outerX), y1: toSvgZ(op.start),
+                        x2: toSvgX(innerX), y2: toSvgZ(op.start),
+                        stroke: '#334155', 'stroke-width': 16
+                    }));
+                }
+                if (!op.cornerJoinEnd) {
+                    sillsG.appendChild(svgEl('line', {
+                        x1: toSvgX(outerX), y1: toSvgZ(op.end),
+                        x2: toSvgX(innerX), y2: toSvgZ(op.end),
+                        stroke: '#334155', 'stroke-width': 16
+                    }));
+                }
             }
 
-            // 1. Clear the wall cutout with floor slab fill so the opening cuts through the 400 mm wall
+            // 1. Clear the wall cutout with solid floor-slab fill (in bottom cutoutsG layer so it never covers perpendicular frames)
             const rx = Math.min(toSvgX(x1), toSvgX(x2));
             const rz = Math.min(toSvgZ(z1), toSvgZ(z2));
             const rw = Math.abs(toSvgX(x2) - toSvgX(x1));
             const rh = Math.abs(toSvgZ(z2) - toSvgZ(z1));
 
-            openingsGroup.appendChild(svgEl('rect', {
+            cutoutsG.appendChild(svgEl('rect', {
                 x: rx, y: rz, width: rw, height: rh,
-                fill: '#162033', stroke: '#334155', 'stroke-width': 16
+                fill: '#162033', stroke: 'none'
             }));
 
             // 2. Draw 200 mm Window Jambs (Ościeża in RAL 7021 #1f2421) at the non-corner ends of the opening
@@ -1826,7 +1897,28 @@
                 e.stopPropagation();
                 selectOpening(op.id);
             });
-            openingsGroup.appendChild(hitRect);
+            framesG.appendChild(hitRect);
+
+            // 3b. Architectural 90 × 90 mm Corner Mullion Post at 90° corner window joins (rendered once per corner by x-axis opening)
+            if (op.axis === 'x' && (op.cornerJoinStart || op.cornerJoinEnd)) {
+                const postX1 = op.cornerJoinStart ? op.start : (op.end - frameThick);
+                const postX2 = op.cornerJoinStart ? (op.start + frameThick) : op.end;
+                const px = Math.min(toSvgX(postX1), toSvgX(postX2));
+                const pz = fz;
+                const pw = Math.abs(toSvgX(postX2) - toSvgX(postX1));
+                const ph = fh;
+
+                // Outer 90 × 90 mm corner post matching window mullion style
+                mullionsG.appendChild(svgEl('rect', {
+                    x: px - 8, y: pz - 8, width: pw + 16, height: ph + 16,
+                    fill: '#0f172a', stroke: '#e2e8f0', 'stroke-width': 14
+                }));
+                // Inner structural core square
+                mullionsG.appendChild(svgEl('rect', {
+                    x: px + 20, y: pz + 20, width: Math.max(20, pw - 40), height: Math.max(20, ph - 40),
+                    fill: '#38bdf8', stroke: 'none'
+                }));
+            }
 
             // Entrance door Z1 outward swing arc on Ground Floor (opens outside to the West)
             if (op.type === 'entrance_door') {
@@ -1836,7 +1928,7 @@
                 const doorPlaneX = op.fixedX + op.inwardSign * 180;
                 const openX = doorPlaneX - op.inwardSign * doorLeafMm;
                 // Leaf in open 90 deg outward position
-                openingsGroup.appendChild(svgEl('line', {
+                framesG.appendChild(svgEl('line', {
                     x1: toSvgX(doorPlaneX), y1: toSvgZ(hingeZ),
                     x2: toSvgX(openX), y2: toSvgZ(hingeZ),
                     stroke: '#fbbf24', 'stroke-width': 32
@@ -1847,7 +1939,7 @@
                 const sx1 = toSvgX(openX);
                 const sy1 = toSvgZ(hingeZ);
                 const sweep = planState.westOnLeft ? 1 : 0;
-                openingsGroup.appendChild(svgEl('path', {
+                framesG.appendChild(svgEl('path', {
                     d: `M ${sx0} ${sy0} A ${doorLeafMm} ${doorLeafMm} 0 0 ${sweep} ${sx1} ${sy1}`,
                     fill: 'none', stroke: '#fbbf24', 'stroke-width': 20, 'stroke-dasharray': '80,60'
                 }));
@@ -1861,12 +1953,12 @@
                     const pos = op.start + (op.end - op.start) * ratio;
                     if (op.axis === 'x') {
                         const px = Math.min(toSvgX(pos - pW / 2), toSvgX(pos + pW / 2));
-                        openingsGroup.appendChild(svgEl('rect', {
+                        mullionsG.appendChild(svgEl('rect', {
                             x: px, y: fz - 15, width: pW, height: fh + 30,
                             fill: '#0f172a', stroke: '#e2e8f0', 'stroke-width': 14
                         }));
                     } else {
-                        openingsGroup.appendChild(svgEl('rect', {
+                        mullionsG.appendChild(svgEl('rect', {
                             x: fx - 15, y: pos - pW / 2, width: fw + 30, height: pW,
                             fill: '#0f172a', stroke: '#e2e8f0', 'stroke-width': 14
                         }));
@@ -1919,7 +2011,7 @@
                     'font-weight': 700,
                     'text-anchor': 'middle'
                 }, op.name));
-                openingsGroup.appendChild(tagG);
+                tagsG.appendChild(tagG);
             }
         }
 
@@ -2611,13 +2703,13 @@
 
                 // 4c) GW_7 (18 cm South wall of Garderoba & WC):
                 //     Garderoba: 14 cm left pier + 90 cm door + 213 cm right wall = 317 cm
-                //     WC: 104 cm left wall + 90 cm door + 6 cm right pier = 200 cm
+                //     WC: 104 cm left wall + 86 cm door (86×210 cm) + 10 cm right pier = 200 cm
                 drawWallSpanDim(group, 17445, 7980, 17305, 7980, -1);
                 drawWallSpanDim(group, 17305, 7980, 16405, 7980, -1);
                 drawWallSpanDim(group, 16405, 7980, 14275, 7980, -1);
                 drawWallSpanDim(group, 14095, 7980, 13055, 7980, -1);
-                drawWallSpanDim(group, 13055, 7980, 12155, 7980, -1);
-                drawWallSpanDim(group, 12155, 7980, 12095, 7980, -1);
+                drawWallSpanDim(group, 13055, 7980, 12195, 7980, -1);
+                drawWallSpanDim(group, 12195, 7980, 12095, 7980, -1);
 
                 // 5) Entrance Alcove, Wiatrołap (259 cm), GW_5 (8 cm), Komunikacja, Jadalnia & Salon bay (Z = 8620 / 10720 mm)
                 wallThick('EW_ALCOVE_WEST', 8950, 1);
@@ -2625,9 +2717,7 @@
                 wallThick('GW_5', 8620, 1);
                 wallSpan('EW_ALCOVE_WEST', 'GW_5', 10720, 1);
                 wallThick('GW_5', 10720, 1);
-                wallSpan('GW_5', 'GW_3b', 10720, 1);
-                wallThick('GW_3b', 11110, -1);
-                wallSpan('GW_3b', 'EW_EAST_CORE', 10720, -1);
+                wallSpan('GW_5', 'EW_EAST_CORE', 10720, -1);
 
                 // 5b) GW_9b corner pier (15 cm long, 12 cm thick at X = 15075..15225, Z = 11200..11320)
                 drawWallSpanDim(group, 15225, 11050, 15075, 11050, -1);
@@ -2713,7 +2803,7 @@
             } else {
                 // ---- UPPER FLOOR (PIĘTRO, A.03) ----
                 // ---- A. HORIZONTAL (EAST <-> WEST) ROOM SPANS & WALL THICKNESSES ----
-                // 1) North rooms: 1.05 Pokój (477 cm), 1.03 Łazienka (148 cm), 1.02 Łazienka (244 cm), 1.01 Sypialnia (454 cm)
+                // 1) North rooms: 1.05 Pokój (459 cm), 1.03 Łazienka (224 cm), 1.02 Łazienka (236 cm), 1.01 Sypialnia (408 cm)
                 wallThick('UW_WEST', 3650, 1);
                 wallSpan('UW_WEST', 'FW_1', 3650, 1);
                 wallThick('FW_1', 3650, 1);
@@ -2724,12 +2814,17 @@
                 wallSpan('FW_5', 'UW_TERRACE_EAST', 3650, 1);
                 wallThick('UW_TERRACE_EAST', 3650, 1);
 
-                // 2) 1.05 / 1.04 Alcove step row (292 cm + 12 cm + 173 cm at Z = 7350 mm)
-                wallSpan('UW_WEST', 'FW_2b', 7350, 1);
-                wallThick('FW_2b', 7350, 1);
-                wallSpan('FW_2b', 'FW_1', 7350, 1);
+                // 1b) FW_2a horizontal segments: from the right 70 cm wall + 90 cm door (90×210) + 299 cm left wall = 459 cm
+                drawWallSpanDim(group, 20325, 6780, 17335, 6780, -1);
+                drawWallSpanDim(group, 17335, 6780, 16435, 6780, -1);
+                drawWallSpanDim(group, 16435, 6780, 15735, 6780, -1);
 
-                // 3) South rooms: 1.04 Pokój (477 cm), 1.06 Korytarz (484 cm), 1.08 Garderoba (324 cm), Void (698 cm)
+                // 2) 1.05 / 1.04 Alcove step row (287 cm + 12 cm + 160 cm at Z = 7600 mm)
+                wallSpan('UW_WEST', 'FW_2b', 7600, 1);
+                wallThick('FW_2b', 7600, 1);
+                wallSpan('FW_2b', 'FW_1', 7600, 1);
+
+                // 3) South rooms: 1.04 Pokój (459 cm), 1.06 Korytarz (472 cm), 1.08 Garderoba (408 cm), FW_9 (18 cm), Void (642 cm)
                 wallSpan('UW_WEST', 'FW_1', 10680, -1);
                 wallThick('FW_1', 10680, -1);
                 wallSpan('FW_1', 'FW_8', 10680, -1);
@@ -2740,28 +2835,28 @@
                 wallThick('UW_EAST', 10680, -1);
 
                 // ---- B. VERTICAL (NORTH <-> SOUTH) ROOM SPANS & WALL THICKNESSES ----
-                // 1) West side: 1.05 Pokój (357 cm) + 12 cm + 1.04 Pokój (430 cm) (X = 19750 mm)
+                // 1) West side: 1.05 Pokój (377 cm) + 12 cm + 1.04 Pokój (414 cm) (X = 19750 mm)
                 wallThick('UW_NORTH_MAIN', 17500, 1);
                 wallSpan('UW_NORTH_MAIN', 'FW_2a', 19750, 1);
                 wallThick('FW_2a', 19750, 1);
                 wallSpan('FW_2a', 'UW_SOUTH', 19750, 1);
                 wallThick('UW_SOUTH', 17500, -1);
 
-                // 2) Alcove step: 119 cm + 12 cm + 299 cm (X = 16950 mm)
-                wallSpan('FW_2a', 'FW_2c', 16950, 1);
-                wallThick('FW_2c', 16950, 1);
-                wallSpan('FW_2c', 'UW_SOUTH', 16950, 1);
+                // 2) Alcove step: 126 cm + 12 cm + 276 cm (X = 16150 mm)
+                wallSpan('FW_2a', 'FW_2c', 16150, 1);
+                wallThick('FW_2c', 16150, 1);
+                wallSpan('FW_2c', 'UW_SOUTH', 16150, 1);
 
-                // 3) 1.03 Łazienka (357 cm at X = 15100 mm)
-                wallSpan('UW_NORTH_MAIN', 'FW_4', 15100, 1);
-                wallThick('FW_4', 15100, 1);
+                // 3) 1.03 Łazienka (377 cm at X = 14495 mm)
+                wallSpan('UW_NORTH_MAIN', 'FW_4', 14495, 1);
+                wallThick('FW_4', 14495, 1);
 
-                // 4) 1.02 Łazienka (282 cm) & 1.06 Korytarz (505 cm) (X = 13350 mm)
-                wallSpan('UW_NORTH_MAIN', 'FW_6', 13350, 1);
-                wallThick('FW_6', 13350, 1);
-                wallSpan('FW_6', 'UW_SOUTH', 13350, 1);
+                // 4) 1.02 Łazienka (298 cm) & 1.06 Korytarz (493 cm) (X = 12075 mm)
+                wallSpan('UW_NORTH_MAIN', 'FW_6', 12075, 1);
+                wallThick('FW_6', 12075, 1);
+                wallSpan('FW_6', 'UW_SOUTH', 12075, 1);
 
-                // 5) 1.01 Sypialnia (294 cm) & 1.08 Garderoba (493 cm) (X = 7650 mm)
+                // 5) 1.01 Sypialnia (377 cm) + FW_7 (18 cm) + 1.08 Garderoba (408 cm) (X = 7650 mm)
                 wallSpan('UW_NORTH_MAIN', 'FW_7', 7650, -1);
                 wallThick('FW_7', 7650, -1);
                 wallSpan('FW_7', 'UW_SOUTH', 7650, -1);
@@ -2986,13 +3081,13 @@
             }
 
             if (floor === 'first') {
-                // Double-height void (Pustka nad salonem ±0.00) East of FW_9 (X = 95..7095, Z = 6270..11200)
+                // Double-height void (Pustka nad salonem ±0.00) East of FW_9 (X = 95..6515, Z = 6270..11200)
                 group.appendChild(svgEl('line', {
-                    x1: toSvgX(95), y1: toSvgZ(6270), x2: toSvgX(7095), y2: toSvgZ(11200),
+                    x1: toSvgX(95), y1: toSvgZ(6270), x2: toSvgX(6515), y2: toSvgZ(11200),
                     stroke: 'rgba(148, 163, 184, 0.25)', 'stroke-width': 14, 'stroke-dasharray': '120,90'
                 }));
                 group.appendChild(svgEl('line', {
-                    x1: toSvgX(7095), y1: toSvgZ(6270), x2: toSvgX(95), y2: toSvgZ(11200),
+                    x1: toSvgX(6515), y1: toSvgZ(6270), x2: toSvgX(95), y2: toSvgZ(11200),
                     stroke: 'rgba(148, 163, 184, 0.25)', 'stroke-width': 14, 'stroke-dasharray': '120,90'
                 }));
             }
