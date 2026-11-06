@@ -711,7 +711,7 @@
                 zBottom: 3430,
                 zTop: 6130,
                 rooms: 'NE Covered Balcony (N) ↔ Pustka nad salonem',
-                specs: '6,600 mm (plan) / 6,315 mm (balcony clear span) × 380 mm (38 cm) • Recessed 3,100 mm South behind NE terrace',
+                specs: '6,400 mm (plan) / 6,115 mm (balcony clear span) × 380 mm (38 cm) • Recessed 3,100 mm South behind NE terrace',
                 openings: [],
                 doors: [],
                 sides: [
@@ -722,11 +722,11 @@
                         materialLabel: 'Vertical Natural Timber Slat Cladding',
                         normal: [0, -1, 0],
                         p1: [-285, 5890],
-                        p2: [6315, 5890],
+                        p2: [6115, 5890],
                         outerLoop: [
                             [-285, 5890, 3430],
-                            [6315, 5890, 3430],
-                            [6315, 5890, 6130],
+                            [6115, 5890, 3430],
+                            [6115, 5890, 6130],
                             [-285, 5890, 6130]
                         ],
                         holes: []
@@ -737,13 +737,13 @@
                         material: 'plaster_white',
                         materialLabel: 'Interior Gypsum Plaster',
                         normal: [0, 1, 0],
-                        p1: [6695, 6270],
+                        p1: [6495, 6270],
                         p2: [95, 6270],
                         outerLoop: [
-                            [6695, 6270, 3430],
+                            [6495, 6270, 3430],
                             [95, 6270, 3430],
                             [95, 6270, 6130],
-                            [6695, 6270, 6130]
+                            [6495, 6270, 6130]
                         ],
                         holes: []
                     }
@@ -768,13 +768,13 @@
                         material: 'timber_slats',
                         materialLabel: 'Vertical Natural Timber Slat Cladding',
                         normal: [-1, 0, 0],
-                        p1: [6315, 5890],
-                        p2: [6315, 2790],
+                        p1: [6115, 5890],
+                        p2: [6115, 2790],
                         outerLoop: [
-                            [6315, 5890, 3430],
-                            [6315, 5800, 3430],
-                            [6315, 5800, 6130],
-                            [6315, 5890, 6130]
+                            [6115, 5890, 3430],
+                            [6115, 5800, 3430],
+                            [6115, 5800, 6130],
+                            [6115, 5890, 6130]
                         ],
                         holes: []
                     },
@@ -784,13 +784,13 @@
                         material: 'plaster_white',
                         materialLabel: 'Interior Gypsum Plaster',
                         normal: [1, 0, 0],
-                        p1: [6695, 3170],
-                        p2: [6695, 6270],
+                        p1: [6495, 3170],
+                        p2: [6495, 6270],
                         outerLoop: [
-                            [6695, 5800, 3430],
-                            [6695, 6270, 3430],
-                            [6695, 6270, 6130],
-                            [6695, 5800, 6130]
+                            [6495, 5800, 3430],
+                            [6495, 6270, 3430],
+                            [6495, 6270, 6130],
+                            [6495, 5800, 6130]
                         ],
                         holes: []
                     }
@@ -805,7 +805,7 @@
                 zBottom: 3430,
                 zTop: 6130,
                 rooms: 'North Garden (N) ↔ 1.01 Sypialnia, 1.02 Łazienka, 1.03 Łazienka & 1.05 Pokój',
-                specs: '14,390 mm (plan) / 14,190 mm (excl. 200 mm right jamb) × 380 mm (38 cm) • Starts at X=7,505 after full-height corner window 14a and notches down to Z=4,180 for NW corner window O13a',
+                specs: '14,590 mm (plan) / 14,390 mm (excl. 200 mm right jamb) × 380 mm (38 cm) • Starts at X=7,305 after full-height corner window 14a and notches down to Z=4,180 for NW corner window O13a',
                 openings: ['14a', 'O15', 'O11_1', 'O11_2', 'O11_3', 'O13a'],
                 doors: [],
                 sides: [
@@ -815,15 +815,15 @@
                         material: 'timber_slats',
                         materialLabel: 'Vertical Natural Timber Slat Cladding',
                         normal: [0, -1, 0],
-                        p1: [6315, 2790],
+                        p1: [6115, 2790],
                         p2: [20705, 2790],
                         outerLoop: [
-                            [7505, 2790, 3430],
+                            [7305, 2790, 3430],
                             [20705, 2790, 3430],
                             [20705, 2790, 4180],
                             [18125, 2790, 4180],
                             [18125, 2790, 6130],
-                            [7505, 2790, 6130]
+                            [7305, 2790, 6130]
                         ],
                         holes: [
                             {
@@ -865,11 +865,11 @@
                         materialLabel: 'Interior Gypsum Plaster',
                         normal: [0, 1, 0],
                         p1: [20325, 3170],
-                        p2: [6695, 3170],
+                        p2: [6495, 3170],
                         outerLoop: [
                             [20325, 3170, 3430],
-                            [7505, 3170, 3430],
-                            [7505, 3170, 6130],
+                            [7305, 3170, 3430],
+                            [7305, 3170, 6130],
                             [18125, 3170, 6130],
                             [18125, 3170, 4180],
                             [20325, 3170, 4180]
@@ -2059,37 +2059,31 @@
             // =========================================================================
             {
                 id: 'FW_1',
-                name: 'FW_1 (1.05 & 1.04 Pokój East Wall)',
+                name: 'FW_1 (1.05 Pokój / 1.03 Łazienka Wall)',
                 floor: 'first',
                 category: 'internal',
                 axis: 'y',
-                x1: 15615, y1: 3170, x2: 15735, y2: 11200,
+                x1: 15435, y1: 3170, x2: 15555, y2: 6940,
                 thickness: 120,
                 zBottom: 3430,
                 zTop: 6130,
-                rooms: '1.05 Pokój & 1.04 Pokój (459 cm) ↔ 1.03 Łazienka (224 cm) & 1.06 Korytarz (472 cm)',
-                specs: '120 × 8,030 mm • 389 cm upper wall (Z=3170..7060) + 138 cm open alcove passage (Z=7060..8440) + 276 cm lower wall (Z=8440..11200)',
+                rooms: '1.05 Pokój (477 cm) ↔ 1.03 Łazienka (226 cm)',
+                specs: '120 × 3,770 mm (377 cm) • Upper partition wall between 1.05 Pokój (477 cm) and 1.03 Łazienka (226 cm) (Z=3,170..6,940 mm)',
                 openings: [],
-                doors: [
-                    { id: 'D_FW1_1', start: 7060, end: 8440, sillMm: 0, heightMm: 2100, swingDir: 1, hingeStart: true }
-                ],
+                doors: [],
                 sides: [
                     {
                         id: 'FW_1_EAST',
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [-1, 0, 0],
-                        p1: [15615, 11200],
-                        p2: [15615, 3170],
+                        p1: [15435, 6940],
+                        p2: [15435, 3170],
                         outerLoop: [
-                            [15615, 11200, 3430],
-                            [15615, 8440, 3430],
-                            [15615, 8440, 5530],
-                            [15615, 7060, 5530],
-                            [15615, 7060, 3430],
-                            [15615, 3170, 3430],
-                            [15615, 3170, 6130],
-                            [15615, 11200, 6130]
+                            [15435, 6940, 3430],
+                            [15435, 3170, 3430],
+                            [15435, 3170, 6130],
+                            [15435, 6940, 6130]
                         ],
                         holes: []
                     },
@@ -2098,17 +2092,60 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [1, 0, 0],
-                        p1: [15735, 3170],
-                        p2: [15735, 11200],
+                        p1: [15555, 3170],
+                        p2: [15555, 6940],
                         outerLoop: [
-                            [15735, 3170, 3430],
-                            [15735, 7060, 3430],
-                            [15735, 7060, 5530],
-                            [15735, 8440, 5530],
-                            [15735, 8440, 3430],
-                            [15735, 11200, 3430],
-                            [15735, 11200, 6130],
-                            [15735, 3170, 6130]
+                            [15555, 3170, 3430],
+                            [15555, 6940, 3430],
+                            [15555, 6940, 6130],
+                            [15555, 3170, 6130]
+                        ],
+                        holes: []
+                    }
+                ]
+            },
+            {
+                id: 'FW_1b',
+                name: 'FW_1b (1.04 Pokój / 1.06 Korytarz Wall)',
+                floor: 'first',
+                category: 'internal',
+                axis: 'y',
+                x1: 15535, y1: 8440, x2: 15655, y2: 11200,
+                thickness: 120,
+                zBottom: 3430,
+                zTop: 6130,
+                rooms: '1.04 Pokój (467 cm) ↔ 1.06 Korytarz (484 cm)',
+                specs: '120 × 2,760 mm (276 cm) • Stepped West of FW_1 so East face is at X=15,535 mm (484 cm West of FW_8 at X=10,695 mm)',
+                openings: [],
+                doors: [],
+                sides: [
+                    {
+                        id: 'FW_1b_EAST',
+                        role: 'interior',
+                        material: 'plaster_white',
+                        normal: [-1, 0, 0],
+                        p1: [15535, 11200],
+                        p2: [15535, 8440],
+                        outerLoop: [
+                            [15535, 11200, 3430],
+                            [15535, 8440, 3430],
+                            [15535, 8440, 6130],
+                            [15535, 11200, 6130]
+                        ],
+                        holes: []
+                    },
+                    {
+                        id: 'FW_1b_WEST',
+                        role: 'interior',
+                        material: 'plaster_white',
+                        normal: [1, 0, 0],
+                        p1: [15655, 8440],
+                        p2: [15655, 11200],
+                        outerLoop: [
+                            [15655, 8440, 3430],
+                            [15655, 11200, 3430],
+                            [15655, 11200, 6130],
+                            [15655, 8440, 6130]
                         ],
                         holes: []
                     }
@@ -2116,19 +2153,20 @@
             },
             {
                 id: 'FW_2a',
-                name: 'FW_2a (1.05 Pokój / 1.04 Pokój & Alcove Partition)',
+                name: 'FW_2a (1.05 Pokój, 1.03 & 1.02 Łazienka South 18 cm Structural Wall)',
                 floor: 'first',
                 category: 'internal',
                 axis: 'x',
-                x1: 15735, y1: 6940, x2: 20325, y2: 7060,
-                thickness: 120,
+                x1: 10575, y1: 6940, x2: 20325, y2: 7120,
+                thickness: 180,
                 zBottom: 3430,
                 zTop: 6130,
-                rooms: '1.05 Pokój (377 cm) ↔ Alcove & 1.04 Pokój',
-                specs: '4,590 × 120 mm • 3,770 mm (377 cm) South of North inner wall; from right (FW_1): 70 cm wall (X=15735..16435) + 90×210 cm door (X=16435..17335) + 299 cm wall (X=17335..20325)',
+                rooms: '1.05 Pokój, 1.03 Łazienka & 1.02 Łazienka (377 cm) ↔ 1.06 Korytarz & 1.04 Pokój (408 cm)',
+                specs: '9,750 × 180 mm (18 cm structural wall) • Continuous from UW_WEST (20,325) to East end of 1.02 Łazienka (10,575); 68+90+68 cm in 1.03 Łazienka, 70+90+317 cm in 1.05 Pokój',
                 openings: [],
                 doors: [
-                    { id: 'D_FW2a_1', start: 16435, end: 17335, sillMm: 0, heightMm: 2100, swingDir: -1, hingeStart: false }
+                    { id: 'D_FW4_1', start: 13855, end: 14755, sillMm: 0, heightMm: 2100, swingDir: -1, hingeStart: false },
+                    { id: 'D_FW2a_1', start: 16255, end: 17155, sillMm: 0, heightMm: 2100, swingDir: -1, hingeStart: false }
                 ],
                 sides: [
                     {
@@ -2136,17 +2174,21 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [0, -1, 0],
-                        p1: [15735, 6940],
+                        p1: [10575, 6940],
                         p2: [20325, 6940],
                         outerLoop: [
-                            [15735, 6940, 3430],
-                            [16435, 6940, 3430],
-                            [16435, 6940, 5530],
-                            [17335, 6940, 5530],
-                            [17335, 6940, 3430],
+                            [10575, 6940, 3430],
+                            [13855, 6940, 3430],
+                            [13855, 6940, 5530],
+                            [14755, 6940, 5530],
+                            [14755, 6940, 3430],
+                            [16255, 6940, 3430],
+                            [16255, 6940, 5530],
+                            [17155, 6940, 5530],
+                            [17155, 6940, 3430],
                             [20325, 6940, 3430],
                             [20325, 6940, 6130],
-                            [15735, 6940, 6130]
+                            [10575, 6940, 6130]
                         ],
                         holes: []
                     },
@@ -2155,17 +2197,21 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [0, 1, 0],
-                        p1: [20325, 7060],
-                        p2: [15735, 7060],
+                        p1: [20325, 7120],
+                        p2: [10575, 7120],
                         outerLoop: [
-                            [20325, 7060, 3430],
-                            [17335, 7060, 3430],
-                            [17335, 7060, 5530],
-                            [16435, 7060, 5530],
-                            [16435, 7060, 3430],
-                            [15735, 7060, 3430],
-                            [15735, 7060, 6130],
-                            [20325, 7060, 6130]
+                            [20325, 7120, 3430],
+                            [17155, 7120, 3430],
+                            [17155, 7120, 5530],
+                            [16255, 7120, 5530],
+                            [16255, 7120, 3430],
+                            [14755, 7120, 3430],
+                            [14755, 7120, 5530],
+                            [13855, 7120, 5530],
+                            [13855, 7120, 3430],
+                            [10575, 7120, 3430],
+                            [10575, 7120, 6130],
+                            [20325, 7120, 6130]
                         ],
                         holes: []
                     }
@@ -2177,12 +2223,12 @@
                 floor: 'first',
                 category: 'internal',
                 axis: 'y',
-                x1: 17335, y1: 7060, x2: 17455, y2: 8320,
+                x1: 17255, y1: 7120, x2: 17375, y2: 8320,
                 thickness: 120,
                 zBottom: 3430,
                 zTop: 6130,
-                rooms: '1.04 Pokój ↔ Doorway Alcove',
-                specs: '120 × 1,260 mm • Vertical step wall immediately West of the 90×210 cm door in FW_2a (X=17335..17455)',
+                rooms: '1.04 Pokój ↔ Doorway Alcove (172 cm)',
+                specs: '120 × 1,200 mm • 1,720 mm (172 cm) West of X=15,535 mm (X=17,255..17,375 mm)',
                 openings: [],
                 doors: [],
                 sides: [
@@ -2191,9 +2237,9 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [-1, 0, 0],
-                        p1: [17335, 8320],
-                        p2: [17335, 7060],
-                        outerLoop: [[17335, 8320, 3430], [17335, 7060, 3430], [17335, 7060, 6130], [17335, 8320, 6130]],
+                        p1: [17255, 8320],
+                        p2: [17255, 7120],
+                        outerLoop: [[17255, 8320, 3430], [17255, 7120, 3430], [17255, 7120, 6130], [17255, 8320, 6130]],
                         holes: []
                     },
                     {
@@ -2201,9 +2247,9 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [1, 0, 0],
-                        p1: [17455, 7060],
-                        p2: [17455, 8320],
-                        outerLoop: [[17455, 7060, 3430], [17455, 8320, 3430], [17455, 8320, 6130], [17455, 7060, 6130]],
+                        p1: [17375, 7120],
+                        p2: [17375, 8320],
+                        outerLoop: [[17375, 7120, 3430], [17375, 8320, 3430], [17375, 8320, 6130], [17375, 7120, 6130]],
                         holes: []
                     }
                 ]
@@ -2214,15 +2260,15 @@
                 floor: 'first',
                 category: 'internal',
                 axis: 'x',
-                x1: 15735, y1: 8320, x2: 17455, y2: 8440,
+                x1: 15535, y1: 8320, x2: 17375, y2: 8440,
                 thickness: 120,
                 zBottom: 3430,
                 zTop: 6130,
-                rooms: '1.05 Pokój Alcove ↔ 1.04 Pokój (276 cm)',
-                specs: '1,720 × 120 mm • 2,760 mm (276 cm) North of South inner wall (Z=11,200 mm); doorway notch X=16365..17265, Y=3430..5530 mm',
+                rooms: 'Doorway Alcove (172 cm) ↔ 1.04 Pokój (276 cm)',
+                specs: '1,840 × 120 mm (172 cm alcove span + 12 cm FW_2b) • From right (X=15,535 mm): 75 cm wall (X=15535..16285) + 90×210 cm door (X=16285..17185) + 7 cm pier to FW_2b (X=17185..17255)',
                 openings: [],
                 doors: [
-                    { id: 'D_FW2c_1', start: 16365, end: 17265, sillMm: 0, heightMm: 2100, swingDir: 1, hingeStart: true }
+                    { id: 'D_FW2c_1', start: 16285, end: 17185, sillMm: 0, heightMm: 2100, swingDir: 1, hingeStart: true }
                 ],
                 sides: [
                     {
@@ -2230,17 +2276,17 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [0, -1, 0],
-                        p1: [15735, 8320],
-                        p2: [17455, 8320],
+                        p1: [15535, 8320],
+                        p2: [17375, 8320],
                         outerLoop: [
-                            [15735, 8320, 3430],
-                            [16365, 8320, 3430],
-                            [16365, 8320, 5530],
-                            [17265, 8320, 5530],
-                            [17265, 8320, 3430],
-                            [17455, 8320, 3430],
-                            [17455, 8320, 6130],
-                            [15735, 8320, 6130]
+                            [15535, 8320, 3430],
+                            [16285, 8320, 3430],
+                            [16285, 8320, 5530],
+                            [17185, 8320, 5530],
+                            [17185, 8320, 3430],
+                            [17375, 8320, 3430],
+                            [17375, 8320, 6130],
+                            [15535, 8320, 6130]
                         ],
                         holes: []
                     },
@@ -2249,17 +2295,17 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [0, 1, 0],
-                        p1: [17455, 8440],
-                        p2: [15735, 8440],
+                        p1: [17375, 8440],
+                        p2: [15535, 8440],
                         outerLoop: [
-                            [17455, 8440, 3430],
-                            [17265, 8440, 3430],
-                            [17265, 8440, 5530],
-                            [16365, 8440, 5530],
-                            [16365, 8440, 3430],
-                            [15735, 8440, 3430],
-                            [15735, 8440, 6130],
-                            [17455, 8440, 6130]
+                            [17375, 8440, 3430],
+                            [17185, 8440, 3430],
+                            [17185, 8440, 5530],
+                            [16285, 8440, 5530],
+                            [16285, 8440, 3430],
+                            [15535, 8440, 3430],
+                            [15535, 8440, 6130],
+                            [17375, 8440, 6130]
                         ],
                         holes: []
                     }
@@ -2271,12 +2317,12 @@
                 floor: 'first',
                 category: 'internal',
                 axis: 'y',
-                x1: 13255, y1: 3170, x2: 13375, y2: 7060,
+                x1: 13055, y1: 3170, x2: 13175, y2: 6940,
                 thickness: 120,
                 zBottom: 3430,
                 zTop: 6130,
-                rooms: '1.03 Łazienka (224 cm) ↔ 1.02 Łazienka (236 cm)',
-                specs: '120 × 3,890 mm • 2,240 mm (224 cm) East of FW_1 (X = 15,615 mm)',
+                rooms: '1.03 Łazienka (226 cm) ↔ 1.02 Łazienka (236 cm)',
+                specs: '120 × 3,770 mm (377 cm) • 2,260 mm (226 cm) East of FW_1 (X = 15,435 mm), terminates at FW_2a (Z = 6,940 mm)',
                 openings: [],
                 doors: [],
                 sides: [
@@ -2285,9 +2331,9 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [-1, 0, 0],
-                        p1: [13255, 7060],
-                        p2: [13255, 3170],
-                        outerLoop: [[13255, 7060, 3430], [13255, 3170, 3430], [13255, 3170, 6130], [13255, 7060, 6130]],
+                        p1: [13055, 6940],
+                        p2: [13055, 3170],
+                        outerLoop: [[13055, 6940, 3430], [13055, 3170, 3430], [13055, 3170, 6130], [13055, 6940, 6130]],
                         holes: []
                     },
                     {
@@ -2295,66 +2341,9 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [1, 0, 0],
-                        p1: [13375, 3170],
-                        p2: [13375, 7060],
-                        outerLoop: [[13375, 3170, 3430], [13375, 7060, 3430], [13375, 7060, 6130], [13375, 3170, 6130]],
-                        holes: []
-                    }
-                ]
-            },
-            {
-                id: 'FW_4',
-                name: 'FW_4 (1.03 Łazienka South Wall)',
-                floor: 'first',
-                category: 'internal',
-                axis: 'x',
-                x1: 13375, y1: 6940, x2: 15615, y2: 7060,
-                thickness: 120,
-                zBottom: 3430,
-                zTop: 6130,
-                rooms: '1.03 Łazienka (224 × 377 cm) ↔ 1.06 Korytarz',
-                specs: '2,240 × 120 mm • 3,770 mm (377 cm) South of North inner wall; doorway notch X=14045..14945, Y=3430..5530 mm',
-                openings: [],
-                doors: [
-                    { id: 'D_FW4_1', start: 14045, end: 14945, sillMm: 0, heightMm: 2100, swingDir: -1, hingeStart: false }
-                ],
-                sides: [
-                    {
-                        id: 'FW_4_NORTH',
-                        role: 'interior',
-                        material: 'plaster_white',
-                        normal: [0, -1, 0],
-                        p1: [13375, 6940],
-                        p2: [15615, 6940],
-                        outerLoop: [
-                            [13375, 6940, 3430],
-                            [14045, 6940, 3430],
-                            [14045, 6940, 5530],
-                            [14945, 6940, 5530],
-                            [14945, 6940, 3430],
-                            [15615, 6940, 3430],
-                            [15615, 6940, 6130],
-                            [13375, 6940, 6130]
-                        ],
-                        holes: []
-                    },
-                    {
-                        id: 'FW_4_SOUTH',
-                        role: 'interior',
-                        material: 'plaster_white',
-                        normal: [0, 1, 0],
-                        p1: [15615, 7060],
-                        p2: [13375, 7060],
-                        outerLoop: [
-                            [15615, 7060, 3430],
-                            [14945, 7060, 3430],
-                            [14945, 7060, 5530],
-                            [14045, 7060, 5530],
-                            [14045, 7060, 3430],
-                            [13375, 7060, 3430],
-                            [13375, 7060, 6130],
-                            [15615, 7060, 6130]
-                        ],
+                        p1: [13175, 3170],
+                        p2: [13175, 6940],
+                        outerLoop: [[13175, 3170, 3430], [13175, 6940, 3430], [13175, 6940, 6130], [13175, 3170, 6130]],
                         holes: []
                     }
                 ]
@@ -2365,23 +2354,34 @@
                 floor: 'first',
                 category: 'internal',
                 axis: 'y',
-                x1: 10775, y1: 3170, x2: 10895, y2: 7120,
+                x1: 10575, y1: 3170, x2: 10695, y2: 6940,
                 thickness: 120,
                 zBottom: 3430,
                 zTop: 6130,
                 rooms: '1.02 Łazienka (236 cm) ↔ 1.01 Sypialnia (408 cm)',
-                specs: '120 × 3,950 mm • 2,360 mm (236 cm) East of FW_3, aligned with FW_8 (408 cm West of UW_TERRACE_EAST)',
+                specs: '120 × 3,770 mm (377 cm) • 139 cm North pier (Z=3170..4560) + 90×210 cm door (Z=4560..5460) + 148 cm South pier (Z=5460..6940)',
                 openings: [],
-                doors: [],
+                doors: [
+                    { id: 'D_FW5_1', start: 4560, end: 5460, sillMm: 0, heightMm: 2100, swingDir: -1, hingeStart: true }
+                ],
                 sides: [
                     {
                         id: 'FW_5_EAST',
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [-1, 0, 0],
-                        p1: [10775, 7120],
-                        p2: [10775, 3170],
-                        outerLoop: [[10775, 7120, 3430], [10775, 3170, 3430], [10775, 3170, 6130], [10775, 7120, 6130]],
+                        p1: [10575, 6940],
+                        p2: [10575, 3170],
+                        outerLoop: [
+                            [10575, 6940, 3430],
+                            [10575, 5460, 3430],
+                            [10575, 5460, 5530],
+                            [10575, 4560, 5530],
+                            [10575, 4560, 3430],
+                            [10575, 3170, 3430],
+                            [10575, 3170, 6130],
+                            [10575, 6940, 6130]
+                        ],
                         holes: []
                     },
                     {
@@ -2389,65 +2389,17 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [1, 0, 0],
-                        p1: [10895, 3170],
-                        p2: [10895, 7120],
-                        outerLoop: [[10895, 3170, 3430], [10895, 7120, 3430], [10895, 7120, 6130], [10895, 3170, 6130]],
-                        holes: []
-                    }
-                ]
-            },
-            {
-                id: 'FW_6',
-                name: 'FW_6 (1.02 Łazienka South Wall)',
-                floor: 'first',
-                category: 'internal',
-                axis: 'x',
-                x1: 10895, y1: 6010, x2: 13255, y2: 6130,
-                thickness: 120,
-                zBottom: 3430,
-                zTop: 6130,
-                rooms: '1.02 Łazienka (236 × 284 cm) ↔ 1.06 Korytarz',
-                specs: '2,360 × 120 mm • Doorway notch X=11625..12525, Y=3430..5530 mm',
-                openings: [],
-                doors: [
-                    { id: 'D_FW6_1', start: 11625, end: 12525, sillMm: 0, heightMm: 2100, swingDir: -1, hingeStart: true }
-                ],
-                sides: [
-                    {
-                        id: 'FW_6_NORTH',
-                        role: 'interior',
-                        material: 'plaster_white',
-                        normal: [0, -1, 0],
-                        p1: [10895, 6010],
-                        p2: [13255, 6010],
+                        p1: [10695, 3170],
+                        p2: [10695, 6940],
                         outerLoop: [
-                            [10895, 6010, 3430],
-                            [11625, 6010, 3430],
-                            [11625, 6010, 5530],
-                            [12525, 6010, 5530],
-                            [12525, 6010, 3430],
-                            [13255, 6010, 3430],
-                            [13255, 6010, 6130],
-                            [10895, 6010, 6130]
-                        ],
-                        holes: []
-                    },
-                    {
-                        id: 'FW_6_SOUTH',
-                        role: 'interior',
-                        material: 'plaster_white',
-                        normal: [0, 1, 0],
-                        p1: [13255, 6130],
-                        p2: [10895, 6130],
-                        outerLoop: [
-                            [13255, 6130, 3430],
-                            [12525, 6130, 3430],
-                            [12525, 6130, 5530],
-                            [11625, 6130, 5530],
-                            [11625, 6130, 3430],
-                            [10895, 6130, 3430],
-                            [10895, 6130, 6130],
-                            [13255, 6130, 6130]
+                            [10695, 3170, 3430],
+                            [10695, 4560, 3430],
+                            [10695, 4560, 5530],
+                            [10695, 5460, 5530],
+                            [10695, 5460, 3430],
+                            [10695, 6940, 3430],
+                            [10695, 6940, 6130],
+                            [10695, 3170, 6130]
                         ],
                         holes: []
                     }
@@ -2459,15 +2411,15 @@
                 floor: 'first',
                 category: 'internal',
                 axis: 'x',
-                x1: 6695, y1: 6940, x2: 10775, y2: 7120,
+                x1: 6495, y1: 6940, x2: 10575, y2: 7120,
                 thickness: 180,
                 zBottom: 3430,
                 zTop: 6130,
                 rooms: '1.01 Sypialnia (408 × 377 cm) ↔ 1.08 Garderoba (408 × 408 cm)',
-                specs: '4,080 × 180 mm (18 cm structural wall) • 3,770 mm (377 cm) South of North inner wall (Z = 3,170 mm); doorway notch X=9725..10625, Y=3430..5530 mm',
+                specs: '4,080 × 180 mm (18 cm structural wall) • 3,770 mm (377 cm) South of North inner wall (Z = 3,170 mm); doorway notch X=9525..10425, Y=3430..5530 mm',
                 openings: [],
                 doors: [
-                    { id: 'D_FW7_1', start: 9725, end: 10625, sillMm: 0, heightMm: 2100, swingDir: -1, hingeStart: false }
+                    { id: 'D_FW7_1', start: 9525, end: 10425, sillMm: 0, heightMm: 2100, swingDir: -1, hingeStart: false }
                 ],
                 sides: [
                     {
@@ -2475,17 +2427,17 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [0, -1, 0],
-                        p1: [6695, 6940],
-                        p2: [10775, 6940],
+                        p1: [6495, 6940],
+                        p2: [10575, 6940],
                         outerLoop: [
-                            [6695, 6940, 3430],
-                            [9725, 6940, 3430],
-                            [9725, 6940, 5530],
-                            [10625, 6940, 5530],
-                            [10625, 6940, 3430],
-                            [10775, 6940, 3430],
-                            [10775, 6940, 6130],
-                            [6695, 6940, 6130]
+                            [6495, 6940, 3430],
+                            [9525, 6940, 3430],
+                            [9525, 6940, 5530],
+                            [10425, 6940, 5530],
+                            [10425, 6940, 3430],
+                            [10575, 6940, 3430],
+                            [10575, 6940, 6130],
+                            [6495, 6940, 6130]
                         ],
                         holes: []
                     },
@@ -2494,17 +2446,17 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [0, 1, 0],
-                        p1: [10775, 7120],
-                        p2: [6695, 7120],
+                        p1: [10575, 7120],
+                        p2: [6495, 7120],
                         outerLoop: [
-                            [10775, 7120, 3430],
-                            [10625, 7120, 3430],
-                            [10625, 7120, 5530],
-                            [9725, 7120, 5530],
-                            [9725, 7120, 3430],
-                            [6695, 7120, 3430],
-                            [6695, 7120, 6130],
-                            [10775, 7120, 6130]
+                            [10575, 7120, 3430],
+                            [10425, 7120, 3430],
+                            [10425, 7120, 5530],
+                            [9525, 7120, 5530],
+                            [9525, 7120, 3430],
+                            [6495, 7120, 3430],
+                            [6495, 7120, 6130],
+                            [10575, 7120, 6130]
                         ],
                         holes: []
                     }
@@ -2516,15 +2468,15 @@
                 floor: 'first',
                 category: 'internal',
                 axis: 'y',
-                x1: 10775, y1: 7120, x2: 10895, y2: 11200,
+                x1: 10575, y1: 7120, x2: 10695, y2: 11200,
                 thickness: 120,
                 zBottom: 3430,
                 zTop: 6130,
-                rooms: '1.06 Korytarz & Schody (472 cm) ↔ 1.08 Garderoba (408 cm)',
-                specs: '120 × 4,080 mm • Aligned with FW_5 (4,080 mm West of FW_9); doorway notch Z=7320..8220, Y=3430..5530 mm',
+                rooms: '1.06 Korytarz & Schody (484 cm) ↔ 1.08 Garderoba (408 cm)',
+                specs: '120 × 4,080 mm • Aligned with FW_5 (4,080 mm West of FW_9); 15 cm North stub (Z=7120..7270) + 90×210 cm door (Z=7270..8170) + 303 cm South wall (Z=8170..11200)',
                 openings: [],
                 doors: [
-                    { id: 'D_FW8_1', start: 7320, end: 8220, sillMm: 0, heightMm: 2100, swingDir: -1, hingeStart: true }
+                    { id: 'D_FW8_1', start: 7270, end: 8170, sillMm: 0, heightMm: 2100, swingDir: -1, hingeStart: true }
                 ],
                 sides: [
                     {
@@ -2532,17 +2484,17 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [-1, 0, 0],
-                        p1: [10775, 11200],
-                        p2: [10775, 7120],
+                        p1: [10575, 11200],
+                        p2: [10575, 7120],
                         outerLoop: [
-                            [10775, 11200, 3430],
-                            [10775, 8220, 3430],
-                            [10775, 8220, 5530],
-                            [10775, 7320, 5530],
-                            [10775, 7320, 3430],
-                            [10775, 7120, 3430],
-                            [10775, 7120, 6130],
-                            [10775, 11200, 6130]
+                            [10575, 11200, 3430],
+                            [10575, 8170, 3430],
+                            [10575, 8170, 5530],
+                            [10575, 7270, 5530],
+                            [10575, 7270, 3430],
+                            [10575, 7120, 3430],
+                            [10575, 7120, 6130],
+                            [10575, 11200, 6130]
                         ],
                         holes: []
                     },
@@ -2551,17 +2503,17 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [1, 0, 0],
-                        p1: [10895, 7120],
-                        p2: [10895, 11200],
+                        p1: [10695, 7120],
+                        p2: [10695, 11200],
                         outerLoop: [
-                            [10895, 7120, 3430],
-                            [10895, 7320, 3430],
-                            [10895, 7320, 5530],
-                            [10895, 8220, 5530],
-                            [10895, 8220, 3430],
-                            [10895, 11200, 3430],
-                            [10895, 11200, 6130],
-                            [10895, 7120, 6130]
+                            [10695, 7120, 3430],
+                            [10695, 7270, 3430],
+                            [10695, 7270, 5530],
+                            [10695, 8170, 5530],
+                            [10695, 8170, 3430],
+                            [10695, 11200, 3430],
+                            [10695, 11200, 6130],
+                            [10695, 7120, 6130]
                         ],
                         holes: []
                     }
@@ -2573,12 +2525,12 @@
                 floor: 'first',
                 category: 'internal',
                 axis: 'y',
-                x1: 6515, y1: 6270, x2: 6695, y2: 11200,
+                x1: 6315, y1: 6270, x2: 6495, y2: 11200,
                 thickness: 180,
                 zBottom: 3430,
                 zTop: 6130,
                 rooms: '1.08 Garderoba (408 × 408 cm) ↔ Pustka nad salonem (+0.00)',
-                specs: '180 × 4,930 mm (18 cm structural wall) • Aligned with UW_TERRACE_EAST inner face (X = 6,695 mm), 4,080 mm (408 cm) East of FW_8',
+                specs: '180 × 4,930 mm (18 cm structural wall) • Aligned with UW_TERRACE_EAST inner face (X = 6,495 mm), 6,220 mm (622 cm) West of UW_EAST',
                 openings: [],
                 doors: [],
                 sides: [
@@ -2587,9 +2539,9 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [-1, 0, 0],
-                        p1: [6515, 11200],
-                        p2: [6515, 6270],
-                        outerLoop: [[6515, 11200, 3430], [6515, 6270, 3430], [6515, 6270, 6130], [6515, 11200, 6130]],
+                        p1: [6315, 11200],
+                        p2: [6315, 6270],
+                        outerLoop: [[6315, 11200, 3430], [6315, 6270, 3430], [6315, 6270, 6130], [6315, 11200, 6130]],
                         holes: []
                     },
                     {
@@ -2597,9 +2549,9 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [1, 0, 0],
-                        p1: [6695, 6270],
-                        p2: [6695, 11200],
-                        outerLoop: [[6695, 6270, 3430], [6695, 11200, 3430], [6695, 11200, 6130], [6695, 6270, 6130]],
+                        p1: [6495, 6270],
+                        p2: [6495, 11200],
+                        outerLoop: [[6495, 6270, 3430], [6495, 11200, 3430], [6495, 11200, 6130], [6495, 6270, 6130]],
                         holes: []
                     }
                 ]

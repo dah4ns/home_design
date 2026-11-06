@@ -890,22 +890,22 @@
 
         // Outer clockwise vertices of Upper Floor (Piętro) enclosed volume in [X, Z] millimeters
         const FIRST_OUTER_POLY = [
-            [6315, 2790],     // North-East corner next to 6,315 mm covered terrace (14a)
+            [6115, 2790],     // North-East corner next to covered terrace (14a)
             [20705, 2790],    // Upper NW corner (O13a / O13b_1)
             [20705, 11580],   // Upper SW corner (O13b_2 / O13a_2)
             [-285, 11580],    // Upper SE corner (O10 / O9)
             [-285, 5890],     // Upper East wall North end at terrace back wall
-            [6315, 5890]      // NE Covered Terrace inner corner (O14b + D1)
+            [6115, 5890]      // NE Covered Terrace inner corner (O14b + D1)
         ];
 
         // Inner clockwise vertices of Upper Floor (offset inward by WALL_THICKNESS = 380 mm)
         const FIRST_INNER_POLY = [
-            [6695, 3170],
+            [6495, 3170],
             [20325, 3170],
             [20325, 11200],
             [95, 11200],
             [95, 6270],
-            [6695, 6270]
+            [6495, 6270]
         ];
 
         const INTERNAL_WALL_THICKNESS = 120; // 12 cm (120 mm) internal partition walls per A.02 & A.03
@@ -1074,94 +1074,84 @@
             ],
             first: [
                 {
-                    id: 'FW_1', name: 'FW_1 (1.05 & 1.04 Pokój East Wall)',
-                    axis: 'z', x1: 15615, z1: 3170, x2: 15735, z2: 11200,
-                    rooms: '1.05 Pokój & 1.04 Pokój (459 cm) ↔ 1.03 Łazienka (224 cm) & 1.06 Korytarz (472 cm)',
-                    specs: '120 × 8,030 mm • 389 cm upper wall (Z=3170..7060) + 138 cm open alcove passage (Z=7060..8440) + 276 cm lower wall (Z=8440..11200)',
-                    doors: [
-                        { start: 7060, end: 8440, swingDir: 1, hingeStart: true }
-                    ]
+                    id: 'FW_1', name: 'FW_1 (1.05 Pokój / 1.03 Łazienka Wall)',
+                    axis: 'z', x1: 15435, z1: 3170, x2: 15555, z2: 6940,
+                    rooms: '1.05 Pokój (477 cm) ↔ 1.03 Łazienka (226 cm)',
+                    specs: '120 × 3,770 mm • 4,770 mm (477 cm) East of UW_WEST inner face (X = 20,325 mm), terminates at Z = 6,940 mm (North face of 18 cm wall FW_2a)',
+                    doors: []
                 },
                 {
-                    id: 'FW_2a', name: 'FW_2a (1.05 Pokój / 1.04 Pokój & Alcove Partition)',
-                    axis: 'x', x1: 15735, z1: 6940, x2: 20325, z2: 7060,
-                    rooms: '1.05 Pokój (377 cm) ↔ Alcove & 1.04 Pokój',
-                    specs: '4,590 × 120 mm • 3,770 mm (377 cm) South of North inner wall; from right (FW_1): 70 cm wall (X=15735..16435) + 90×210 cm door (X=16435..17335) + 299 cm wall (X=17335..20325)',
+                    id: 'FW_1b', name: 'FW_1b (1.04 Pokój / 1.06 Korytarz Wall)',
+                    axis: 'z', x1: 15535, z1: 8440, x2: 15655, z2: 11200,
+                    rooms: '1.04 Pokój (467 cm) ↔ 1.06 Korytarz & Schody (484 cm)',
+                    specs: '120 × 2,760 mm • Stepped West of FW_1 so East face (X = 15,535 mm) is 4,840 mm (484 cm) West of FW_8 (X = 10,695 mm)',
+                    doors: []
+                },
+                {
+                    id: 'FW_2a', name: 'FW_2a (1.05 Pokój, 1.03 & 1.02 Łazienka South Structural Wall)',
+                    axis: 'x', x1: 10575, z1: 6940, x2: 20325, z2: 7120,
+                    rooms: '1.05 Pokój (477 cm), 1.03 Łazienka (226 cm) & 1.02 Łazienka (236 cm) ↔ 1.04 Pokój & 1.06 Korytarz',
+                    specs: '9,750 × 180 mm (18 cm structural wall) • Continuous from East end of 1.02 (X = 10,575 mm) to UW_WEST (X = 20,325 mm); 1.03 door: 68 cm + 90×210 cm + 68 cm; 1.05 door: 70 cm + 90×210 cm + 317 cm',
                     doors: [
-                        { start: 16435, end: 17335, swingDir: -1, hingeStart: false }
+                        { start: 13855, end: 14755, swingDir: -1, hingeStart: false },
+                        { start: 16255, end: 17155, swingDir: -1, hingeStart: false }
                     ]
                 },
                 {
                     id: 'FW_2b', name: 'FW_2b (1.05 / 1.04 Alcove Step Wall)',
-                    axis: 'z', x1: 17335, z1: 7060, x2: 17455, z2: 8320,
-                    rooms: '1.04 Pokój ↔ Doorway Alcove',
-                    specs: '120 × 1,260 mm • Vertical step wall immediately West of the 90×210 cm door in FW_2a (X=17335..17455)',
+                    axis: 'z', x1: 17255, z1: 7120, x2: 17375, z2: 8320,
+                    rooms: '1.04 Pokój (295 cm) ↔ Doorway Alcove (172 cm)',
+                    specs: '120 × 1,200 mm • 1,720 mm (172 cm) West of FW_1b East face (X = 15,535 mm), South of 18 cm wall FW_2a (Z = 7,120..8,320 mm)',
                     doors: []
                 },
                 {
-                    id: 'FW_2c', name: 'FW_2c (1.05 / 1.04 East Partition)',
-                    axis: 'x', x1: 15735, z1: 8320, x2: 17455, z2: 8440,
-                    rooms: '1.05 Pokój Alcove ↔ 1.04 Pokój (276 cm)',
-                    specs: '1,720 × 120 mm • 2,760 mm (276 cm) North of South inner wall (Z = 11,200 mm)',
+                    id: 'FW_2c', name: 'FW_2c (1.05 / 1.04 South Alcove Partition)',
+                    axis: 'x', x1: 15535, z1: 8320, x2: 17375, z2: 8440,
+                    rooms: 'Doorway Alcove (172 cm) ↔ 1.04 Pokój (276 cm)',
+                    specs: '1,840 × 120 mm • From right (X=15535): 75 cm wall (X=15535..16285) + 90×210 cm door (X=16285..17185) + 7 cm wall (X=17185..17255) + 12 cm corner (X=17255..17375)',
                     doors: [
-                        { start: 16365, end: 17265, swingDir: 1, hingeStart: true }
+                        { start: 16285, end: 17185, swingDir: 1, hingeStart: false }
                     ]
                 },
                 {
                     id: 'FW_3', name: 'FW_3 (1.03 Łazienka / 1.02 Łazienka)',
-                    axis: 'z', x1: 13255, z1: 3170, x2: 13375, z2: 7060,
-                    rooms: '1.03 Łazienka (224 cm) ↔ 1.02 Łazienka (236 cm)',
-                    specs: '120 × 3,890 mm • 2,240 mm (224 cm) East of FW_1 (X = 15,615 mm)',
+                    axis: 'z', x1: 13055, z1: 3170, x2: 13175, z2: 6940,
+                    rooms: '1.03 Łazienka (226 cm) ↔ 1.02 Łazienka (236 cm)',
+                    specs: '120 × 3,770 mm • 2,260 mm (226 cm) East of FW_1 (X = 15,435 mm), terminates at Z = 6,940 mm (North face of 18 cm wall FW_2a)',
                     doors: []
-                },
-                {
-                    id: 'FW_4', name: 'FW_4 (1.03 Łazienka South Wall)',
-                    axis: 'x', x1: 13375, z1: 6940, x2: 15615, z2: 7060,
-                    rooms: '1.03 Łazienka (224 × 377 cm) ↔ 1.06 Korytarz',
-                    specs: '2,240 × 120 mm • 3,770 mm (377 cm) South of North inner wall (Z = 3,170 mm)',
-                    doors: [
-                        { start: 14045, end: 14945, swingDir: -1, hingeStart: false }
-                    ]
                 },
                 {
                     id: 'FW_5', name: 'FW_5 (1.02 Łazienka / 1.01 Sypialnia)',
-                    axis: 'z', x1: 10775, z1: 3170, x2: 10895, z2: 7120,
+                    axis: 'z', x1: 10575, z1: 3170, x2: 10695, z2: 6940,
                     rooms: '1.02 Łazienka (236 cm) ↔ 1.01 Sypialnia (408 cm)',
-                    specs: '120 × 3,950 mm • 2,360 mm (236 cm) East of FW_3, aligned with FW_8 (408 cm West of UW_TERRACE_EAST)',
-                    doors: []
-                },
-                {
-                    id: 'FW_6', name: 'FW_6 (1.02 Łazienka South Wall)',
-                    axis: 'x', x1: 10895, z1: 6010, x2: 13255, z2: 6130,
-                    rooms: '1.02 Łazienka (236 × 284 cm) ↔ 1.06 Korytarz',
-                    specs: '2,360 × 120 mm • 2,840 mm (284 cm) South of North inner wall (Z = 3,170 mm)',
+                    specs: '120 × 3,770 mm • 2,360 mm (236 cm) East of FW_3, terminates at Z = 6,940 mm; 139 cm North wall (Z=3170..4560) + 90×210 cm door (Z=4560..5460) + 148 cm South wall (Z=5460..6940)',
                     doors: [
-                        { start: 11625, end: 12525, swingDir: -1, hingeStart: true }
+                        { start: 4560, end: 5460, swingDir: 1, hingeStart: true }
                     ]
                 },
                 {
                     id: 'FW_7', name: 'FW_7 (1.01 Sypialnia South Wall)',
-                    axis: 'x', x1: 6695, z1: 6940, x2: 10775, z2: 7120,
+                    axis: 'x', x1: 6495, z1: 6940, x2: 10575, z2: 7120,
                     rooms: '1.01 Sypialnia (408 × 377 cm) ↔ 1.08 Garderoba (408 × 408 cm)',
                     specs: '4,080 × 180 mm (18 cm structural wall) • 3,770 mm (377 cm) South of North inner wall (Z = 3,170 mm)',
                     doors: [
-                        { start: 9725, end: 10625, swingDir: -1, hingeStart: false }
+                        { start: 9525, end: 10425, swingDir: -1, hingeStart: false }
                     ]
                 },
                 {
                     id: 'FW_8', name: 'FW_8 (1.06 Korytarz / 1.08 Garderoba West Wall)',
-                    axis: 'z', x1: 10775, z1: 7120, x2: 10895, z2: 11200,
-                    rooms: '1.06 Korytarz & Schody (472 cm) ↔ 1.08 Garderoba (408 cm)',
-                    specs: '120 × 4,080 mm • Aligned with FW_5 (4,080 mm West of FW_9)',
+                    axis: 'z', x1: 10575, z1: 7120, x2: 10695, z2: 11200,
+                    rooms: '1.06 Korytarz & Schody (484 cm) ↔ 1.08 Garderoba (408 cm)',
+                    specs: '120 × 4,080 mm • Aligned with FW_5; 15 cm North stub (Z=7120..7270) + 90×210 cm door (Z=7270..8170) + 303 cm South wall (Z=8170..11200)',
                     doors: [
-                        { start: 7320, end: 8220, swingDir: -1, hingeStart: true }
+                        { start: 7270, end: 8170, swingDir: -1, hingeStart: true }
                     ]
                 },
                 {
                     id: 'FW_9', name: 'FW_9 (1.08 Garderoba East Wall)',
-                    axis: 'z', x1: 6515, z1: 6270, x2: 6695, z2: 11200,
+                    axis: 'z', x1: 6315, z1: 6270, x2: 6495, z2: 11200,
                     rooms: '1.08 Garderoba (408 × 408 cm) ↔ Pustka nad salonem (+0.00)',
-                    specs: '180 × 4,930 mm (18 cm structural wall) • Aligned with UW_TERRACE_EAST inner face (X = 6,695 mm), 4,080 mm (408 cm) East of FW_8',
+                    specs: '180 × 4,930 mm (18 cm structural wall) • Aligned with UW_TERRACE_EAST inner face (X = 6,495 mm), 6,220 mm (622 cm) West of UW_EAST',
                     doors: []
                 }
             ]
@@ -1189,14 +1179,14 @@
                 { code: '0.11', name: 'SALON', area: '31.08 m²', dims: '642 × 491 cm', x: 3400, z: 8700 }
             ],
             first: [
-                { code: '1.05', name: 'POKÓJ', area: '17.64 m²', dims: '459 × 377 cm', x: 18030, z: 5055 },
-                { code: '1.04', name: 'POKÓJ', area: '16.41 m²', dims: '459 × 414/276 cm', x: 18250, z: 9750 },
-                { code: '1.03', name: 'ŁAZIENKA', area: '8.28 m²', dims: '224 × 377 cm', x: 14495, z: 5055 },
-                { code: '1.02', name: 'ŁAZIENKA', area: '6.65 m²', dims: '236 × 284 cm', x: 12075, z: 4600 },
-                { code: '1.01', name: 'SYPIALNIA', area: '15.21 m²', dims: '408 × 377 cm', x: 8735, z: 5055 },
-                { code: '1.06', name: 'KORYTARZ', area: '15.02 m²', dims: '472 cm • +3.33 m', x: 13250, z: 8600 },
-                { code: '1.08', name: 'GARDEROBA', area: '16.48 m²', dims: '408 × 408 cm', x: 8735, z: 9160 },
-                { code: '±0.00', name: 'PUSTKA NAD SALONEM', area: 'Antresola', dims: '642 × 493 cm', x: 3300, z: 8715 }
+                { code: '1.05', name: 'POKÓJ', area: '18.36 m²', dims: '477 × 377 cm', x: 17940, z: 5055 },
+                { code: '1.04', name: 'POKÓJ', area: '17.20 m²', dims: '467 × 408/276 cm', x: 18150, z: 9750 },
+                { code: '1.03', name: 'ŁAZIENKA', area: '8.28 m²', dims: '226 × 377 cm', x: 14305, z: 5055 },
+                { code: '1.02', name: 'ŁAZIENKA', area: '6.65 m²', dims: '236 × 377 cm', x: 11875, z: 5055 },
+                { code: '1.01', name: 'SYPIALNIA', area: '15.21 m²', dims: '408 × 377 cm', x: 8535, z: 5055 },
+                { code: '1.06', name: 'KORYTARZ', area: '15.02 m²', dims: '484 cm • +3.33 m', x: 13115, z: 7850 },
+                { code: '1.08', name: 'GARDEROBA', area: '16.48 m²', dims: '408 × 408 cm', x: 8535, z: 9160 },
+                { code: '±0.00', name: 'PUSTKA NAD SALONEM', area: 'Antresola', dims: '622 × 493 cm', x: 3205, z: 8715 }
             ]
         };
 
@@ -1284,14 +1274,14 @@
             // ================= UPPER FLOOR (PIĘTRO) =================
             {
                 id: '14a', name: '14a', floor: 'first', facade: 'North Facade', room: '1.04 Sypialnia Wschodnia',
-                axis: 'x', fixedZ: 2790, inwardSign: 1, start: 6515, end: 7505,
+                axis: 'x', fixedZ: 2790, inwardSign: 1, start: 6315, end: 7305,
                 widthMm: 1190, heightMm: 2700, sillMm: 0, sashes: 1, pillarMm: 0,
                 jambStart: false, jambEnd: true, cornerJoinStart: true,
                 specs: '1,190 × 2,700 mm (hp = 0 mm) • Full-height glazing meeting O14b at recessed NE terrace corner'
             },
             {
                 id: 'O14b', name: 'O14b + D1', floor: 'first', facade: 'East Facade (Terrace)', room: '1.04 Sypialnia / Taras',
-                axis: 'z', fixedX: 6315, inwardSign: 1, start: 2990, end: 5800,
+                axis: 'z', fixedX: 6115, inwardSign: 1, start: 2990, end: 5800,
                 widthMm: 2810, heightMm: 2700, sillMm: 0, sashes: 2, sashRatios: [1820 / 2720], pillarMm: 90,
                 jambStart: false, jambEnd: true, cornerJoinStart: true,
                 specs: '2,810 × 2,700 mm (hp = 0 mm) • 1,820 mm fixed pane + 90 mm pillar + 900 mm terrace door D1'
@@ -2273,22 +2263,22 @@
                         'text-anchor': 'middle'
                     }, 'SW Wing Flat Roof (+3.43 m • Includes 1,960 mm East Overhang)'));
 
-                    // 3) North-East Covered Upper Terrace (X = -285..6,315 mm, Z = 2,790..5,890 mm)
-                    const tx = Math.min(toSvgX(-285), toSvgX(6315));
+                    // 3) North-East Covered Upper Terrace (X = -285..6,115 mm, Z = 2,790..5,890 mm)
+                    const tx = Math.min(toSvgX(-285), toSvgX(6115));
                     roofsG.appendChild(svgEl('rect', {
-                        x: tx, y: 2790, width: 6600, height: 3100,
+                        x: tx, y: 2790, width: 6400, height: 3100,
                         fill: 'rgba(16, 185, 129, 0.12)',
                         stroke: '#34d399',
                         'stroke-width': 28
                     }));
                     roofsG.appendChild(svgEl('text', {
-                        x: tx + 3300, y: 4400,
+                        x: tx + 3200, y: 4400,
                         fill: '#6ee7b7',
                         'font-family': 'JetBrains Mono, monospace',
                         'font-size': 250,
                         'font-weight': 600,
                         'text-anchor': 'middle'
-                    }, 'NE Covered Terrace (6,315 × 3,100 mm)'));
+                    }, 'NE Covered Terrace (6,115 × 3,100 mm)'));
                 }
             }
             svg.appendChild(roofsG);
@@ -2403,8 +2393,8 @@
                     drawDimensionMm(dimsG, -285, 2790, -285, 11580, 1350 * dirSign, 0, '8,790 mm (East Core)', '#4ade80');
                 } else {
                     // Upper Floor dimensions
-                    drawDimensionMm(dimsG, 6315, 2790, 20705, 2790, 0, -1100, '14,390 mm (Upper North Wall)', '#38bdf8');
-                    drawDimensionMm(dimsG, -285, 2790, 6315, 2790, 0, -1100, '6,600 mm (NE Terrace)', '#34d399');
+                    drawDimensionMm(dimsG, 6115, 2790, 20705, 2790, 0, -1100, '14,590 mm (Upper North Wall)', '#38bdf8');
+                    drawDimensionMm(dimsG, -285, 2790, 6115, 2790, 0, -1100, '6,400 mm (NE Terrace)', '#34d399');
                     drawDimensionMm(dimsG, -285, 11580, 20705, 11580, 0, 1150, '20,990 mm (Upper South Wall)', '#fbbf24');
                     drawDimensionMm(dimsG, 20705, 2790, 20705, 11580, -1350 * dirSign, 0, '8,790 mm (Upper West)', '#c084fc');
                     drawDimensionMm(dimsG, -285, 5890, -285, 11580, 1350 * dirSign, 0, '5,690 mm (Upper East)', '#4ade80');
@@ -2803,7 +2793,7 @@
             } else {
                 // ---- UPPER FLOOR (PIĘTRO, A.03) ----
                 // ---- A. HORIZONTAL (EAST <-> WEST) ROOM SPANS & WALL THICKNESSES ----
-                // 1) North rooms: 1.05 Pokój (459 cm), 1.03 Łazienka (224 cm), 1.02 Łazienka (236 cm), 1.01 Sypialnia (408 cm)
+                // 1) North rooms: 1.05 Pokój (477 cm), 1.03 Łazienka (226 cm), 1.02 Łazienka (236 cm), 1.01 Sypialnia (408 cm)
                 wallThick('UW_WEST', 3650, 1);
                 wallSpan('UW_WEST', 'FW_1', 3650, 1);
                 wallThick('FW_1', 3650, 1);
@@ -2814,20 +2804,28 @@
                 wallSpan('FW_5', 'UW_TERRACE_EAST', 3650, 1);
                 wallThick('UW_TERRACE_EAST', 3650, 1);
 
-                // 1b) FW_2a horizontal segments: from the right 70 cm wall + 90 cm door (90×210) + 299 cm left wall = 459 cm
-                drawWallSpanDim(group, 20325, 6780, 17335, 6780, -1);
-                drawWallSpanDim(group, 17335, 6780, 16435, 6780, -1);
-                drawWallSpanDim(group, 16435, 6780, 15735, 6780, -1);
+                // 1b) FW_2a horizontal segments in 1.05 Pokój (317 + 90 + 70 = 477 cm) & 1.03 Łazienka (68 + 90 + 68 = 226 cm)
+                drawWallSpanDim(group, 20325, 6780, 17155, 6780, -1);
+                drawWallSpanDim(group, 17155, 6780, 16255, 6780, -1);
+                drawWallSpanDim(group, 16255, 6780, 15555, 6780, -1);
+                drawWallSpanDim(group, 15435, 6780, 14755, 6780, -1);
+                drawWallSpanDim(group, 14755, 6780, 13855, 6780, -1);
+                drawWallSpanDim(group, 13855, 6780, 13175, 6780, -1);
 
-                // 2) 1.05 / 1.04 Alcove step row (287 cm + 12 cm + 160 cm at Z = 7600 mm)
-                wallSpan('UW_WEST', 'FW_2b', 7600, 1);
-                wallThick('FW_2b', 7600, 1);
-                wallSpan('FW_2b', 'FW_1', 7600, 1);
+                // 2) 1.05 / 1.04 Alcove step row (295 cm + 12 cm + 172 cm at Z = 7550 mm)
+                wallSpan('UW_WEST', 'FW_2b', 7550, 1);
+                wallThick('FW_2b', 7550, 1);
+                drawWallSpanDim(group, 17255, 7550, 15535, 7550, 1);
 
-                // 3) South rooms: 1.04 Pokój (459 cm), 1.06 Korytarz (472 cm), 1.08 Garderoba (408 cm), FW_9 (18 cm), Void (642 cm)
-                wallSpan('UW_WEST', 'FW_1', 10680, -1);
-                wallThick('FW_1', 10680, -1);
-                wallSpan('FW_1', 'FW_8', 10680, -1);
+                // 2b) FW_2c horizontal segments: from the right 75 cm wall + 90 cm door (90×210) + 7 cm left wall = 172 cm
+                drawWallSpanDim(group, 17255, 8160, 17185, 8160, -1);
+                drawWallSpanDim(group, 17185, 8160, 16285, 8160, -1);
+                drawWallSpanDim(group, 16285, 8160, 15535, 8160, -1);
+
+                // 3) South rooms: 1.04 Pokój (467 cm), FW_1b (12 cm), 1.06 Korytarz (484 cm), 1.08 Garderoba (408 cm), FW_9 (18 cm), Void (622 cm)
+                wallSpan('UW_WEST', 'FW_1b', 10680, -1);
+                wallThick('FW_1b', 10680, -1);
+                wallSpan('FW_1b', 'FW_8', 10680, -1);
                 wallThick('FW_8', 10680, -1);
                 wallSpan('FW_8', 'FW_9', 10680, -1);
                 wallThick('FW_9', 10680, -1);
@@ -2835,31 +2833,39 @@
                 wallThick('UW_EAST', 10680, -1);
 
                 // ---- B. VERTICAL (NORTH <-> SOUTH) ROOM SPANS & WALL THICKNESSES ----
-                // 1) West side: 1.05 Pokój (377 cm) + 12 cm + 1.04 Pokój (414 cm) (X = 19750 mm)
+                // 1) West side: 1.05 Pokój (377 cm) + 18 cm (FW_2a) + 1.04 Pokój (408 cm) (X = 19750 mm)
                 wallThick('UW_NORTH_MAIN', 17500, 1);
                 wallSpan('UW_NORTH_MAIN', 'FW_2a', 19750, 1);
                 wallThick('FW_2a', 19750, 1);
                 wallSpan('FW_2a', 'UW_SOUTH', 19750, 1);
                 wallThick('UW_SOUTH', 17500, -1);
 
-                // 2) Alcove step: 126 cm + 12 cm + 276 cm (X = 16150 mm)
-                wallSpan('FW_2a', 'FW_2c', 16150, 1);
-                wallThick('FW_2c', 16150, 1);
-                wallSpan('FW_2c', 'UW_SOUTH', 16150, 1);
+                // 2) Alcove step: 120 cm + 12 cm + 276 cm (X = 15900 mm)
+                wallSpan('FW_2a', 'FW_2c', 15900, 1);
+                wallThick('FW_2c', 15900, 1);
+                wallSpan('FW_2c', 'UW_SOUTH', 15900, 1);
 
-                // 3) 1.03 Łazienka (377 cm at X = 14495 mm)
-                wallSpan('UW_NORTH_MAIN', 'FW_4', 14495, 1);
-                wallThick('FW_4', 14495, 1);
+                // 3) 1.03 Łazienka (377 cm + 18 cm FW_2a at X = 15000 mm)
+                wallSpan('UW_NORTH_MAIN', 'FW_2a', 15000, 1);
+                wallThick('FW_2a', 15000, 1);
 
-                // 4) 1.02 Łazienka (298 cm) & 1.06 Korytarz (493 cm) (X = 12075 mm)
-                wallSpan('UW_NORTH_MAIN', 'FW_6', 12075, 1);
-                wallThick('FW_6', 12075, 1);
-                wallSpan('FW_6', 'UW_SOUTH', 12075, 1);
+                // 4) 1.02 Łazienka (377 cm) + 18 cm FW_2a + 1.06 Korytarz (408 cm) (X = 11875 mm)
+                wallSpan('UW_NORTH_MAIN', 'FW_2a', 11875, 1);
+                wallThick('FW_2a', 11875, 1);
+                wallSpan('FW_2a', 'UW_SOUTH', 11875, 1);
 
-                // 5) 1.01 Sypialnia (377 cm) + FW_7 (18 cm) + 1.08 Garderoba (408 cm) (X = 7650 mm)
-                wallSpan('UW_NORTH_MAIN', 'FW_7', 7650, -1);
-                wallThick('FW_7', 7650, -1);
-                wallSpan('FW_7', 'UW_SOUTH', 7650, -1);
+                // 4b) FW_5 vertical segments (139 cm + 90 cm door + 148 cm = 377 cm) & FW_8 vertical segments (15 cm + 90 cm door + 303 cm = 408 cm)
+                drawWallSpanDim(group, 10410, 3170, 10410, 4560, 1);
+                drawWallSpanDim(group, 10410, 4560, 10410, 5460, 1);
+                drawWallSpanDim(group, 10410, 5460, 10410, 6940, 1);
+                drawWallSpanDim(group, 10410, 7120, 10410, 7270, 1);
+                drawWallSpanDim(group, 10410, 7270, 10410, 8170, 1);
+                drawWallSpanDim(group, 10410, 8170, 10410, 11200, 1);
+
+                // 5) 1.01 Sypialnia (377 cm) + FW_7 (18 cm) + 1.08 Garderoba (408 cm) (X = 7450 mm)
+                wallSpan('UW_NORTH_MAIN', 'FW_7', 7450, -1);
+                wallThick('FW_7', 7450, -1);
+                wallSpan('FW_7', 'UW_SOUTH', 7450, -1);
             }
         }
 
@@ -3081,13 +3087,13 @@
             }
 
             if (floor === 'first') {
-                // Double-height void (Pustka nad salonem ±0.00) East of FW_9 (X = 95..6515, Z = 6270..11200)
+                // Double-height void (Pustka nad salonem ±0.00) East of FW_9 (X = 95..6315, Z = 6270..11200)
                 group.appendChild(svgEl('line', {
-                    x1: toSvgX(95), y1: toSvgZ(6270), x2: toSvgX(6515), y2: toSvgZ(11200),
+                    x1: toSvgX(95), y1: toSvgZ(6270), x2: toSvgX(6315), y2: toSvgZ(11200),
                     stroke: 'rgba(148, 163, 184, 0.25)', 'stroke-width': 14, 'stroke-dasharray': '120,90'
                 }));
                 group.appendChild(svgEl('line', {
-                    x1: toSvgX(6515), y1: toSvgZ(6270), x2: toSvgX(95), y2: toSvgZ(11200),
+                    x1: toSvgX(6315), y1: toSvgZ(6270), x2: toSvgX(95), y2: toSvgZ(11200),
                     stroke: 'rgba(148, 163, 184, 0.25)', 'stroke-width': 14, 'stroke-dasharray': '120,90'
                 }));
             }
