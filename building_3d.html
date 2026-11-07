@@ -1737,7 +1737,7 @@
                 ctx.fillRect(0, h - 5, w, 5);
             }, 256, 256);
 
-            // 4. Reflective Architectural Glass Texture
+            // 4. Reflective Architectural Glass Texture (clamped per-pane so no repeat seam ever appears inside a glass pane)
             textures.glass = createCanvasTexture(glCtx, (ctx, w, h) => {
                 const grad = ctx.createLinearGradient(0, 0, w, h);
                 grad.addColorStop(0, '#385a7c');
@@ -1760,6 +1760,9 @@
                 ctx.lineTo(w + 20, h * 0.2);
                 ctx.stroke();
             }, 256, 256);
+            glCtx.bindTexture(glCtx.TEXTURE_2D, textures.glass);
+            glCtx.texParameteri(glCtx.TEXTURE_2D, glCtx.TEXTURE_WRAP_S, glCtx.CLAMP_TO_EDGE);
+            glCtx.texParameteri(glCtx.TEXTURE_2D, glCtx.TEXTURE_WRAP_T, glCtx.CLAMP_TO_EDGE);
 
             // 5. Sectional Garage Door Texture (Horizontal ribs)
             textures.garage = createCanvasTexture(glCtx, (ctx, w, h) => {
@@ -1872,6 +1875,47 @@
                 this.addQuad(
                     [X1, Y1, Z1], [X2, Y1, Z1], [X2, Y1, Z2], [X1, Y1, Z2],
                     [0, -1, 0], [ux1, uz1], [ux2, uz1], [ux2, uz2], [ux1, uz2], color
+                );
+            }
+
+            // Add a single glass pane with normalized [0..1] UVs per pane so the glass reflection never splits mid-pane
+            addGlassPaneMm(x1, y1, z1, x2, y2, z2, color, yOffsetMeters = 0) {
+                const X1 = Math.min(x1, x2) / 1000;
+                const X2 = Math.max(x1, x2) / 1000;
+                const Y1 = Math.min(y1, y2) / 1000 + yOffsetMeters;
+                const Y2 = Math.max(y1, y2) / 1000 + yOffsetMeters;
+                const Z1 = Math.min(z1, z2) / 1000;
+                const Z2 = Math.max(z1, z2) / 1000;
+
+                // Front (+Z, South)
+                this.addQuad(
+                    [X1, Y1, Z2], [X2, Y1, Z2], [X2, Y2, Z2], [X1, Y2, Z2],
+                    [0, 0, 1], [0, 1], [1, 1], [1, 0], [0, 0], color
+                );
+                // Back (-Z, North)
+                this.addQuad(
+                    [X2, Y1, Z1], [X1, Y1, Z1], [X1, Y2, Z1], [X2, Y2, Z1],
+                    [0, 0, -1], [0, 1], [1, 1], [1, 0], [0, 0], color
+                );
+                // Right (+X, West)
+                this.addQuad(
+                    [X2, Y1, Z2], [X2, Y1, Z1], [X2, Y2, Z1], [X2, Y2, Z2],
+                    [1, 0, 0], [0, 1], [1, 1], [1, 0], [0, 0], color
+                );
+                // Left (-X, East)
+                this.addQuad(
+                    [X1, Y1, Z1], [X1, Y1, Z2], [X1, Y2, Z2], [X1, Y2, Z1],
+                    [-1, 0, 0], [0, 1], [1, 1], [1, 0], [0, 0], color
+                );
+                // Top (+Y)
+                this.addQuad(
+                    [X1, Y2, Z2], [X2, Y2, Z2], [X2, Y2, Z1], [X1, Y2, Z1],
+                    [0, 1, 0], [0, 0], [1, 0], [1, 1], [0, 1], color
+                );
+                // Bottom (-Y)
+                this.addQuad(
+                    [X1, Y1, Z1], [X2, Y1, Z1], [X2, Y1, Z2], [X1, Y1, Z2],
+                    [0, -1, 0], [0, 0], [1, 0], [1, 1], [0, 1], color
                 );
             }
 
@@ -2070,7 +2114,7 @@
                     jambBuilder.addBoxMm(cFrameFront - 25, op.y1 + 400, splitZ - 140, cFrameFront, op.y1 + 1850, splitZ - 110, [0.82, 0.86, 0.90], 1.0, yOffset);
                     // Sidelight mullion & glass
                     jambBuilder.addBoxMm(cFrameFront, op.y1, splitZ - 25, cFrameBack, op.y2, splitZ + 25, ralCol, 1.0, yOffset);
-                    glassBuilder.addBoxMm(cGlassFront, op.y1 + frameW, splitZ + 25, cGlassBack, op.y2 - frameW, opEnd - frameW, [0.85, 0.94, 1.0], 0.35, yOffset);
+                    glassBuilder.addGlassPaneMm(cGlassFront, op.y1 + frameW, splitZ + 25, cGlassBack, op.y2 - frameW, opEnd - frameW, [0.85, 0.94, 1.0], yOffset);
                 } else {
                     // Glazed Window / HST Terrace Door
                     const isSelected = (state.selectedOpeningId === op.id);
@@ -2079,27 +2123,35 @@
                         ? [0.55, 0.92, 1.0]
                         : (isHovered ? [0.70, 0.95, 1.0] : [0.88, 0.95, 1.0]);
 
-                    if (axis === 'x') {
-                        glassBuilder.addBoxMm(opStart + 20, op.y1 + frameW, cGlassFront, opEnd - 20, op.y2 - frameW, cGlassBack, glassTint, 0.25, yOffset);
-                    } else {
-                        glassBuilder.addBoxMm(cGlassFront, op.y1 + frameW, opStart + 20, cGlassBack, op.y2 - frameW, opEnd - 20, glassTint, 0.25, yOffset);
-                    }
-
-                    // Inner 90 mm pillars or mullions
+                    // Inner 90 mm pillars or mullions + individual per-sash glass panes
                     const numSashes = Math.max(1, op.sashes || 1);
+                    const pWidth = op.pillarMm || 65;
+                    const mullionCenters = [];
                     if (numSashes > 1) {
-                        const pWidth = op.pillarMm || 65;
                         for (let s = 1; s < numSashes; s++) {
                             let ratio = s / numSashes;
                             if (Array.isArray(op.sashRatios) && op.sashRatios.length >= s) {
-                                ratio = op.sashRatios[0];
+                                ratio = op.sashRatios[s - 1];
                             }
                             const mCenter = opStart + (opEnd - opStart) * ratio;
+                            mullionCenters.push(mCenter);
                             if (axis === 'x') {
                                 jambBuilder.addBoxMm(mCenter - pWidth / 2, op.y1, cFrameFront - inwardSign * 8, mCenter + pWidth / 2, op.y2, cFrameBack, ralCol, 1.0, yOffset);
                             } else {
                                 jambBuilder.addBoxMm(cFrameFront - inwardSign * 8, op.y1, mCenter - pWidth / 2, cFrameBack, op.y2, mCenter + pWidth / 2, ralCol, 1.0, yOffset);
                             }
+                        }
+                    }
+
+                    // Build each individual sash glass pane with normalized [0..1] UVs so no texture seam ever appears mid-pane
+                    for (let s = 0; s < numSashes; s++) {
+                        const paneStart = (s === 0) ? (opStart + frameW) : (mullionCenters[s - 1] + pWidth / 2);
+                        const paneEnd = (s === numSashes - 1) ? (opEnd - frameW) : (mullionCenters[s] - pWidth / 2);
+                        if (paneEnd - paneStart <= 5) continue;
+                        if (axis === 'x') {
+                            glassBuilder.addGlassPaneMm(paneStart, op.y1 + frameW, cGlassFront, paneEnd, op.y2 - frameW, cGlassBack, glassTint, yOffset);
+                        } else {
+                            glassBuilder.addGlassPaneMm(cGlassFront, op.y1 + frameW, paneStart, cGlassBack, op.y2 - frameW, paneEnd, glassTint, yOffset);
                         }
                     }
                 }
@@ -2388,8 +2440,8 @@
                 jambBuilder.addBoxMm(-65, 3430, 2790, 85, 6130, 2940, ralCol, 1.0, upperOffsetM);
 
                 // Glass Balustrade along North (X = 0..6315, Z = 2790) and East (X = -285, Z = 2790..5890), H = 950 mm
-                glassBuilder.addBoxMm(0, 3430, 2790, 6315, 4380, 2830, [0.65, 0.88, 0.98], 0.3, upperOffsetM);
-                glassBuilder.addBoxMm(-285, 3430, 2790, -245, 4380, 5890, [0.65, 0.88, 0.98], 0.3, upperOffsetM);
+                glassBuilder.addGlassPaneMm(0, 3430, 2790, 6315, 4380, 2830, [0.65, 0.88, 0.98], upperOffsetM);
+                glassBuilder.addGlassPaneMm(-285, 3430, 2790, -245, 4380, 5890, [0.65, 0.88, 0.98], upperOffsetM);
                 // Black Top Handrail & Stanchions
                 jambBuilder.addBoxMm(-285, 4360, 2780, 6315, 4410, 2840, ralCol, 1.0, upperOffsetM);
                 jambBuilder.addBoxMm(-295, 4360, 2780, -235, 4410, 5890, ralCol, 1.0, upperOffsetM);

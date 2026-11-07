@@ -898,14 +898,20 @@
             [6115, 5890]      // NE Covered Terrace inner corner (O14b + D1)
         ];
 
-        // Inner clockwise vertices of Upper Floor (offset inward by WALL_THICKNESS = 380 mm)
+        // Inner vertices of Upper Floor Slab (excludes High Living Room X=95..6315, High Hall, and Stairwell)
         const FIRST_INNER_POLY = [
-            [6495, 3170],
             [20325, 3170],
-            [20325, 11200],
-            [95, 11200],
-            [95, 6270],
-            [6495, 6270]
+            [6495, 3170],
+            [6495, 6270],
+            [6315, 6270],
+            [6315, 11200],
+            [10695, 11200],
+            [10695, 9370],
+            [11910, 9370],
+            [11910, 8360],
+            [15535, 8360],
+            [15535, 11200],
+            [20325, 11200]
         ];
 
         const INTERNAL_WALL_THICKNESS = 120; // 12 cm (120 mm) internal partition walls per A.02 & A.03
@@ -2288,10 +2294,15 @@
                 ? WallService.getFloorPlanSlice(floor, 1200)
                 : null;
             const outerPoly = (floor === 'ground') ? GROUND_OUTER_POLY : FIRST_OUTER_POLY;
-            const innerPoly = (floor === 'ground') ? GROUND_INNER_POLY : FIRST_INNER_POLY;
+            const upperSlabObj = (floor === 'first' && typeof WallService !== 'undefined' && typeof WallService.getFloor3DById === 'function')
+                ? WallService.getFloor3DById('FLOOR_UPPER')
+                : null;
+            const innerPoly = (floor === 'ground')
+                ? GROUND_INNER_POLY
+                : ((upperSlabObj && Array.isArray(upperSlabObj.footprint2D)) ? upperSlabObj.footprint2D : FIRST_INNER_POLY);
 
             const shellG = svgEl('g', { class: 'layer-shell' });
-            // Open interior floor slab polygon
+            // Open interior floor slab polygon (excludes double-height Living Room, High Hall, and Stairwell on Upper Floor)
             shellG.appendChild(svgEl('polygon', {
                 points: polyToPointsAttr(innerPoly),
                 fill: '#162033',
@@ -3090,7 +3101,21 @@
             }
 
             if (floor === 'first') {
-                // Double-height void (Pustka nad salonem ±0.00) East of FW_9 (X = 95..6315, Z = 6270..11200)
+                // Solid Upper Floor Slab (FLOOR_UPPER, Z = 2960..3330 mm, 12-vertex polygon inside 38 cm exterior walls)
+                const upperSlab = (typeof WallService !== 'undefined' && typeof WallService.getFloor3DById === 'function')
+                    ? WallService.getFloor3DById('FLOOR_UPPER')
+                    : null;
+                if (upperSlab && Array.isArray(upperSlab.footprint2D)) {
+                    group.appendChild(svgEl('polygon', {
+                        points: polyToPointsAttr(upperSlab.footprint2D),
+                        fill: 'rgba(203, 213, 225, 0.04)',
+                        stroke: 'rgba(250, 204, 21, 0.45)',
+                        'stroke-width': 18,
+                        'stroke-dasharray': '90,50'
+                    }));
+                }
+
+                // 1. Double-height void: High Living Room (Pustka nad salonem ±0.00) East of FW_9 (X = 95..6315, Z = 6270..11200)
                 group.appendChild(svgEl('line', {
                     x1: toSvgX(95), y1: toSvgZ(6270), x2: toSvgX(6315), y2: toSvgZ(11200),
                     stroke: 'rgba(148, 163, 184, 0.25)', 'stroke-width': 14, 'stroke-dasharray': '120,90'
@@ -3098,6 +3123,21 @@
                 group.appendChild(svgEl('line', {
                     x1: toSvgX(6315), y1: toSvgZ(6270), x2: toSvgX(95), y2: toSvgZ(11200),
                     stroke: 'rgba(148, 163, 184, 0.25)', 'stroke-width': 14, 'stroke-dasharray': '120,90'
+                }));
+
+                // 2. Double-height void: High Hall (Pustka nad komunikacją in front of O12, X = 10695..15535, Z = 9370..11200)
+                group.appendChild(svgEl('line', {
+                    x1: toSvgX(10695), y1: toSvgZ(9370), x2: toSvgX(15535), y2: toSvgZ(11200),
+                    stroke: 'rgba(148, 163, 184, 0.25)', 'stroke-width': 14, 'stroke-dasharray': '120,90'
+                }));
+                group.appendChild(svgEl('line', {
+                    x1: toSvgX(15535), y1: toSvgZ(9370), x2: toSvgX(10695), y2: toSvgZ(11200),
+                    stroke: 'rgba(148, 163, 184, 0.25)', 'stroke-width': 14, 'stroke-dasharray': '120,90'
+                }));
+                // Top landing balustrade along South edge of 121.5 cm landing (X = 10695..11910, Z = 9370)
+                group.appendChild(svgEl('line', {
+                    x1: toSvgX(10695), y1: toSvgZ(9370), x2: toSvgX(11910), y2: toSvgZ(9370),
+                    stroke: '#fcd34d', 'stroke-width': 28
                 }));
             }
 

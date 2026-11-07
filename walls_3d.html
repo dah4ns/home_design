@@ -613,14 +613,15 @@
                         <span>2. Quick Wall &amp; Stair Presets</span>
                     </div>
                     <div class="preset-grid">
+                        <button type="button" class="ctrl-btn" id="preset-upper-slab" style="grid-column: span 2;">🟫 Floor Slabs + Flat Roofs + Stairs</button>
                         <button type="button" class="ctrl-btn" id="preset-stairs-hall">🪜 Stairs + Hall (STAIRS_1, GW_5, GW_7)</button>
                         <button type="button" class="ctrl-btn" id="preset-garage-doors">🚗 Garage + Doors (GW_1, GW_4)</button>
                         <button type="button" class="ctrl-btn" id="preset-north-facade">🧭 North Facade Walls</button>
                         <button type="button" class="ctrl-btn" id="preset-ground-ext">🧱 Ground Exterior (EW_*)</button>
                         <button type="button" class="ctrl-btn" id="preset-ground-int">🚪 Ground Internal (GW_*)</button>
-                        <button type="button" class="ctrl-btn" id="preset-ground-all">📐 All Ground + Stairs</button>
-                        <button type="button" class="ctrl-btn" id="preset-first-all">🪵 All Upper Floor</button>
-                        <button type="button" class="ctrl-btn" id="preset-all-walls">🏢 All 48 Walls + Stairs</button>
+                        <button type="button" class="ctrl-btn" id="preset-ground-all">📐 All Ground + Slabs + Roofs</button>
+                        <button type="button" class="ctrl-btn" id="preset-first-all">🪵 All Upper Floor + Slab</button>
+                        <button type="button" class="ctrl-btn" id="preset-all-walls">🏢 All Walls + Slabs + Roofs</button>
                         <button type="button" class="ctrl-btn" id="preset-clear" style="grid-column: span 2;">✖ Clear Selection</button>
                     </div>
                 </div>
@@ -659,7 +660,7 @@
                             <span class="kv-key">Cut Plane Height `Z`:</span>
                             <span class="kv-val" id="slice-y-label">1,200 mm</span>
                         </div>
-                        <input type="range" id="slice-y-slider" min="0" max="6130" step="50" value="1200">
+                        <input type="range" id="slice-y-slider" min="-250" max="6130" step="50" value="1200">
                     </div>
                 </div>
 
@@ -682,8 +683,8 @@
             <!-- RIGHT INSPECTOR DOCK -->
             <aside class="right-dock">
                 <div class="dock-title">
-                    <span>Selected Wall, Stair &amp; Window 3D B-Rep Inspector</span>
-                    <span class="tech-pill" id="inspector-summary-pill">outerLoop &amp; 3D steps</span>
+                    <span>Selected Wall, Slab, Stair &amp; Window 3D B-Rep Inspector</span>
+                    <span class="tech-pill" id="inspector-summary-pill">outerLoop &amp; 3D B-Rep</span>
                 </div>
                 <div id="inspector-cards-container" style="display: flex; flex-direction: column; gap: 10px;"></div>
             </aside>
@@ -725,15 +726,21 @@
                 if (s.stairId) stairById[s.stairId] = s;
             });
 
-            // Default selection: highlight the 3D Winder Staircase STAIRS_1 and its adjacent
-            // hallway walls GW_5 (with Wiatrołap door D_GW5_1) and GW_7 (with WC door D_GW7_2 under the stairs)
+            const allFloors = (typeof WallService.getFloors3D === 'function') ? WallService.getFloors3D() : [];
+            const floorById = {};
+            allFloors.forEach(fl => {
+                floorById[fl.id] = fl;
+            });
+
+            // Default selection: highlight Lower & Upper Floor Slabs (FLOOR_LOWER, FLOOR_UPPER),
+            // Gym & Garage Flat Roofs (ROOF_GYM, ROOF_GARAGE), 3D Winder Staircase STAIRS_1, and hallway walls
             //
             // Right-Handed Z-Up Coordinate System:
             // - X axis: East -> West horizontal axis (grows to the RIGHT when looking from North)
             // - Y axis: North -> South horizontal axis (second horizontal axis, into depth)
-            // - Z axis: Vertical height axis (0..6,130 mm, pointing UP)
+            // - Z axis: Vertical height axis (-220..6,130 mm, pointing UP)
             const appState = {
-                selectedIds: new Set(['STAIRS_1', 'GW_5', 'GW_7', 'GW_3']),
+                selectedIds: new Set(['FLOOR_LOWER', 'FLOOR_UPPER', 'ROOF_GYM', 'ROOF_GARAGE', 'STAIRS_1', 'GW_5', 'GW_7', 'GW_3']),
                 searchQuery: '',
                 showWindows: true,
                 showAxes: true,
@@ -745,8 +752,8 @@
                 // Camera spherical coordinates around Z-up (in meters, 1 m = 1,000 mm)
                 yaw: 65 * Math.PI / 180,
                 pitch: 28 * Math.PI / 180,
-                distance: 11.5,
-                target: { x: 13.9, y: 9.0, z: 1.6 }
+                distance: 15.5,
+                target: { x: 13.3, y: 7.5, z: 2.2 }
             };
 
             // Distinct palette per wall category/side so multiple selected walls are easy to distinguish
@@ -1593,6 +1600,97 @@
                     }
                 });
 
+                // ---------------------------------------------------------------------
+                // C-3. RENDER 3D SOLID FLOOR & FLAT ROOF SLAB OBJECTS
+                // ---------------------------------------------------------------------
+                allFloors.forEach(fl => {
+                    if (!appState.selectedIds.has(fl.id)) return;
+
+                    const isRoof = (fl.category === 'roof' || fl.id.startsWith('ROOF_'));
+                    const isLower = (!isRoof && (fl.id === 'FLOOR_LOWER' || fl.floor === 'ground'));
+
+                    const topColor = isRoof
+                        ? [0.34, 0.44, 0.50, 0.94]
+                        : (isLower ? [0.64, 0.67, 0.71, 0.94] : [0.78, 0.72, 0.63, 0.94]);
+                    const botColor = isRoof
+                        ? [0.46, 0.54, 0.60, 0.94]
+                        : (isLower ? [0.46, 0.50, 0.56, 0.94] : [0.60, 0.64, 0.69, 0.94]);
+                    const sideColor = isRoof
+                        ? [0.38, 0.46, 0.53, 0.94]
+                        : (isLower ? [0.42, 0.47, 0.54, 0.94] : [0.51, 0.56, 0.62, 0.94]);
+
+                    // 1. Top Surface (Finished Level Z = fl.zTop mm)
+                    (fl.topCellQuads3D || []).forEach(quad => {
+                        pushConvexLoop3D(quad, [0, 0, 1], topColor);
+                    });
+
+                    // 2. Bottom Surface (Slab Underside Z = fl.zBottom mm)
+                    (fl.bottomCellQuads3D || []).forEach(quad => {
+                        pushConvexLoop3D(quad, [0, 0, -1], botColor);
+                    });
+
+                    // 3. Vertical Perimeter Faces (Thickness = fl.thickness mm)
+                    (fl.sideQuads3D || []).forEach(sq => {
+                        const sqLoop = sq.loop3D || sq.loop;
+                        pushConvexLoop3D(sqLoop, sq.normal, sideColor);
+                        pushLoopLines(sqLoop, [0.35, 0.42, 0.52, 0.85]);
+                    });
+
+                    // 4. Top & Bottom Outer Boundary Wireframes
+                    if (Array.isArray(fl.topLoop3D)) {
+                        const topWireColor = isRoof
+                            ? [0.20, 0.83, 0.60, 1.0]
+                            : (isLower ? [0.38, 0.85, 0.98, 1.0] : [0.98, 0.82, 0.35, 1.0]);
+                        pushLoopLines(fl.topLoop3D, topWireColor);
+                    }
+                    if (Array.isArray(fl.bottomLoop3D)) {
+                        pushLoopLines(fl.bottomLoop3D, [0.58, 0.64, 0.72, 0.90]);
+                    }
+
+                    // 5. Vertex Coordinate Labels for the Slab Vertices
+                    if (appState.showVertices && Array.isArray(fl.topLoop3D)) {
+                        const vColor = isRoof ? '#6ee7b7' : (isLower ? '#bae6fd' : '#fef08a');
+                        fl.topLoop3D.forEach((pt, idx) => {
+                            hudLabels.push({
+                                ptMm: pt,
+                                text: `V${idx + 1}[${pt[0]},${pt[1]},${pt[2]}]`,
+                                color: vColor,
+                                bg: 'rgba(15, 23, 42, 0.88)',
+                                fontSize: 9.5,
+                                isVertex: true
+                            });
+                        });
+                    }
+
+                    // 6. Floating Floor / Roof Slab Badge
+                    let badgePt = [13500, 5600, fl.zTop + 320];
+                    if (fl.id === 'FLOOR_LOWER') {
+                        badgePt = [4800, 7500, fl.zTop + 260];
+                    } else if (fl.id === 'ROOF_GYM') {
+                        badgePt = [17700, 15975, fl.zTop + 280];
+                    } else if (fl.id === 'ROOF_GARAGE') {
+                        badgePt = [16210, 1630, fl.zTop + 280];
+                    }
+                    hudLabels.push({
+                        ptMm: badgePt,
+                        text: `${isRoof ? '🏠' : '🧱'} ${fl.id} (Z=${fl.zBottom}..${fl.zTop}mm • ${fl.thickness}mm • ${fl.areaM2} m²)`,
+                        color: isRoof ? '#6ee7b7' : (isLower ? '#bae6fd' : '#fef08a'),
+                        bg: isRoof
+                            ? 'rgba(6, 78, 59, 0.94)'
+                            : (isLower ? 'rgba(12, 74, 110, 0.94)' : 'rgba(113, 63, 18, 0.94)'),
+                        fontSize: 11.5
+                    });
+
+                    // 7. Horizontal Slice Plane (Z = appState.sliceZMm) Intersection with 3D Slab
+                    if (appState.showSlicePlane && typeof WallService.sliceFloor3DAtElevation === 'function') {
+                        const floorSlice = WallService.sliceFloor3DAtElevation(fl, appState.sliceZMm);
+                        (floorSlice.polygons2D || []).forEach(poly2D => {
+                            const loop3D = poly2D.map(p => [p[0], p[1], appState.sliceZMm + 3]);
+                            pushLoopLines(loop3D, [1.0, 0.25, 0.45, 1.0]);
+                        });
+                    }
+                });
+
                 // Translucent Horizontal Cut Plane at Z = appState.sliceZMm
                 if (appState.showSlicePlane) {
                     const zS = appState.sliceZMm;
@@ -1713,8 +1811,9 @@
             function focusSelectedWalls() {
                 const selectedWalls = allWalls.filter(w => appState.selectedIds.has(w.id));
                 const selectedStairs = allStairs.filter(s => appState.selectedIds.has(s.id) || appState.selectedIds.has(s.stairId));
-                const list = (selectedWalls.length + selectedStairs.length > 0)
-                    ? selectedWalls.concat(selectedStairs)
+                const selectedFloors = allFloors.filter(f => appState.selectedIds.has(f.id));
+                const list = (selectedWalls.length + selectedStairs.length + selectedFloors.length > 0)
+                    ? selectedWalls.concat(selectedStairs).concat(selectedFloors)
                     : allWalls;
 
                 let minX = Infinity, maxX = -Infinity;
@@ -1809,11 +1908,64 @@
                 countBadge.textContent = `${count} selected`;
                 triggerText.textContent = count > 0
                     ? `Selected: ${Array.from(appState.selectedIds).slice(0, 3).join(', ')}${count > 3 ? ` +${count - 3} more` : ''}`
-                    : 'Choose Wall / Stair IDs from Database...';
+                    : 'Choose Wall / Stair / Floor IDs from Database...';
 
                 const q = appState.searchQuery.trim().toLowerCase();
 
-                // 0. 3D Staircase Objects Group
+                // 0-A. 3D Floor Slab Objects Group
+                const matchingFloors = allFloors.filter(f => (
+                    !q ||
+                    f.id.toLowerCase().includes(q) ||
+                    f.name.toLowerCase().includes(q) ||
+                    (f.rooms && f.rooms.toLowerCase().includes(q))
+                ));
+                if (matchingFloors.length > 0) {
+                    optionsContainer.appendChild(createEl('div', 'wall-group-header', '3D Floor & Flat Roof Slabs (data/walls.js)'));
+                    matchingFloors.forEach(f => {
+                        const isChecked = appState.selectedIds.has(f.id);
+                        const row = createEl('label', 'wall-option-row' + (isChecked ? ' checked' : ''));
+                        const cb = document.createElement('input');
+                        cb.type = 'checkbox';
+                        cb.checked = isChecked;
+                        cb.addEventListener('change', () => {
+                            if (cb.checked) {
+                                appState.selectedIds.add(f.id);
+                            } else {
+                                appState.selectedIds.delete(f.id);
+                            }
+                            renderDropdownAndInspector();
+                            renderScene();
+                        });
+
+                        const isRoof = (f.category === 'roof' || f.id.startsWith('ROOF_'));
+                        const isLower = (!isRoof && (f.id === 'FLOOR_LOWER' || f.floor === 'ground'));
+                        const idSpan = createEl('span', 'wall-option-id', `${isRoof ? '🏠' : '🧱'} ${f.id}`);
+                        let descLabel = 'Solid Upper Floor Slab (Strop nad parterem +296..+333 cm)';
+                        if (isLower) {
+                            descLabel = 'Solid Lower Floor Slab (Podłoga na gruncie -22..0 cm)';
+                        } else if (f.id === 'ROOF_GYM') {
+                            descLabel = 'SW Wing / Gym Flat Roof (+296..+340 cm)';
+                        } else if (f.id === 'ROOF_GARAGE') {
+                            descLabel = 'Garage & Magazyn Flat Roof (+296..+340 cm)';
+                        }
+                        const nameSpan = createEl('span', '', descLabel);
+                        nameSpan.style.color = isRoof ? '#6ee7b7' : (isLower ? '#bae6fd' : '#fef08a');
+                        nameSpan.style.fontSize = '11px';
+                        nameSpan.style.overflow = 'hidden';
+                        nameSpan.style.textOverflow = 'ellipsis';
+                        nameSpan.style.whiteSpace = 'nowrap';
+
+                        const metaSpan = createEl('span', 'wall-option-meta', `Z=${f.zBottom}..${f.zTop} • ${f.thickness}mm • ${f.areaM2}m²`);
+
+                        row.appendChild(cb);
+                        row.appendChild(idSpan);
+                        row.appendChild(nameSpan);
+                        row.appendChild(metaSpan);
+                        optionsContainer.appendChild(row);
+                    });
+                }
+
+                // 0-B. 3D Staircase Objects Group
                 const matchingStairs = allStairs.filter(s => (
                     !q ||
                     s.id.toLowerCase().includes(q) ||
@@ -1924,15 +2076,54 @@
                     chipsContainer.appendChild(chip);
                 });
 
-                // Render Inspector Cards for selected stairs & walls
+                // Render Inspector Cards for selected floors, stairs & walls
+                const selectedFloors = allFloors.filter(f => appState.selectedIds.has(f.id));
                 const selectedStairs = allStairs.filter(s => appState.selectedIds.has(s.id) || appState.selectedIds.has(s.stairId));
                 const selectedWalls = allWalls.filter(w => appState.selectedIds.has(w.id));
-                if (selectedStairs.length === 0 && selectedWalls.length === 0) {
+                if (selectedFloors.length === 0 && selectedStairs.length === 0 && selectedWalls.length === 0) {
                     const emptyCard = createEl('div', 'inspector-wall-card');
-                    emptyCard.appendChild(createEl('div', 'inspector-wall-name', 'No objects selected. Choose STAIRS_1 or wall IDs from the dropdown on the left.'));
+                    emptyCard.appendChild(createEl('div', 'inspector-wall-name', 'No objects selected. Choose FLOOR_LOWER, FLOOR_UPPER, ROOF_GYM, ROOF_GARAGE, STAIRS_1, or wall IDs from the dropdown on the left.'));
                     inspectorContainer.appendChild(emptyCard);
                     return;
                 }
+
+                selectedFloors.forEach(f => {
+                    const isRoof = (f.category === 'roof' || f.id.startsWith('ROOF_'));
+                    const isLower = (!isRoof && (f.id === 'FLOOR_LOWER' || f.floor === 'ground'));
+                    const card = createEl('div', 'inspector-wall-card');
+                    const header = createEl('div', 'inspector-wall-header');
+                    header.appendChild(createEl('span', 'inspector-wall-id', `${isRoof ? '🏠' : '🧱'} ${f.id}`));
+                    header.appendChild(createEl('span', 'tech-pill', `${f.thickness} mm • Z=${f.zBottom}..${f.zTop} • ${f.areaM2} m²`));
+                    card.appendChild(header);
+
+                    card.appendChild(createEl('div', 'inspector-wall-name', f.name));
+
+                    const addKv = (k, v) => {
+                        const r = createEl('div', 'kv-row');
+                        r.appendChild(createEl('span', 'kv-key', k));
+                        r.appendChild(createEl('span', 'kv-val', v));
+                        card.appendChild(r);
+                    };
+
+                    addKv('Elevation & Thickness', `Z = ${f.zBottom}..${f.zTop} mm (${f.zBottom / 10}..${f.zTop / 10} cm, ${f.thickness / 10} cm thick)`);
+                    addKv('X / Y Footprint Bounds', `X: ${f.x1}..${f.x2} | Y: ${f.y1}..${f.y2} mm (${isLower ? 'includes 38 cm external walls' : 'excludes outer 38 cm ground-floor walls'})`);
+                    addKv('Polygon Topology', `1 solid piece • ${(f.footprint2D || []).length} vertices • ${(f.sideQuads3D || []).length} vertical edge faces`);
+                    if (f.id === 'ROOF_GYM') {
+                        addKv('Overlap & Boundaries', 'Covers 38 cm under UW_SOUTH (Y=11,200..11,580 mm); excludes outer 38 cm above EW_SW_EAST, EW_SW_SOUTH & EW_WEST_SOUTH');
+                    } else if (f.id === 'ROOF_GARAGE') {
+                        addKv('Overlap & Boundaries', 'Covers 38 cm under UW_NORTH_MAIN (Y=2,790..3,170 mm); excludes outer 38 cm above EW_GARAGE_EAST, EW_GARAGE_NORTH & EW_GARAGE_WEST');
+                    } else {
+                        addKv(isLower ? 'Coverage' : 'Double-Height Cutouts', isLower
+                            ? 'Full Ground Floor building footprint including 38 cm external walls (265.95 m²)'
+                            : 'Living Room (X<6315), High Hall (X=10695..15535, Y>9370), Stairwell (X=11910..15535, Y=8360..9370)');
+                    }
+
+                    const polyText = `footprint2D (${(f.footprint2D || []).length} pts, Z=${f.zBottom}..${f.zTop}): ` +
+                        (f.footprint2D || []).map((p, i) => `V${i + 1}[${p[0]}, ${p[1]}]`).join(' → ');
+                    card.appendChild(createEl('div', 'coord-block', polyText));
+
+                    inspectorContainer.appendChild(card);
+                });
 
                 selectedStairs.forEach(s => {
                     const card = createEl('div', 'inspector-wall-card');
@@ -2041,13 +2232,18 @@
                 focusSelectedWalls();
             }
 
+            document.getElementById('preset-upper-slab').addEventListener('click', () => {
+                appState.yaw = 42 * Math.PI / 180;
+                appState.pitch = 38 * Math.PI / 180;
+                applyPreset(['FLOOR_LOWER', 'FLOOR_UPPER', 'ROOF_GYM', 'ROOF_GARAGE', 'STAIRS_1', 'FW_1b', 'FW_8', 'FW_9']);
+            });
             document.getElementById('preset-stairs-hall').addEventListener('click', () => {
                 appState.yaw = 65 * Math.PI / 180;
                 appState.pitch = 28 * Math.PI / 180;
                 applyPreset(['STAIRS_1', 'GW_5', 'GW_7', 'GW_3']);
             });
             document.getElementById('preset-garage-doors').addEventListener('click', () => {
-                applyPreset(['EW_GARAGE_NORTH', 'EW_GARAGE_WEST', 'EW_GARAGE_EAST', 'GW_1', 'GW_2', 'GW_4']);
+                applyPreset(['EW_GARAGE_NORTH', 'EW_GARAGE_WEST', 'EW_GARAGE_EAST', 'GW_1', 'GW_2', 'GW_4', 'ROOF_GARAGE']);
             });
             document.getElementById('preset-north-facade').addEventListener('click', () => {
                 applyPreset(['EW_NORTH_RECESSED', 'EW_GARAGE_EAST', 'EW_GARAGE_NORTH', 'UW_TERRACE_BACK', 'UW_TERRACE_EAST', 'UW_NORTH_MAIN']);
@@ -2059,13 +2255,13 @@
                 applyPreset(allWalls.filter(w => w.floor === 'ground' && w.category === 'internal').map(w => w.id).concat(['STAIRS_1']));
             });
             document.getElementById('preset-ground-all').addEventListener('click', () => {
-                applyPreset(allWalls.filter(w => w.floor === 'ground').map(w => w.id).concat(['STAIRS_1']));
+                applyPreset(allWalls.filter(w => w.floor === 'ground').map(w => w.id).concat(['FLOOR_LOWER', 'ROOF_GYM', 'ROOF_GARAGE', 'STAIRS_1']));
             });
             document.getElementById('preset-first-all').addEventListener('click', () => {
-                applyPreset(allWalls.filter(w => w.floor === 'first').map(w => w.id).concat(['STAIRS_1']));
+                applyPreset(allWalls.filter(w => w.floor === 'first').map(w => w.id).concat(['FLOOR_UPPER', 'STAIRS_1']));
             });
             document.getElementById('preset-all-walls').addEventListener('click', () => {
-                applyPreset(allWalls.map(w => w.id).concat(['STAIRS_1']));
+                applyPreset(allWalls.map(w => w.id).concat(['FLOOR_LOWER', 'FLOOR_UPPER', 'ROOF_GYM', 'ROOF_GARAGE', 'STAIRS_1']));
             });
             document.getElementById('preset-clear').addEventListener('click', () => {
                 appState.selectedIds.clear();

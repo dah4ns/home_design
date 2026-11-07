@@ -2357,6 +2357,211 @@
                     balustradePos2D: [13950, yS + 230]
                 }
             };
+        },
+
+        // =====================================================================
+        // 3D MONOLITHIC FLOOR SLAB B-REP COMPILER (FLOOR_UPPER)
+        // =====================================================================
+        compileFloor3D: function (floorObjOrId) {
+            const rawFloors = (wallsData && Array.isArray(wallsData.floors)) ? wallsData.floors : [];
+            const raw = (typeof floorObjOrId === 'object' && floorObjOrId)
+                ? floorObjOrId
+                : (rawFloors.find(f => f.id === floorObjOrId) || rawFloors[0] || {
+                    id: 'FLOOR_UPPER',
+                    name: 'FLOOR_UPPER — Upper Floor Slab (Strop nad parterem +2.96..+3.33 m)',
+                    floor: 'first',
+                    category: 'floor',
+                    zBottom: 2960,
+                    zTop: 3330,
+                    thickness: 370,
+                    rooms: '1.01 Sypialnia, 1.02 & 1.03 Łazienka, 1.04 & 1.05 Pokój, 1.06 Korytarz (Walkway & Landing), 1.08 Garderoba',
+                    specs: 'Single monolithic 12-vertex orthogonal slab • Z = 2,960..3,330 mm (370 mm = 20 cm RC slab + 17 cm insulation/screed/oak finish) • Inside 38 cm exterior walls; excludes High Living Room, High Hall, and Stairwell',
+                    footprint2D: [
+                        [20325, 3170],
+                        [6495, 3170],
+                        [6495, 6270],
+                        [6315, 6270],
+                        [6315, 11200],
+                        [10695, 11200],
+                        [10695, 9370],
+                        [11910, 9370],
+                        [11910, 8360],
+                        [15535, 8360],
+                        [15535, 11200],
+                        [20325, 11200]
+                    ],
+                    excludedVoids: []
+                });
+
+            const poly2D = raw.footprint2D || [];
+            const zBot = (raw.zBottom !== undefined && raw.zBottom !== null) ? Number(raw.zBottom) : 2960;
+            const zTop = (raw.zTop !== undefined && raw.zTop !== null) ? Number(raw.zTop) : 3330;
+            const thick = (raw.thickness !== undefined && raw.thickness !== null) ? Number(raw.thickness) : (zTop - zBot);
+
+            const topLoop3D = poly2D.map(p => [p[0], p[1], zTop]);
+            const bottomLoop3D = poly2D.slice().reverse().map(p => [p[0], p[1], zBot]);
+
+            // 12 vertical perimeter faces around the slab boundary
+            const sideQuads3D = [];
+            for (let i = 0; i < poly2D.length; i++) {
+                const a = poly2D[i];
+                const b = poly2D[(i + 1) % poly2D.length];
+                const dx = b[0] - a[0];
+                const dy = b[1] - a[1];
+                const len = Math.hypot(dx, dy) || 1;
+                const normal = [
+                    Math.round((-dy / len) * 1000) / 1000,
+                    Math.round((dx / len) * 1000) / 1000,
+                    0
+                ];
+                sideQuads3D.push({
+                    edgeIndex: i,
+                    lengthMm: Math.round(len),
+                    normal,
+                    loop3D: [
+                        [a[0], a[1], zBot],
+                        [b[0], b[1], zBot],
+                        [b[0], b[1], zTop],
+                        [a[0], a[1], zTop]
+                    ]
+                });
+            }
+
+            // Rectilinear 2D cell decomposition of the non-convex orthogonal footprint
+            function pointInPoly2D(x, y, loop) {
+                let inside = false;
+                for (let i = 0, j = loop.length - 1; i < loop.length; j = i++) {
+                    const xi = loop[i][0], yi = loop[i][1];
+                    const xj = loop[j][0], yj = loop[j][1];
+                    const intersect = ((yi > y) !== (yj > y)) &&
+                        (x < (xj - xi) * (y - yi) / ((yj - yi) || 1e-9) + xi);
+                    if (intersect) inside = !inside;
+                }
+                return inside;
+            }
+
+            const xSet = new Set();
+            const ySet = new Set();
+            poly2D.forEach(p => {
+                xSet.add(p[0]);
+                ySet.add(p[1]);
+            });
+            const xCoords = Array.from(xSet).sort((a, b) => a - b);
+            const yCoords = Array.from(ySet).sort((a, b) => a - b);
+
+            const cells2D = [];
+            const topCellQuads3D = [];
+            const bottomCellQuads3D = [];
+            let totalAreaMm2 = 0;
+
+            for (let i = 0; i + 1 < xCoords.length; i++) {
+                const x0 = xCoords[i];
+                const x1 = xCoords[i + 1];
+                if (x1 - x0 < 1) continue;
+                const xm = (x0 + x1) / 2;
+                for (let j = 0; j + 1 < yCoords.length; j++) {
+                    const y0 = yCoords[j];
+                    const y1 = yCoords[j + 1];
+                    if (y1 - y0 < 1) continue;
+                    const ym = (y0 + y1) / 2;
+                    if (!pointInPoly2D(xm, ym, poly2D)) continue;
+
+                    const areaMm2 = (x1 - x0) * (y1 - y0);
+                    totalAreaMm2 += areaMm2;
+                    cells2D.push({ x0, y0, x1, y1, areaM2: Math.round((areaMm2 / 1e6) * 100) / 100 });
+                    topCellQuads3D.push([
+                        [x0, y0, zTop],
+                        [x1, y0, zTop],
+                        [x1, y1, zTop],
+                        [x0, y1, zTop]
+                    ]);
+                    bottomCellQuads3D.push([
+                        [x0, y1, zBot],
+                        [x1, y1, zBot],
+                        [x1, y0, zBot],
+                        [x0, y0, zBot]
+                    ]);
+                }
+            }
+
+            const xs = poly2D.map(p => p[0]);
+            const ys = poly2D.map(p => p[1]);
+
+            const xMin = Math.min.apply(null, xs);
+            const xMax = Math.max.apply(null, xs);
+            const yMin = Math.min.apply(null, ys);
+            const yMax = Math.max.apply(null, ys);
+
+            return {
+                id: raw.id || 'FLOOR_UPPER',
+                name: raw.name || 'FLOOR_UPPER — Upper Floor Slab (+2.96..+3.33 m)',
+                floor: raw.floor || 'first',
+                category: raw.category || 'floor',
+                zBottom: zBot,
+                zTop,
+                thickness: thick,
+                x1: xMin,
+                x2: xMax,
+                y1: yMin,
+                y2: yMax,
+                xMin,
+                xMax,
+                yMin,
+                yMax,
+                areaM2: Math.round((totalAreaMm2 / 1e6) * 100) / 100,
+                rooms: raw.rooms || '',
+                specs: raw.specs || '',
+                footprint2D: poly2D,
+                excludedVoids: raw.excludedVoids || [],
+                topLoop3D,
+                bottomLoop3D,
+                sideQuads3D,
+                cells2D,
+                topCellQuads3D,
+                bottomCellQuads3D
+            };
+        },
+
+        getFloors3D: function () {
+            const rawFloors = (wallsData && Array.isArray(wallsData.floors)) ? wallsData.floors : [];
+            if (rawFloors.length === 0) {
+                return [
+                    this.compileFloor3D('FLOOR_LOWER'),
+                    this.compileFloor3D('FLOOR_UPPER'),
+                    this.compileFloor3D('ROOF_GYM'),
+                    this.compileFloor3D('ROOF_GARAGE')
+                ];
+            }
+            return rawFloors.map(f => this.compileFloor3D(f));
+        },
+
+        getFloor3DById: function (id) {
+            const floors = this.getFloors3D();
+            if (!id) return floors[0] || null;
+            return floors.find(f => f.id === id) || null;
+        },
+
+        getRoofs3D: function () {
+            return this.getFloors3D().filter(f => f.category === 'roof');
+        },
+
+        getRoof3DById: function (id) {
+            const roofs = this.getRoofs3D();
+            if (!id) return roofs[0] || null;
+            return roofs.find(r => r.id === id) || null;
+        },
+
+        sliceFloor3DAtElevation: function (floorObjOrId, zSlice) {
+            const fl = (floorObjOrId && floorObjOrId.footprint2D && floorObjOrId.topLoop3D)
+                ? floorObjOrId
+                : this.compileFloor3D(floorObjOrId);
+            if (!fl || zSlice < fl.zBottom || zSlice > fl.zTop) {
+                return { zSlice, polygons2D: [] };
+            }
+            return {
+                zSlice,
+                polygons2D: [fl.footprint2D]
+            };
         }
     };
 
