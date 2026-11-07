@@ -469,11 +469,12 @@
 
         const hasExplicitThickness = rawWall.thickness !== undefined && rawWall.thickness !== null && Number.isFinite(Number(rawWall.thickness));
         const targetThicknessMm = hasExplicitThickness ? Number(rawWall.thickness) : geomThicknessMm;
+        const isMultiSegmentRing = Array.isArray(rawWall.outerPolygon2D) && rawWall.outerPolygon2D.length >= 3;
 
         // If rawWall.thickness was explicitly edited and differs from the distance between sideA and sideB,
         // shift the movable side so that the 3D B-Rep geometry matches rawWall.thickness.
         // For exterior walls, never move sideA (exterior face); move sideB (interior face) instead.
-        if (sideA && sideB && hasExplicitThickness && Math.abs(targetThicknessMm - geomThicknessMm) > 0.5) {
+        if (!isMultiSegmentRing && sideA && sideB && hasExplicitThickness && Math.abs(targetThicknessMm - geomThicknessMm) > 0.5) {
             const deltaMm = targetThicknessMm - geomThicknessMm;
             const moveInterior = rawWall.category === 'exterior';
             const targetSide = moveInterior ? sideB : sideA;
@@ -496,9 +497,9 @@
             targetSide.holes3D = targetSide.holes;
         }
 
-        const footprint2D = (sideA && sideB)
-            ? [sideA.p1, sideA.p2, sideB.p1, sideB.p2]
-            : [];
+        const footprint2D = isMultiSegmentRing
+            ? rawWall.outerPolygon2D.map(pt => [Number(pt[0]), Number(pt[1])])
+            : ((sideA && sideB) ? [sideA.p1, sideA.p2, sideB.p1, sideB.p2] : []);
 
         const allX = footprint2D.map(pt => pt[0]);
         const allY = footprint2D.map(pt => pt[1]);
@@ -535,6 +536,8 @@
             sideA,
             sideB,
             footprint2D,
+            outerPolygon2D: isMultiSegmentRing ? rawWall.outerPolygon2D.map(pt => [Number(pt[0]), Number(pt[1])]) : null,
+            innerPolygon2D: Array.isArray(rawWall.innerPolygon2D) ? rawWall.innerPolygon2D.map(pt => [Number(pt[0]), Number(pt[1])]) : null,
             openings: resolvedOpenings,
             doors: Array.isArray(rawWall.doors) ? rawWall.doors : []
         };
@@ -638,6 +641,10 @@
                 reconcileMiterCornersForFloor(floorWalls);
                 allCompiled = allCompiled.concat(floorWalls);
             });
+            const bandOrOtherWalls = rawList
+                .filter(w => w.floor !== 'ground' && w.floor !== 'first')
+                .map(compileWall);
+            allCompiled = allCompiled.concat(bandOrOtherWalls);
 
             if (filter && filter.floor) {
                 allCompiled = allCompiled.filter(w => w.floor === filter.floor);
@@ -2529,7 +2536,8 @@
                     this.compileFloor3D('FLOOR_LOWER'),
                     this.compileFloor3D('FLOOR_UPPER'),
                     this.compileFloor3D('ROOF_GYM'),
-                    this.compileFloor3D('ROOF_GARAGE')
+                    this.compileFloor3D('ROOF_GARAGE'),
+                    this.compileFloor3D('ROOF_UPPER')
                 ];
             }
             return rawFloors.map(f => this.compileFloor3D(f));
