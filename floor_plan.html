@@ -1048,24 +1048,22 @@
                     ]
                 },
                 {
-                    id: 'GW_14a', name: 'GW_14a (Spiżarnia Upper East Wall)',
-                    axis: 'z', x1: 4335, z1: 3170, x2: 4455, z2: 5090,
-                    rooms: '0.14 Spiżarnia (186 cm upper) ↔ 0.15 Gabinet (424 cm upper)',
-                    specs: '120 × 1,920 mm • 1,860 mm (186 cm) East of GW_13, 4,240 mm (424 cm) West of EW_EAST_CORE',
-                    doors: []
-                },
-                {
-                    id: 'GW_14b', name: 'GW_14b (Spiżarnia / Gabinet 25 cm Wall Step)',
-                    axis: 'x', x1: 4085, z1: 5090, x2: 4455, z2: 5210,
-                    rooms: '0.14 Spiżarnia ↔ 0.15 Gabinet (25 cm Step)',
-                    specs: '370 × 120 mm • 250 mm (25 cm) step between 186 cm upper and 211 cm lower Spiżarnia width',
-                    doors: []
-                },
-                {
-                    id: 'GW_14c', name: 'GW_14c (Spiżarnia Lower East Wall)',
-                    axis: 'z', x1: 4085, z1: 5210, x2: 4205, z2: 6110,
-                    rooms: '0.14 Spiżarnia (211 cm lower) ↔ 0.15 Gabinet (399 cm lower)',
-                    specs: '120 × 900 mm (90 cm) • Stepped 250 mm (25 cm) East of GW_14a; 399 cm West of EW_EAST_CORE',
+                    id: 'GW_14', name: 'GW_14 (Spiżarnia / Gabinet Stepped Wall)',
+                    axis: 'z', x1: 4085, z1: 3170, x2: 4455, z2: 6110,
+                    rooms: '0.14 Spiżarnia (186 cm upper / 211 cm lower) ↔ 0.15 Gabinet (424 cm upper / 399 cm lower)',
+                    specs: 'Stepped 120 mm (12 cm) wall • Z = 0..2,850 mm (285 cm tall under TERRACE_UPPER) • Upper 1,920 mm + 250 mm step + Lower 900 mm',
+                    solidPolygons2D: [
+                        [
+                            [4335, 3170],
+                            [4455, 3170],
+                            [4455, 5210],
+                            [4205, 5210],
+                            [4205, 6110],
+                            [4085, 6110],
+                            [4085, 5090],
+                            [4335, 5090]
+                        ]
+                    ],
                     doors: []
                 },
                 {
@@ -2667,16 +2665,16 @@
                 wallThick('GW_3', 3650, 1);
                 wallSpan('GW_3', 'GW_13', 3650, 1);
                 wallThick('GW_13', 5680, 1);
-                wallSpan('GW_13', 'GW_14a', 3650, 1);
-                wallThick('GW_14a', 3650, 1);
-                wallSpan('GW_14a', 'EW_EAST_CORE', 3650, 1);
+                drawWallSpanDim(group, 6315, 3650, 4455, 3650, 1);
+                drawWallThicknessDim(group, 4455, 3650, 4335, 3650, 1);
+                drawWallSpanDim(group, 4335, 3650, 95, 3650, 1);
                 wallThick('EW_EAST_CORE', 3650, 1);
 
-                // 3) Spiżarnia (lower 211 cm), 25 cm step (GW_14b), & Gabinet (lower 399 cm) bay (Z = 5680 mm)
+                // 3) Spiżarnia (lower 211 cm), 25 cm step (GW_14), & Gabinet (lower 399 cm) bay (Z = 5680 mm)
                 drawWallSpanDim(group, 4335, 4940, 4085, 4940, -1);
-                wallSpan('GW_13', 'GW_14c', 5680, 1);
-                wallThick('GW_14c', 5680, 1);
-                wallSpan('GW_14c', 'EW_EAST_CORE', 5680, 1);
+                drawWallSpanDim(group, 6315, 5680, 4205, 5680, 1);
+                drawWallThicknessDim(group, 4205, 5680, 4085, 5680, 1);
+                drawWallSpanDim(group, 4085, 5680, 95, 5680, 1);
 
                 // 3a) GW_15 horizontal segments: 457 cm left wall + 90 cm door (H=210 cm) + 93 cm right pier = 640 cm
                 drawWallSpanDim(group, 6495, 6440, 1925, 6440, 1);
@@ -2789,9 +2787,9 @@
                 drawWallSpanDim(group, 6650, 3170, 6650, 3870, 1);
                 drawWallSpanDim(group, 6650, 3870, 6650, 4770, 1);
                 drawWallSpanDim(group, 6650, 4770, 6650, 6110, 1);
-                wallSpan('EW_NORTH_RECESSED', 'GW_14b', 4270, 1);
-                wallThick('GW_14b', 4270, 1);
-                wallSpan('GW_14b', 'GW_15', 4270, 1);
+                drawWallSpanDim(group, 4270, 3170, 4270, 5090, 1);
+                drawWallThicknessDim(group, 4270, 5090, 4270, 5210, 1);
+                drawWallSpanDim(group, 4270, 5210, 4270, 6110, 1);
 
                 // 5) Gabinet (294 cm) & Salon (491 cm) along East side (X = 650 mm)
                 wallThick('EW_NORTH_RECESSED', 650, -1);

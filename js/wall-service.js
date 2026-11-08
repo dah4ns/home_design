@@ -470,11 +470,12 @@
         const hasExplicitThickness = rawWall.thickness !== undefined && rawWall.thickness !== null && Number.isFinite(Number(rawWall.thickness));
         const targetThicknessMm = hasExplicitThickness ? Number(rawWall.thickness) : geomThicknessMm;
         const isMultiSegmentRing = Array.isArray(rawWall.outerPolygon2D) && rawWall.outerPolygon2D.length >= 3;
+        const isMultiSideWall = compiledSides.length > 2 || (Array.isArray(rawWall.footprint2D) && rawWall.footprint2D.length > 4);
 
         // If rawWall.thickness was explicitly edited and differs from the distance between sideA and sideB,
         // shift the movable side so that the 3D B-Rep geometry matches rawWall.thickness.
         // For exterior walls, never move sideA (exterior face); move sideB (interior face) instead.
-        if (!isMultiSegmentRing && sideA && sideB && hasExplicitThickness && Math.abs(targetThicknessMm - geomThicknessMm) > 0.5) {
+        if (!isMultiSegmentRing && !isMultiSideWall && sideA && sideB && hasExplicitThickness && Math.abs(targetThicknessMm - geomThicknessMm) > 0.5) {
             const deltaMm = targetThicknessMm - geomThicknessMm;
             const moveInterior = rawWall.category === 'exterior';
             const targetSide = moveInterior ? sideB : sideA;
@@ -499,7 +500,9 @@
 
         const footprint2D = isMultiSegmentRing
             ? rawWall.outerPolygon2D.map(pt => [Number(pt[0]), Number(pt[1])])
-            : ((sideA && sideB) ? [sideA.p1, sideA.p2, sideB.p1, sideB.p2] : []);
+            : (Array.isArray(rawWall.footprint2D) && rawWall.footprint2D.length >= 4
+                ? rawWall.footprint2D.map(pt => [Number(pt[0]), Number(pt[1])])
+                : ((sideA && sideB) ? [sideA.p1, sideA.p2, sideB.p1, sideB.p2] : []));
 
         const allX = footprint2D.map(pt => pt[0]);
         const allY = footprint2D.map(pt => pt[1]);
@@ -536,6 +539,8 @@
             sideA,
             sideB,
             footprint2D,
+            solidPolygons2D: Array.isArray(rawWall.solidPolygons2D) ? rawWall.solidPolygons2D : null,
+            collisionBoxes2D: Array.isArray(rawWall.collisionBoxes2D) ? rawWall.collisionBoxes2D : null,
             outerPolygon2D: isMultiSegmentRing ? rawWall.outerPolygon2D.map(pt => [Number(pt[0]), Number(pt[1])]) : null,
             innerPolygon2D: Array.isArray(rawWall.innerPolygon2D) ? rawWall.innerPolygon2D.map(pt => [Number(pt[0]), Number(pt[1])]) : null,
             openings: resolvedOpenings,
@@ -675,6 +680,18 @@
 
             function sliceWall(w) {
                 const slicedOpenings = w.openings.filter(op => op.active && op.zMin <= zSlice && op.zMax >= zSlice);
+                if (Array.isArray(w.solidPolygons2D) && w.solidPolygons2D.length > 0) {
+                    const inSlice = (zSlice >= w.zBottom && zSlice <= w.zTop);
+                    return Object.assign({}, w, {
+                        zSlice,
+                        ySlice: zSlice,
+                        slicedOpenings,
+                        solidIntervalsAtSlice: inSlice ? [[w.y1, w.y2]] : [],
+                        cutOpeningsAtSlice: [],
+                        solidPolygons2D: inSlice ? w.solidPolygons2D : []
+                    });
+                }
+
                 const scan = w.sideA
                     ? sliceFace3DAtElevation(w.sideA.outerLoop3D, w.sideA.holes3D, w.axis, zSlice)
                     : { solidIntervals: [], cutOpenings: [] };
@@ -1768,6 +1785,8 @@
             const steps3D = [];
 
             // A. 4 Turn Steps (1 Straight Entry + 3 Winder Steps in 1,000 × 1,280 mm West Bay)
+            const zSlabWestTop = 4 * riserH - plankH; // 700 mm
+            const zSlabWestBot = zSlabWestTop - waistH; // 507 mm
             (spec.turnSteps2D || []).forEach(ts => {
                 const zTop = Number(ts.zTop);
                 const zBottom = Number(ts.zBottom);
@@ -1775,7 +1794,6 @@
                 const poly2D = ts.treadPolygon2D;
 
                 const plank = buildExtrudedPolygonFaces(poly2D, zConcreteTop, zTop);
-                const concrete = buildExtrudedPolygonFaces(poly2D, 0, zConcreteTop);
 
                 const r1 = ts.riserLine2D[0];
                 const r2 = ts.riserLine2D[1];
@@ -1783,16 +1801,49 @@
                     loop3D: [
                         [r1[0], r1[1], zBottom],
                         [r2[0], r2[1], zBottom],
-                        [r2[0], r2[1], zTop],
-                        [r1[0], r1[1], zTop]
+                        [r2[0], r2[1], zConcreteTop],
+                        [r1[0], r1[1], zConcreteTop]
                     ],
                     normal: ts.riserNormal || [0, 1, 0]
                 };
 
-                const concreteFaces3D = [
-                    { loop3D: concrete.topLoop, normal: [0, 0, 1] },
-                    { loop3D: concrete.botLoop.slice().reverse(), normal: [0, 0, -1] }
-                ].concat(concrete.sideQuads);
+                // Only exterior non-riser vertical faces of the turn block (no internal step-to-step partitions or z=zConcreteTop cap)
+                const concreteFaces3D = [];
+                if (ts.stepNumber === 1) {
+                    // West hallway cheek face (X = 15,175, Y = 9,370..9,640) + East wall face (X = 16,175)
+                    concreteFaces3D.push({
+                        loop3D: [[15175, 9370, 0], [15175, 9640, 0], [15175, 9640, zConcreteTop], [15175, 9370, zConcreteTop]],
+                        normal: [-1, 0, 0]
+                    });
+                    concreteFaces3D.push({
+                        loop3D: [[16175, 9640, 0], [16175, 9370, 0], [16175, 9370, zConcreteTop], [16175, 9640, zConcreteTop]],
+                        normal: [1, 0, 0]
+                    });
+                } else if (ts.stepNumber === 2) {
+                    concreteFaces3D.push({
+                        loop3D: [[16175, 9370, 0], [16175, 8750, 0], [16175, 8750, zConcreteTop], [16175, 9370, zConcreteTop]],
+                        normal: [1, 0, 0]
+                    });
+                } else if (ts.stepNumber === 3) {
+                    concreteFaces3D.push({
+                        loop3D: [[16175, 8750, 0], [16175, 8360, 0], [16175, 8360, zConcreteTop], [16175, 8750, zConcreteTop]],
+                        normal: [1, 0, 0]
+                    });
+                    concreteFaces3D.push({
+                        loop3D: [[16175, 8360, 0], [15675, 8360, 0], [15675, 8360, zConcreteTop], [16175, 8360, zConcreteTop]],
+                        normal: [0, -1, 0]
+                    });
+                } else if (ts.stepNumber === 4) {
+                    concreteFaces3D.push({
+                        loop3D: [[15675, 8360, 0], [15175, 8360, 0], [15175, 8360, zConcreteTop], [15675, 8360, zConcreteTop]],
+                        normal: [0, -1, 0]
+                    });
+                    // West under-stair face below waist slab soffit (Z = 0 .. zSlabWestBot)
+                    concreteFaces3D.push({
+                        loop3D: [[15175, 8360, 0], [15175, 9370, 0], [15175, 9370, zSlabWestBot], [15175, 8360, zSlabWestBot]],
+                        normal: [-1, 0, 0]
+                    });
+                }
 
                 steps3D.push({
                     stepNumber: ts.stepNumber,
@@ -1838,34 +1889,15 @@
                     loop3D: [
                         [xWest, yNorth, zBottom],
                         [xWest, ySouth, zBottom],
-                        [xWest, ySouth, zTop],
-                        [xWest, yNorth, zTop]
+                        [xWest, ySouth, zConcreteTop],
+                        [xWest, yNorth, zConcreteTop]
                     ],
                     normal: [1, 0, 0]
                 };
 
-                // Triangular concrete step wedge sitting atop the sloped waist slab
+                // Triangular concrete step wedge cheek faces sitting atop the sloped waist slab
+                // (Excludes internal top face under oak plank and front riser face already in riserQuad3D)
                 const concreteFaces3D = [
-                    // Top horizontal concrete face under plank
-                    {
-                        loop3D: [
-                            [xWest, yNorth, zConcreteTop],
-                            [xWest, ySouth, zConcreteTop],
-                            [xEast, ySouth, zConcreteTop],
-                            [xEast, yNorth, zConcreteTop]
-                        ],
-                        normal: [0, 0, 1]
-                    },
-                    // West vertical concrete riser face
-                    {
-                        loop3D: [
-                            [xWest, yNorth, zConcreteBottom],
-                            [xWest, ySouth, zConcreteBottom],
-                            [xWest, ySouth, zConcreteTop],
-                            [xWest, yNorth, zConcreteTop]
-                        ],
-                        normal: [1, 0, 0]
-                    },
                     // North vertical triangular cheek face (against GW_7)
                     {
                         loop3D: [
@@ -1906,7 +1938,7 @@
                 });
             }
 
-            // C. Final Arrival Riser 18 at X = 11,665 mm (Z = 3,145 -> 3,330 mm)
+            // C. Final Arrival Riser 18 at X = 11,910 mm (Z = 3,145 -> 3,330 mm)
             const zLastConcrete = (spec.riserCount - 1) * riserH - plankH; // 3,105 mm
             const topRiser3D = {
                 stepNumber: spec.riserCount,
@@ -1917,17 +1949,15 @@
                 riserLine2D: [[spec.xMin, yNorth], [spec.xMin, ySouth]],
                 riserNormal: [1, 0, 0],
                 loop3D: [
-                    [spec.xMin, yNorth, zLastConcrete],
-                    [spec.xMin, ySouth, zLastConcrete],
+                    [spec.xMin, yNorth, (spec.riserCount - 1) * riserH],
+                    [spec.xMin, ySouth, (spec.riserCount - 1) * riserH],
                     [spec.xMin, ySouth, spec.zTop],
                     [spec.xMin, yNorth, spec.zTop]
                 ]
             };
 
-            // D. Monolithic Reinforced Concrete Waist Slab (193 mm vertical thickness under straight flight)
-            // Runs from X = 15,175 (zTop = 700, zBot = 507) to X = 11,665 (zTop = 3,105, zBot = 2,912)
-            const zSlabWestTop = 4 * riserH - plankH; // 700 mm
-            const zSlabWestBot = zSlabWestTop - waistH; // 507 mm
+            // D. Monolithic Reinforced Concrete Waist Slab under straight flight
+            // Runs from X = 15,175 (zTop = 700, zBot = 507) to X = 11,910 (zTop = 3,105, zBot = 2,912)
             const zSlabEastTop = zLastConcrete; // 3,105 mm
             const zSlabEastBot = zSlabEastTop - waistH; // 2,912 mm
 
@@ -1947,17 +1977,6 @@
                             [spec.xPivot, ySouth, zSlabWestBot],
                             [spec.xMin, ySouth, zSlabEastBot],
                             [spec.xMin, yNorth, zSlabEastBot]
-                        ]
-                    },
-                    // Sloped top interface
-                    {
-                        id: 'top',
-                        normal: [-0.566, 0, 0.824],
-                        loop3D: [
-                            [spec.xPivot, yNorth, zSlabWestTop],
-                            [spec.xMin, yNorth, zSlabEastTop],
-                            [spec.xMin, ySouth, zSlabEastTop],
-                            [spec.xPivot, ySouth, zSlabWestTop]
                         ]
                     },
                     // North face (against GW_7)
@@ -1982,18 +2001,7 @@
                             [spec.xMin, ySouth, zSlabEastBot]
                         ]
                     },
-                    // West end cap at X = 15,175
-                    {
-                        id: 'west',
-                        normal: [1, 0, 0],
-                        loop3D: [
-                            [spec.xPivot, yNorth, zSlabWestBot],
-                            [spec.xPivot, yNorth, zSlabWestTop],
-                            [spec.xPivot, ySouth, zSlabWestTop],
-                            [spec.xPivot, ySouth, zSlabWestBot]
-                        ]
-                    },
-                    // East arrival end cap at X = 11,665
+                    // East arrival end cap at X = 11,910
                     {
                         id: 'east',
                         normal: [-1, 0, 0],
@@ -2007,7 +2015,7 @@
                 ]
             };
 
-            // E. 3D Balustrade (h = 900 mm along open South edge Y = 9,310..9,370, X = 11,665..15,175)
+            // E. 3D Balustrade (h = 900 mm along open South edge Y = 9,310..9,370, X = 11,910..15,175)
             const yBalNorth = ySouth - balThick; // 9310
             const yBalSouth = ySouth;            // 9370
             const yBalMid = (yBalNorth + yBalSouth) / 2; // 9340
@@ -2069,6 +2077,26 @@
                             [spec.xMin, yBalNorth, zRailEastTop],
                             [spec.xPivot, yBalNorth, zRailWestTop]
                         ]
+                    },
+                    // West end cap of handrail
+                    {
+                        normal: [1, 0, 0],
+                        loop3D: [
+                            [spec.xPivot, yBalNorth, zRailWestBot],
+                            [spec.xPivot, yBalNorth, zRailWestTop],
+                            [spec.xPivot, yBalSouth, zRailWestTop],
+                            [spec.xPivot, yBalSouth, zRailWestBot]
+                        ]
+                    },
+                    // East end cap of handrail
+                    {
+                        normal: [-1, 0, 0],
+                        loop3D: [
+                            [spec.xMin, yBalNorth, zRailEastBot],
+                            [spec.xMin, yBalSouth, zRailEastBot],
+                            [spec.xMin, yBalSouth, zRailEastTop],
+                            [spec.xMin, yBalNorth, zRailEastTop]
+                        ]
                     }
                 ],
                 glassPanelLoop3D: [
@@ -2078,16 +2106,16 @@
                     [spec.xPivot, yBalMid, zRailWestBot]
                 ],
                 posts3D: [
-                    { x: spec.xPivot - 20, zBot: 4 * riserH, zTop: zRailWestTop },
-                    { x: Math.round((spec.xPivot + spec.xMin) / 2), zBot: Math.round((4 * riserH + spec.zTop) / 2), zTop: Math.round((zRailWestTop + zRailEastTop) / 2) },
-                    { x: spec.xMin + 20, zBot: spec.zTop - riserH, zTop: zRailEastTop }
+                    { x: spec.xPivot - 25, zBot: 5 * riserH, zTop: zRailWestBot },
+                    { x: Math.round((spec.xPivot + spec.xMin) / 2), zBot: 11 * riserH, zTop: Math.round((zRailWestBot + zRailEastBot) / 2) },
+                    { x: spec.xMin + 25, zBot: 17 * riserH, zTop: zRailEastBot }
                 ].map(p => {
                     const postFaces = buildExtrudedPolygonFaces(
                         [
-                            [p.x - 20, yBalNorth],
-                            [p.x + 20, yBalNorth],
-                            [p.x + 20, yBalSouth],
-                            [p.x - 20, yBalSouth]
+                            [p.x - 18, yBalMid - 18],
+                            [p.x + 18, yBalMid - 18],
+                            [p.x + 18, yBalMid + 18],
+                            [p.x - 18, yBalMid + 18]
                         ],
                         p.zBot,
                         p.zTop

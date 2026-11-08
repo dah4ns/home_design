@@ -744,7 +744,7 @@
             // - Y axis: North -> South horizontal axis (second horizontal axis, into depth)
             // - Z axis: Vertical height axis (-220..6,740 mm, pointing UP)
             const appState = {
-                selectedIds: new Set(['FLOOR_LOWER', 'FLOOR_UPPER', 'ROOF_GYM', 'ROOF_GARAGE', 'ROOF_UPPER', 'WALL_BAND', 'STAIRS_1', 'GW_5', 'GW_7', 'GW_3']),
+                selectedIds: new Set(['FLOOR_LOWER', 'FLOOR_UPPER', 'TERRACE_UPPER', 'ROOF_GYM', 'ROOF_GARAGE', 'ROOF_UPPER', 'WALL_BAND', 'STAIRS_1', 'GW_14', 'GW_5', 'GW_7', 'GW_3']),
                 searchQuery: '',
                 showLabels: true,
                 showWindows: true,
@@ -903,6 +903,21 @@
                             [p1[0], p1[1], zBot]
                         ]);
                     }
+                    return quads;
+                }
+
+                // Multi-segment stepped interior wall (e.g. GW_14 with 6 vertical faces and 3 constituent boxes)
+                if (Array.isArray(wall.collisionBoxes2D) && wall.collisionBoxes2D.length > 0 && Array.isArray(wall.sides) && wall.sides.length > 2) {
+                    const zBot = wall.zBottom !== undefined ? wall.zBottom : 0;
+                    const zTop = wall.zTop !== undefined ? wall.zTop : 2850;
+                    wall.collisionBoxes2D.forEach(b => {
+                        quads.push([[b.x0, b.y0, zTop], [b.x1, b.y0, zTop], [b.x1, b.y1, zTop], [b.x0, b.y1, zTop]]);
+                        quads.push([[b.x0, b.y1, zBot], [b.x1, b.y1, zBot], [b.x1, b.y0, zBot], [b.x0, b.y0, zBot]]);
+                    });
+                    const firstBox = wall.collisionBoxes2D[0];
+                    const lastBox = wall.collisionBoxes2D[wall.collisionBoxes2D.length - 1];
+                    quads.push([[firstBox.x0, firstBox.y0, zBot], [firstBox.x1, firstBox.y0, zBot], [firstBox.x1, firstBox.y0, zTop], [firstBox.x0, firstBox.y0, zTop]]);
+                    quads.push([[lastBox.x1, lastBox.y1, zBot], [lastBox.x0, lastBox.y1, zBot], [lastBox.x0, lastBox.y1, zTop], [lastBox.x1, lastBox.y1, zTop]]);
                     return quads;
                 }
 
@@ -1291,10 +1306,13 @@
                     const zBot = w.zBottom !== undefined ? w.zBottom : (w.yBottom || 0);
                     const zTop = w.zTop !== undefined ? w.zTop : (w.yTop || 2800);
                     const isRingWall = Array.isArray(w.outerPolygon2D) && Array.isArray(w.innerPolygon2D);
+                    const isSteppedWall = !isRingWall && Array.isArray(w.sides) && w.sides.length > 2;
 
                     // 1. Triangulate Side A and Side B faces (with doorway notches & window holes)
                     w.sides.forEach((side, sIdx) => {
-                        const isPrimarySide = isRingWall ? (side.role === 'exterior') : (sIdx === 0);
+                        const isPrimarySide = isRingWall
+                            ? (side.role === 'exterior')
+                            : (isSteppedWall ? (side.normal[0] < 0 || side.normal[1] < 0) : (sIdx === 0));
                         const baseRgb = isPrimarySide ? pal.sideA : pal.sideB;
                         const tris = triangulateWallSide3D(side);
                         tris.forEach(tri => {
@@ -1345,7 +1363,7 @@
                         }
 
                         // 3. 3D Vertex [x, y, z] Labels on Side A (for standard single-segment walls)
-                        if (!isRingWall && appState.showVertices && sIdx === 0) {
+                        if (!isRingWall && !isSteppedWall && appState.showVertices && sIdx === 0) {
                             (side.outerLoop || []).forEach(pt => {
                                 hudLabels.push({
                                     ptMm: pt,
@@ -1359,9 +1377,10 @@
                         }
                     });
 
-                    // 3b. Unique 3D Corner Vertex Labels for closed multi-segment perimeter ring walls (e.g. WALL_BAND)
-                    if (isRingWall && appState.showVertices) {
-                        w.outerPolygon2D.forEach(pt2D => {
+                    // 3b. Unique 3D Corner Vertex Labels for closed multi-segment perimeter ring walls or stepped walls (WALL_BAND, GW_14)
+                    if ((isRingWall || isSteppedWall) && appState.showVertices) {
+                        const polyPts = isRingWall ? w.outerPolygon2D : (w.footprint2D || []);
+                        polyPts.forEach(pt2D => {
                             hudLabels.push({
                                 ptMm: [pt2D[0], pt2D[1], zTop],
                                 text: `(${pt2D[0]},${pt2D[1]},${zTop})`,
@@ -1516,6 +1535,18 @@
                                         pushTri(loop3D[0], loop3D[2], loop3D[3], [0, 0, 1], [1.0, 0.25, 0.45, 0.55]);
                                     }
                                 });
+                                if (Array.isArray(sw.collisionBoxes2D) && sw.collisionBoxes2D.length > 0) {
+                                    sw.collisionBoxes2D.forEach(b => {
+                                        const box3D = [
+                                            [b.x0, b.y0, appState.sliceZMm],
+                                            [b.x1, b.y0, appState.sliceZMm],
+                                            [b.x1, b.y1, appState.sliceZMm],
+                                            [b.x0, b.y1, appState.sliceZMm]
+                                        ];
+                                        pushTri(box3D[0], box3D[1], box3D[2], [0, 0, 1], [1.0, 0.25, 0.45, 0.55]);
+                                        pushTri(box3D[0], box3D[2], box3D[3], [0, 0, 1], [1.0, 0.25, 0.45, 0.55]);
+                                    });
+                                }
                             }
                         }
                     }
@@ -1671,7 +1702,7 @@
                 allFloors.forEach(fl => {
                     if (!appState.selectedIds.has(fl.id)) return;
 
-                    const isRoof = (fl.category === 'roof' || fl.id.startsWith('ROOF_'));
+                    const isRoof = (fl.category === 'roof' || fl.category === 'terrace' || fl.id.startsWith('ROOF_') || fl.id.startsWith('TERRACE_'));
                     const isLower = (!isRoof && (fl.id === 'FLOOR_LOWER' || fl.floor === 'ground'));
 
                     const topColor = isRoof
@@ -1732,6 +1763,8 @@
                         let badgePt = [13500, 5600, fl.zTop + 320];
                         if (fl.id === 'FLOOR_LOWER') {
                             badgePt = [4800, 7500, fl.zTop + 260];
+                        } else if (fl.id === 'TERRACE_UPPER') {
+                            badgePt = [3205, 4640, fl.zTop + 280];
                         } else if (fl.id === 'ROOF_GYM') {
                             badgePt = [17700, 15975, fl.zTop + 280];
                         } else if (fl.id === 'ROOF_GARAGE') {
@@ -2006,12 +2039,14 @@
                             renderScene();
                         });
 
-                        const isRoof = (f.category === 'roof' || f.id.startsWith('ROOF_'));
+                        const isRoof = (f.category === 'roof' || f.category === 'terrace' || f.id.startsWith('ROOF_') || f.id.startsWith('TERRACE_'));
                         const isLower = (!isRoof && (f.id === 'FLOOR_LOWER' || f.floor === 'ground'));
                         const idSpan = createEl('span', 'wall-option-id', `${isRoof ? '🏠' : '🧱'} ${f.id}`);
                         let descLabel = 'Solid Upper Floor Slab (Strop nad parterem +296..+333 cm)';
                         if (isLower) {
                             descLabel = 'Solid Lower Floor Slab (Podłoga na gruncie -22..0 cm)';
+                        } else if (f.id === 'TERRACE_UPPER') {
+                            descLabel = 'NE Terrace & Ceiling Over 0.14/0.15 (+285..+333 cm)';
                         } else if (f.id === 'ROOF_GYM') {
                             descLabel = 'SW Wing / Gym Flat Roof (+296..+340 cm)';
                         } else if (f.id === 'ROOF_GARAGE') {
@@ -2125,13 +2160,16 @@
                         nameSpan.style.whiteSpace = 'nowrap';
 
                         const isRingWall = Array.isArray(w.outerPolygon2D) && Array.isArray(w.innerPolygon2D);
+                        const isSteppedWall = !isRingWall && Array.isArray(w.sides) && w.sides.length > 2;
                         const holesCount = (w.sideA && w.sideA.holes) ? w.sideA.holes.length : 0;
                         const loopVerts = isRingWall
                             ? (w.outerPolygon2D.length * 2)
-                            : ((w.sideA && w.sideA.outerLoop) ? w.sideA.outerLoop.length : 4);
+                            : (isSteppedWall ? (w.footprint2D || []).length : ((w.sideA && w.sideA.outerLoop) ? w.sideA.outerLoop.length : 4));
                         const metaSpan = createEl('span', 'wall-option-meta', isRingWall
                             ? `Z=${w.zBottom}..${w.zTop} • ${w.thickness}mm • 8 seg`
-                            : `${w.thickness}mm • ${loopVerts}v${holesCount ? ` • ${holesCount}h` : ''}`);
+                            : (isSteppedWall
+                                ? `Z=${w.zBottom}..${w.zTop} • ${w.thickness}mm • ${w.sides.length} faces`
+                                : `${w.thickness}mm • ${loopVerts}v${holesCount ? ` • ${holesCount}h` : ''}`));
 
                         row.appendChild(cb);
                         row.appendChild(idSpan);
@@ -2159,13 +2197,13 @@
                 const selectedWalls = allWalls.filter(w => appState.selectedIds.has(w.id));
                 if (selectedFloors.length === 0 && selectedStairs.length === 0 && selectedWalls.length === 0) {
                     const emptyCard = createEl('div', 'inspector-wall-card');
-                    emptyCard.appendChild(createEl('div', 'inspector-wall-name', 'No objects selected. Choose FLOOR_LOWER, FLOOR_UPPER, ROOF_GYM, ROOF_GARAGE, ROOF_UPPER, WALL_BAND, STAIRS_1, or wall IDs from the dropdown on the left.'));
+                    emptyCard.appendChild(createEl('div', 'inspector-wall-name', 'No objects selected. Choose FLOOR_LOWER, FLOOR_UPPER, TERRACE_UPPER, ROOF_GYM, ROOF_GARAGE, ROOF_UPPER, WALL_BAND, STAIRS_1, or wall IDs from the dropdown on the left.'));
                     inspectorContainer.appendChild(emptyCard);
                     return;
                 }
 
                 selectedFloors.forEach(f => {
-                    const isRoof = (f.category === 'roof' || f.id.startsWith('ROOF_'));
+                    const isRoof = (f.category === 'roof' || f.category === 'terrace' || f.id.startsWith('ROOF_') || f.id.startsWith('TERRACE_'));
                     const isLower = (!isRoof && (f.id === 'FLOOR_LOWER' || f.floor === 'ground'));
                     const card = createEl('div', 'inspector-wall-card');
                     const header = createEl('div', 'inspector-wall-header');
@@ -2185,7 +2223,9 @@
                     addKv('Elevation & Thickness', `Z = ${f.zBottom}..${f.zTop} mm (${f.zBottom / 10}..${f.zTop / 10} cm, ${f.thickness / 10} cm thick)`);
                     addKv('X / Y Footprint Bounds', `X: ${f.x1}..${f.x2} | Y: ${f.y1}..${f.y2} mm (${isLower ? 'includes 38 cm external walls' : (f.id === 'ROOF_UPPER' ? 'includes inner 18 cm of upper external walls' : 'excludes outer 38 cm ground-floor walls')})`);
                     addKv('Polygon Topology', `1 solid piece • ${(f.footprint2D || []).length} vertices • ${(f.sideQuads3D || []).length} vertical edge faces`);
-                    if (f.id === 'ROOF_GYM') {
+                    if (f.id === 'TERRACE_UPPER') {
+                        addKv('Role & Boundaries', 'Ceiling of 0.14 Spiżarnia & 0.15 Gabinet (resting on 285 cm wall GW_14 at Z=2,850 mm) and NE Upper Terrace at Z=3,330 mm');
+                    } else if (f.id === 'ROOF_GYM') {
                         addKv('Overlap & Boundaries', 'Covers 38 cm under UW_SOUTH (Y=11,200..11,580 mm); excludes outer 38 cm above EW_SW_EAST, EW_SW_SOUTH & EW_WEST_SOUTH');
                     } else if (f.id === 'ROOF_GARAGE') {
                         addKv('Overlap & Boundaries', 'Covers 38 cm under UW_NORTH_MAIN (Y=2,790..3,170 mm); excludes outer 38 cm above EW_GARAGE_EAST, EW_GARAGE_NORTH & EW_GARAGE_WEST');
@@ -2240,6 +2280,7 @@
                     const zBot = w.zBottom !== undefined ? w.zBottom : (w.yBottom || 0);
                     const zTop = w.zTop !== undefined ? w.zTop : (w.yTop || 2800);
                     const isRingWall = Array.isArray(w.outerPolygon2D) && Array.isArray(w.innerPolygon2D);
+                    const isSteppedWall = !isRingWall && Array.isArray(w.sides) && w.sides.length > 2;
                     const card = createEl('div', 'inspector-wall-card');
                     const header = createEl('div', 'inspector-wall-header');
                     header.appendChild(createEl('span', 'inspector-wall-id', w.id));
@@ -2265,6 +2306,11 @@
                         const innerText = `innerPolygon2D (${w.innerPolygon2D.length} pts): ` +
                             w.innerPolygon2D.map((p, i) => `Q${i + 1}[${p[0]}, ${p[1]}]`).join(' → ');
                         card.appendChild(createEl('div', 'coord-block', innerText));
+                    } else if (isSteppedWall) {
+                        addKv('Stepped Wall Faces', `${w.sides.length} vertical faces • ${(w.footprint2D || []).length}-vertex monolithic footprint`);
+                        const fpText = `footprint2D (${(w.footprint2D || []).length} pts): ` +
+                            (w.footprint2D || []).map((p, i) => `V${i + 1}[${p[0]}, ${p[1]}]`).join(' → ');
+                        card.appendChild(createEl('div', 'coord-block', fpText));
                     } else {
                         if (w.sideA) {
                             addKv('Side A Normal', `n = [${w.sideA.normal.join(', ')}] (${w.sideA.materialLabel})`);
@@ -2325,7 +2371,7 @@
             document.getElementById('preset-upper-slab').addEventListener('click', () => {
                 appState.yaw = 42 * Math.PI / 180;
                 appState.pitch = 38 * Math.PI / 180;
-                applyPreset(['FLOOR_LOWER', 'FLOOR_UPPER', 'ROOF_GYM', 'ROOF_GARAGE', 'ROOF_UPPER', 'WALL_BAND', 'STAIRS_1', 'FW_1b', 'FW_8', 'FW_9']);
+                applyPreset(['FLOOR_LOWER', 'FLOOR_UPPER', 'TERRACE_UPPER', 'ROOF_GYM', 'ROOF_GARAGE', 'ROOF_UPPER', 'WALL_BAND', 'STAIRS_1', 'GW_14', 'FW_1b', 'FW_8', 'FW_9']);
             });
             document.getElementById('preset-stairs-hall').addEventListener('click', () => {
                 appState.yaw = 65 * Math.PI / 180;
@@ -2336,7 +2382,7 @@
                 applyPreset(['EW_GARAGE_NORTH', 'EW_GARAGE_WEST', 'EW_GARAGE_EAST', 'GW_1', 'GW_2', 'GW_4', 'ROOF_GARAGE', 'WALL_BAND']);
             });
             document.getElementById('preset-north-facade').addEventListener('click', () => {
-                applyPreset(['EW_NORTH_RECESSED', 'EW_GARAGE_EAST', 'EW_GARAGE_NORTH', 'WALL_BAND', 'UW_TERRACE_BACK', 'UW_TERRACE_EAST', 'UW_NORTH_MAIN']);
+                applyPreset(['EW_NORTH_RECESSED', 'EW_GARAGE_EAST', 'EW_GARAGE_NORTH', 'WALL_BAND', 'TERRACE_UPPER', 'GW_14', 'UW_TERRACE_BACK', 'UW_TERRACE_EAST', 'UW_NORTH_MAIN']);
             });
             document.getElementById('preset-ground-ext').addEventListener('click', () => {
                 applyPreset(allWalls.filter(w => w.floor === 'ground' && w.category === 'exterior').map(w => w.id));
@@ -2345,13 +2391,13 @@
                 applyPreset(allWalls.filter(w => w.floor === 'ground' && w.category === 'internal').map(w => w.id).concat(['STAIRS_1']));
             });
             document.getElementById('preset-ground-all').addEventListener('click', () => {
-                applyPreset(allWalls.filter(w => w.floor === 'ground').map(w => w.id).concat(['FLOOR_LOWER', 'ROOF_GYM', 'ROOF_GARAGE', 'WALL_BAND', 'STAIRS_1']));
+                applyPreset(allWalls.filter(w => w.floor === 'ground').map(w => w.id).concat(['FLOOR_LOWER', 'TERRACE_UPPER', 'ROOF_GYM', 'ROOF_GARAGE', 'WALL_BAND', 'STAIRS_1']));
             });
             document.getElementById('preset-first-all').addEventListener('click', () => {
-                applyPreset(allWalls.filter(w => w.floor === 'first').map(w => w.id).concat(['FLOOR_UPPER', 'ROOF_UPPER', 'WALL_BAND', 'STAIRS_1']));
+                applyPreset(allWalls.filter(w => w.floor === 'first').map(w => w.id).concat(['FLOOR_UPPER', 'TERRACE_UPPER', 'ROOF_UPPER', 'WALL_BAND', 'STAIRS_1']));
             });
             document.getElementById('preset-all-walls').addEventListener('click', () => {
-                applyPreset(allWalls.map(w => w.id).concat(['FLOOR_LOWER', 'FLOOR_UPPER', 'ROOF_GYM', 'ROOF_GARAGE', 'ROOF_UPPER', 'STAIRS_1']));
+                applyPreset(allWalls.map(w => w.id).concat(['FLOOR_LOWER', 'FLOOR_UPPER', 'TERRACE_UPPER', 'ROOF_GYM', 'ROOF_GARAGE', 'ROOF_UPPER', 'STAIRS_1']));
             });
             document.getElementById('preset-clear').addEventListener('click', () => {
                 appState.selectedIds.clear();

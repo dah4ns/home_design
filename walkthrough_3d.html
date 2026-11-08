@@ -838,11 +838,15 @@
         'uniform float uAlpha;',
         'uniform float uUseTex;',
         'uniform float uIsGlass;',
+        'uniform float uIsInteriorWall;',
         'uniform vec3 uSunDir;',
         'uniform vec3 uCamPos;',
         'uniform sampler2D uSampler;',
         'void main() {',
         '  vec3 n = normalize(vNormal);',
+        '  if (dot(n, uCamPos - vWorldPos) < 0.0) {',
+        '    n = -n;',
+        '  }',
         '  vec3 base = uColor;',
         '  if (uUseTex > 0.5) {',
         '    vec4 tex = texture2D(uSampler, vUV);',
@@ -859,8 +863,14 @@
         '    gl_FragColor = vec4(glassCol, finalAlpha);',
         '    return;',
         '  }',
-        '  // Multi-directional architectural studio + sun lighting so both exterior facades',
-        '  // and plain white interior rooms have clear, readable 3D corner contrast',
+        '  if (uIsInteriorWall > 0.5) {',
+        '    // Slightly different tone on perpendicular interior walls (X-facing vs Y-facing) so inner corners are clearly visible',
+        '    float wallTone = 0.796 + 0.046 * abs(n.x);',
+        '    gl_FragColor = vec4(base * wallTone, uAlpha);',
+        '    return;',
+        '  }',
+        '  // Multi-directional architectural studio + sun lighting so exterior facades',
+        '  // and door/window opening edges have readable 3D depth contrast',
         '  vec3 lSun = normalize(uSunDir);',
         '  vec3 lFill1 = normalize(vec3(-lSun.x, -lSun.y, 0.45));',
         '  vec3 lFill2 = normalize(vec3(lSun.y, -lSun.x, 0.65));',
@@ -870,7 +880,6 @@
         '  // Hemispheric sky-ground bounce (n.z is vertical up)',
         '  float hemi = 0.5 + 0.5 * n.z;',
         '  float light = 0.46 + 0.34 * dSun + 0.12 * dFill1 + 0.08 * dFill2 + 0.06 * hemi;',
-        '  // Subtle elevation shadow near floor/ceiling corners for crisp interior depth',
         '  vec3 litColor = base * clamp(light, 0.38, 1.08);',
         '  gl_FragColor = vec4(litColor, uAlpha);',
         '}'
@@ -898,6 +907,7 @@
       var uAlphaLoc = gl.getUniformLocation(prog, 'uAlpha');
       var uUseTexLoc = gl.getUniformLocation(prog, 'uUseTex');
       var uIsGlassLoc = gl.getUniformLocation(prog, 'uIsGlass');
+      var uIsInteriorWallLoc = gl.getUniformLocation(prog, 'uIsInteriorWall');
       var uSunDirLoc = gl.getUniformLocation(prog, 'uSunDir');
       var uCamPosLoc = gl.getUniformLocation(prog, 'uCamPos');
       var uSamplerLoc = gl.getUniformLocation(prog, 'uSampler');
@@ -1162,6 +1172,22 @@
         addQuad3D(b, [x0, y1, z0], [x0, y0, z0], [x0, y0, z1], [x0, y1, z1], [-1, 0, 0], 0, 0, dy, dz);
       }
 
+      // Open-ended vertical box (4 vertical walls only, omitting top/bottom horizontal caps when flush with slabs/sills/heads)
+      function addOpenVerticalBoxZUp(b, x0, y0, z0, x1, y1, z1, texScaleMm) {
+        var s = texScaleMm || 1500;
+        var dx = Math.abs(x1 - x0) / s;
+        var dy = Math.abs(y1 - y0) / s;
+        var dz = Math.abs(z1 - z0) / s;
+        // South (+Y)
+        addQuad3D(b, [x0, y1, z0], [x1, y1, z0], [x1, y1, z1], [x0, y1, z1], [0, 1, 0], 0, 0, dx, dz);
+        // North (-Y)
+        addQuad3D(b, [x1, y0, z0], [x0, y0, z0], [x0, y0, z1], [x1, y0, z1], [0, -1, 0], 0, 0, dx, dz);
+        // West (+X)
+        addQuad3D(b, [x1, y0, z0], [x1, y1, z0], [x1, y1, z1], [x1, y0, z1], [1, 0, 0], 0, 0, dy, dz);
+        // East (-X)
+        addQuad3D(b, [x0, y1, z0], [x0, y0, z0], [x0, y0, z1], [x0, y1, z1], [-1, 0, 0], 0, 0, dy, dz);
+      }
+
       function uploadMesh(builder, props) {
         var data = new Float32Array(builder.verts);
         var vbo = gl.createBuffer();
@@ -1174,7 +1200,9 @@
           alpha: props.alpha !== undefined ? props.alpha : 1.0,
           texKey: props.texKey || null,
           isGlass: !!props.isGlass,
+          isInteriorWall: !!props.isInteriorWall,
           isRoof: !!props.isRoof,
+          isWallTopCap: !!props.isWallTopCap,
           isTree: !!props.isTree,
           center: props.center || [10000, 10000, 1500]
         };
@@ -1261,8 +1289,21 @@
         return tris;
       }
 
-      // Triangulate a 3D wall/frame face (sideA, sideB, or frameFace3D) with rectangular window/door holes
-      function addWallFace3D(builder, sideObj, texScaleU, texScaleV, flipNormal) {
+      function pointInPolygon2D(u, v, loop2D) {
+        var inside = false;
+        for (var i = 0, j = loop2D.length - 1; i < loop2D.length; j = i++) {
+          var ui = loop2D[i][0], vi = loop2D[i][1];
+          var uj = loop2D[j][0], vj = loop2D[j][1];
+          var intersect = ((vi > v) !== (vj > v)) &&
+            (u < (uj - ui) * (v - vi) / ((vj - vi) || 1e-9) + ui);
+          if (intersect) inside = !inside;
+        }
+        return inside;
+      }
+
+      // Triangulate a 3D planar wall side or window frame (outerLoop + holes) using
+      // exact 2D rectilinear grid cell decomposition (handles all doorway notches, corner notches, and window holes)
+      function addWallFace3D(builder, sideObj, texScaleU, texScaleV, flipNormal, depthOffsetMm) {
         if (!sideObj) return;
         var outer = sideObj.outerLoop3D || sideObj.outerLoop || sideObj.outer;
         if (!outer || outer.length < 3) return;
@@ -1271,174 +1312,281 @@
           return Array.isArray(h) ? h : (h.loop3D || h.loop || []);
         }).filter(function (h) { return h.length >= 3; });
 
-        var p0 = outer[0], p1 = outer[1];
-        var ux = p1[0] - p0[0], uy = p1[1] - p0[1], uz = p1[2] - p0[2];
-        var uLen = Math.hypot(ux, uy, uz) || 1;
-        ux /= uLen; uy /= uLen; uz /= uLen;
+        var origin = sideObj.p1
+          ? [sideObj.p1[0], sideObj.p1[1], 0]
+          : [outer[0][0], outer[0][1], 0];
 
-        // Compute face normal from outer polygon Newell method
-        var nx = 0, ny = 0, nz = 0;
-        for (var i = 0; i < outer.length; i++) {
-          var c = outer[i], nxt = outer[(i + 1) % outer.length];
-          nx += (c[1] - nxt[1]) * (c[2] + nxt[2]);
-          ny += (c[2] - nxt[2]) * (c[0] + nxt[0]);
-          nz += (c[0] - nxt[0]) * (c[1] + nxt[1]);
-        }
-        var nLen = Math.hypot(nx, ny, nz) || 1;
-        nx /= nLen; ny /= nLen; nz /= nLen;
-        if (flipNormal) {
-          nx = -nx; ny = -ny; nz = -nz;
-        }
-        var normal = [nx, ny, nz];
-
-        // In-plane vertical/second axis V = normal x U
-        var vx = ny * uz - nz * uy;
-        var vy = nz * ux - nx * uz;
-        var vz = nx * uy - ny * ux;
-
-        function to2D(pt) {
-          var dx = pt[0] - p0[0], dy = pt[1] - p0[1], dz = pt[2] - p0[2];
-          return [dx * ux + dy * uy + dz * uz, dx * vx + dy * vy + dz * vz];
+        var t = sideObj.tangent;
+        if (!t) {
+          var dx0 = outer[1][0] - outer[0][0];
+          var dy0 = outer[1][1] - outer[0][1];
+          var len0 = Math.hypot(dx0, dy0) || 1;
+          t = [dx0 / len0, dy0 / len0, 0];
         }
 
-        function to3D(uv) {
+        var baseNormal = sideObj.normal || [t[1], -t[0], 0];
+        var normal = flipNormal
+          ? [-baseNormal[0], -baseNormal[1], -baseNormal[2]]
+          : [baseNormal[0], baseNormal[1], baseNormal[2]];
+        var dOff = depthOffsetMm || 0;
+
+        function to2D(pt3) {
+          var dx = pt3[0] - origin[0];
+          var dy = pt3[1] - origin[1];
+          var u = dx * t[0] + dy * t[1];
+          var v = pt3[2];
+          return [u, v];
+        }
+
+        function to3D(u, v) {
           return [
-            p0[0] + uv[0] * ux + uv[1] * vx,
-            p0[1] + uv[0] * uy + uv[1] * vy,
-            p0[2] + uv[0] * uz + uv[1] * vz
+            origin[0] + u * t[0] - baseNormal[0] * dOff,
+            origin[1] + u * t[1] - baseNormal[1] * dOff,
+            v
           ];
         }
 
         var scaleU = texScaleU || 1600;
         var scaleV = texScaleV || 1600;
 
-        function calcTexUV(pt3) {
-          var horiz = pt3[0] * ux + pt3[1] * uy;
-          return [horiz / scaleU, pt3[2] / scaleV];
-        }
-
         var outer2D = outer.map(to2D);
-        var uMin = Infinity, uMax = -Infinity, vMin = Infinity, vMax = -Infinity;
-        outer2D.forEach(function (uv) {
-          if (uv[0] < uMin) uMin = uv[0];
-          if (uv[0] > uMax) uMax = uv[0];
-          if (uv[1] < vMin) vMin = uv[1];
-          if (uv[1] > vMax) vMax = uv[1];
-        });
+        var holes2D = holes.map(function (h) { return h.map(to2D); });
 
-        if (holes.length === 0) {
-          var tris = earClip2D(outer2D);
-          tris.forEach(function (t) {
-            var a3 = to3D(t[0]), b3 = to3D(t[1]), c3 = to3D(t[2]);
-            if (flipNormal) {
-              addTriangle3D(builder, a3, c3, b3, normal, calcTexUV(a3), calcTexUV(c3), calcTexUV(b3));
-            } else {
-              addTriangle3D(builder, a3, b3, c3, normal, calcTexUV(a3), calcTexUV(b3), calcTexUV(c3));
-            }
-          });
-          return;
+        var uSet = {};
+        var vSet = {};
+        function addUV(p) {
+          var uk = Math.round(p[0] * 10) / 10;
+          var vk = Math.round(p[1] * 10) / 10;
+          uSet[uk] = uk;
+          vSet[vk] = vk;
         }
-
-        // Slice vertical strips at hole boundaries so multi-opening walls/frames triangulate cleanly
-        var xCuts = [uMin, uMax];
-        var holeBoxes = holes.map(function (h) {
-          var h2 = h.map(to2D);
-          var hx0 = Infinity, hx1 = -Infinity, hy0 = Infinity, hy1 = -Infinity;
-          h2.forEach(function (p) {
-            if (p[0] < hx0) hx0 = p[0];
-            if (p[0] > hx1) hx1 = p[0];
-            if (p[1] < hy0) hy0 = p[1];
-            if (p[1] > hy1) hy1 = p[1];
-          });
-          xCuts.push(hx0, hx1);
-          return { u0: hx0, u1: hx1, v0: hy0, v1: hy1 };
+        outer2D.forEach(addUV);
+        holes2D.forEach(function (hLoop) {
+          hLoop.forEach(addUV);
         });
 
-        xCuts.sort(function (a, b) { return a - b; });
-        var uniqueCuts = [];
-        xCuts.forEach(function (x) {
-          if (uniqueCuts.length === 0 || Math.abs(x - uniqueCuts[uniqueCuts.length - 1]) > 1.0) {
-            uniqueCuts.push(x);
-          }
-        });
+        var uCoords = Object.keys(uSet).map(Number).sort(function (a, b) { return a - b; });
+        var vCoords = Object.keys(vSet).map(Number).sort(function (a, b) { return a - b; });
 
-        for (var s = 0; s < uniqueCuts.length - 1; s++) {
-          var su0 = uniqueCuts[s], su1 = uniqueCuts[s + 1];
-          var sMid = 0.5 * (su0 + su1);
-          var activeHoles = holeBoxes.filter(function (hb) {
-            return sMid > hb.u0 + 0.5 && sMid < hb.u1 - 0.5;
-          }).sort(function (a, b) { return a.v0 - b.v0; });
+        for (var i = 0; i + 1 < uCoords.length; i++) {
+          var u0 = uCoords[i];
+          var u1 = uCoords[i + 1];
+          if (u1 - u0 < 0.5) continue;
+          var uMid = 0.5 * (u0 + u1);
 
-          var curV = vMin;
-          activeHoles.forEach(function (hb) {
-            if (hb.v0 > curV + 1.0) {
-              var pA = to3D([su0, curV]), pB = to3D([su1, curV]), pC = to3D([su1, hb.v0]), pD = to3D([su0, hb.v0]);
-              if (flipNormal) {
-                addTriangle3D(builder, pA, pC, pB, normal, calcTexUV(pA), calcTexUV(pC), calcTexUV(pB));
-                addTriangle3D(builder, pA, pD, pC, normal, calcTexUV(pA), calcTexUV(pD), calcTexUV(pC));
-              } else {
-                addTriangle3D(builder, pA, pB, pC, normal, calcTexUV(pA), calcTexUV(pB), calcTexUV(pC));
-                addTriangle3D(builder, pA, pC, pD, normal, calcTexUV(pA), calcTexUV(pC), calcTexUV(pD));
+          for (var j = 0; j + 1 < vCoords.length; j++) {
+            var v0 = vCoords[j];
+            var v1 = vCoords[j + 1];
+            if (v1 - v0 < 0.5) continue;
+            var vMid = 0.5 * (v0 + v1);
+
+            if (!pointInPolygon2D(uMid, vMid, outer2D)) continue;
+            var inHole = false;
+            for (var k = 0; k < holes2D.length; k++) {
+              if (pointInPolygon2D(uMid, vMid, holes2D[k])) {
+                inHole = true;
+                break;
               }
             }
-            curV = Math.max(curV, hb.v1);
-          });
-          if (vMax > curV + 1.0) {
-            var pA2 = to3D([su0, curV]), pB2 = to3D([su1, curV]), pC2 = to3D([su1, vMax]), pD2 = to3D([su0, vMax]);
+            if (inHole) continue;
+
+            var p00 = to3D(u0, v0);
+            var p10 = to3D(u1, v0);
+            var p11 = to3D(u1, v1);
+            var p01 = to3D(u0, v1);
+
+            var uv00 = [u0 / scaleU, v0 / scaleV];
+            var uv10 = [u1 / scaleU, v0 / scaleV];
+            var uv11 = [u1 / scaleU, v1 / scaleV];
+            var uv01 = [u0 / scaleU, v1 / scaleV];
+
             if (flipNormal) {
-              addTriangle3D(builder, pA2, pC2, pB2, normal, calcTexUV(pA2), calcTexUV(pC2), calcTexUV(pB2));
-              addTriangle3D(builder, pA2, pD2, pC2, normal, calcTexUV(pA2), calcTexUV(pD2), calcTexUV(pC2));
+              addTriangle3D(builder, p00, p11, p10, normal, uv00, uv11, uv10);
+              addTriangle3D(builder, p00, p01, p11, normal, uv00, uv01, uv11);
             } else {
-              addTriangle3D(builder, pA2, pB2, pC2, normal, calcTexUV(pA2), calcTexUV(pB2), calcTexUV(pC2));
-              addTriangle3D(builder, pA2, pC2, pD2, normal, calcTexUV(pA2), calcTexUV(pC2), calcTexUV(pD2));
+              addTriangle3D(builder, p00, p10, p11, normal, uv00, uv10, uv11);
+              addTriangle3D(builder, p00, p11, p01, normal, uv00, uv11, uv01);
             }
           }
         }
       }
 
-      // Add thickness reveals between sideA and sideB of a wall
-      function addWallReveals3D(extJambBuilder, intPlasterBuilder, wall, isExteriorWall) {
-        if (!wall.sideA || !wall.sideB) return;
-        var outA = wall.sideA.outerLoop3D || wall.sideA.outerLoop;
-        var outB = wall.sideB.outerLoop3D || wall.sideB.outerLoop;
-        if (outA && outB && outA.length === outB.length) {
-          var n = outA.length;
-          for (var i = 0; i < n; i++) {
-            var j = (i + 1) % n;
-            // Note: sideB has opposite horizontal direction to sideA, so match closest vertices or reverse index
-            var bIdx0 = (n - 1 - i) % n;
-            var bIdx1 = (n - 1 - j + n) % n;
-            // Verify vertex distance to pick exact matching pair on sideB
-            if (Math.hypot(outA[i][0] - outB[i][0], outA[i][1] - outB[i][1], outA[i][2] - outB[i][2]) <
-                Math.hypot(outA[i][0] - outB[bIdx0][0], outA[i][1] - outB[bIdx0][1], outA[i][2] - outB[bIdx0][2])) {
-              bIdx0 = i;
-              bIdx1 = j;
+      // Add perpendicular thickness reveals (mitered end caps, top cap, doorway jambs/lintels, and window reveals)
+      // connecting sideA and sideB without vertex-index twisting or coplanar Z-fighting
+      function addWallReveals3D(extJambBuilder, intWallBuilder, intRevealBuilder, topCapFasciaBuilder, topCapWhiteBuilder, wall, isExteriorWall, allWallFaceSegments) {
+        // Closed multi-segment perimeter ring (e.g. WALL_BAND: Z = 2,800..3,430 mm)
+        // WALL_BAND provides the single authoritative horizontal soffit/cap at Z = 2,800 mm and Z = 3,430 mm
+        // around the building perimeter so EW_* (zTop = 2,800) and UW_* (zBottom = 3,430) never Z-fight with it.
+        if (
+          Array.isArray(wall.outerPolygon2D) &&
+          Array.isArray(wall.innerPolygon2D) &&
+          wall.outerPolygon2D.length >= 3 &&
+          wall.outerPolygon2D.length === wall.innerPolygon2D.length
+        ) {
+          var zBot = wall.zBottom !== undefined ? wall.zBottom : 2800;
+          var zTop = wall.zTop !== undefined ? wall.zTop : 3430;
+          var numSegs = wall.outerPolygon2D.length;
+          var tBand = 280 / 380; // 200 mm exterior reveal + 80 mm window frame depth = 280 mm dark fascia, 100 mm interior white reveal
+          for (var s = 0; s < numSegs; s++) {
+            var op1 = wall.outerPolygon2D[s];
+            var op2 = wall.outerPolygon2D[(s + 1) % numSegs];
+            var ip1 = wall.innerPolygon2D[s];
+            var ip2 = wall.innerPolygon2D[(s + 1) % numSegs];
+            var m1Top = [op1[0] + (ip1[0] - op1[0]) * tBand, op1[1] + (ip1[1] - op1[1]) * tBand, zTop];
+            var m2Top = [op2[0] + (ip2[0] - op2[0]) * tBand, op2[1] + (ip2[1] - op2[1]) * tBand, zTop];
+            var m1Bot = [op1[0] + (ip1[0] - op1[0]) * tBand, op1[1] + (ip1[1] - op1[1]) * tBand, zBot];
+            var m2Bot = [op2[0] + (ip2[0] - op2[0]) * tBand, op2[1] + (ip2[1] - op2[1]) * tBand, zBot];
+
+            // Single-story Garage (s=1,2) and SW Gym Wing (s=4,5) parapets have full-width dark coping on top at zTop = 3,430 mm
+            var isSingleStoryParapet = (s === 1 || s === 2 || s === 4 || s === 5);
+            if (isSingleStoryParapet) {
+              addQuad3D(extJambBuilder, [op1[0], op1[1], zTop], [op2[0], op2[1], zTop], [ip2[0], ip2[1], zTop], [ip1[0], ip1[1], zTop], [0, 0, 1]);
+            } else {
+              addQuad3D(extJambBuilder, [op1[0], op1[1], zTop], [op2[0], op2[1], zTop], m2Top, m1Top, [0, 0, 1]);
+              addQuad3D(intRevealBuilder, m1Top, m2Top, [ip2[0], ip2[1], zTop], [ip1[0], ip1[1], zTop], [0, 0, 1]);
             }
-            addQuad3D(intPlasterBuilder, outA[j], outA[i], outB[bIdx0], outB[bIdx1]);
+
+            // Bottom cap at zBot = 2,800 mm (forms window head soffit above full-height ground windows O3, O4, O5, O6a, O6b, O7, O8a)
+            addQuad3D(extJambBuilder, m1Bot, m2Bot, [op2[0], op2[1], zBot], [op1[0], op1[1], zBot], [0, 0, -1]);
+            addQuad3D(intRevealBuilder, [ip1[0], ip1[1], zBot], [ip2[0], ip2[1], zBot], m2Bot, m1Bot, [0, 0, -1]);
+          }
+          return;
+        }
+
+        // Multi-segment stepped interior wall (e.g. GW_14: 6 closed vertical faces, buried N/S ends, Z=0..2850 capped by TERRACE_UPPER)
+        if (Array.isArray(wall.sides) && wall.sides.length > 2) {
+          return;
+        }
+
+        var sideA = wall.sideA;
+        var sideB = wall.sideB;
+        if (!sideA || !sideB) return;
+
+        var nA = sideA.normal; // [nx, ny, 0] pointing from sideB toward sideA
+        var thick = wall.thickness || 120;
+        var offsetToB = [-nA[0] * thick, -nA[1] * thick, 0];
+
+        var bMinX = Math.min(sideB.p1[0], sideB.p2[0]);
+        var bMaxX = Math.max(sideB.p1[0], sideB.p2[0]);
+        var bMinY = Math.min(sideB.p1[1], sideB.p2[1]);
+        var bMaxY = Math.max(sideB.p1[1], sideB.p2[1]);
+
+        function mapSideAPointToSideB(pt) {
+          if (Math.hypot(pt[0] - sideA.p1[0], pt[1] - sideA.p1[1]) < 2) {
+            return [sideB.p2[0], sideB.p2[1], pt[2]];
+          }
+          if (Math.hypot(pt[0] - sideA.p2[0], pt[1] - sideA.p2[1]) < 2) {
+            return [sideB.p1[0], sideB.p1[1], pt[2]];
+          }
+          var bx = Math.max(bMinX, Math.min(bMaxX, pt[0] + offsetToB[0]));
+          var by = Math.max(bMinY, Math.min(bMaxY, pt[1] + offsetToB[1]));
+          return [bx, by, pt[2]];
+        }
+
+        // Skip horizontal reveal caps on slab/band interface planes that are already capped by
+        // FLOOR_LOWER (Z=0), WALL_BAND (Z=2800 and Z=3430), TERRACE_UPPER (Z=2850), FLOOR_UPPER/ROOF_GARAGE/ROOF_GYM (Z=2960), or FLOOR_UPPER (Z=3330)
+        function isSharedHorizontalInterface(p1, p2) {
+          if (Math.abs(p1[2] - p2[2]) >= 1) return false;
+          var z = Math.round(p1[2]);
+          if (z === 0 || z === 2850 || z === 2960 || z === 3330) return true;
+          if (isExteriorWall && (z === 2800 || z === 3430)) return true;
+          if (!isExteriorWall && wall.id === 'GW_15' && z === 3430) return true;
+          return false;
+        }
+
+        // Check whether a vertical end cap (p1 -> q1) of an interior wall is buried inside/against another wall face
+        function isBuriedEndCap(p1, q1, zMid) {
+          if (!allWallFaceSegments) return false;
+          var mx = 0.5 * (p1[0] + q1[0]);
+          var my = 0.5 * (p1[1] + q1[1]);
+          var edx = q1[0] - p1[0];
+          var edy = q1[1] - p1[1];
+          var elen = Math.hypot(edx, edy) || 1;
+          for (var s = 0; s < allWallFaceSegments.length; s++) {
+            var seg = allWallFaceSegments[s];
+            if (seg.wallId === wall.id) continue;
+            if (zMid < seg.zMin || zMid > seg.zMax) continue;
+            var sdx = seg.x2 - seg.x1;
+            var sdy = seg.y2 - seg.y1;
+            var slen = Math.hypot(sdx, sdy) || 1;
+            // End-cap segment must be collinear with the other wall's face segment
+            var cross = Math.abs((edx * sdy - edy * sdx) / (elen * slen));
+            if (cross > 0.05) continue;
+            // Midpoint of end cap must lie on the other wall's face segment within 4 mm
+            var t = ((mx - seg.x1) * sdx + (my - seg.y1) * sdy) / (slen * slen);
+            if (t < -0.02 || t > 1.02) continue;
+            var projX = seg.x1 + t * sdx;
+            var projY = seg.y1 + t * sdy;
+            if (Math.hypot(mx - projX, my - projY) < 4) {
+              return true;
+            }
+          }
+          return false;
+        }
+
+        function emitRevealQuad(p1, p2, splitForExteriorJamb, isOuterLoop) {
+          if (isSharedHorizontalInterface(p1, p2)) return;
+          var q1 = mapSideAPointToSideB(p1);
+          var q2 = mapSideAPointToSideB(p2);
+
+          var isVerticalEdge = (Math.abs(p1[0] - p2[0]) < 1 && Math.abs(p1[1] - p2[1]) < 1);
+          var isWallEndCap = isOuterLoop && isVerticalEdge && (
+            Math.hypot(p1[0] - sideA.p1[0], p1[1] - sideA.p1[1]) < 2 ||
+            Math.hypot(p1[0] - sideA.p2[0], p1[1] - sideA.p2[1]) < 2
+          );
+
+          // Skip buried vertical end caps on interior partition walls where they T-junction or L-corner against another wall face
+          if (!isExteriorWall && isWallEndCap) {
+            var zMid = 0.5 * (p1[2] + p2[2]);
+            if (isBuriedEndCap(p1, q1, zMid)) return;
+          }
+
+          var isTopCap6300 = (Math.abs(p1[2] - p2[2]) < 1 && Math.round(p1[2]) === 6300);
+          var fBuilder = isTopCap6300 ? topCapFasciaBuilder : extJambBuilder;
+          // Exposed wall end caps on interior walls use intWallBuilder (uniform wall color) so L-corners have zero color seam;
+          // Doorway jambs/lintels and window opening reveals use intRevealBuilder so door/window edges keep distinct shading.
+          var wBuilder = isTopCap6300
+            ? topCapWhiteBuilder
+            : ((!isExteriorWall && isWallEndCap) ? intWallBuilder : intRevealBuilder);
+
+          if (isExteriorWall && splitForExteriorJamb) {
+            // 200 mm exterior reveal + 80 mm window frame depth = 280 mm dark fascia, remaining 100 mm interior white reveal
+            var t = Math.min(1.0, 280 / thick);
+            var m1 = [p1[0] + (q1[0] - p1[0]) * t, p1[1] + (q1[1] - p1[1]) * t, p1[2] + (q1[2] - p1[2]) * t];
+            var m2 = [p2[0] + (q2[0] - p2[0]) * t, p2[1] + (q2[1] - p2[1]) * t, p2[2] + (q2[2] - p2[2]) * t];
+            if (isOuterLoop) {
+              addQuad3D(fBuilder, p2, p1, m1, m2);
+              addQuad3D(wBuilder, m2, m1, q1, q2);
+            } else {
+              addQuad3D(fBuilder, p1, p2, m2, m1);
+              addQuad3D(wBuilder, m1, m2, q2, q1);
+            }
+          } else {
+            if (isOuterLoop) {
+              addQuad3D(wBuilder, p2, p1, q1, q2);
+            } else {
+              addQuad3D(wBuilder, p1, p2, q2, q1);
+            }
           }
         }
-        var rawHolesA = wall.sideA.holes3D || wall.sideA.holes || [];
-        var rawHolesB = wall.sideB.holes3D || wall.sideB.holes || [];
-        var count = Math.min(rawHolesA.length, rawHolesB.length);
-        for (var h = 0; h < count; h++) {
-          var hA = rawHolesA[h].loop3D || rawHolesA[h].loop || rawHolesA[h];
-          var hB = rawHolesB[h].loop3D || rawHolesB[h].loop || rawHolesB[h];
-          if (!hA || !hB) continue;
-          var m = Math.min(hA.length, hB.length);
-          for (var k = 0; k < m; k++) {
-            var kn = (k + 1) % m;
-            var a0 = hA[k], a1 = hA[kn];
-            // Find matching vertex on hB with same Z and closest XY
-            var b0 = hB[k], b1 = hB[kn];
-            if (isExteriorWall) {
-              var t = 200 / 380;
-              var m0 = [a0[0] + (b0[0] - a0[0]) * t, a0[1] + (b0[1] - a0[1]) * t, a0[2] + (b0[2] - a0[2]) * t];
-              var m1 = [a1[0] + (b1[0] - a1[0]) * t, a1[1] + (b1[1] - a1[1]) * t, a1[2] + (b1[2] - a1[2]) * t];
-              addQuad3D(extJambBuilder, a0, a1, m1, m0);
-              addQuad3D(intPlasterBuilder, m0, m1, b1, b0);
-            } else {
-              addQuad3D(intPlasterBuilder, a0, a1, b1, b0);
-            }
+
+        // 1. OuterLoop perimeter caps (mitered ends, top cap, and doorway/window notches)
+        var loopA = sideA.outerLoop3D || sideA.outerLoop || [];
+        for (var i = 0; i < loopA.length; i++) {
+          var p1 = loopA[i];
+          var p2 = loopA[(i + 1) % loopA.length];
+          emitRevealQuad(p1, p2, isExteriorWall, true);
+        }
+
+        // 2. Window hole reveals (jambs, sill, head)
+        var rawHolesA = sideA.holes3D || sideA.holes || [];
+        for (var h = 0; h < rawHolesA.length; h++) {
+          var hLoop = rawHolesA[h].loop3D || rawHolesA[h].loop || rawHolesA[h];
+          if (!hLoop || hLoop.length < 3) continue;
+          for (var k = 0; k < hLoop.length; k++) {
+            var hp1 = hLoop[k];
+            var hp2 = hLoop[(k + 1) % hLoop.length];
+            emitRevealQuad(hp1, hp2, true, false);
           }
         }
       }
@@ -1463,6 +1611,9 @@
         var bUpperFacade = createBuilder();
         var bFascia = createBuilder();
         var bInteriorWall = createBuilder();
+        var bInteriorReveal = createBuilder();
+        var bUpperWallCapFascia = createBuilder();
+        var bUpperWallCapWhite = createBuilder();
         var bInteriorCeiling = createBuilder();
         var bFloorLower = createBuilder();
         var bFloorUpper = createBuilder();
@@ -1479,27 +1630,25 @@
         // -----------------------------------------------------------------------
         addBoxZUp(bLawn, -20000, -18000, -190, 42000, 38000, -145, 2500);
 
-        // West Driveway & Pedestrian Front Entry Walkway
-        addBoxZUp(bDriveway, 20325, 90, -144, 36000, 7000, -40, 1800);
-        addBoxZUp(bDriveway, 18845, 8300, -144, 28500, 11200, -20, 1800);
+        // West Driveway & Pedestrian Front Entry Walkway (top + vertical curbs only, omitting buried bottom at Z = -145)
+        addOpenVerticalBoxZUp(bDriveway, 20325, 90, -145, 36000, 7000, -40, 1800);
+        addQuad3D(bDriveway, [20325, 90, -40], [36000, 90, -40], [36000, 7000, -40], [20325, 7000, -40], [0, 0, 1], 0, 0, 8.7, 3.84);
+        addOpenVerticalBoxZUp(bDriveway, 18845, 8300, -145, 28500, 11200, -20, 1800);
+        addQuad3D(bDriveway, [18845, 8300, -20], [28500, 8300, -20], [28500, 11200, -20], [18845, 11200, -20], [0, 0, 1], 0, 0, 5.36, 1.61);
 
         // Garden Gres Terraces (South & East L-shaped terrace around Salon, Jadalnia & Gabinet)
-        // South Terrace nestled in the L-recess south of Salon & Jadalnia (X=-285..14,695, Y=11,580..17,800)
-        addBoxZUp(bTerrace, -285, 11580, -140, 14695, 17800, -20, 1200);
-        // East Garden Terrace along East Core (X=-3,200..-285, Y=2,790..17,800)
-        addBoxZUp(bTerrace, -3200, 2790, -140, -285, 17800, -20, 1200);
-
-        // NE Covered Terrace Structural Slab (Z = 2,960..3,430 mm)
-        addBoxZUp(bInteriorCeiling, -285, 2790, 2960, 6495, 6110, 3410, 2000);
-        addBoxZUp(bTerrace, -285, 2790, 3410, 6115, 5890, 3430, 1200);
-        addBoxZUp(bFascia, -295, 2780, 2800, 6125, 2795, 3435, 2000);
-        addBoxZUp(bFascia, -295, 2780, 2800, -280, 5900, 3435, 2000);
+        // South Terrace nestled in the L-recess south of Salon & Jadalnia (X=-285..14,690, Y=11,585..17,800)
+        addOpenVerticalBoxZUp(bTerrace, -285, 11585, -145, 14690, 17800, -20, 1200);
+        addQuad3D(bTerrace, [-285, 11585, -20], [14690, 11585, -20], [14690, 17800, -20], [-285, 17800, -20], [0, 0, 1], 0, 0, 12.48, 5.18);
+        // East Garden Terrace along East Core (X=-3,200..-290, Y=2,790..17,800)
+        addOpenVerticalBoxZUp(bTerrace, -3200, 2790, -145, -290, 17800, -20, 1200);
+        addQuad3D(bTerrace, [-3200, 2790, -20], [-290, 2790, -20], [-290, 17800, -20], [-3200, 17800, -20], [0, 0, 1], 0, 0, 2.43, 12.5);
 
         // NE Upper Balcony Glass Balustrade (Z = 3,430..4,380 mm) + RAL 7021 Handrail
         addBoxZUp(bWindowFrames, -285, 2790, 4350, 6115, 2840, 4390, 1000);
-        addBoxZUp(bWindowFrames, -285, 2790, 4350, -235, 5890, 4390, 1000);
+        addBoxZUp(bWindowFrames, -285, 2845, 4350, -235, 5888, 4390, 1000);
         var bBalconyGlassN = createBuilder();
-        addBoxZUp(bBalconyGlassN, -270, 2805, 3430, 6100, 2825, 4350, 1000);
+        addBoxZUp(bBalconyGlassN, -270, 2805, 3432, 6100, 2825, 4348, 1000);
         transparentMeshes.push(uploadMesh(bBalconyGlassN, {
           color: [0.68, 0.84, 0.94],
           alpha: glassOpacity,
@@ -1507,7 +1656,7 @@
           center: [2900, 2815, 3890]
         }));
         var bBalconyGlassE = createBuilder();
-        addBoxZUp(bBalconyGlassE, -270, 2805, 3430, -250, 5890, 4350, 1000);
+        addBoxZUp(bBalconyGlassE, -270, 2830, 3432, -250, 5888, 4348, 1000);
         transparentMeshes.push(uploadMesh(bBalconyGlassE, {
           color: [0.68, 0.84, 0.94],
           alpha: glassOpacity,
@@ -1515,8 +1664,14 @@
           center: [-260, 4350, 3890]
         }));
 
-        // Entrance Alcove Porch Ceiling Soffit & Interior Closure (X=18,845..20,705, Y=8,180..11,400, Z=2,800..2,960)
-        addBoxZUp(bInteriorCeiling, 18845, 8180, 2800, 20705, 11400, 2960, 2000);
+        // Entrance Alcove Porch Ceiling Soffit (Z = 2,800 mm, strictly inside alcove X=19,225..20,325, Y=8,560..11,020)
+        addQuad3D(bInteriorCeiling, [19225, 11020, 2800], [20325, 11020, 2800], [20325, 8560, 2800], [19225, 8560, 2800], [0, 0, -1]);
+
+        // Upper Floor Perimeter Interior Baseboard Closure (Z = 3,330..3,430 mm where UW_*_INT starts at Z = 3,430 mm
+        // above ROOF_GARAGE and ROOF_GYM, plus Z = 2,960..3,430 mm at High Hall South wall X = 15,075..15,535)
+        addQuad3D(bInteriorWall, [20325, 3170, 3330], [12095, 3170, 3330], [12095, 3170, 3430], [20325, 3170, 3430], [0, 1, 0]);
+        addQuad3D(bInteriorWall, [15075, 11200, 3330], [20325, 11200, 3330], [20325, 11200, 3430], [15075, 11200, 3430], [0, -1, 0]);
+        addQuad3D(bInteriorWall, [15075, 11200, 2960], [15535, 11200, 2960], [15535, 11200, 3330], [15075, 11200, 3330], [0, -1, 0]);
 
         // Surrounding Pine Trees
         var treeCoords = [
@@ -1528,7 +1683,7 @@
         treeCoords.forEach(function (tc) {
           var tx = tc[0], ty = tc[1], sc = tc[2];
           var trunkH = 3600 * sc;
-          addBoxZUp(bTreeTrunk, tx - 180 * sc, ty - 180 * sc, -145, tx + 180 * sc, ty + 180 * sc, trunkH, 800);
+          addOpenVerticalBoxZUp(bTreeTrunk, tx - 180 * sc, ty - 180 * sc, -145, tx + 180 * sc, ty + 180 * sc, trunkH, 800);
           addBoxZUp(bTreeFoliage, tx - 1450 * sc, ty - 1450 * sc, trunkH - 600, tx + 1450 * sc, ty + 1450 * sc, trunkH + 1500 * sc, 1200);
           addBoxZUp(bTreeFoliage, tx - 1050 * sc, ty - 1050 * sc, trunkH + 1200 * sc, tx + 1050 * sc, ty + 1050 * sc, trunkH + 2900 * sc, 1200);
           addBoxZUp(bTreeFoliage, tx - 600 * sc, ty - 600 * sc, trunkH + 2600 * sc, tx + 600 * sc, ty + 600 * sc, trunkH + 3900 * sc, 1200);
@@ -1538,12 +1693,58 @@
         // B. 3D B-REP WALLS (EW_*, UW_*, WALL_BAND, GW_*, FW_*)
         // -----------------------------------------------------------------------
         var walls = WallService.getWalls();
+        var allWallFaceSegments = [];
+        walls.forEach(function (w) {
+          if (w.id === 'WALL_BAND' && Array.isArray(w.sides)) {
+            w.sides.forEach(function (s) {
+              allWallFaceSegments.push({
+                wallId: w.id,
+                x1: s.p1[0], y1: s.p1[1],
+                x2: s.p2[0], y2: s.p2[1],
+                zMin: 2800, zMax: 3430
+              });
+            });
+            return;
+          }
+          var isUpperWall = (w.id.indexOf('UW_') === 0 || w.id.indexOf('FW_') === 0);
+          var zMin = isUpperWall ? 3330 : 0;
+          var zMax = isUpperWall ? 6300 : 2960;
+          if (Array.isArray(w.sides) && w.sides.length > 2) {
+            w.sides.forEach(function (s) {
+              allWallFaceSegments.push({
+                wallId: w.id,
+                x1: s.p1[0], y1: s.p1[1],
+                x2: s.p2[0], y2: s.p2[1],
+                zMin: zMin, zMax: zMax
+              });
+            });
+            return;
+          }
+          if (w.sideA && w.sideA.p1 && w.sideA.p2) {
+            allWallFaceSegments.push({
+              wallId: w.id,
+              x1: w.sideA.p1[0], y1: w.sideA.p1[1],
+              x2: w.sideA.p2[0], y2: w.sideA.p2[1],
+              zMin: zMin, zMax: zMax
+            });
+          }
+          if (w.sideB && w.sideB.p1 && w.sideB.p2) {
+            allWallFaceSegments.push({
+              wallId: w.id,
+              x1: w.sideB.p1[0], y1: w.sideB.p1[1],
+              x2: w.sideB.p2[0], y2: w.sideB.p2[1],
+              zMin: zMin, zMax: zMax
+            });
+          }
+        });
+
         walls.forEach(function (w) {
           if (w.id === 'WALL_BAND' && Array.isArray(w.sides)) {
             w.sides.forEach(function (side) {
               var targetBuilder = (side.role === 'exterior') ? bFascia : bInteriorWall;
-              addWallFace3D(targetBuilder, side, 1600, 1600, false);
+              addWallFace3D(targetBuilder, side, 1600, 1600, false, 0);
             });
+            addWallReveals3D(bFascia, bInteriorWall, bInteriorReveal, bUpperWallCapFascia, bUpperWallCapWhite, w, true, allWallFaceSegments);
             return;
           }
 
@@ -1551,66 +1752,115 @@
           var isUW = w.id.indexOf('UW_') === 0;
 
           if (isEW) {
-            addWallFace3D(bLowerFacade, w.sideA, 1600, 1600, false);
-            addWallFace3D(bInteriorWall, w.sideB, 1600, 1600, false);
-            addWallReveals3D(bFascia, bInteriorWall, w, true);
+            addWallFace3D(bLowerFacade, w.sideA, 1600, 1600, false, 0);
+            addWallFace3D(bInteriorWall, w.sideB, 1600, 1600, false, 0);
+            addWallReveals3D(bFascia, bInteriorWall, bInteriorReveal, bUpperWallCapFascia, bUpperWallCapWhite, w, true, allWallFaceSegments);
           } else if (isUW) {
-            addWallFace3D(bUpperFacade, w.sideA, 1600, 1600, false);
-            addWallFace3D(bInteriorWall, w.sideB, 1600, 1600, false);
-            addWallReveals3D(bFascia, bInteriorWall, w, true);
+            addWallFace3D(bUpperFacade, w.sideA, 1600, 1600, false, 0);
+            addWallFace3D(bInteriorWall, w.sideB, 1600, 1600, false, 0);
+            addWallReveals3D(bFascia, bInteriorWall, bInteriorReveal, bUpperWallCapFascia, bUpperWallCapWhite, w, true, allWallFaceSegments);
+          } else if (Array.isArray(w.sides) && w.sides.length > 2) {
+            w.sides.forEach(function (side) {
+              addWallFace3D(bInteriorWall, side, 1600, 1600, false, 0);
+            });
+            addWallReveals3D(bFascia, bInteriorWall, bInteriorReveal, bUpperWallCapFascia, bUpperWallCapWhite, w, false, allWallFaceSegments);
           } else {
-            addWallFace3D(bInteriorWall, w.sideA, 1600, 1600, false);
-            addWallFace3D(bInteriorWall, w.sideB, 1600, 1600, false);
-            addWallReveals3D(bFascia, bInteriorWall, w, false);
+            addWallFace3D(bInteriorWall, w.sideA, 1600, 1600, false, 0);
+            addWallFace3D(bInteriorWall, w.sideB, 1600, 1600, false, 0);
+            addWallReveals3D(bFascia, bInteriorWall, bInteriorReveal, bUpperWallCapFascia, bUpperWallCapWhite, w, false, allWallFaceSegments);
           }
         });
 
         // -----------------------------------------------------------------------
-        // C. FLOOR & ROOF SLABS (FLOOR_LOWER, FLOOR_UPPER, ROOF_*)
+        // C. FLOOR & ROOF SLABS (FLOOR_LOWER, FLOOR_UPPER, TERRACE_UPPER, ROOF_*)
         // -----------------------------------------------------------------------
         var floors3D = WallService.getFloors3D();
         floors3D.forEach(function (slab) {
           var isRoofSlab = slab.id.indexOf('ROOF_') === 0;
 
-          function addSlabQuads(topBuilder, botBuilder, edgeBuilder) {
+          if (slab.id === 'FLOOR_LOWER') {
             (slab.topCellQuads3D || []).forEach(function (q) {
-              addQuad3D(topBuilder, q[0], q[1], q[2], q[3], [0, 0, 1]);
+              addQuad3D(bFloorLower, q[0], q[1], q[2], q[3], [0, 0, 1]);
             });
             (slab.bottomCellQuads3D || []).forEach(function (q) {
-              addQuad3D(botBuilder, q[0], q[1], q[2], q[3], [0, 0, -1]);
+              addQuad3D(bPlinth, q[0], q[1], q[2], q[3], [0, 0, -1]);
             });
             (slab.sideQuads3D || []).forEach(function (sq) {
               var lp = sq.loop3D;
-              if (lp && lp.length >= 4) {
-                addQuad3D(edgeBuilder, lp[0], lp[1], lp[2], lp[3], sq.normal);
-              }
+              if (lp && lp.length >= 4) addQuad3D(bPlinth, lp[0], lp[1], lp[2], lp[3], sq.normal);
             });
-          }
-
-          if (slab.id === 'FLOOR_LOWER') {
-            addSlabQuads(bFloorLower, bPlinth, bPlinth);
+          } else if (slab.id === 'TERRACE_UPPER') {
+            // TERRACE_UPPER (Z = 2,850..3,330 mm): top gres terrace tiles at Z = 3,330 mm + bottom ceiling for rooms 0.14 & 0.15 at Z = 2,850 mm
+            (slab.topCellQuads3D || []).forEach(function (q) {
+              addQuad3D(bTerrace, q[0], q[1], q[2], q[3], [0, 0, 1], 0, 0, 5.18, 2.45);
+            });
+            (slab.bottomCellQuads3D || []).forEach(function (q) {
+              addQuad3D(bInteriorCeiling, q[0], q[1], q[2], q[3], [0, 0, -1]);
+            });
+            // Exterior base closure at Z = 3,330..3,430 mm where UW_TERRACE_EAST (X=6,115) & UW_TERRACE_BACK (Y=5,890) start at Z = 3,430 mm
+            addQuad3D(bFascia, [6115, 3170, 3330], [6115, 5890, 3330], [6115, 5890, 3430], [6115, 3170, 3430], [-1, 0, 0]);
+            addQuad3D(bFascia, [6115, 5890, 3330], [95, 5890, 3330], [95, 5890, 3430], [6115, 5890, 3430], [0, -1, 0]);
           } else if (slab.id === 'FLOOR_UPPER') {
-            addSlabQuads(bFloorUpper, bInteriorCeiling, bInteriorWall);
+            (slab.topCellQuads3D || []).forEach(function (q) {
+              addQuad3D(bFloorUpper, q[0], q[1], q[2], q[3], [0, 0, 1]);
+            });
+            (slab.bottomCellQuads3D || []).forEach(function (q) {
+              addQuad3D(bInteriorCeiling, q[0], q[1], q[2], q[3], [0, 0, -1]);
+            });
+            // Only emit interior void/gallery sideQuads3D (skip outer perimeter edges at Y=3170, Y=11200, X=20325, X=6495 which are covered by WALL_BAND / GW_13)
+            (slab.sideQuads3D || []).forEach(function (sq) {
+              var lp = sq.loop3D;
+              if (!lp || lp.length < 4) return;
+              var mx = 0.5 * (lp[0][0] + lp[1][0]);
+              var my = 0.5 * (lp[0][1] + lp[1][1]);
+              if (Math.abs(my - 3170) < 5 || Math.abs(my - 11200) < 5 || Math.abs(mx - 20325) < 5 || Math.abs(mx - 6495) < 5) return;
+              addQuad3D(bInteriorWall, lp[0], lp[1], lp[2], lp[3], sq.normal);
+            });
           } else if (isRoofSlab) {
             var bRoofTop = createBuilder();
             var bRoofCeil = createBuilder();
             var bRoofEdge = createBuilder();
-            addSlabQuads(bRoofTop, bRoofCeil, bRoofEdge);
 
-            if (slab.id === 'ROOF_UPPER') {
-              // Outer 200 mm perimeter fascia band covering full UW_* footprint (Z = 6,300..6,740 mm)
-              addBoxZUp(bRoofEdge, 5915, 3170, 6300, 20325, 3370, 6740, 2000);
-              addBoxZUp(bRoofEdge, 5915, 11850, 6300, 20325, 12050, 6740, 2000);
-              addBoxZUp(bRoofEdge, 5915, 3170, 6300, 6115, 12050, 6740, 2000);
-              addBoxZUp(bRoofEdge, 20125, 3170, 6300, 20325, 12050, 6740, 2000);
-              // Architectural Fireplace Chimney Shaft above ROOF_UPPER
-              addBoxZUp(bRoofEdge, 9650, 11400, 6740, 10450, 12050, 7450, 1200);
+            if (slab.id === 'ROOF_GARAGE') {
+              // Top membrane stopped at exterior face of UW_NORTH_MAIN (Y = 2,790 mm) so it never protrudes into upper bathrooms/bedrooms
+              addQuad3D(bRoofTop, [12095, 90, 3400], [20325, 90, 3400], [20325, 2790, 3400], [12095, 2790, 3400], [0, 0, 1]);
+              (slab.bottomCellQuads3D || []).forEach(function (q) {
+                addQuad3D(bRoofCeil, q[0], q[1], q[2], q[3], [0, 0, -1]);
+              });
+            } else if (slab.id === 'ROOF_GYM') {
+              // Top membrane stopped at exterior face of UW_SOUTH (Y = 11,580 mm) so it never protrudes into upper bedrooms/corridor
+              addQuad3D(bRoofTop, [15075, 11580, 3400], [20325, 11580, 3400], [20325, 20750, 3400], [15075, 20750, 3400], [0, 0, 1]);
+              (slab.bottomCellQuads3D || []).forEach(function (q) {
+                addQuad3D(bRoofCeil, q[0], q[1], q[2], q[3], [0, 0, -1]);
+              });
+            } else if (slab.id === 'ROOF_UPPER') {
+              // 1. Top Roof Membrane at Z = 6,740 mm covering full exterior perimeter of UW_*_EXT
+              addQuad3D(bRoofTop, [6115, 2790, 6740], [20705, 2790, 6740], [20705, 5890, 6740], [6115, 5890, 6740], [0, 0, 1], 0, 0, 7.3, 1.55);
+              addQuad3D(bRoofTop, [-285, 5890, 6740], [20705, 5890, 6740], [20705, 11580, 6740], [-285, 11580, 6740], [0, 0, 1], 0, 0, 10.5, 2.85);
+
+              // 2. Interior White Ceiling at exact Z = 6,300 mm strictly inside UW_*_INT (zero overlap with exterior fascia)
+              addQuad3D(bRoofCeil, [6495, 6270, 6300], [20325, 6270, 6300], [20325, 3170, 6300], [6495, 3170, 6300], [0, 0, -1]);
+              addQuad3D(bRoofCeil, [95, 11200, 6300], [20325, 11200, 6300], [20325, 6270, 6300], [95, 6270, 6300], [0, 0, -1]);
+
+              // 3. Exterior Perimeter Fascia Band (Z = 6,300..6,740 mm) flush with UW_*_EXT
+              addQuad3D(bRoofEdge, [20705, 2790, 6300], [6115, 2790, 6300], [6115, 2790, 6740], [20705, 2790, 6740], [0, -1, 0], 0, 0, 7.3, 0.22);
+              addQuad3D(bRoofEdge, [6115, 2790, 6300], [6115, 5890, 6300], [6115, 5890, 6740], [6115, 2790, 6740], [-1, 0, 0], 0, 0, 1.55, 0.22);
+              addQuad3D(bRoofEdge, [6115, 5890, 6300], [-285, 5890, 6300], [-285, 5890, 6740], [6115, 5890, 6740], [0, -1, 0], 0, 0, 3.2, 0.22);
+              addQuad3D(bRoofEdge, [-285, 5890, 6300], [-285, 11580, 6300], [-285, 11580, 6740], [-285, 5890, 6740], [-1, 0, 0], 0, 0, 2.85, 0.22);
+              addQuad3D(bRoofEdge, [-285, 11580, 6300], [20705, 11580, 6300], [20705, 11580, 6740], [-285, 11580, 6740], [0, 1, 0], 0, 0, 10.5, 0.22);
+              addQuad3D(bRoofEdge, [20705, 11580, 6300], [20705, 2790, 6300], [20705, 2790, 6740], [20705, 11580, 6740], [1, 0, 0], 0, 0, 4.4, 0.22);
+
+              // 4. Architectural Fireplace Chimney Shaft above ROOF_UPPER (omitting bottom cap at Z = 6,740 mm)
+              addOpenVerticalBoxZUp(bRoofEdge, 9650, 9300, 6740, 10450, 9950, 7450, 1200);
+              addQuad3D(bRoofEdge, [9650, 9300, 7450], [10450, 9300, 7450], [10450, 9950, 7450], [9650, 9950, 7450], [0, 0, 1], 0, 0, 0.67, 0.54);
             }
 
             var hideable = (slab.id === 'ROOF_UPPER');
             opaqueMeshes.push(uploadMesh(bRoofTop, { color: [0.22, 0.25, 0.24], texKey: 'fascia', isRoof: hideable }));
             opaqueMeshes.push(uploadMesh(bRoofCeil, { color: [0.97, 0.965, 0.95], isRoof: hideable }));
-            opaqueMeshes.push(uploadMesh(bRoofEdge, { color: [0.9, 0.9, 0.9], texKey: 'fascia', isRoof: hideable }));
+            if (bRoofEdge.verts.length > 0) {
+              opaqueMeshes.push(uploadMesh(bRoofEdge, { color: [0.9, 0.9, 0.9], texKey: 'fascia', isRoof: hideable }));
+            }
           }
         });
 
@@ -1619,10 +1869,32 @@
         // -----------------------------------------------------------------------
         cachedStairs3D = WallService.getStairs3D();
         cachedStairs3D.forEach(function (st) {
-          function addLoopList(builder, faceList) {
+          // Inset stair vertices by 3 mm from surrounding walls/slabs (GW_7 y=8360, GW_5 x=16175, FLOOR_UPPER x=11910, FLOOR_LOWER z=0)
+          function insetStairPt3D(pt) {
+            var x = pt[0];
+            var y = pt[1];
+            var z = pt[2];
+            if (x >= 16174) x = 16172;
+            if (x <= 11911) x = 11913;
+            if (y <= 8361) y = 8363;
+            if (z <= 1) z = 2;
+            return [x, y, z];
+          }
+
+          function insetStairPt2D(pt) {
+            var x = pt[0];
+            var y = pt[1];
+            if (x >= 16174) x = 16172;
+            if (x <= 11911) x = 11913;
+            if (y <= 8361) y = 8363;
+            return [x, y];
+          }
+
+          function addLoopList(builder, faceList, useInset) {
             (faceList || []).forEach(function (f) {
-              var lp = f.loop3D || f.vertices;
-              if (!lp || lp.length < 3) return;
+              var rawLp = f.loop3D || f.vertices;
+              if (!rawLp || rawLp.length < 3) return;
+              var lp = useInset ? rawLp.map(insetStairPt3D) : rawLp;
               var n = f.normal || computeTriNormal(lp[0], lp[1], lp[2]);
               for (var i = 1; i < lp.length - 1; i++) {
                 addTriangle3D(builder, lp[0], lp[i], lp[i + 1], n);
@@ -1630,46 +1902,92 @@
             });
           }
 
-          // 1. Sloped Concrete Waist Slab & Top Riser
+          // 1. Sloped Concrete Waist Slab (soffit, north, south; East stairwell wall x=11910 is already drawn by FLOOR_UPPER)
           if (st.waistSlab3D && st.waistSlab3D.faces3D) {
-            addLoopList(bStairConcrete, st.waistSlab3D.faces3D);
-          }
-          if (st.topRiser3D && st.topRiser3D.loop3D) {
-            addLoopList(bStairConcrete, [st.topRiser3D]);
+            var visibleWaistFaces = st.waistSlab3D.faces3D.filter(function (f) {
+              return f.id !== 'east' && f.id !== 'top' && f.id !== 'west';
+            });
+            addLoopList(bStairConcrete, visibleWaistFaces, true);
           }
 
-          // 2. Individual Steps: Concrete wedge + 40 mm Solid Oak Tread
+          // 2. Individual Steps: Concrete core cheeks + Recessed vertical riser + 40 mm Solid Oak Tread
+          var nosingOverhangMm = 8;
           (st.steps3D || []).forEach(function (step) {
-            addLoopList(bStairConcrete, step.concreteFaces3D);
-            if (step.riserQuad3D) {
-              addLoopList(bStairConcrete, [step.riserQuad3D]);
-            }
-            addLoopList(bStairOak, step.plankSideQuads3D);
+            // 2a. Exterior concrete step cheeks (North/South triangles on straight flight, hallway cheek on turn block)
+            addLoopList(bStairConcrete, step.concreteFaces3D, true);
 
-            var poly = step.treadPolygon2D;
-            if (poly && poly.length >= 3) {
-              var z0 = step.zConcreteTop;
+            // 2b. Vertical plaster riser (zBottom -> zConcreteTop), recessed 8 mm behind the 40 mm oak tread nosing
+            var rn = step.riserNormal || [1, 0, 0];
+            if (step.riserLine2D && step.riserLine2D.length >= 2) {
+              var r1 = insetStairPt2D(step.riserLine2D[0]);
+              var r2 = insetStairPt2D(step.riserLine2D[1]);
+              var r1Back = [r1[0] - rn[0] * nosingOverhangMm, r1[1] - rn[1] * nosingOverhangMm];
+              var r2Back = [r2[0] - rn[0] * nosingOverhangMm, r2[1] - rn[1] * nosingOverhangMm];
+              var zRiserBot = Math.max(2, step.zBottom);
+              var zRiserTop = step.zConcreteTop;
+
+              addQuad3D(
+                bStairConcrete,
+                [r1Back[0], r1Back[1], zRiserBot],
+                [r2Back[0], r2Back[1], zRiserBot],
+                [r2Back[0], r2Back[1], zRiserTop],
+                [r1Back[0], r1Back[1], zRiserTop],
+                rn
+              );
+
+              // 8 mm oak nosing underside return lip at z = zConcreteTop
+              addQuad3D(
+                bStairOak,
+                [r1[0], r1[1], zRiserTop],
+                [r1Back[0], r1Back[1], zRiserTop],
+                [r2Back[0], r2Back[1], zRiserTop],
+                [r2[0], r2[1], zRiserTop],
+                [0, 0, -1]
+              );
+            }
+
+            // 2c. Visible perimeter side edges of the 40 mm solid oak tread (skipping internal back edge against next riser)
+            var sideQuads = step.plankSideQuads3D || [];
+            if (step.stepNumber >= 5) {
+              // Straight step: edge 0 = West nosing, edge 1 = South hallway, edge 3 = North wall; skip edge 2 (East back edge)
+              [0, 1, 3].forEach(function (idx) {
+                if (sideQuads[idx]) addLoopList(bStairOak, [sideQuads[idx]], true);
+              });
+            } else if (step.stepNumber === 1) {
+              // Entry step 1: edge 0 = South nosing, edge 1 = East wall, edge 3 = West hallway; skip edge 2 (North back edge)
+              [0, 1, 3].forEach(function (idx) {
+                if (sideQuads[idx]) addLoopList(bStairOak, [sideQuads[idx]], true);
+              });
+            } else {
+              // Winder steps 2..4: edge 0 = front nosing + outer wall edges (skipping last edge which is back edge against next winder)
+              for (var sIdx = 0; sIdx < sideQuads.length - 1; sIdx++) {
+                addLoopList(bStairOak, [sideQuads[sIdx]], true);
+              }
+            }
+
+            // 2d. Top horizontal surface of the 40 mm solid oak tread at z = step.zTop (no internal bottom face at zConcreteTop)
+            var rawPoly = step.treadPolygon2D;
+            if (rawPoly && rawPoly.length >= 3) {
+              var poly = rawPoly.map(insetStairPt2D);
               var z1 = step.zTop;
               var tris = earClip2D(poly);
               tris.forEach(function (t) {
                 addTriangle3D(bStairOak, [t[0][0], t[0][1], z1], [t[1][0], t[1][1], z1], [t[2][0], t[2][1], z1], [0, 0, 1]);
-                addTriangle3D(bStairOak, [t[0][0], t[0][1], z0], [t[2][0], t[2][1], z0], [t[1][0], t[1][1], z0], [0, 0, -1]);
               });
             }
           });
 
-          // 3. Staircase Balustrade Handrail, Posts & Glass Panel
+          // 3. Staircase Balustrade Handrail, Posts & Glass Panel + Upper Floor Gallery Guardrails
           if (st.balustrade3D) {
             var bal = st.balustrade3D;
-            addLoopList(bWindowFrames, bal.handrailFaces3D);
+            addLoopList(bWindowFrames, bal.handrailFaces3D, false);
             (bal.posts3D || []).forEach(function (postFaces) {
-              addLoopList(bWindowFrames, postFaces);
+              addLoopList(bWindowFrames, postFaces, false);
             });
             if (bal.glassPanelLoop3D && bal.glassPanelLoop3D.length >= 4) {
               var gp = bal.glassPanelLoop3D;
               var bStairGlass = createBuilder();
               addQuad3D(bStairGlass, gp[0], gp[1], gp[2], gp[3]);
-              addQuad3D(bStairGlass, gp[1], gp[0], gp[3], gp[2]);
               transparentMeshes.push(uploadMesh(bStairGlass, {
                 color: [0.72, 0.88, 0.96],
                 alpha: glassOpacity,
@@ -1677,25 +1995,76 @@
                 center: [0.5 * (gp[0][0] + gp[2][0]), 0.5 * (gp[0][1] + gp[2][1]), 0.5 * (gp[0][2] + gp[2][2])]
               }));
             }
+
+            // 3b. Upper Floor Gallery & Stairwell Guardrail Balustrades (Z = 3,330 .. 4,230 mm)
+            // - South Upper Gallery guardrail overlooking double-height Hall (X = 10,695..11,910, Y = 9,310..9,370)
+            addBoxZUp(bWindowFrames, 10697, 9310, 4180, 11908, 9370, 4230, 600);
+            addOpenVerticalBoxZUp(bWindowFrames, 10715, 9322, 3330, 10751, 9358, 4180, 400);
+            var bGalleryGlassS = createBuilder();
+            addQuad3D(bGalleryGlassS, [10697, 9340, 3410], [11908, 9340, 3410], [11908, 9340, 4178], [10697, 9340, 4178]);
+            transparentMeshes.push(uploadMesh(bGalleryGlassS, {
+              color: [0.72, 0.88, 0.96],
+              alpha: glassOpacity,
+              isGlass: true,
+              center: [11302, 9340, 3795]
+            }));
+
+            // - North Upper Corridor stairwell guardrail (X = 11,910..15,530, Y = 8,300..8,355)
+            addBoxZUp(bWindowFrames, 11912, 8300, 4180, 15530, 8355, 4230, 600);
+            addOpenVerticalBoxZUp(bWindowFrames, 11915, 8310, 3330, 11951, 8346, 4180, 400);
+            addOpenVerticalBoxZUp(bWindowFrames, 13705, 8310, 3330, 13741, 8346, 4180, 400);
+            addOpenVerticalBoxZUp(bWindowFrames, 15494, 8310, 3330, 15530, 8346, 4180, 400);
+            var bGalleryGlassN = createBuilder();
+            addQuad3D(bGalleryGlassN, [11912, 8328, 3410], [15530, 8328, 3410], [15530, 8328, 4178], [11912, 8328, 4178]);
+            transparentMeshes.push(uploadMesh(bGalleryGlassN, {
+              color: [0.72, 0.88, 0.96],
+              alpha: glassOpacity,
+              isGlass: true,
+              center: [13722, 8328, 3795]
+            }));
           }
         });
 
         // -----------------------------------------------------------------------
         // E. 3D WINDOWS, 90 MM MULLIONS, CORNER POSTS & DOORS (Z1, Z2)
         // -----------------------------------------------------------------------
-        var windows3D = WallService.getWindows3D({ activeOnly: true });
+        var windows3D = WallService.getWindows3D({ activeOnly: true }).map(function (win) {
+          // Align NE corner windows 14a (X=6315..7305) and O14b (Y=2990..5800) with exact 3D wall notches
+          if (win.id === '14a') {
+            return WallService.compileWindow3D({ id: '14a', x: 6315, width: 990 }) || win;
+          }
+          if (win.id === 'O14b') {
+            return WallService.compileWindow3D({ id: 'O14b', y: 2990, width: 2810 }) || win;
+          }
+          return win;
+        });
+
+        // 90x90 mm RAL 7021 Corner Window Mullion Posts at the 6 corner window junctions (open ends flush with sill/head)
+        var cornerPostCoords = [
+          [6315, 2990, 3430, 6130],
+          [20505, 2990, 4180, 6130],
+          [20505, 11380, 4180, 6130],
+          [-85, 11380, 0, 2800],
+          [-85, 11380, 3430, 6130],
+          [14895, 20930, 0, 2800]
+        ];
+        cornerPostCoords.forEach(function (cp) {
+          addOpenVerticalBoxZUp(bWindowFrames, cp[0] - 45, cp[1] - 45, cp[2], cp[0] + 45, cp[1] + 45, cp[3], 800);
+        });
+
+        // Secondary legs of the 6 corner windows (trimmed by 48 mm at the corner post end so 80 mm sash reveals never overlap)
+        var secondaryCornerWindowIds = { 'O14b': true, 'O13b_1': true, 'O13b_2': true, 'O9': true, 'O3': true, 'O6b': true };
 
         windows3D.forEach(function (win) {
-          // 1. Exterior 200 mm RAL 7021 Jambs & Sill Plate
-          (win.jambFaces3D || []).forEach(function (jf) {
-            if (jf.loop3D && jf.loop3D.length >= 4) {
-              addQuad3D(bFascia, jf.loop3D[0], jf.loop3D[1], jf.loop3D[2], jf.loop3D[3], jf.normal);
-              addQuad3D(bFascia, jf.loop3D[1], jf.loop3D[0], jf.loop3D[3], jf.loop3D[2]);
-            }
-          });
+          var fDepth = win.frameDepthMm || 80;
+          var wn = win.normal || [0, -1, 0];
+
+          // 1. Exterior Sill Drip Plate (offset 6 mm outward along win.normal to avoid Z-fighting with vertical exterior facade)
           if (win.sillPlate3D && win.sillPlate3D.length >= 4) {
-            var sp = win.sillPlate3D;
-            addQuad3D(bWindowFrames, sp[0], sp[1], sp[2], sp[3], [0, 0, 1]);
+            var sp = win.sillPlate3D.map(function (p) {
+              return [p[0] + wn[0] * 6, p[1] + wn[1] * 6, p[2]];
+            });
+            addQuad3D(bWindowFrames, sp[0], sp[1], sp[2], sp[3], wn);
           }
 
           // 2. Special Case: Sectional Garage Door Z2
@@ -1703,65 +2072,99 @@
             var sb = win.setbackLoop3D || win.outerLoop3D;
             if (sb && sb.length >= 4) {
               if (openDoorsState) {
-                // Rolled up overhead so user can walk/drive right into Garage
+                // Rolled up overhead (Z = 1,950..2,200 mm) so user can walk/drive right into Garage
                 var gTop0 = [sb[0][0], sb[0][1], 1950];
                 var gTop1 = [sb[1][0], sb[1][1], 1950];
                 addQuad3D(bGarageDoor, gTop0, gTop1, sb[2], sb[3]);
-                addQuad3D(bGarageDoor, gTop1, gTop0, sb[3], sb[2]);
               } else {
                 addQuad3D(bGarageDoor, sb[0], sb[1], sb[2], sb[3]);
-                addQuad3D(bGarageDoor, sb[1], sb[0], sb[3], sb[2]);
               }
             }
             return;
           }
 
-          // 3. Special Case: Main Entrance Door Z1 (with sidelight glass pane)
+          // 3. Special Case: Main Entrance Door Z1 (with sidelight glass pane + openable door leaf)
           if (win.id === 'Z1') {
-            var z1b = win.setbackLoop3D || win.outerLoop3D;
-            if (openDoorsState && z1b && z1b.length >= 4) {
-              // Sidelight glass pane
-              (win.glassPanes3D || []).forEach(function (pane) {
-                var lp = pane.loop3D;
-                if (!lp || lp.length < 4) return;
-                var bPane = createBuilder();
-                addQuad3D(bPane, lp[0], lp[1], lp[2], lp[3]);
-                addQuad3D(bPane, lp[1], lp[0], lp[3], lp[2]);
-                transparentMeshes.push(uploadMesh(bPane, {
-                  color: [0.68, 0.85, 0.96],
-                  alpha: glassOpacity,
-                  isGlass: true,
-                  center: pane.center3D || [19025, 10200, 1125]
-                }));
+            (win.glassPanes3D || []).forEach(function (pane) {
+              var rawLp = pane.loop3D;
+              if (!rawLp || rawLp.length < 4) return;
+              var lp = rawLp.map(function (pt) {
+                return [pt[0] - wn[0] * (fDepth * 0.5), pt[1] - wn[1] * (fDepth * 0.5), pt[2]];
               });
-              // Pivoted open door leaf inside Wiatrołap
-              addBoxZUp(bWoodDoor, 18050, 8920, 0, 19025, 8980, 2220, 1200);
-              return;
+              var bPane = createBuilder();
+              addQuad3D(bPane, lp[0], lp[1], lp[2], lp[3]);
+              transparentMeshes.push(uploadMesh(bPane, {
+                color: [0.68, 0.85, 0.96],
+                alpha: glassOpacity,
+                isGlass: true,
+                center: pane.center3D || [19025, 10200, 1125]
+              }));
+            });
+            if (openDoorsState) {
+              // Sidelight frame on right (Y = 9,940..10,615 mm) + pivoted open door leaf inside Wiatrołap
+              addOpenVerticalBoxZUp(bWindowFrames, 18945, 9940, 0, 19025, 10615, 55, 800);
+              addQuad3D(bWindowFrames, [18945, 9940, 55], [19025, 9940, 55], [19025, 10615, 55], [18945, 10615, 55], [0, 0, 1]);
+              addOpenVerticalBoxZUp(bWindowFrames, 18945, 9940, 2195, 19025, 10615, 2250, 800);
+              addQuad3D(bWindowFrames, [18945, 10615, 2195], [19025, 10615, 2195], [19025, 9940, 2195], [18945, 9940, 2195], [0, 0, -1]);
+              addOpenVerticalBoxZUp(bWindowFrames, 18945, 9940, 55, 19025, 9995, 2195, 800);
+              addOpenVerticalBoxZUp(bWindowFrames, 18945, 10565, 55, 19025, 10615, 2195, 800);
+              // Open door leaf with 10 mm floor clearance (Z = 10..2,220 mm) and 5 mm jamb clearance
+              addBoxZUp(bWoodDoor, 18005, 8925, 10, 19025, 8985, 2220, 1200);
+            } else if (win.frameFace3D) {
+              addWallFace3D(bWoodDoor, win.frameFace3D, 1000, 1000, false, 0);
+              addWallFace3D(bWoodDoor, win.frameFace3D, 1000, 1000, true, fDepth);
             }
+            return;
           }
 
-          // 4. Window Frame & 90 mm Structural Mullions (both sides + 80 mm depth)
+          // 4. 3D Window Frame & 90 mm Structural Mullions (front face at 200mm setback + back face at 280mm + 80mm sash reveals)
           if (win.frameFace3D) {
-            addWallFace3D(bWindowFrames, win.frameFace3D, 1000, 1000, false);
-            addWallFace3D(bWindowFrames, win.frameFace3D, 1000, 1000, true);
-            if (win.frameFace3D.exteriorOuterLoop3D) {
-              var extSide = {
-                outerLoop3D: win.frameFace3D.exteriorOuterLoop3D,
-                holes3D: win.frameFace3D.exteriorHoles3D || []
-              };
-              addWallFace3D(bWindowFrames, extSide, 1000, 1000, false);
-              addWallFace3D(bWindowFrames, extSide, 1000, 1000, true);
-            }
+            addWallFace3D(bWindowFrames, win.frameFace3D, 1000, 1000, false, 0);
+            addWallFace3D(bWindowFrames, win.frameFace3D, 1000, 1000, true, fDepth);
+
+            var isSecCorner = !!secondaryCornerWindowIds[win.id];
+            (win.frameFace3D.holes3D || []).forEach(function (h) {
+              var hl = h.loop3D || h.loop || [];
+              for (var k = 0; k < hl.length; k++) {
+                var a0 = hl[k];
+                var a1 = hl[(k + 1) % hl.length];
+                // On secondary corner window legs, trim horizontal sash reveal by 48 mm at the corner post end
+                if (isSecCorner && Math.abs(a0[2] - a1[2]) < 1) {
+                  var p0 = a0.slice(), p1 = a1.slice();
+                  for (var ci = 0; ci < cornerPostCoords.length; ci++) {
+                    var cp = cornerPostCoords[ci];
+                    if (Math.hypot(p0[0] - cp[0], p0[1] - cp[1]) < 150) {
+                      var dx0 = p1[0] - p0[0], dy0 = p1[1] - p0[1], l0 = Math.hypot(dx0, dy0) || 1;
+                      p0[0] += (dx0 / l0) * 48;
+                      p0[1] += (dy0 / l0) * 48;
+                    }
+                    if (Math.hypot(p1[0] - cp[0], p1[1] - cp[1]) < 150) {
+                      var dx1 = p0[0] - p1[0], dy1 = p0[1] - p1[1], l1 = Math.hypot(dx1, dy1) || 1;
+                      p1[0] += (dx1 / l1) * 48;
+                      p1[1] += (dy1 / l1) * 48;
+                    }
+                  }
+                  a0 = p0;
+                  a1 = p1;
+                }
+                var b0 = [a0[0] - wn[0] * fDepth, a0[1] - wn[1] * fDepth, a0[2]];
+                var b1 = [a1[0] - wn[0] * fDepth, a1[1] - wn[1] * fDepth, a1[2]];
+                addQuad3D(bWindowFrames, a0, a1, b1, b0);
+              }
+            });
           }
 
-          // 5. Crystal-Clear See-Through Glass Panes (rendered in sorted second pass)
+          // 5. Crystal-Clear See-Through Glass Panes (centered at d = 240 mm inside the 80 mm window frame)
+          var gShift = fDepth * 0.5;
           (win.glassPanes3D || []).forEach(function (pane) {
-            var lp = pane.loop3D;
-            if (!lp || lp.length < 4) return;
+            var rawLp = pane.loop3D;
+            if (!rawLp || rawLp.length < 4) return;
+            var lp = rawLp.map(function (pt) {
+              return [pt[0] - wn[0] * gShift, pt[1] - wn[1] * gShift, pt[2]];
+            });
             var bPane = createBuilder();
             addQuad3D(bPane, lp[0], lp[1], lp[2], lp[3]);
-            addQuad3D(bPane, lp[1], lp[0], lp[3], lp[2]);
-            var c = pane.center3D || [
+            var c = [
               0.25 * (lp[0][0] + lp[1][0] + lp[2][0] + lp[3][0]),
               0.25 * (lp[0][1] + lp[1][1] + lp[2][1] + lp[3][1]),
               0.25 * (lp[0][2] + lp[1][2] + lp[2][2] + lp[3][2])
@@ -1783,7 +2186,10 @@
         opaqueMeshes.push(uploadMesh(bLowerFacade, { color: [1, 1, 1], texKey: activeLowerMatId, isLowerFacade: true }));
         opaqueMeshes.push(uploadMesh(bUpperFacade, { color: [1, 1, 1], texKey: activeUpperMatId, isUpperFacade: true }));
         opaqueMeshes.push(uploadMesh(bFascia, { color: [0.92, 0.94, 0.93], texKey: 'fascia' }));
-        opaqueMeshes.push(uploadMesh(bInteriorWall, { color: [0.955, 0.948, 0.932] }));
+        opaqueMeshes.push(uploadMesh(bInteriorWall, { color: [0.955, 0.948, 0.932], isInteriorWall: true }));
+        opaqueMeshes.push(uploadMesh(bInteriorReveal, { color: [0.88, 0.872, 0.856] }));
+        opaqueMeshes.push(uploadMesh(bUpperWallCapFascia, { color: [0.92, 0.94, 0.93], texKey: 'fascia', isWallTopCap: true }));
+        opaqueMeshes.push(uploadMesh(bUpperWallCapWhite, { color: [0.955, 0.948, 0.932], isWallTopCap: true }));
         opaqueMeshes.push(uploadMesh(bInteriorCeiling, { color: [0.98, 0.976, 0.965] }));
         opaqueMeshes.push(uploadMesh(bFloorLower, { color: [0.89, 0.87, 0.835] }));
         opaqueMeshes.push(uploadMesh(bFloorUpper, { color: [0.875, 0.85, 0.81] }));
@@ -1822,32 +2228,90 @@
 
       function buildCollisionSegments() {
         var gfSlice = WallService.getFloorPlanSlice('ground');
-        var ufSlice = WallService.getFloorPlanSlice('upper');
+        var ufSlice = WallService.getFloorPlanSlice('first');
 
-        function extractSolidBoxes(slice) {
-          var boxes = [];
-          var allWalls = [].concat(slice.exteriorWalls || [], slice.internalWalls || []);
-          allWalls.forEach(function (w) {
-            (w.solidPolygons2D || []).forEach(function (poly) {
-              if (!poly || poly.length < 3) return;
-              var x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
-              poly.forEach(function (p) {
-                if (p[0] < x0) x0 = p[0];
-                if (p[0] > x1) x1 = p[0];
-                if (p[1] < y0) y0 = p[1];
-                if (p[1] > y1) y1 = p[1];
+        function addWallBoxes(boxes, wallList, isExterior) {
+          (wallList || []).forEach(function (w) {
+            if (!isExterior) {
+              // Stepped multi-segment wall (e.g. GW_14): use constituent collisionBoxes2D
+              if (Array.isArray(w.collisionBoxes2D) && w.collisionBoxes2D.length > 0) {
+                w.collisionBoxes2D.forEach(function (b) {
+                  boxes.push({ x0: b.x0, x1: b.x1, y0: b.y0, y1: b.y1, wallId: w.id });
+                });
+                return;
+              }
+              // Internal walls: use exact solidPolygons2D (carves out only interior doorways D_*)
+              (w.solidPolygons2D || []).forEach(function (poly) {
+                if (!poly || poly.length < 3) return;
+                var x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+                poly.forEach(function (p) {
+                  if (p[0] < x0) x0 = p[0];
+                  if (p[0] > x1) x1 = p[0];
+                  if (p[1] < y0) y0 = p[1];
+                  if (p[1] > y1) y1 = p[1];
+                });
+                boxes.push({ x0: x0, x1: x1, y0: y0, y1: y1, wallId: w.id });
               });
-              boxes.push({ x0: x0, x1: x1, y0: y0, y1: y1, wallId: w.id });
-            });
+              return;
+            }
+
+            // Exterior walls: windows (O1..O17, 14a, SO3) have glass panes and MUST block walking!
+            // Only carve out exterior entrance door Z1 and garage door Z2 when openDoorsState is true.
+            var wx0 = Math.min(w.x1, w.x2);
+            var wx1 = Math.max(w.x1, w.x2);
+            var wy0 = Math.min(w.y1, w.y2);
+            var wy1 = Math.max(w.y1, w.y2);
+
+            if (openDoorsState && w.id === 'EW_ALCOVE_WEST') {
+              // Carve out Z1 (Y = 8,920 .. 10,620 mm)
+              boxes.push({ x0: wx0, x1: wx1, y0: wy0, y1: 8920, wallId: w.id });
+              boxes.push({ x0: wx0, x1: wx1, y0: 10620, y1: wy1, wallId: w.id });
+            } else if (openDoorsState && w.id === 'EW_GARAGE_WEST') {
+              // Carve out Z2 (Y = 690 .. 5,890 mm)
+              boxes.push({ x0: wx0, x1: wx1, y0: wy0, y1: 690, wallId: w.id });
+              boxes.push({ x0: wx0, x1: wx1, y0: 5890, y1: wy1, wallId: w.id });
+            } else {
+              boxes.push({ x0: wx0, x1: wx1, y0: wy0, y1: wy1, wallId: w.id });
+            }
           });
-          return boxes;
         }
 
-        groundSegments = extractSolidBoxes(gfSlice);
-        upperSegments = extractSolidBoxes(ufSlice);
+        var gBoxes = [];
+        addWallBoxes(gBoxes, gfSlice.exteriorWalls, true);
+        addWallBoxes(gBoxes, gfSlice.internalWalls, false);
+        // Staircase South balustrade & West entry cheek on Ground Floor (prevents walking sideways into mid-air steps)
+        gBoxes.push({ x0: 11910, x1: 15175, y0: 9310, y1: 9380, wallId: 'STAIR_BALUSTRADE_GF' });
+        gBoxes.push({ x0: 15135, x1: 15175, y0: 9370, y1: 9640, wallId: 'STAIR_TURN_CHEEK_GF' });
+        groundSegments = gBoxes;
+
+        var uBoxes = [];
+        addWallBoxes(uBoxes, ufSlice.exteriorWalls, true);
+        addWallBoxes(uBoxes, ufSlice.internalWalls, false);
+        // Upper Floor guardrails around Stairwell (X = 11,910..15,535, Y = 8,360..9,370) and High Hall void (X = 10,695..15,535, Y = 9,370..11,200)
+        // Leaves only the East stair landing (X = 11,910, Y = 8,360..9,370) open so user walks smoothly onto the stairs!
+        uBoxes.push({ x0: 11910, x1: 15555, y0: 8300, y1: 8365, wallId: 'UPPER_STAIRWELL_NORTH_GUARD' });
+        uBoxes.push({ x0: 11910, x1: 15555, y0: 9310, y1: 9380, wallId: 'UPPER_STAIRWELL_SOUTH_GUARD' });
+        uBoxes.push({ x0: 10650, x1: 11910, y0: 9310, y1: 9380, wallId: 'UPPER_GALLERY_HALL_GUARD' });
+        uBoxes.push({ x0: 6315, x1: 6495, y0: 3170, y1: 6270, wallId: 'GW_15_UPPER' });
+        upperSegments = uBoxes;
       }
 
       buildCollisionSegments();
+
+      var UPPER_FLOOR_POLY = [
+        [20325, 3170],
+        [6495, 3170],
+        [6495, 6270],
+        [6315, 6270],
+        [6315, 11200],
+        [10695, 11200],
+        [10695, 9370],
+        [11910, 9370],
+        [11910, 8360],
+        [15535, 8360],
+        [15535, 11200],
+        [20325, 11200]
+      ];
 
       function ptInPoly2D(x, y, poly) {
         var inside = false;
@@ -1860,42 +2324,75 @@
         return inside;
       }
 
-      // Determine floor elevation Z at (x, y) given currentFootZ (handles STAIRS_1 climbing/descending!)
+      // Continuous, gap-free elevation along the L-shaped STAIRS_1 footprint (X = 11,910..16,175, Y = 8,360..9,640)
+      function computeContinuousStairZ(x, y) {
+        // 1. Straight flight (X = 11,910 .. 15,175, Y = 8,360 .. 9,370): Z = 740 mm (West pivot) -> 3,330 mm (East top landing)
+        if (x <= 15175) {
+          var tStraight = Math.max(0, Math.min(1, (15175 - x) / (15175 - 11910)));
+          return 740 + tStraight * (3330 - 740);
+        }
+        // 2. Winder turn bay (X = 15,175 .. 16,175, Y <= 9,370): fan angle around pivot (15,175, 9,370), Z = 220 -> 740 mm
+        if (y <= 9370) {
+          var dx = Math.max(1, x - 15175);
+          var dy = Math.max(0, 9370 - y);
+          var theta = Math.atan2(dy, dx); // 0 at Y=9370 (South) -> PI/2 at X=15175 (West)
+          var tWinder = Math.max(0, Math.min(1, theta / (Math.PI * 0.5)));
+          return 220 + tWinder * (740 - 220);
+        }
+        // 3. Bottom entry Step 1 (X = 15,175 .. 16,175, Y = 9,370 .. 9,640): Z = 0 (at Y=9640) -> 220 mm (at Y=9370)
+        var tEntry = Math.max(0, Math.min(1, (9660 - y) / (9660 - 9370)));
+        return tEntry * 220;
+      }
+
+      function isInStairFootprint(x, y, pad) {
+        var p = pad || 0;
+        // Straight flight box: X = 11,910..15,175, Y = 8,360..9,370
+        var inStraight = (x >= 11910 - p && x <= 15175 + p && y >= 8360 - p && y <= 9370 + p);
+        // Winder & entry turn box: X = 15,175..16,175, Y = 8,360..9,640
+        var inTurn = (x >= 15175 - p && x <= 16175 + p && y >= 8360 - p && y <= 9640 + p);
+        return inStraight || inTurn;
+      }
+
+      // Determine floor elevation Z at (x, y) given currentFootZ (handles STAIRS_1 climbing/descending with zero drop-outs!)
       function computeTargetFloorZ(x, y, curFootZ) {
-        // 1. Check exact step polygons of STAIRS_1 (X = 11,910..16,175, Y = 8,360..9,640)
-        if (cachedStairs3D.length > 0) {
-          var st = cachedStairs3D[0];
-          if (x >= st.xMin - 250 && x <= st.xMax + 250 && y >= st.yMin - 150 && y <= st.yMax + 250) {
-            var steps = st.steps3D || [];
-            for (var s = 0; s < steps.length; s++) {
-              var step = steps[s];
-              if (step.treadPolygon2D && ptInPoly2D(x, y, step.treadPolygon2D)) {
-                // Only snap to stair step if within reasonable vertical reach (prevents snapping from ground floor under high steps if walking in hall)
-                if (Math.abs(step.zTop - curFootZ) < 1200) {
-                  return step.zTop;
-                }
-              }
-            }
-            // Top landing transition at X = 11,650..11,910, Y = 8,360..9,370
-            if (x >= 11500 && x <= 11950 && y >= 8360 && y <= 9370 && curFootZ > 2200) {
-              return 3330;
-            }
+        // 1. Check if actively on the staircase (curFootZ between 90 and 3,240 mm)
+        var activelyOnStairs = (curFootZ > 90 && curFootZ < 3240);
+        if (activelyOnStairs) {
+          // Exiting bottom of stairs into Ground Floor Hall (Y >= 9,610 near bottom step)
+          if (y >= 9610 && x >= 15050 && x <= 16250 && curFootZ < 380) {
+            return 0;
           }
+          // Exiting top of stairs onto Upper Floor Gallery (X <= 11,930 near top step)
+          if (x <= 11930 && y >= 8300 && y <= 9400 && curFootZ > 2900) {
+            return 3330;
+          }
+          // Otherwise, stay locked on the continuous staircase surface so the user can NEVER fall through the stairs!
+          return computeContinuousStairZ(x, y);
         }
 
-        // 2. If currently on Upper Floor level (curFootZ >= 2650)
+        // 2. Entering the staircase from Ground Floor (bottom entry at X = 15,175..16,175, Y = 9,300..9,660)
+        if (curFootZ <= 90 && x >= 15150 && x <= 16180 && y >= 9250 && y <= 9650) {
+          return computeContinuousStairZ(x, y);
+        }
+
+        // 3. Entering the staircase from Upper Floor (top landing at X = 11,910..12,450, Y = 8,360..9,370)
+        if (curFootZ >= 3240 && x >= 11910 && x <= 12450 && y >= 8350 && y <= 9375) {
+          return computeContinuousStairZ(x, y);
+        }
+
+        // 4. If currently on Upper Floor level (curFootZ >= 2,650 mm)
         if (curFootZ >= 2650) {
-          // NE Covered Upper Terrace (X = -285..6115, Y = 2790..5890)
-          if (x >= -285 && x <= 6115 && y >= 2790 && y <= 5890) {
-            return 3430;
+          // NE Covered Upper Terrace (TERRACE_UPPER: X = 95..6315, Y = 3170..6110, zTop = 3,330 mm)
+          if (x >= -285 && x <= 6315 && y >= 2790 && y <= 6110) {
+            return 3330;
           }
-          // Upper Floor Slab footprint (X = 6315..20325, Y = 3170..11200)
-          if (x >= 6315 && x <= 20325 && y >= 3170 && y <= 11200) {
+          // Stay on Upper Floor elevation (3,330 mm) strictly inside the walkable upper floor slab (excludes High Living Room & High Hall void)
+          if (ptInPoly2D(x, y, UPPER_FLOOR_POLY)) {
             return 3330;
           }
         }
 
-        // 3. Ground Floor interior footprint check (exact FLOOR_LOWER L-shape)
+        // 5. Ground Floor interior footprint check (exact FLOOR_LOWER L-shape)
         var inGroundBuilding =
           (x >= -285 && x <= 20705 && y >= 2790 && y <= 11580) ||
           (x >= 11715 && x <= 20705 && y >= -290 && y <= 2790) ||
@@ -1904,7 +2401,7 @@
           return 0;
         }
 
-        // 4. Exterior Terraces & Entrance Walkway
+        // 6. Exterior Terraces & Entrance Walkway
         var onTerraceOrPath =
           (x >= -3200 && x <= 14695 && y >= 11580 && y <= 17800) ||
           (x >= -3200 && x <= -285 && y >= 2790 && y <= 17800) ||
@@ -1917,50 +2414,103 @@
           return -40;
         }
 
-        // 5. Surrounding Lawn
+        // 7. Surrounding Lawn
         return -145;
       }
 
-      // Resolve 2D wall collision with smooth sliding along walls
+      // Build active collision boxes for the player's current elevation (including dedicated stair channel walls)
+      function getActiveCollisionBoxes(curFootZ) {
+        if (curFootZ > 90 && curFootZ < 3240) {
+          // Player is actively on STAIRS_1: channel walls keep the player safely inside the L-shaped staircase
+          var sBoxes = [
+            // North stairwell wall GW_7 (solid along entire staircase length)
+            { x0: 11700, x1: 16350, y0: 8180, y1: 8360 },
+            // West/East turn bay wall GW_5 (solid along entire winder bay)
+            { x0: 16175, x1: 16350, y0: 8180, y1: 9750 },
+            // South straight-flight balustrade (Y = 9,370, X = 11,910..15,175)
+            { x0: 11880, x1: 15175, y0: 9360, y1: 9440 },
+            // Upper gallery South guardrail at top of stairs
+            { x0: 10650, x1: 11910, y0: 9360, y1: 9440 }
+          ];
+          // West cheek of turn bay (X = 15,175, Y = 9,370..9,680) once above Step 1
+          if (curFootZ > 230) {
+            sBoxes.push({ x0: 15095, x1: 15175, y0: 9370, y1: 9700 });
+          }
+          // South back edge of winder bay (Y = 9,640) when on upper winders (Steps 3..4)
+          if (curFootZ > 450) {
+            sBoxes.push({ x0: 15175, x1: 16350, y0: 9640, y1: 9750 });
+          }
+          return sBoxes;
+        }
+        return (curFootZ >= 2650) ? upperSegments : groundSegments;
+      }
+
+      // Resolve 2D wall collision using sub-stepped (<= 35 mm) iterative circle-vs-AABB push-out
       function moveWithCollision(oldX, oldY, targetX, targetY, curFootZ) {
         if (ghostMode || navMode !== 'walk') {
           return [targetX, targetY];
         }
-        // Disable wall collision while actively on the middle of the staircase so user never snags on landing corner
-        if (curFootZ > 250 && curFootZ < 3150) {
-          return [targetX, targetY];
-        }
 
-        var boxes = (curFootZ >= 2650) ? upperSegments : groundSegments;
-        var radius = 240; // 24 cm player body radius for easy doorway passage
+        var boxes = getActiveCollisionBoxes(curFootZ);
+        var radius = 195; // 19.5 cm player collision radius (fits easily through 80-90 cm doors & 100 cm stairs)
 
-        function collidesAt(px, py) {
-          for (var i = 0; i < boxes.length; i++) {
-            var b = boxes[i];
-            if (px + radius > b.x0 && px - radius < b.x1 && py + radius > b.y0 && py - radius < b.y1) {
-              return true;
+        var totalDx = targetX - oldX;
+        var totalDy = targetY - oldY;
+        var dist = Math.hypot(totalDx, totalDy);
+        var steps = Math.max(1, Math.ceil(dist / 35)); // Sub-step <= 35 mm so thin 120 mm walls can never be tunneled
+        var stepX = totalDx / steps;
+        var stepY = totalDy / steps;
+
+        var px = oldX;
+        var py = oldY;
+
+        for (var s = 0; s < steps; s++) {
+          px += stepX;
+          py += stepY;
+
+          // 3 passes of closest-point circle-vs-AABB push-out for smooth corner & wall sliding
+          for (var iter = 0; iter < 3; iter++) {
+            for (var i = 0; i < boxes.length; i++) {
+              var b = boxes[i];
+              if (px + radius <= b.x0 || px - radius >= b.x1 || py + radius <= b.y0 || py - radius >= b.y1) {
+                continue;
+              }
+              // Closest point on AABB [b.x0, b.x1] x [b.y0, b.y1] to circle center (px, py)
+              var cx = Math.max(b.x0, Math.min(px, b.x1));
+              var cy = Math.max(b.y0, Math.min(py, b.y1));
+              var dx = px - cx;
+              var dy = py - cy;
+              var d2 = dx * dx + dy * dy;
+
+              if (d2 >= radius * radius) continue;
+
+              if (d2 > 1e-4) {
+                var d = Math.sqrt(d2);
+                var push = radius - d;
+                px += (dx / d) * push;
+                py += (dy / d) * push;
+              } else {
+                // Center is inside box: push out along minimum penetration axis
+                var penLeft = (px - b.x0) + radius;
+                var penRight = (b.x1 - px) + radius;
+                var penTop = (py - b.y0) + radius;
+                var penBot = (b.y1 - py) + radius;
+                var minPen = Math.min(penLeft, penRight, penTop, penBot);
+                if (minPen === penLeft) px = b.x0 - radius;
+                else if (minPen === penRight) px = b.x1 + radius;
+                else if (minPen === penTop) py = b.y0 - radius;
+                else py = b.y1 + radius;
+              }
             }
           }
-          return false;
         }
 
-        if (!collidesAt(targetX, targetY)) {
-          return [targetX, targetY];
-        }
-        // Try sliding along X only
-        if (!collidesAt(targetX, oldY)) {
-          return [targetX, oldY];
-        }
-        // Try sliding along Y only
-        if (!collidesAt(oldX, targetY)) {
-          return [oldX, targetY];
-        }
-        return [oldX, oldY];
+        return [px, py];
       }
 
       // Detect current room / exterior area name for HUD badge
       function detectRoomName(x, y, z) {
-        if (x >= 11910 && x <= 16175 && y >= 8360 && y <= 9640 && z > 150 && z < 3250) {
+        if (isInStairFootprint(x, y, 120) && z > 90 && z < 3250) {
           return '🪜 STAIRS_1 (Oak Winder Staircase)';
         }
         var floorIdx = (z >= 2650) ? 1 : 0;
@@ -2071,10 +2621,10 @@
 
       floorUpperBtn.addEventListener('click', function () {
         footZ = 3330;
-        // If outside upper floor slab, move to Upper Gallery so user stands on solid floor
-        if (camPos[0] < 5915 || camPos[0] > 14675 || camPos[1] < 5690 || camPos[1] > 15010) {
-          camPos[0] = 11100;
-          camPos[1] = 10100;
+        // If outside solid upper floor slab, place user on the Upper Gallery landing at the top of the stairs
+        if (!ptInPoly2D(camPos[0], camPos[1], UPPER_FLOOR_POLY)) {
+          camPos[0] = 11350;
+          camPos[1] = 8600;
         }
         camPos[2] = footZ + eyeHeightMm;
         updateFloorTabHighlight();
@@ -2161,6 +2711,7 @@
 
       document.getElementById('openDoorsToggle').addEventListener('change', function (e) {
         openDoorsState = e.target.checked;
+        buildCollisionSegments();
         buildSceneMeshes();
       });
 
@@ -2282,19 +2833,50 @@
         return [wx, wy];
       }
 
+      // Check whether a world point (wx, wy) is selectable on the active mini-map floor
+      function isSelectableMinimapPoint(wx, wy, floorIdx) {
+        if (floorIdx === 1) {
+          // On Upper Floor mini-map: only walkable FLOOR_UPPER slab (which excludes High Living Room & High Hall void),
+          // STAIRS_1 staircase, or NE Covered Upper Terrace (TERRACE_UPPER) are selectable.
+          if (ptInPoly2D(wx, wy, UPPER_FLOOR_POLY)) return true;
+          if (isInStairFootprint(wx, wy, 0)) return true;
+          if (wx >= 95 && wx <= 6315 && wy >= 3170 && wy <= 6110) return true;
+          return false;
+        }
+        return true;
+      }
+
       var isDraggingMinimap = false;
       function handleMinimapPointer(e) {
         var wpt = minimapToWorld(e.clientX, e.clientY);
+        if (!isSelectableMinimapPoint(wpt[0], wpt[1], minimapFloor)) {
+          return;
+        }
         camPos[0] = wpt[0];
         camPos[1] = wpt[1];
-        footZ = (minimapFloor === 1) ? 3330 : computeTargetFloorZ(camPos[0], camPos[1], 0);
+        if (minimapFloor === 1) {
+          if (!ptInPoly2D(camPos[0], camPos[1], UPPER_FLOOR_POLY) && isInStairFootprint(camPos[0], camPos[1], 0)) {
+            footZ = computeContinuousStairZ(camPos[0], camPos[1]);
+          } else {
+            footZ = 3330;
+          }
+        } else {
+          footZ = computeTargetFloorZ(camPos[0], camPos[1], 0);
+        }
         camPos[2] = footZ + eyeHeightMm;
         if (navMode === 'orbit') setNavMode('walk');
+        updateFloorTabHighlight();
       }
 
       mmCanvas.addEventListener('mousedown', function (e) {
+        var wpt = minimapToWorld(e.clientX, e.clientY);
+        if (!isSelectableMinimapPoint(wpt[0], wpt[1], minimapFloor)) return;
         isDraggingMinimap = true;
         handleMinimapPointer(e);
+      });
+      mmCanvas.addEventListener('mousemove', function (e) {
+        var wpt = minimapToWorld(e.clientX, e.clientY);
+        mmCanvas.style.cursor = isSelectableMinimapPoint(wpt[0], wpt[1], minimapFloor) ? 'crosshair' : 'not-allowed';
       });
       window.addEventListener('mousemove', function (e) {
         if (isDraggingMinimap) handleMinimapPointer(e);
@@ -2311,18 +2893,84 @@
         mmCtx.fillStyle = '#0c111a';
         mmCtx.fillRect(0, 0, w, h);
 
-        // Building footprint tint
+        if (minimapFloor === 1) {
+          // 1. Subtle walkable Upper Floor slab fill (UPPER_FLOOR_POLY)
+          mmCtx.save();
+          mmCtx.beginPath();
+          for (var pi = 0; pi < UPPER_FLOOR_POLY.length; pi++) {
+            var mp = worldToMinimap(UPPER_FLOOR_POLY[pi][0], UPPER_FLOOR_POLY[pi][1]);
+            if (pi === 0) mmCtx.moveTo(mp[0], mp[1]);
+            else mmCtx.lineTo(mp[0], mp[1]);
+          }
+          mmCtx.closePath();
+          mmCtx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+          mmCtx.fill();
+          mmCtx.restore();
+
+          // 2. Non-selectable High Hall Void (X = 10,695..15,535, Y = 9,370..11,200) diagonal hatch
+          var hh0 = worldToMinimap(10695, 9370);
+          var hh1 = worldToMinimap(15535, 11200);
+          var hhW = hh1[0] - hh0[0];
+          var hhH = hh1[1] - hh0[1];
+          mmCtx.save();
+          mmCtx.beginPath();
+          mmCtx.rect(hh0[0], hh0[1], hhW, hhH);
+          mmCtx.fillStyle = 'rgba(15, 23, 42, 0.75)';
+          mmCtx.fill();
+          mmCtx.clip();
+          mmCtx.strokeStyle = 'rgba(148, 163, 184, 0.24)';
+          mmCtx.lineWidth = 1;
+          for (var hx = hh0[0] - hhH; hx < hh1[0] + hhH; hx += 6) {
+            mmCtx.beginPath();
+            mmCtx.moveTo(hx, hh0[1]);
+            mmCtx.lineTo(hx + hhH, hh1[1]);
+            mmCtx.stroke();
+          }
+          mmCtx.restore();
+
+          // Dashed gallery balustrade line along North edge of High Hall void (X = 10,695..11,910, Y = 9,370)
+          var gb0 = worldToMinimap(10695, 9370);
+          var gb1 = worldToMinimap(11910, 9370);
+          mmCtx.save();
+          mmCtx.setLineDash([3, 3]);
+          mmCtx.strokeStyle = 'rgba(148, 163, 184, 0.55)';
+          mmCtx.lineWidth = 1.5;
+          mmCtx.beginPath();
+          mmCtx.moveTo(gb0[0], gb0[1]);
+          mmCtx.lineTo(gb1[0], gb1[1]);
+          mmCtx.stroke();
+          mmCtx.restore();
+        }
+
+        // Building walls
         var boxes = (minimapFloor === 1) ? upperSegments : groundSegments;
         mmCtx.fillStyle = 'rgba(255, 255, 255, 0.78)';
         boxes.forEach(function (b) {
-          var p0 = worldToMinimap(b.x0, b.y0);
-          var p1 = worldToMinimap(b.x1, b.y1);
+          var bx0 = b.x0, bx1 = b.x1, by0 = b.y0, by1 = b.y1;
+          if (minimapFloor === 1) {
+            // Omit High Living Room double-height exterior walls (UW_EAST, UW_TERRACE_BACK) and invisible guardrail collision boxes
+            if (
+              b.wallId === 'UW_EAST' ||
+              b.wallId === 'UW_TERRACE_BACK' ||
+              b.wallId === 'UPPER_STAIRWELL_NORTH_GUARD' ||
+              b.wallId === 'UPPER_STAIRWELL_SOUTH_GUARD' ||
+              b.wallId === 'UPPER_GALLERY_HALL_GUARD'
+            ) {
+              return;
+            }
+            // Clip UW_SOUTH to start at X = 6,315 mm so the High Living Room (X < 6,315) is not drawn on the Upper Floor mini-map
+            if (b.wallId === 'UW_SOUTH') {
+              bx0 = Math.max(bx0, 6315);
+            }
+          }
+          var p0 = worldToMinimap(bx0, by0);
+          var p1 = worldToMinimap(bx1, by1);
           mmCtx.fillRect(p0[0], p0[1], Math.max(2, p1[0] - p0[0]), Math.max(2, p1[1] - p0[1]));
         });
 
         // Staircase indicator
-        var st0 = worldToMinimap(11295, 8560);
-        var st1 = worldToMinimap(14295, 10560);
+        var st0 = worldToMinimap(11910, 8360);
+        var st1 = worldToMinimap(16175, 9640);
         mmCtx.strokeStyle = 'rgba(245, 158, 11, 0.7)';
         mmCtx.lineWidth = 2;
         mmCtx.strokeRect(st0[0], st0[1], st1[0] - st0[0], st1[1] - st0[1]);
@@ -2492,6 +3140,7 @@
         gl.uniform3fv(uColorLoc, m.color);
         gl.uniform1f(uAlphaLoc, m.alpha);
         gl.uniform1f(uIsGlassLoc, m.isGlass ? 1.0 : 0.0);
+        gl.uniform1f(uIsInteriorWallLoc, m.isInteriorWall ? 1.0 : 0.0);
 
         if (m.texKey && textures[m.texKey]) {
           gl.uniform1f(uUseTexLoc, 1.0);
@@ -2527,7 +3176,7 @@
         gl.enable(gl.DEPTH_TEST);
 
         var aspect = canvas.width / Math.max(1, canvas.height);
-        var proj = perspectiveMatrix(62 * Math.PI / 180, aspect, 80, 120000);
+        var proj = perspectiveMatrix(62 * Math.PI / 180, aspect, 120, 65000);
 
         var lookTarget;
         if (navMode === 'orbit') {
@@ -2555,6 +3204,7 @@
         for (var i = 0; i < opaqueMeshes.length; i++) {
           var m = opaqueMeshes[i];
           if (m.isRoof && hideRoof) continue;
+          if (m.isWallTopCap && !hideRoof) continue;
           if (m.isTree && !showTrees) continue;
           renderMesh(m);
         }

@@ -1923,112 +1923,105 @@
                 ]
             },
             {
-                id: 'GW_14a',
-                name: 'GW_14a (Spiżarnia Upper East Wall)',
+                id: 'GW_14',
+                name: 'GW_14 (Spiżarnia / Gabinet Stepped Wall)',
                 floor: 'ground',
                 category: 'internal',
                 axis: 'y',
-                x1: 4335, y1: 3170, x2: 4455, y2: 5090,
+                x1: 4085, y1: 3170, x2: 4455, y2: 6110,
                 thickness: 120,
                 zBottom: 0,
-                zTop: 2960,
-                rooms: '0.14 Spiżarnia (186 cm upper) ↔ 0.15 Gabinet (424 cm upper)',
-                specs: '120 × 1,920 mm • 1,860 mm (186 cm) East of GW_13, 4,240 mm (424 cm) West of EW_EAST_CORE',
+                zTop: 2850,
+                rooms: '0.14 Spiżarnia (186 cm upper / 211 cm lower) ↔ 0.15 Gabinet (424 cm upper / 399 cm lower)',
+                specs: 'Stepped 120 mm (12 cm) wall • Z = 0..2,850 mm (285 cm tall under TERRACE_UPPER) • Upper 1,920 mm (X=4,335..4,455, Y=3,170..5,090) + 250 mm step (X=4,085..4,455, Y=5,090..5,210) + Lower 900 mm (X=4,085..4,205, Y=5,210..6,110)',
+                footprint2D: [
+                    [4335, 3170],
+                    [4455, 3170],
+                    [4455, 5210],
+                    [4205, 5210],
+                    [4205, 6110],
+                    [4085, 6110],
+                    [4085, 5090],
+                    [4335, 5090]
+                ],
+                solidPolygons2D: [
+                    [
+                        [4335, 3170],
+                        [4455, 3170],
+                        [4455, 5210],
+                        [4205, 5210],
+                        [4205, 6110],
+                        [4085, 6110],
+                        [4085, 5090],
+                        [4335, 5090]
+                    ]
+                ],
+                collisionBoxes2D: [
+                    { x0: 4335, x1: 4455, y0: 3170, y1: 5090 },
+                    { x0: 4085, x1: 4455, y0: 5090, y1: 5210 },
+                    { x0: 4085, x1: 4205, y0: 5210, y1: 6110 }
+                ],
                 openings: [],
                 doors: [],
                 sides: [
                     {
-                        id: 'GW_14a_EAST',
+                        id: 'GW_14_UPPER_EAST',
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [-1, 0, 0],
                         p1: [4335, 5090],
                         p2: [4335, 3170],
-                        outerLoop: [[4335, 5090, 0], [4335, 3170, 0], [4335, 3170, 2960], [4335, 5090, 2960]],
+                        outerLoop: [[4335, 5090, 0], [4335, 3170, 0], [4335, 3170, 2850], [4335, 5090, 2850]],
                         holes: []
                     },
                     {
-                        id: 'GW_14a_WEST',
+                        id: 'GW_14_UPPER_WEST',
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [1, 0, 0],
                         p1: [4455, 3170],
-                        p2: [4455, 5090],
-                        outerLoop: [[4455, 3170, 0], [4455, 5090, 0], [4455, 5090, 2960], [4455, 3170, 2960]],
+                        p2: [4455, 5210],
+                        outerLoop: [[4455, 3170, 0], [4455, 5210, 0], [4455, 5210, 2850], [4455, 3170, 2850]],
                         holes: []
-                    }
-                ]
-            },
-            {
-                id: 'GW_14b',
-                name: 'GW_14b (Spiżarnia / Gabinet 25 cm Wall Step)',
-                floor: 'ground',
-                category: 'internal',
-                axis: 'x',
-                x1: 4085, y1: 5090, x2: 4455, y2: 5210,
-                thickness: 120,
-                zBottom: 0,
-                zTop: 2960,
-                rooms: '0.14 Spiżarnia ↔ 0.15 Gabinet (25 cm Step)',
-                specs: '370 × 120 mm • 250 mm (25 cm) step between 186 cm upper and 211 cm lower Spiżarnia width',
-                openings: [],
-                doors: [],
-                sides: [
+                    },
                     {
-                        id: 'GW_14b_NORTH',
+                        id: 'GW_14_STEP_NORTH',
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [0, -1, 0],
                         p1: [4085, 5090],
-                        p2: [4455, 5090],
-                        outerLoop: [[4085, 5090, 0], [4455, 5090, 0], [4455, 5090, 2960], [4085, 5090, 2960]],
+                        p2: [4335, 5090],
+                        outerLoop: [[4085, 5090, 0], [4335, 5090, 0], [4335, 5090, 2850], [4085, 5090, 2850]],
                         holes: []
                     },
                     {
-                        id: 'GW_14b_SOUTH',
+                        id: 'GW_14_STEP_SOUTH',
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [0, 1, 0],
                         p1: [4455, 5210],
-                        p2: [4085, 5210],
-                        outerLoop: [[4455, 5210, 0], [4085, 5210, 0], [4085, 5210, 2960], [4455, 5210, 2960]],
+                        p2: [4205, 5210],
+                        outerLoop: [[4455, 5210, 0], [4205, 5210, 0], [4205, 5210, 2850], [4455, 5210, 2850]],
                         holes: []
-                    }
-                ]
-            },
-            {
-                id: 'GW_14c',
-                name: 'GW_14c (Spiżarnia Lower East Wall)',
-                floor: 'ground',
-                category: 'internal',
-                axis: 'y',
-                x1: 4085, y1: 5210, x2: 4205, y2: 6110,
-                thickness: 120,
-                zBottom: 0,
-                zTop: 2960,
-                rooms: '0.14 Spiżarnia (211 cm lower) ↔ 0.15 Gabinet (399 cm lower)',
-                specs: '120 × 900 mm (90 cm) • Stepped 250 mm (25 cm) East of GW_14a; 399 cm West of EW_EAST_CORE',
-                openings: [],
-                doors: [],
-                sides: [
+                    },
                     {
-                        id: 'GW_14c_EAST',
+                        id: 'GW_14_LOWER_EAST',
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [-1, 0, 0],
                         p1: [4085, 6110],
-                        p2: [4085, 5210],
-                        outerLoop: [[4085, 6110, 0], [4085, 5210, 0], [4085, 5210, 2960], [4085, 6110, 2960]],
+                        p2: [4085, 5090],
+                        outerLoop: [[4085, 6110, 0], [4085, 5090, 0], [4085, 5090, 2850], [4085, 6110, 2850]],
                         holes: []
                     },
                     {
-                        id: 'GW_14c_WEST',
+                        id: 'GW_14_LOWER_WEST',
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [1, 0, 0],
                         p1: [4205, 5210],
                         p2: [4205, 6110],
-                        outerLoop: [[4205, 5210, 0], [4205, 6110, 0], [4205, 6110, 2960], [4205, 5210, 2960]],
+                        outerLoop: [[4205, 5210, 0], [4205, 6110, 0], [4205, 6110, 2850], [4205, 5210, 2850]],
                         holes: []
                     }
                 ]
@@ -3006,6 +2999,24 @@
                     [-85, 6090],
                     [-85, 11380],
                     [20505, 11380]
+                ]
+            },
+            {
+                id: 'TERRACE_UPPER',
+                name: 'TERRACE_UPPER — NE Terrace & Ceiling Over 0.14/0.15 (+2.85..+3.33 m)',
+                floor: 'ground',
+                category: 'terrace',
+                zBottom: 2850,
+                zTop: 3330,
+                thickness: 480,
+                areaM2: 18.29,
+                rooms: '0.14 Spiżarnia & 0.15 Gabinet Ceiling + NE Covered Upper Terrace (+2.85..+3.33 m)',
+                specs: 'Single monolithic 4-vertex rectangular terrace & ceiling slab • Z = 2,850..3,330 mm (480 mm = 48 cm RC slab + thermal insulation + waterproofing + gres terrace tiles) • Ceiling for rooms 0.14 Spiżarnia and 0.15 Gabinet (resting directly on top of 285 cm wall GW_14 at Z = 2,850 mm) and upper terrace floor at Z = 3,330 mm',
+                footprint2D: [
+                    [6315, 3170],
+                    [95, 3170],
+                    [95, 6110],
+                    [6315, 6110]
                 ]
             }
         ]
