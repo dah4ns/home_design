@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- TODO(security): Enforce strict Content-Security-Policy and X-Frame-Options headers at the web server level when deployed -->
-    <title>3D Wall B-Rep Explorer — Interactive (X, Y, Z) Spatial Visualizer</title>
+    <title>3D Objects B-Rep Explorer — Interactive (X, Y, Z) Spatial Visualizer</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -113,6 +113,12 @@
             border: 1px solid rgba(56, 189, 248, 0.32);
         }
 
+        .tech-pill.amber {
+            background: rgba(245, 158, 11, 0.16);
+            color: #fde68a;
+            border-color: rgba(245, 158, 11, 0.38);
+        }
+
         .axis-legend-pills {
             display: flex;
             align-items: center;
@@ -181,13 +187,77 @@
             z-index: 2;
         }
 
-        /* Left Dock: Multi-Select Wall Dropdown & Display Options */
-        .left-dock {
+        /* Top-Left Menu Switcher Bar */
+        .left-menu-switcher {
             position: absolute;
             top: 14px;
             left: 14px;
-            width: 350px;
-            max-height: calc(100vh - 84px);
+            z-index: 25;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(15, 23, 42, 0.94);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            padding: 5px;
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
+        }
+
+        .menu-tab-btn {
+            background: rgba(30, 41, 59, 0.75);
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            color: #cbd5e1;
+            border-radius: 7px;
+            padding: 6px 10px;
+            font-size: 11.5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .menu-tab-btn:hover {
+            background: rgba(51, 65, 85, 0.92);
+            color: #ffffff;
+            border-color: rgba(56, 189, 248, 0.45);
+        }
+
+        .menu-tab-btn.active-walls {
+            background: rgba(56, 189, 248, 0.22);
+            border-color: #38bdf8;
+            color: #7dd3fc;
+            box-shadow: 0 0 14px rgba(56, 189, 248, 0.25);
+        }
+
+        .menu-tab-btn.active-objects {
+            background: rgba(245, 158, 11, 0.22);
+            border-color: #f59e0b;
+            color: #fde68a;
+            box-shadow: 0 0 14px rgba(245, 158, 11, 0.25);
+        }
+
+        .menu-tab-btn.hide-btn {
+            padding: 6px 9px;
+            color: #94a3b8;
+        }
+
+        .menu-tab-btn.hide-btn.active-hidden {
+            background: rgba(244, 63, 94, 0.18);
+            border-color: rgba(244, 63, 94, 0.45);
+            color: #fda4af;
+        }
+
+        /* Left Dock: Mutually Exclusive Menus (Walls & Stairs vs Objects/Furniture) */
+        .left-dock {
+            position: absolute;
+            top: 58px;
+            left: 14px;
+            width: 360px;
+            max-height: calc(100vh - 128px);
             overflow-y: auto;
             background: var(--bg-panel);
             backdrop-filter: blur(14px);
@@ -202,12 +272,16 @@
             gap: 12px;
         }
 
-        /* Right Dock: Selected Wall(s) 3D B-Rep Inspector */
+        .left-dock.hidden-menu {
+            display: none !important;
+        }
+
+        /* Right Dock: Selected Object(s) 3D B-Rep Inspector */
         .right-dock {
             position: absolute;
             top: 14px;
             right: 14px;
-            width: 390px;
+            width: 395px;
             max-height: calc(100vh - 84px);
             overflow-y: auto;
             background: var(--bg-panel);
@@ -243,6 +317,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 6px;
         }
 
         /* Multi-Select Dropdown Component */
@@ -267,9 +342,17 @@
             transition: all 0.15s ease;
         }
 
+        .multiselect-trigger.amber {
+            border-color: rgba(245, 158, 11, 0.5);
+        }
+
         .multiselect-trigger:hover {
             border-color: #38bdf8;
             background: rgba(30, 41, 59, 0.95);
+        }
+
+        .multiselect-trigger.amber:hover {
+            border-color: #f59e0b;
         }
 
         .multiselect-menu {
@@ -317,6 +400,10 @@
             margin-top: 2px;
         }
 
+        .wall-group-header.amber {
+            color: #fbbf24;
+        }
+
         .wall-group-header:first-of-type {
             border-top: none;
             margin-top: 0;
@@ -340,6 +427,11 @@
         .wall-option-row.checked {
             background: rgba(56, 189, 248, 0.18);
             border: 1px solid rgba(56, 189, 248, 0.35);
+        }
+
+        .wall-option-row.checked-amber {
+            background: rgba(245, 158, 11, 0.18);
+            border: 1px solid rgba(245, 158, 11, 0.4);
         }
 
         .wall-option-row input[type="checkbox"] {
@@ -385,9 +477,57 @@
             cursor: pointer;
         }
 
+        .wall-chip.amber {
+            background: rgba(245, 158, 11, 0.18);
+            border-color: rgba(245, 158, 11, 0.45);
+            color: #fef3c7;
+        }
+
         .wall-chip:hover {
             background: rgba(244, 63, 94, 0.22);
             border-color: rgba(244, 63, 94, 0.5);
+        }
+
+        /* Per-Object Furniture Part Control Card */
+        .furniture-part-card {
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(245, 158, 11, 0.28);
+            border-radius: 8px;
+            padding: 8px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 6px;
+        }
+
+        .furniture-part-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .fronts-pill-btn {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 5px;
+            cursor: pointer;
+            border: 1px solid;
+            transition: all 0.14s ease;
+        }
+
+        .fronts-pill-btn.on {
+            background: rgba(16, 185, 129, 0.18);
+            border-color: rgba(16, 185, 129, 0.5);
+            color: #6ee7b7;
+        }
+
+        .fronts-pill-btn.off {
+            background: rgba(245, 158, 11, 0.18);
+            border-color: rgba(245, 158, 11, 0.5);
+            color: #fde68a;
         }
 
         /* Buttons & Grids */
@@ -524,6 +664,7 @@
             line-height: 1.45;
             max-height: 120px;
             overflow-y: auto;
+            white-space: pre-wrap;
         }
 
         /* Bottom HUD Bar */
@@ -563,18 +704,19 @@
         <!-- TOP HEADER -->
         <header class="top-header">
             <div class="header-title-group">
-                <h1>🧊 3D Wall B-Rep Spatial Visualizer</h1>
-                <span class="tech-pill">outerLoop + holes [x, y, z]</span>
+                <h1>🧊 3D Objects B-Rep Spatial Visualizer</h1>
+                <span class="tech-pill">Walls • Slabs • Stairs • Furniture [x, y, z]</span>
                 <div class="axis-legend-pills">
                     <span class="axis-pill x">X: East → West (0..20,705 mm, Right)</span>
                     <span class="axis-pill y">Y: North → South (-290..21,130 mm, Depth)</span>
-                    <span class="axis-pill z">Z: Vertical Height (0..6,130 mm, Up)</span>
+                    <span class="axis-pill z">Z: Vertical Height (0..6,740 mm, Up)</span>
                 </div>
             </div>
             <nav class="nav-bar">
                 <a href="index.html" class="nav-btn">🏠 Dashboard</a>
+                <a href="kitchen.html" class="nav-btn">🍳 Kitchen 2D</a>
                 <a href="floor_plan.html" class="nav-btn">📐 2D Floor Plan</a>
-                <a href="north_facade.html" class="nav-btn">🧭 North Facade</a>
+                <a href="walkthrough_3d.html" class="nav-btn">🚶 3D Walkthrough</a>
                 <a href="building_3d.html" class="nav-btn">🏢 Full 3D Building</a>
             </nav>
         </header>
@@ -584,8 +726,21 @@
             <canvas id="webgl-canvas"></canvas>
             <canvas id="hud-canvas"></canvas>
 
-            <!-- LEFT CONTROL DOCK -->
-            <aside class="left-dock">
+            <!-- TOP-LEFT MENU SWITCHER (Mutually Exclusive Menus + Hide Both) -->
+            <div class="left-menu-switcher" role="tablist" aria-label="Left Control Menu Switcher">
+                <button type="button" class="menu-tab-btn" id="tab-btn-walls" title="Show Select Wall & Stair Objects by ID menu">
+                    <span>🧱 Walls &amp; Stairs</span>
+                </button>
+                <button type="button" class="menu-tab-btn active-objects" id="tab-btn-objects" title="Show Select Objects by ID (Furniture & Cabinets) menu">
+                    <span>🗄️ Select Objects by ID</span>
+                </button>
+                <button type="button" class="menu-tab-btn hide-btn" id="tab-btn-hide" title="Hide both left-hand side menus">
+                    <span id="tab-btn-hide-label">👁️ Hide Menu</span>
+                </button>
+            </div>
+
+            <!-- MENU 1: SELECT WALL & STAIR OBJECTS BY ID -->
+            <aside class="left-dock hidden-menu" id="left-dock-walls">
                 <!-- 1. Multi-Select Wall Dropdown -->
                 <div class="dock-section">
                     <div class="dock-title">
@@ -622,7 +777,7 @@
                         <button type="button" class="ctrl-btn" id="preset-ground-all">📐 All Ground + Slabs + Roofs</button>
                         <button type="button" class="ctrl-btn" id="preset-first-all">🪵 All Upper Floor + Slab</button>
                         <button type="button" class="ctrl-btn" id="preset-all-walls">🏢 All Walls + Slabs + Roofs</button>
-                        <button type="button" class="ctrl-btn" id="preset-clear" style="grid-column: span 2;">✖ Clear Selection</button>
+                        <button type="button" class="ctrl-btn" id="preset-clear" style="grid-column: span 2;">✖ Clear All Selection</button>
                     </div>
                 </div>
 
@@ -632,7 +787,7 @@
                         <span>3. 3D Space &amp; B-Rep Visualization</span>
                     </div>
                     <label class="toggle-row">
-                        <span>Show Object &amp; Window ID Labels (`UW_SOUTH`, `SO3`)</span>
+                        <span>Show Object &amp; Window ID Labels (`UW_SOUTH`, `CAB_KITCHEN_1`)</span>
                         <input type="checkbox" id="toggle-labels" checked>
                     </label>
                     <label class="toggle-row">
@@ -652,7 +807,7 @@
                         <input type="checkbox" id="toggle-normals" checked>
                     </label>
                     <label class="toggle-row">
-                        <span>Show Unselected Walls Ghost Footprint</span>
+                        <span>Show Unselected Objects Ghost Footprint</span>
                         <input type="checkbox" id="toggle-ghost" checked>
                     </label>
                     <label class="toggle-row">
@@ -662,9 +817,9 @@
                     <div class="slider-row" id="slice-slider-row" style="display: none;">
                         <div class="kv-row">
                             <span class="kv-key">Cut Plane Height `Z`:</span>
-                            <span class="kv-val" id="slice-y-label">1,200 mm</span>
+                            <span class="kv-val" id="slice-y-label">650 mm</span>
                         </div>
-                        <input type="range" id="slice-y-slider" min="-250" max="6800" step="50" value="1200">
+                        <input type="range" id="slice-y-slider" min="-250" max="6800" step="25" value="650">
                     </div>
                 </div>
 
@@ -684,10 +839,83 @@
                 </div>
             </aside>
 
+            <!-- MENU 2: SELECT OBJECTS BY ID (FURNITURE & CABINETS) -->
+            <aside class="left-dock" id="left-dock-objects">
+                <!-- 1. Select Objects by ID -->
+                <div class="dock-section">
+                    <div class="dock-title">
+                        <span>1. Select Objects by ID</span>
+                        <span class="tech-pill amber" id="selected-objects-count-badge">1 selected</span>
+                    </div>
+
+                    <div class="multiselect-box">
+                        <button type="button" class="multiselect-trigger amber" id="obj-dropdown-trigger">
+                            <span id="obj-dropdown-trigger-text">Choose Furniture / Cabinet IDs...</span>
+                            <span>▾</span>
+                        </button>
+                        <div class="multiselect-menu" id="obj-dropdown-menu">
+                            <input type="text" class="search-input" id="obj-search-input" placeholder="Filter objects by ID, room, or type (e.g. CAB_KITCHEN_1)...">
+                            <div id="obj-options-container"></div>
+                        </div>
+                    </div>
+
+                    <div class="selected-chips" id="selected-obj-chips-container"></div>
+                </div>
+
+                <!-- 2. Cabinet Parts: Skeleton & Fronts (Global + Per-Object) -->
+                <div class="dock-section">
+                    <div class="dock-title">
+                        <span>2. Cabinet Parts: Skeleton &amp; Fronts</span>
+                        <span class="tech-pill" id="fronts-summary-pill">Fronts: ON</span>
+                    </div>
+
+                    <label class="toggle-row">
+                        <span><strong>Global:</strong> Show Fronts Across All Furniture</span>
+                        <input type="checkbox" id="toggle-all-fronts" checked>
+                    </label>
+                    <label class="toggle-row">
+                        <span><strong>Global:</strong> Show Cabinet Skeleton (Carcass &amp; Plinth)</span>
+                        <input type="checkbox" id="toggle-all-skeleton" checked>
+                    </label>
+
+                    <div class="preset-grid" style="margin-top: 6px;">
+                        <button type="button" class="ctrl-btn" id="btn-all-fronts-on">🚪 Show All Fronts</button>
+                        <button type="button" class="ctrl-btn" id="btn-all-fronts-off">🦴 Skeleton Only (No Fronts)</button>
+                    </div>
+
+                    <div id="per-object-fronts-container" style="margin-top: 8px;"></div>
+                </div>
+
+                <!-- 3. Quick Object & Kitchen Context Presets -->
+                <div class="dock-section">
+                    <div class="dock-title">
+                        <span>3. Quick Object &amp; Context Presets</span>
+                    </div>
+                    <div class="preset-grid">
+                        <button type="button" class="ctrl-btn" id="preset-cab-only" style="grid-column: span 2;">🗄️ CAB_KITCHEN_1 Only (Focus Cabinet)</button>
+                        <button type="button" class="ctrl-btn" id="preset-cab-kitchen" style="grid-column: span 2;">🍳 CAB_KITCHEN_1 + Kitchen Walls &amp; Window O1</button>
+                        <button type="button" class="ctrl-btn" id="preset-cab-full-house">🏢 Cabinet + Full Building</button>
+                        <button type="button" class="ctrl-btn" id="preset-cab-clear">✖ Clear Objects</button>
+                    </div>
+                </div>
+
+                <!-- 4. Camera & Display Overlays -->
+                <div class="dock-section">
+                    <div class="dock-title">
+                        <span>4. Camera &amp; Viewpoint</span>
+                    </div>
+                    <div class="preset-grid three-cols">
+                        <button type="button" class="ctrl-btn" id="obj-cam-focus">🎯 Focus Selected</button>
+                        <button type="button" class="ctrl-btn" id="obj-cam-front">🧭 Front (Look N)</button>
+                        <button type="button" class="ctrl-btn" id="obj-cam-iso">📐 Iso Cabinet</button>
+                    </div>
+                </div>
+            </aside>
+
             <!-- RIGHT INSPECTOR DOCK -->
             <aside class="right-dock">
                 <div class="dock-title">
-                    <span>Selected Wall, Slab, Stair &amp; Window 3D B-Rep Inspector</span>
+                    <span>Selected 3D Object B-Rep Inspector</span>
                     <span class="tech-pill" id="inspector-summary-pill">outerLoop &amp; 3D B-Rep</span>
                 </div>
                 <div id="inspector-cards-container" style="display: flex; flex-direction: column; gap: 10px;"></div>
@@ -707,6 +935,7 @@
     <script src="data/windows.js"></script>
     <script src="data/walls.js"></script>
     <script src="data/stairs.js"></script>
+    <script src="data/furniture.js"></script>
     <script src="js/persistence.js"></script>
     <script src="js/window-store.js"></script>
     <script src="js/coordinate-service.js"></script>
@@ -736,16 +965,25 @@
                 floorById[fl.id] = fl;
             });
 
-            // Default selection: highlight Lower & Upper Floor Slabs (FLOOR_LOWER, FLOOR_UPPER),
-            // Gym, Garage & Upper Flat Roofs (ROOF_GYM, ROOF_GARAGE, ROOF_UPPER), WALL_BAND, STAIRS_1, and hallway walls
-            //
+            const allFurniture = (typeof WallService.getFurniture3D === 'function') ? WallService.getFurniture3D() : [];
+            const furnitureById = {};
+            const initialFrontsById = {};
+            allFurniture.forEach(fn => {
+                furnitureById[fn.id] = fn;
+                initialFrontsById[fn.id] = true;
+            });
+
             // Right-Handed Z-Up Coordinate System:
             // - X axis: East -> West horizontal axis (grows to the RIGHT when looking from North)
             // - Y axis: North -> South horizontal axis (second horizontal axis, into depth)
             // - Z axis: Vertical height axis (-220..6,740 mm, pointing UP)
             const appState = {
-                selectedIds: new Set(['FLOOR_LOWER', 'FLOOR_UPPER', 'TERRACE_UPPER', 'ROOF_GYM', 'ROOF_GARAGE', 'ROOF_UPPER', 'WALL_BAND', 'STAIRS_1', 'GW_14', 'GW_5', 'GW_7', 'GW_3']),
+                activeLeftMenu: 'objects', // 'walls' | 'objects' | 'none'
+                selectedIds: new Set(['CAB_KITCHEN_1', 'EW_NORTH_RECESSED', 'GW_3', 'GW_13', 'FLOOR_LOWER']),
                 searchQuery: '',
+                objectSearchQuery: '',
+                showAllFurnitureSkeleton: true,
+                furnitureFrontsById: initialFrontsById,
                 showLabels: true,
                 showWindows: true,
                 showAxes: true,
@@ -753,12 +991,12 @@
                 showNormals: true,
                 showGhost: true,
                 showSlicePlane: false,
-                sliceZMm: 1200,
+                sliceZMm: 650,
                 // Camera spherical coordinates around Z-up (in meters, 1 m = 1,000 mm)
-                yaw: 65 * Math.PI / 180,
-                pitch: 28 * Math.PI / 180,
-                distance: 15.5,
-                target: { x: 13.3, y: 7.5, z: 2.2 }
+                yaw: 112 * Math.PI / 180,
+                pitch: 24 * Math.PI / 180,
+                distance: 4.2,
+                target: { x: 9.215, y: 3.47, z: 0.48 }
             };
 
             // Distinct palette per wall category/side so multiple selected walls are easy to distinguish
@@ -789,7 +1027,6 @@
             /**
              * Triangulate a 3D planar wall side defined by its connected `outerLoop` [[x,y,z], ...]
              * and interior `holes` [{ loop: [[x,y,z], ...] }] into 3D triangles.
-             * Here (x, y) is the horizontal floor-plan coordinate and z is vertical height.
              */
             function triangulateWallSide3D(side) {
                 const origin = [side.p1[0], side.p1[1], 0];
@@ -867,13 +1104,11 @@
             }
 
             /**
-             * Build thickness reveal quads (top cap, bottom cap, mitered end caps, doorway jambs/lintels,
-             * and window hole reveals) connecting sideA and sideB so the 3D wall is a closed mitered solid.
+             * Build thickness reveal quads connecting sideA and sideB so the 3D wall is a closed solid.
              */
             function buildWallThicknessReveals3D(wall) {
                 const quads = [];
 
-                // Closed multi-segment perimeter ring (e.g. WALL_BAND)
                 if (
                     Array.isArray(wall.outerPolygon2D) &&
                     Array.isArray(wall.innerPolygon2D) &&
@@ -888,14 +1123,12 @@
                         const p2 = wall.outerPolygon2D[(i + 1) % n];
                         const q1 = wall.innerPolygon2D[i];
                         const q2 = wall.innerPolygon2D[(i + 1) % n];
-                        // Top cap trapezoid at zTop
                         quads.push([
                             [p1[0], p1[1], zTop],
                             [p2[0], p2[1], zTop],
                             [q2[0], q2[1], zTop],
                             [q1[0], q1[1], zTop]
                         ]);
-                        // Bottom cap trapezoid at zBot
                         quads.push([
                             [q1[0], q1[1], zBot],
                             [q2[0], q2[1], zBot],
@@ -906,7 +1139,6 @@
                     return quads;
                 }
 
-                // Multi-segment stepped interior wall (e.g. GW_14 with 6 vertical faces and 3 constituent boxes)
                 if (Array.isArray(wall.collisionBoxes2D) && wall.collisionBoxes2D.length > 0 && Array.isArray(wall.sides) && wall.sides.length > 2) {
                     const zBot = wall.zBottom !== undefined ? wall.zBottom : 0;
                     const zTop = wall.zTop !== undefined ? wall.zTop : 2850;
@@ -925,7 +1157,7 @@
                 const sideB = wall.sideB;
                 if (!sideA || !sideB) return quads;
 
-                const nA = sideA.normal; // [nx, ny, 0] pointing from sideB toward sideA
+                const nA = sideA.normal;
                 const thick = wall.thickness || 120;
                 const offsetToB = [-nA[0] * thick, -nA[1] * thick, 0];
 
@@ -934,11 +1166,6 @@
                 const bMinY = Math.min(sideB.p1[1], sideB.p2[1]);
                 const bMaxY = Math.max(sideB.p1[1], sideB.p2[1]);
 
-                // Map any 3D vertex on sideA to its corresponding 3D vertex on sideB:
-                // - Vertices at sideA.p1 map to sideB.p2 (exact mitered corner at start of wall)
-                // - Vertices at sideA.p2 map to sideB.p1 (exact mitered corner at end of wall)
-                // - Interior doorway notch / window hole vertices project across the wall thickness,
-                //   clamped to sideB's [p1, p2] span so corner-zone jambs meet the interior corner cleanly
                 function mapSideAPointToSideB(pt) {
                     if (Math.hypot(pt[0] - sideA.p1[0], pt[1] - sideA.p1[1]) < 2) {
                         return [sideB.p2[0], sideB.p2[1], pt[2]];
@@ -951,7 +1178,6 @@
                     return [bx, by, pt[2]];
                 }
 
-                // 1. OuterLoop perimeter caps (mitered left/right end bevels, top cap, and doorway jambs/lintels)
                 const loopA = sideA.outerLoop || [];
                 for (let i = 0; i < loopA.length; i++) {
                     const p1 = loopA[i];
@@ -961,7 +1187,6 @@
                     quads.push([p1, p2, q2, q1]);
                 }
 
-                // 2. Window hole reveals (jambs, sill, head)
                 (sideA.holes || []).forEach(h => {
                     const hLoop = h.loop || [];
                     for (let i = 0; i < hLoop.length; i++) {
@@ -1053,7 +1278,6 @@
             const meshBuffer = gl.createBuffer();
             const lineBuffer = gl.createBuffer();
 
-            // Matrix math utilities
             function mat4Perspective(fovRad, aspect, near, far) {
                 const f = 1.0 / Math.tan(fovRad / 2);
                 const nf = 1 / (near - far);
@@ -1129,7 +1353,7 @@
             }
 
             // =========================================================================
-            // 4. BUILD SCENE GEOMETRY FROM SELECTED WALLS
+            // 4. BUILD SCENE GEOMETRY FROM SELECTED WALLS, SLABS, STAIRS & FURNITURE
             // =========================================================================
             function renderScene() {
                 const rect = glCanvas.parentElement.getBoundingClientRect();
@@ -1151,15 +1375,13 @@
                 gl.enable(gl.BLEND);
                 gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-                // Z-up right-handed spherical camera:
-                // X = East-West (grows to the right), Y = North-South (depth), Z = Vertical Height (up = [0, 0, 1])
                 const eye = [
                     appState.target.x + appState.distance * Math.cos(appState.pitch) * Math.cos(appState.yaw),
                     appState.target.y + appState.distance * Math.cos(appState.pitch) * Math.sin(appState.yaw),
                     appState.target.z + appState.distance * Math.sin(appState.pitch)
                 ];
                 const viewMat = mat4LookAt(eye, [appState.target.x, appState.target.y, appState.target.z], [0, 0, 1]);
-                const projMat = mat4Perspective(42 * Math.PI / 180, width / height, 0.2, 150.0);
+                const projMat = mat4Perspective(42 * Math.PI / 180, width / height, 0.1, 150.0);
                 const viewProj = mat4Multiply(projMat, viewMat);
 
                 const meshVerts = [];  // [x,y,z, nx,ny,nz, r,g,b,a] = 10 floats per vertex (opaque)
@@ -1195,11 +1417,17 @@
                     }
                 }
 
+                function pushConvexLoop3D(loop3D, normal, rgba, targetArr) {
+                    if (!Array.isArray(loop3D) || loop3D.length < 3) return;
+                    for (let i = 1; i + 1 < loop3D.length; i++) {
+                        pushTri(loop3D[0], loop3D[i], loop3D[i + 1], normal, rgba, targetArr);
+                    }
+                }
+
                 // ---------------------------------------------------------------------
                 // A. 3D REFERENCE GRID & (X, Y, Z) AXES IN MILLIMETERS (Z-UP)
                 // ---------------------------------------------------------------------
                 if (appState.showAxes) {
-                    // 1-meter ground grid on horizontal plane Z = 0 mm
                     for (let x = 0; x <= 21000; x += 1000) {
                         const isMajor = (x % 5000 === 0);
                         pushLine([x, -1000, 0], [x, 22000, 0], isMajor ? [0.28, 0.36, 0.50, 0.45] : [0.18, 0.24, 0.35, 0.24]);
@@ -1209,7 +1437,7 @@
                         pushLine([-1000, y, 0], [21000, y, 0], isMajor ? [0.28, 0.36, 0.50, 0.45] : [0.18, 0.24, 0.35, 0.24]);
                     }
 
-                    // X Axis (Red: East 0 -> West 22,500 mm, growing to the RIGHT)
+                    // X Axis (Red: East 0 -> West 22,500 mm)
                     pushLine([-1000, 0, 0], [22500, 0, 0], [0.95, 0.27, 0.27, 1.0]);
                     for (let x = 0; x <= 20000; x += 5000) {
                         pushLine([x, -250, 0], [x, 250, 0], [0.95, 0.27, 0.27, 1.0]);
@@ -1229,7 +1457,7 @@
                         fontSize: 11
                     });
 
-                    // Y Axis (Green: North 0 -> South 22,500 mm, second horizontal axis)
+                    // Y Axis (Green: North 0 -> South 22,500 mm)
                     pushLine([0, -1000, 0], [0, 22500, 0], [0.06, 0.73, 0.51, 1.0]);
                     for (let y = 0; y <= 20000; y += 5000) {
                         if (y === 0) continue;
@@ -1278,7 +1506,7 @@
                 }
 
                 // ---------------------------------------------------------------------
-                // B. UNSELECTED WALLS GHOST FOOTPRINT (FOR SPATIAL CONTEXT)
+                // B. UNSELECTED OBJECTS GHOST FOOTPRINT (FOR SPATIAL CONTEXT)
                 // ---------------------------------------------------------------------
                 if (appState.showGhost) {
                     allWalls.forEach(w => {
@@ -1291,6 +1519,12 @@
                             const innerLoop = w.innerPolygon2D.map(pt => [pt[0], pt[1], zBase + 5]);
                             pushLoopLines(innerLoop, [0.45, 0.55, 0.70, 0.25]);
                         }
+                    });
+                    allFurniture.forEach(fn => {
+                        if (appState.selectedIds.has(fn.id)) return;
+                        if (!Array.isArray(fn.footprint2D)) return;
+                        const loop = fn.footprint2D.map(pt => [pt[0], pt[1], (fn.zBottom || 0) + 6]);
+                        pushLoopLines(loop, [0.96, 0.62, 0.04, 0.35]);
                     });
                 }
 
@@ -1308,7 +1542,6 @@
                     const isRingWall = Array.isArray(w.outerPolygon2D) && Array.isArray(w.innerPolygon2D);
                     const isSteppedWall = !isRingWall && Array.isArray(w.sides) && w.sides.length > 2;
 
-                    // 1. Triangulate Side A and Side B faces (with doorway notches & window holes)
                     w.sides.forEach((side, sIdx) => {
                         const isPrimarySide = isRingWall
                             ? (side.role === 'exterior')
@@ -1319,10 +1552,8 @@
                             pushTri(tri[0], tri[1], tri[2], side.normal, [baseRgb[0], baseRgb[1], baseRgb[2], 0.92]);
                         });
 
-                        // Crisp outerLoop wireframe
                         pushLoopLines(side.outerLoop, isPrimarySide ? [0.98, 0.98, 1.0, 0.95] : [0.75, 0.85, 0.95, 0.75]);
 
-                        // Crisp window hole wireframes (in bright emerald)
                         (side.holes || []).forEach(h => {
                             pushLoopLines(h.loop, [0.15, 0.95, 0.65, 1.0]);
                             if (appState.showLabels && !appState.showWindows && isPrimarySide && Array.isArray(h.loop) && h.loop.length >= 4) {
@@ -1339,7 +1570,6 @@
                             }
                         });
 
-                        // 2. Outward Normal Vector Arrow n = [nx, ny, nz]
                         if (appState.showNormals) {
                             const midZ = (zBot + zTop) / 2;
                             const startMm = [side.midpoint2D[0], side.midpoint2D[1], midZ];
@@ -1362,7 +1592,6 @@
                             }
                         }
 
-                        // 3. 3D Vertex [x, y, z] Labels on Side A (for standard single-segment walls)
                         if (!isRingWall && !isSteppedWall && appState.showVertices && sIdx === 0) {
                             (side.outerLoop || []).forEach(pt => {
                                 hudLabels.push({
@@ -1377,7 +1606,6 @@
                         }
                     });
 
-                    // 3b. Unique 3D Corner Vertex Labels for closed multi-segment perimeter ring walls or stepped walls (WALL_BAND, GW_14)
                     if ((isRingWall || isSteppedWall) && appState.showVertices) {
                         const polyPts = isRingWall ? w.outerPolygon2D : (w.footprint2D || []);
                         polyPts.forEach(pt2D => {
@@ -1392,7 +1620,6 @@
                         });
                     }
 
-                    // 4. Thickness Reveal Quads (top cap, miter ends, doorway jambs & lintels, window reveals)
                     const revealQuads = buildWallThicknessReveals3D(w);
                     revealQuads.forEach(q => {
                         pushTri(q[0], q[1], q[2], [0, 0, 1], [pal.sideB[0] * 0.85, pal.sideB[1] * 0.85, pal.sideB[2] * 0.85, 0.92]);
@@ -1401,11 +1628,9 @@
                         pushLine(q[1], q[2], [0.82, 0.90, 0.98, 0.82]);
                     });
 
-                    // 5. Hosted 3D CAD B-Rep Windows & Doors (Frame + Mullions + Glass Panes + 200mm Jambs)
                     if (appState.showWindows && typeof WallService.getWindows3D === 'function') {
                         const hostedWins = WallService.getWindows3D({ hostWallId: w.id, activeOnly: true });
                         hostedWins.forEach(win3D => {
-                            // 5a. 3D Jamb Reveal Faces (200 mm exterior recess into wall opening)
                             (win3D.jambFaces3D || []).forEach(jamb => {
                                 if (Array.isArray(jamb.loop3D) && jamb.loop3D.length >= 4) {
                                     const q = jamb.loop3D;
@@ -1415,7 +1640,6 @@
                                 }
                             });
 
-                            // 5b. 3D RAL 7021 Frame + Inner Mullions Face (triangulated with glass cutouts)
                             if (win3D.frameFace3D && Array.isArray(win3D.frameFace3D.outerLoop3D)) {
                                 const frameTris = triangulateWallSide3D(win3D.frameFace3D);
                                 frameTris.forEach(tri => {
@@ -1427,7 +1651,6 @@
                                 });
                             }
 
-                            // 5c. 3D Exterior Sill Plate
                             if (Array.isArray(win3D.sillPlate3D) && win3D.sillPlate3D.length >= 4) {
                                 const sq = win3D.sillPlate3D;
                                 pushTri(sq[0], sq[1], sq[2], win3D.normal || [0, -1, 0], [0.20, 0.25, 0.33, 0.96]);
@@ -1435,17 +1658,14 @@
                                 pushLoopLines(sq, [0.65, 0.75, 0.88, 0.9]);
                             }
 
-                            // 5d. 3D Glass Panes + Casement / Sliding Lines
                             (win3D.glassPanes3D || []).forEach(pane => {
                                 if (Array.isArray(pane.loop3D) && pane.loop3D.length >= 4) {
                                     const gq = pane.loop3D;
                                     const isDoorPanel = win3D.openingType === 'garage_door' || win3D.openingType === 'entrance_door';
                                     if (isDoorPanel) {
-                                        // Solid dark anthracite panel for garage/entrance doors
                                         pushTri(gq[0], gq[1], gq[2], win3D.normal || [0, -1, 0], [0.17, 0.20, 0.22, 0.96]);
                                         pushTri(gq[0], gq[2], gq[3], win3D.normal || [0, -1, 0], [0.17, 0.20, 0.22, 0.96]);
                                     } else {
-                                        // Translucent architectural sky-blue glass pane
                                         pushTri(gq[0], gq[1], gq[2], win3D.normal || [0, -1, 0], [0.35, 0.78, 0.98, 0.38], glassVerts);
                                         pushTri(gq[0], gq[2], gq[3], win3D.normal || [0, -1, 0], [0.35, 0.78, 0.98, 0.38], glassVerts);
                                     }
@@ -1467,7 +1687,6 @@
                                 }
                             });
 
-                            // 5e. Floating 3D Window Badge
                             if (appState.showLabels && Array.isArray(win3D.center3D)) {
                                 hudLabels.push({
                                     ptMm: win3D.center3D,
@@ -1480,7 +1699,6 @@
                         });
                     }
 
-                    // 6. Wall ID Floating Badge above wall center
                     if (appState.showLabels) {
                         const topCenterMm = isRingWall
                             ? [20515, 9790, zTop + 260]
@@ -1500,7 +1718,6 @@
                         });
                     }
 
-                    // 7. Optional Horizontal Slice Highlight at Z = appState.sliceZMm
                     if (appState.showSlicePlane && appState.sliceZMm >= zBot && appState.sliceZMm <= zTop) {
                         if (isRingWall) {
                             const n = w.outerPolygon2D.length;
@@ -1555,13 +1772,6 @@
                 // ---------------------------------------------------------------------
                 // C2. SELECTED 3D STAIRCASE OBJECTS (STAIRS_1 — Winder Turn + Flight)
                 // ---------------------------------------------------------------------
-                function pushConvexLoop3D(loop3D, normal, rgba, targetArr) {
-                    if (!Array.isArray(loop3D) || loop3D.length < 3) return;
-                    for (let i = 1; i + 1 < loop3D.length; i++) {
-                        pushTri(loop3D[0], loop3D[i], loop3D[i + 1], normal, rgba, targetArr);
-                    }
-                }
-
                 allStairs.forEach(st => {
                     const isSelected = appState.selectedIds.has(st.id) || appState.selectedIds.has(st.stairId);
                     if (!isSelected) {
@@ -1571,7 +1781,6 @@
                         return;
                     }
 
-                    // 1. Sloped Monolithic Reinforced Concrete Waist Slab (193 mm vertical thickness)
                     if (st.waistSlab3D && Array.isArray(st.waistSlab3D.faces3D)) {
                         st.waistSlab3D.faces3D.forEach(face => {
                             pushConvexLoop3D(face.loop3D, face.normal || [0, 0, 1], [0.80, 0.78, 0.74, 0.96]);
@@ -1579,20 +1788,16 @@
                         });
                     }
 
-                    // 2. All 17 Steps (4 Turn Steps + 13 Straight Flight Steps): Concrete Core + Riser + 40mm Oak Plank
                     (st.steps3D || []).forEach(step => {
-                        // 2a. Concrete step wedge / turn block
                         (step.concreteFaces3D || []).forEach(cf => {
                             pushConvexLoop3D(cf.loop3D, cf.normal || [0, 0, 1], [0.88, 0.86, 0.82, 0.96]);
                         });
 
-                        // 2b. Vertical riser face (warm off-white plaster)
                         if (step.riserQuad3D && Array.isArray(step.riserQuad3D.loop3D)) {
                             pushConvexLoop3D(step.riserQuad3D.loop3D, step.riserQuad3D.normal || [1, 0, 0], [0.95, 0.93, 0.89, 0.98]);
                             pushLoopLines(step.riserQuad3D.loop3D, [0.45, 0.38, 0.30, 0.90]);
                         }
 
-                        // 2c. 40 mm Solid European Oak Tread Plank (top + bottom + perimeter edges)
                         const isWinder = step.kind === 'winder';
                         const oakTopColor = isWinder ? [0.82, 0.53, 0.22, 0.99] : [0.75, 0.47, 0.19, 0.99];
                         const oakSideColor = [0.60, 0.36, 0.14, 0.99];
@@ -1603,7 +1808,6 @@
                         });
                         pushLoopLines(step.treadLoop3D, [0.98, 0.84, 0.48, 0.96]);
 
-                        // Outward Riser Normal Arrow on representative straight Step 8 (only when Show Normals is enabled)
                         if (appState.showNormals && step.stepNumber === 8) {
                             const rq = step.riserQuad3D.loop3D;
                             const rx = (rq[0][0] + rq[1][0]) / 2;
@@ -1622,13 +1826,11 @@
                         }
                     });
 
-                    // 3. Final Arrival Riser 18 at X = 11,665 mm (Z = 3,145 -> 3,330 mm)
                     if (st.topRiser3D && Array.isArray(st.topRiser3D.loop3D)) {
                         pushConvexLoop3D(st.topRiser3D.loop3D, [1, 0, 0], [0.95, 0.93, 0.89, 0.98]);
                         pushLoopLines(st.topRiser3D.loop3D, [0.98, 0.84, 0.48, 0.96]);
                     }
 
-                    // 4. 3D Balustrade (h = 900 mm along South edge Y = 9,310..9,370, X = 11,665..15,175)
                     if (st.balustrade3D) {
                         (st.balustrade3D.handrailFaces3D || []).forEach(hf => {
                             pushConvexLoop3D(hf.loop3D, hf.normal || [0, 0, 1], [0.48, 0.30, 0.14, 0.98]);
@@ -1645,7 +1847,6 @@
                         }
                     }
 
-                    // 5. 3D Walking Line Trajectory (hovering 25 mm above steps)
                     if (Array.isArray(st.walkingLine3D) && st.walkingLine3D.length >= 2) {
                         for (let i = 0; i + 1 < st.walkingLine3D.length; i++) {
                             const pA = st.walkingLine3D[i];
@@ -1654,7 +1855,6 @@
                         }
                     }
 
-                    // 6. Key 3D Vertex Labels on Staircase Corners
                     if (appState.showVertices) {
                         [
                             [st.xMax, st.yMax, 0],
@@ -1674,7 +1874,6 @@
                         });
                     }
 
-                    // 7. Single Floating Staircase Badge (when labels are enabled)
                     if (appState.showLabels) {
                         hudLabels.push({
                             ptMm: [(st.xMin + st.xMax) / 2, (st.yMin + st.yPivot) / 2, st.zTop + 550],
@@ -1685,7 +1884,6 @@
                         });
                     }
 
-                    // 8. Horizontal Slice Plane (Z = appState.sliceZMm) Intersection with 3D Staircase
                     if (appState.showSlicePlane && typeof WallService.sliceStair3DAtElevation === 'function') {
                         const stairSlice = WallService.sliceStair3DAtElevation(st, appState.sliceZMm);
                         (stairSlice.polygons2D || []).forEach(poly2D => {
@@ -1715,24 +1913,20 @@
                         ? [0.38, 0.46, 0.53, 0.94]
                         : (isLower ? [0.42, 0.47, 0.54, 0.94] : [0.51, 0.56, 0.62, 0.94]);
 
-                    // 1. Top Surface (Finished Level Z = fl.zTop mm)
                     (fl.topCellQuads3D || []).forEach(quad => {
                         pushConvexLoop3D(quad, [0, 0, 1], topColor);
                     });
 
-                    // 2. Bottom Surface (Slab Underside Z = fl.zBottom mm)
                     (fl.bottomCellQuads3D || []).forEach(quad => {
                         pushConvexLoop3D(quad, [0, 0, -1], botColor);
                     });
 
-                    // 3. Vertical Perimeter Faces (Thickness = fl.thickness mm)
                     (fl.sideQuads3D || []).forEach(sq => {
                         const sqLoop = sq.loop3D || sq.loop;
                         pushConvexLoop3D(sqLoop, sq.normal, sideColor);
                         pushLoopLines(sqLoop, [0.35, 0.42, 0.52, 0.85]);
                     });
 
-                    // 4. Top & Bottom Outer Boundary Wireframes
                     if (Array.isArray(fl.topLoop3D)) {
                         const topWireColor = isRoof
                             ? [0.20, 0.83, 0.60, 1.0]
@@ -1743,7 +1937,6 @@
                         pushLoopLines(fl.bottomLoop3D, [0.58, 0.64, 0.72, 0.90]);
                     }
 
-                    // 5. Vertex Coordinate Labels for the Slab Vertices
                     if (appState.showVertices && Array.isArray(fl.topLoop3D)) {
                         const vColor = isRoof ? '#6ee7b7' : (isLower ? '#bae6fd' : '#fef08a');
                         fl.topLoop3D.forEach((pt, idx) => {
@@ -1758,7 +1951,6 @@
                         });
                     }
 
-                    // 6. Floating Floor / Roof Slab Badge
                     if (appState.showLabels) {
                         let badgePt = [13500, 5600, fl.zTop + 320];
                         if (fl.id === 'FLOOR_LOWER') {
@@ -1783,12 +1975,112 @@
                         });
                     }
 
-                    // 7. Horizontal Slice Plane (Z = appState.sliceZMm) Intersection with 3D Slab
                     if (appState.showSlicePlane && typeof WallService.sliceFloor3DAtElevation === 'function') {
                         const floorSlice = WallService.sliceFloor3DAtElevation(fl, appState.sliceZMm);
                         (floorSlice.polygons2D || []).forEach(poly2D => {
                             const loop3D = poly2D.map(p => [p[0], p[1], appState.sliceZMm + 3]);
                             pushLoopLines(loop3D, [1.0, 0.25, 0.45, 1.0]);
+                        });
+                    }
+                });
+
+                // ---------------------------------------------------------------------
+                // C-4. RENDER 3D FURNITURE & CABINET OBJECTS (Skeleton + Fronts)
+                // ---------------------------------------------------------------------
+                allFurniture.forEach(furn => {
+                    if (!appState.selectedIds.has(furn.id)) return;
+
+                    const showFronts = appState.furnitureFrontsById[furn.id] !== false;
+                    const showSkeleton = appState.showAllFurnitureSkeleton !== false;
+
+                    // 1. Render Cabinet Skeleton (Plinth + 18mm Carcass Panels)
+                    if (showSkeleton && Array.isArray(furn.skeletonParts3D)) {
+                        furn.skeletonParts3D.forEach(part => {
+                            const rgb = part.colorRgb || [0.93, 0.90, 0.84];
+                            const wireColor = (part.role === 'plinth')
+                                ? [0.42, 0.33, 0.27, 0.90]
+                                : [0.56, 0.42, 0.28, 0.92];
+                            (part.faces3D || []).forEach(face => {
+                                pushConvexLoop3D(face.loop3D, face.normal || [0, 0, 1], [rgb[0], rgb[1], rgb[2], 0.98]);
+                                pushLoopLines(face.loop3D, wireColor);
+                            });
+                        });
+                    }
+
+                    // 2. Render Removable Cabinet Fronts (Wood Drawer Fronts + Aluminum Handle Rails)
+                    if (showFronts && Array.isArray(furn.frontParts3D)) {
+                        furn.frontParts3D.forEach(part => {
+                            const rgb = part.colorRgb || [0.63, 0.48, 0.38];
+                            const isRail = (part.role === 'handle_rail');
+                            const wireColor = isRail
+                                ? [0.60, 0.64, 0.68, 0.95]
+                                : [0.38, 0.26, 0.18, 0.96];
+                            (part.faces3D || []).forEach(face => {
+                                pushConvexLoop3D(face.loop3D, face.normal || [0, 1, 0], [rgb[0], rgb[1], rgb[2], 0.99]);
+                                pushLoopLines(face.loop3D, wireColor);
+                            });
+                        });
+                    }
+
+                    // 3. Outward Normal Vector Arrow n = [nx, ny, nz] from Cabinet Front Face
+                    if (appState.showNormals && Array.isArray(furn.normal)) {
+                        const midX = (furn.xMin + furn.xMax) / 2;
+                        const frontY = showFronts ? furn.yMax : (furn.yMin + furn.carcassDepthMm);
+                        const midZ = (furn.zBottom + furn.zTop) / 2;
+                        const startMm = [midX, frontY, midZ];
+                        const endMm = [
+                            startMm[0] + furn.normal[0] * 420,
+                            startMm[1] + furn.normal[1] * 420,
+                            startMm[2] + furn.normal[2] * 420
+                        ];
+                        pushLine(startMm, endMm, [1.0, 0.80, 0.20, 1.0]);
+                        hudLabels.push({
+                            ptMm: endMm,
+                            text: `${furn.id} n=[${furn.normal.join(',')}]`,
+                            color: '#fde68a',
+                            bg: 'rgba(120, 53, 15, 0.88)',
+                            fontSize: 9.5
+                        });
+                    }
+
+                    // 4. 3D Corner Vertex Labels [x, y, z]
+                    if (appState.showVertices && Array.isArray(furn.cornerVertices3D)) {
+                        furn.cornerVertices3D.forEach(pt => {
+                            hudLabels.push({
+                                ptMm: pt,
+                                text: `(${pt[0]},${pt[1]},${pt[2]})`,
+                                color: '#fde68a',
+                                bg: 'rgba(15, 23, 42, 0.88)',
+                                fontSize: 9.0,
+                                isVertex: true
+                            });
+                        });
+                    }
+
+                    // 5. Floating 3D Cabinet Badge
+                    if (appState.showLabels) {
+                        const partsStateLabel = (showSkeleton && showFronts)
+                            ? 'Skeleton + Fronts'
+                            : (showSkeleton ? 'Skeleton Only' : (showFronts ? 'Fronts Only' : 'Hidden'));
+                        hudLabels.push({
+                            ptMm: [(furn.xMin + furn.xMax) / 2, (furn.yMin + furn.yMax) / 2, furn.zTop + 180],
+                            text: `🗄️ ${furn.id} (${furn.widthMm}×${furn.depthMm}×${furn.heightMm}mm • ${partsStateLabel})`,
+                            color: '#fef3c7',
+                            bg: 'rgba(180, 83, 9, 0.94)',
+                            fontSize: 11.0
+                        });
+                    }
+
+                    // 6. Horizontal Slice Plane Intersection
+                    if (appState.showSlicePlane && typeof WallService.sliceFurniture3DAtElevation === 'function') {
+                        const furnSlice = WallService.sliceFurniture3DAtElevation(furn, appState.sliceZMm, {
+                            includeSkeleton: showSkeleton,
+                            includeFronts: showFronts
+                        });
+                        (furnSlice.polygons2D || []).forEach(poly2D => {
+                            const loop3D = poly2D.map(p => [p[0], p[1], appState.sliceZMm + 2]);
+                            pushLoopLines(loop3D, [1.0, 0.25, 0.45, 1.0]);
+                            pushConvexLoop3D(loop3D, [0, 0, 1], [1.0, 0.25, 0.45, 0.62]);
                         });
                     }
                 });
@@ -1910,12 +2202,13 @@
             // =========================================================================
             // 5. CAMERA FOCUS & INTERACTION CONTROLS
             // =========================================================================
-            function focusSelectedWalls() {
+            function focusSelectedObjects() {
                 const selectedWalls = allWalls.filter(w => appState.selectedIds.has(w.id));
                 const selectedStairs = allStairs.filter(s => appState.selectedIds.has(s.id) || appState.selectedIds.has(s.stairId));
                 const selectedFloors = allFloors.filter(f => appState.selectedIds.has(f.id));
-                const list = (selectedWalls.length + selectedStairs.length + selectedFloors.length > 0)
-                    ? selectedWalls.concat(selectedStairs).concat(selectedFloors)
+                const selectedFurn = allFurniture.filter(fn => appState.selectedIds.has(fn.id));
+                const list = (selectedWalls.length + selectedStairs.length + selectedFloors.length + selectedFurn.length > 0)
+                    ? selectedWalls.concat(selectedStairs).concat(selectedFloors).concat(selectedFurn)
                     : allWalls;
 
                 let minX = Infinity, maxX = -Infinity;
@@ -1923,10 +2216,10 @@
                 let minZ = Infinity, maxZ = -Infinity;
 
                 list.forEach(w => {
-                    minX = Math.min(minX, w.x1);
-                    maxX = Math.max(maxX, w.x2);
-                    minY = Math.min(minY, w.y1);
-                    maxY = Math.max(maxY, w.y2);
+                    minX = Math.min(minX, w.x1 !== undefined ? w.x1 : w.xMin);
+                    maxX = Math.max(maxX, w.x2 !== undefined ? w.x2 : w.xMax);
+                    minY = Math.min(minY, w.y1 !== undefined ? w.y1 : w.yMin);
+                    maxY = Math.max(maxY, w.y2 !== undefined ? w.y2 : w.yMax);
                     minZ = Math.min(minZ, w.zBottom !== undefined ? w.zBottom : (w.yBottom || 0));
                     maxZ = Math.max(maxZ, w.zTop !== undefined ? w.zTop : (w.yTop || 2800));
                 });
@@ -1935,8 +2228,26 @@
                 appState.target.y = ((minY + maxY) / 2) / 1000;
                 appState.target.z = ((minZ + maxZ) / 2) / 1000;
 
-                const spanM = Math.max((maxX - minX) / 1000, (maxY - minY) / 1000, (maxZ - minZ) / 1000, 4.0);
-                appState.distance = Math.min(48.0, Math.max(6.5, spanM * 1.65));
+                const rawSpanM = Math.max((maxX - minX) / 1000, (maxY - minY) / 1000, (maxZ - minZ) / 1000, 0.8);
+                appState.distance = Math.min(48.0, Math.max(2.1, rawSpanM * 1.85));
+                renderScene();
+            }
+
+            function focusSingleObject(obj) {
+                if (!obj) return;
+                const minX = obj.x1 !== undefined ? obj.x1 : obj.xMin;
+                const maxX = obj.x2 !== undefined ? obj.x2 : obj.xMax;
+                const minY = obj.y1 !== undefined ? obj.y1 : obj.yMin;
+                const maxY = obj.y2 !== undefined ? obj.y2 : obj.yMax;
+                const minZ = obj.zBottom !== undefined ? obj.zBottom : 0;
+                const maxZ = obj.zTop !== undefined ? obj.zTop : 870;
+
+                appState.target.x = ((minX + maxX) / 2) / 1000;
+                appState.target.y = ((minY + maxY) / 2) / 1000;
+                appState.target.z = ((minZ + maxZ) / 2) / 1000;
+
+                const rawSpanM = Math.max((maxX - minX) / 1000, (maxY - minY) / 1000, (maxZ - minZ) / 1000, 0.8);
+                appState.distance = Math.max(2.0, rawSpanM * 2.4);
                 renderScene();
             }
 
@@ -1979,14 +2290,14 @@
             glCanvas.addEventListener('wheel', e => {
                 e.preventDefault();
                 const factor = e.deltaY > 0 ? 1.1 : 0.9;
-                appState.distance = Math.max(3.0, Math.min(75.0, appState.distance * factor));
+                appState.distance = Math.max(0.85, Math.min(75.0, appState.distance * factor));
                 renderScene();
             }, { passive: false });
 
             window.addEventListener('resize', renderScene);
 
             // =========================================================================
-            // 6. UI SYNCHRONIZATION (MULTI-SELECT DROPDOWN, CHIPS & INSPECTOR)
+            // 6. MUTUALLY EXCLUSIVE LEFT MENUS & UI SYNCHRONIZATION
             // =========================================================================
             function createEl(tag, className, text) {
                 const el = document.createElement(tag);
@@ -1995,7 +2306,67 @@
                 return el;
             }
 
+            function setLeftMenuMode(mode) {
+                // Clicking the already-active tab button toggles it closed ('none')
+                if (mode === appState.activeLeftMenu && mode !== 'none') {
+                    appState.activeLeftMenu = 'none';
+                } else {
+                    appState.activeLeftMenu = mode;
+                }
+
+                const wallsDock = document.getElementById('left-dock-walls');
+                const objectsDock = document.getElementById('left-dock-objects');
+                const btnWalls = document.getElementById('tab-btn-walls');
+                const btnObjects = document.getElementById('tab-btn-objects');
+                const btnHide = document.getElementById('tab-btn-hide');
+                const hideLabel = document.getElementById('tab-btn-hide-label');
+
+                wallsDock.classList.toggle('hidden-menu', appState.activeLeftMenu !== 'walls');
+                objectsDock.classList.toggle('hidden-menu', appState.activeLeftMenu !== 'objects');
+
+                btnWalls.classList.toggle('active-walls', appState.activeLeftMenu === 'walls');
+                btnObjects.classList.toggle('active-objects', appState.activeLeftMenu === 'objects');
+                btnHide.classList.toggle('active-hidden', appState.activeLeftMenu === 'none');
+                hideLabel.textContent = appState.activeLeftMenu === 'none' ? '👁️ Menus Hidden' : '👁️ Hide Menu';
+            }
+
+            function syncGlobalFrontsCheckbox() {
+                const globalCb = document.getElementById('toggle-all-fronts');
+                const summaryPill = document.getElementById('fronts-summary-pill');
+                if (!globalCb || allFurniture.length === 0) return;
+
+                let onCount = 0;
+                allFurniture.forEach(fn => {
+                    if (appState.furnitureFrontsById[fn.id] !== false) onCount++;
+                });
+
+                if (onCount === allFurniture.length) {
+                    globalCb.checked = true;
+                    globalCb.indeterminate = false;
+                    summaryPill.textContent = 'Fronts: ALL ON';
+                } else if (onCount === 0) {
+                    globalCb.checked = false;
+                    globalCb.indeterminate = false;
+                    summaryPill.textContent = 'Fronts: ALL OFF';
+                } else {
+                    globalCb.checked = true;
+                    globalCb.indeterminate = true;
+                    summaryPill.textContent = `Fronts: ${onCount}/${allFurniture.length} ON`;
+                }
+            }
+
+            function setAllFurnitureFronts(enableFronts) {
+                allFurniture.forEach(fn => {
+                    appState.furnitureFrontsById[fn.id] = Boolean(enableFronts);
+                });
+                renderDropdownAndInspector();
+                renderScene();
+            }
+
             function renderDropdownAndInspector() {
+                // -----------------------------------------------------------------
+                // A. MENU 1: WALLS, SLABS & STAIRS DROPDOWN
+                // -----------------------------------------------------------------
                 const optionsContainer = document.getElementById('wall-options-container');
                 const chipsContainer = document.getElementById('selected-chips-container');
                 const countBadge = document.getElementById('selected-count-badge');
@@ -2006,10 +2377,11 @@
                 chipsContainer.replaceChildren();
                 inspectorContainer.replaceChildren();
 
-                const count = appState.selectedIds.size;
-                countBadge.textContent = `${count} selected`;
-                triggerText.textContent = count > 0
-                    ? `Selected: ${Array.from(appState.selectedIds).slice(0, 3).join(', ')}${count > 3 ? ` +${count - 3} more` : ''}`
+                const structuralSelectedIds = Array.from(appState.selectedIds).filter(id => !furnitureById[id]);
+                const structCount = structuralSelectedIds.length;
+                countBadge.textContent = `${structCount} selected`;
+                triggerText.textContent = structCount > 0
+                    ? `Selected: ${structuralSelectedIds.slice(0, 3).join(', ')}${structCount > 3 ? ` +${structCount - 3} more` : ''}`
                     : 'Choose Wall / Stair / Floor IDs from Database...';
 
                 const q = appState.searchQuery.trim().toLowerCase();
@@ -2115,7 +2487,6 @@
                     });
                 }
 
-                // Group walls into logical sections
                 const groups = [
                     { title: 'Inter-Floor Perimeter Band (Z = 280..343 cm)', filter: w => w.category === 'band' || w.floor === 'band' },
                     { title: 'Ground Floor — Exterior Walls (EW_*)', filter: w => w.floor === 'ground' && w.category === 'exterior' },
@@ -2179,8 +2550,7 @@
                     });
                 });
 
-                // Render selected chips
-                Array.from(appState.selectedIds).forEach(id => {
+                structuralSelectedIds.forEach(id => {
                     const chip = createEl('span', 'wall-chip', `${id} ✕`);
                     chip.title = 'Click to remove from selection';
                     chip.addEventListener('click', () => {
@@ -2191,17 +2561,206 @@
                     chipsContainer.appendChild(chip);
                 });
 
-                // Render Inspector Cards for selected floors, stairs & walls
+                // -----------------------------------------------------------------
+                // B. MENU 2: SELECT OBJECTS BY ID (FURNITURE / CABINETS)
+                // -----------------------------------------------------------------
+                const objOptionsContainer = document.getElementById('obj-options-container');
+                const objChipsContainer = document.getElementById('selected-obj-chips-container');
+                const objCountBadge = document.getElementById('selected-objects-count-badge');
+                const objTriggerText = document.getElementById('obj-dropdown-trigger-text');
+                const perObjFrontsContainer = document.getElementById('per-object-fronts-container');
+
+                objOptionsContainer.replaceChildren();
+                objChipsContainer.replaceChildren();
+                perObjFrontsContainer.replaceChildren();
+
+                const selectedFurnIds = allFurniture.filter(fn => appState.selectedIds.has(fn.id)).map(fn => fn.id);
+                objCountBadge.textContent = `${selectedFurnIds.length} selected`;
+                objTriggerText.textContent = selectedFurnIds.length > 0
+                    ? `Selected: ${selectedFurnIds.join(', ')}`
+                    : 'Choose Furniture / Cabinet IDs...';
+
+                const oq = appState.objectSearchQuery.trim().toLowerCase();
+                const matchingFurn = allFurniture.filter(fn => (
+                    !oq ||
+                    fn.id.toLowerCase().includes(oq) ||
+                    fn.name.toLowerCase().includes(oq) ||
+                    (fn.room && fn.room.toLowerCase().includes(oq)) ||
+                    (fn.category && fn.category.toLowerCase().includes(oq))
+                ));
+
+                if (matchingFurn.length > 0) {
+                    objOptionsContainer.appendChild(createEl('div', 'wall-group-header amber', '3D Kitchen Cabinets & Furniture (data/furniture.js)'));
+                    matchingFurn.forEach(fn => {
+                        const isChecked = appState.selectedIds.has(fn.id);
+                        const row = createEl('label', 'wall-option-row' + (isChecked ? ' checked-amber' : ''));
+                        const cb = document.createElement('input');
+                        cb.type = 'checkbox';
+                        cb.checked = isChecked;
+                        cb.addEventListener('change', () => {
+                            if (cb.checked) {
+                                appState.selectedIds.add(fn.id);
+                            } else {
+                                appState.selectedIds.delete(fn.id);
+                            }
+                            renderDropdownAndInspector();
+                            renderScene();
+                        });
+
+                        const idSpan = createEl('span', 'wall-option-id', `🗄️ ${fn.id}`);
+                        const nameSpan = createEl('span', '', fn.shortName || fn.name);
+                        nameSpan.style.color = '#fde68a';
+                        nameSpan.style.fontSize = '11px';
+                        nameSpan.style.overflow = 'hidden';
+                        nameSpan.style.textOverflow = 'ellipsis';
+                        nameSpan.style.whiteSpace = 'nowrap';
+
+                        const metaSpan = createEl('span', 'wall-option-meta', `${fn.widthMm}×${fn.depthMm}×${fn.heightMm}`);
+
+                        row.appendChild(cb);
+                        row.appendChild(idSpan);
+                        row.appendChild(nameSpan);
+                        row.appendChild(metaSpan);
+                        objOptionsContainer.appendChild(row);
+                    });
+                }
+
+                selectedFurnIds.forEach(id => {
+                    const chip = createEl('span', 'wall-chip amber', `🗄️ ${id} ✕`);
+                    chip.title = 'Click to remove from selection';
+                    chip.addEventListener('click', () => {
+                        appState.selectedIds.delete(id);
+                        renderDropdownAndInspector();
+                        renderScene();
+                    });
+                    objChipsContainer.appendChild(chip);
+                });
+
+                // Per-Object Fronts Toggle Cards inside Menu 2
+                allFurniture.forEach(fn => {
+                    const isSelected = appState.selectedIds.has(fn.id);
+                    const frontsOn = appState.furnitureFrontsById[fn.id] !== false;
+
+                    const partCard = createEl('div', 'furniture-part-card');
+                    const headerRow = createEl('div', 'furniture-part-header');
+
+                    const leftInfo = createEl('span', 'wall-option-id', `🗄️ ${fn.id}`);
+                    leftInfo.style.color = isSelected ? '#fde68a' : '#94a3b8';
+
+                    const btnGroup = createEl('div', '');
+                    btnGroup.style.display = 'flex';
+                    btnGroup.style.gap = '6px';
+                    btnGroup.style.alignItems = 'center';
+
+                    const frontsBtn = createEl(
+                        'button',
+                        'fronts-pill-btn ' + (frontsOn ? 'on' : 'off'),
+                        frontsOn ? '🚪 Fronts: ON' : '🦴 Fronts: OFF'
+                    );
+                    frontsBtn.type = 'button';
+                    frontsBtn.title = 'Toggle fronts for this specific cabinet';
+                    frontsBtn.addEventListener('click', () => {
+                        appState.furnitureFrontsById[fn.id] = !frontsOn;
+                        if (!appState.selectedIds.has(fn.id)) {
+                            appState.selectedIds.add(fn.id);
+                        }
+                        renderDropdownAndInspector();
+                        renderScene();
+                    });
+
+                    const focusBtn = createEl('button', 'ctrl-btn', '🎯');
+                    focusBtn.type = 'button';
+                    focusBtn.style.padding = '3px 7px';
+                    focusBtn.title = `Select and focus camera on ${fn.id}`;
+                    focusBtn.addEventListener('click', () => {
+                        appState.selectedIds.add(fn.id);
+                        renderDropdownAndInspector();
+                        focusSingleObject(fn);
+                    });
+
+                    btnGroup.appendChild(frontsBtn);
+                    btnGroup.appendChild(focusBtn);
+                    headerRow.appendChild(leftInfo);
+                    headerRow.appendChild(btnGroup);
+                    partCard.appendChild(headerRow);
+
+                    const subRow = createEl('div', 'kv-row');
+                    subRow.appendChild(createEl('span', 'kv-key', `${fn.room} (Right of Zmywarka)`));
+                    subRow.appendChild(createEl('span', 'kv-val', `${fn.skeletonParts3D.length} skel + ${fn.frontParts3D.length} fronts`));
+                    partCard.appendChild(subRow);
+
+                    perObjFrontsContainer.appendChild(partCard);
+                });
+
+                syncGlobalFrontsCheckbox();
+
+                // -----------------------------------------------------------------
+                // C. RIGHT INSPECTOR DOCK CARDS (FURNITURE, FLOORS, STAIRS, WALLS)
+                // -----------------------------------------------------------------
+                const selectedFurn = allFurniture.filter(fn => appState.selectedIds.has(fn.id));
                 const selectedFloors = allFloors.filter(f => appState.selectedIds.has(f.id));
                 const selectedStairs = allStairs.filter(s => appState.selectedIds.has(s.id) || appState.selectedIds.has(s.stairId));
                 const selectedWalls = allWalls.filter(w => appState.selectedIds.has(w.id));
-                if (selectedFloors.length === 0 && selectedStairs.length === 0 && selectedWalls.length === 0) {
+
+                if (selectedFurn.length === 0 && selectedFloors.length === 0 && selectedStairs.length === 0 && selectedWalls.length === 0) {
                     const emptyCard = createEl('div', 'inspector-wall-card');
-                    emptyCard.appendChild(createEl('div', 'inspector-wall-name', 'No objects selected. Choose FLOOR_LOWER, FLOOR_UPPER, TERRACE_UPPER, ROOF_GYM, ROOF_GARAGE, ROOF_UPPER, WALL_BAND, STAIRS_1, or wall IDs from the dropdown on the left.'));
+                    emptyCard.appendChild(createEl('div', 'inspector-wall-name', 'No 3D objects selected. Choose CAB_KITCHEN_1 from "Select Objects by ID" or walls/slabs/stairs from "Walls & Stairs".'));
                     inspectorContainer.appendChild(emptyCard);
                     return;
                 }
 
+                // 1. Furniture / Cabinet Inspector Cards
+                selectedFurn.forEach(fn => {
+                    const frontsOn = appState.furnitureFrontsById[fn.id] !== false;
+                    const card = createEl('div', 'inspector-wall-card');
+                    card.style.borderColor = 'rgba(245, 158, 11, 0.45)';
+
+                    const header = createEl('div', 'inspector-wall-header');
+                    const idTitle = createEl('span', 'inspector-wall-id', `🗄️ ${fn.id}`);
+                    idTitle.style.color = '#fbbf24';
+                    header.appendChild(idTitle);
+
+                    const toggleFrontsBtn = createEl(
+                        'button',
+                        'fronts-pill-btn ' + (frontsOn ? 'on' : 'off'),
+                        frontsOn ? '🚪 Fronts: ON (Click to Remove)' : '🦴 Fronts: OFF (Click to Restore)'
+                    );
+                    toggleFrontsBtn.type = 'button';
+                    toggleFrontsBtn.addEventListener('click', () => {
+                        appState.furnitureFrontsById[fn.id] = !frontsOn;
+                        renderDropdownAndInspector();
+                        renderScene();
+                    });
+                    header.appendChild(toggleFrontsBtn);
+                    card.appendChild(header);
+
+                    card.appendChild(createEl('div', 'inspector-wall-name', fn.name));
+
+                    const addKv = (k, v) => {
+                        const r = createEl('div', 'kv-row');
+                        r.appendChild(createEl('span', 'kv-key', k));
+                        r.appendChild(createEl('span', 'kv-val', v));
+                        card.appendChild(r);
+                    };
+
+                    addKv('Room & Host Wall', `${fn.room} • ${fn.hostWallId}`);
+                    addKv('Dimensions (W×D×H)', `${fn.widthMm} × ${fn.depthMm} × ${fn.heightMm} mm (Plinth ${fn.plinthHeightMm} + Body ${fn.bodyHeightMm} mm)`);
+                    addKv('3D Bounding Box', `X: ${fn.xMin}..${fn.xMax} | Y: ${fn.yMin}..${fn.yMax} | Z: ${fn.zBottom}..${fn.zTop} mm`);
+                    addKv('Part 1: Skeleton', `${fn.skeletonParts3D.length} B-Rep boxes (${fn.carcassDepthMm} mm deep, ${fn.boardThicknessMm} mm panels + plinth)`);
+                    addKv('Part 2: Fronts', `${fn.frontParts3D.length} B-Rep boxes (2×330mm wood fronts + 2×30mm handle rails, ${frontsOn ? 'VISIBLE' : 'HIDDEN'})`);
+
+                    const partsBreakdown = [
+                        `[SKELETON — ${fn.skeletonParts3D.length} parts]`,
+                        ...fn.skeletonParts3D.map(p => `  • ${p.name}: X=${p.x0}..${p.x1}, Y=${p.y0}..${p.y1}, Z=${p.z0}..${p.z1}`),
+                        `[FRONTS (${frontsOn ? 'VISIBLE' : 'REMOVED'}) — ${fn.frontParts3D.length} parts]`,
+                        ...fn.frontParts3D.map(p => `  • ${p.name}: X=${p.x0}..${p.x1}, Y=${p.y0}..${p.y1}, Z=${p.z0}..${p.z1}`)
+                    ].join('\n');
+                    card.appendChild(createEl('div', 'coord-block', partsBreakdown));
+
+                    inspectorContainer.appendChild(card);
+                });
+
+                // 2. Floor / Roof Slab Inspector Cards
                 selectedFloors.forEach(f => {
                     const isRoof = (f.category === 'roof' || f.category === 'terrace' || f.id.startsWith('ROOF_') || f.id.startsWith('TERRACE_'));
                     const isLower = (!isRoof && (f.id === 'FLOOR_LOWER' || f.floor === 'ground'));
@@ -2221,21 +2780,8 @@
                     };
 
                     addKv('Elevation & Thickness', `Z = ${f.zBottom}..${f.zTop} mm (${f.zBottom / 10}..${f.zTop / 10} cm, ${f.thickness / 10} cm thick)`);
-                    addKv('X / Y Footprint Bounds', `X: ${f.x1}..${f.x2} | Y: ${f.y1}..${f.y2} mm (${isLower ? 'includes 38 cm external walls' : (f.id === 'ROOF_UPPER' ? 'includes inner 18 cm of upper external walls' : 'excludes outer 38 cm ground-floor walls')})`);
+                    addKv('X / Y Footprint Bounds', `X: ${f.x1}..${f.x2} | Y: ${f.y1}..${f.y2} mm`);
                     addKv('Polygon Topology', `1 solid piece • ${(f.footprint2D || []).length} vertices • ${(f.sideQuads3D || []).length} vertical edge faces`);
-                    if (f.id === 'TERRACE_UPPER') {
-                        addKv('Role & Boundaries', 'Ceiling of 0.14 Spiżarnia & 0.15 Gabinet (resting on 285 cm wall GW_14 at Z=2,850 mm) and NE Upper Terrace at Z=3,330 mm');
-                    } else if (f.id === 'ROOF_GYM') {
-                        addKv('Overlap & Boundaries', 'Covers 38 cm under UW_SOUTH (Y=11,200..11,580 mm); excludes outer 38 cm above EW_SW_EAST, EW_SW_SOUTH & EW_WEST_SOUTH');
-                    } else if (f.id === 'ROOF_GARAGE') {
-                        addKv('Overlap & Boundaries', 'Covers 38 cm under UW_NORTH_MAIN (Y=2,790..3,170 mm); excludes outer 38 cm above EW_GARAGE_EAST, EW_GARAGE_NORTH & EW_GARAGE_WEST');
-                    } else if (f.id === 'ROOF_UPPER') {
-                        addKv('Overlap & Boundaries', 'Covers enclosed upper floor + inner 18 cm (180 mm) of all 38 cm (380 mm) upper external walls (UW_*); leaves outer 20 cm (200 mm) uncovered');
-                    } else {
-                        addKv(isLower ? 'Coverage' : 'Double-Height Cutouts', isLower
-                            ? 'Full Ground Floor building footprint including 38 cm external walls (265.95 m²)'
-                            : 'Living Room (X<6315), High Hall (X=10695..15535, Y>9370), Stairwell (X=11910..15535, Y=8360..9370)');
-                    }
 
                     const polyText = `footprint2D (${(f.footprint2D || []).length} pts, Z=${f.zBottom}..${f.zTop}): ` +
                         (f.footprint2D || []).map((p, i) => `V${i + 1}[${p[0]}, ${p[1]}]`).join(' → ');
@@ -2244,6 +2790,7 @@
                     inspectorContainer.appendChild(card);
                 });
 
+                // 3. Staircase Inspector Cards
                 selectedStairs.forEach(s => {
                     const card = createEl('div', 'inspector-wall-card');
                     const header = createEl('div', 'inspector-wall-header');
@@ -2263,9 +2810,6 @@
                     addKv('Rooms Connected', s.rooms);
                     addKv('X / Y Bounds', `X: ${s.xMin}..${s.xMax} | Y: ${s.yMin}..${s.yMax} mm`);
                     addKv('Risers & Treads', `${s.riserCount} × ${s.riserHeightMm} mm | ${s.treadCount} treads (${s.treadDepthMm} mm)`);
-                    addKv('West Winder Turn', `${s.turnWidthMm} × ${s.yMax - s.yMin} mm (1 straight + 3 winder steps)`);
-                    addKv('Straight Flight', `${s.xPivot - s.xMin} × ${s.flightWidthMm} mm (13 treads along ${s.northWallId})`);
-                    addKv('Structure & Finish', `${s.waistSlabThicknessMm} mm RC slab + ${s.plankThicknessMm} mm oak + h=${s.balustradeHeightMm} mm rail`);
 
                     const stepsSummary = s.steps3D.map(stStep =>
                         `Step ${stStep.stepNumber} (${stStep.kind}, Z=${stStep.zBottom}..${stStep.zTop}): ` +
@@ -2276,6 +2820,7 @@
                     inspectorContainer.appendChild(card);
                 });
 
+                // 4. Wall Inspector Cards
                 selectedWalls.forEach(w => {
                     const zBot = w.zBottom !== undefined ? w.zBottom : (w.yBottom || 0);
                     const zTop = w.zTop !== undefined ? w.zTop : (w.yTop || 2800);
@@ -2299,18 +2844,9 @@
                     addKv('Floor & Category', `${w.floor} (${w.category})`);
                     addKv('X / Y Bounds', `X: ${w.x1}..${w.x2} | Y: ${w.y1}..${w.y2}`);
                     if (isRingWall) {
-                        addKv('Perimeter Segments', `${w.outerPolygon2D.length} straight segments (${w.sides.length} vertical faces) • wraps around NE balcony & runs straight over West entrance nook`);
-                        const outerText = `outerPolygon2D (${w.outerPolygon2D.length} pts): ` +
-                            w.outerPolygon2D.map((p, i) => `P${i + 1}[${p[0]}, ${p[1]}]`).join(' → ');
-                        card.appendChild(createEl('div', 'coord-block', outerText));
-                        const innerText = `innerPolygon2D (${w.innerPolygon2D.length} pts): ` +
-                            w.innerPolygon2D.map((p, i) => `Q${i + 1}[${p[0]}, ${p[1]}]`).join(' → ');
-                        card.appendChild(createEl('div', 'coord-block', innerText));
+                        addKv('Perimeter Segments', `${w.outerPolygon2D.length} straight segments (${w.sides.length} vertical faces)`);
                     } else if (isSteppedWall) {
                         addKv('Stepped Wall Faces', `${w.sides.length} vertical faces • ${(w.footprint2D || []).length}-vertex monolithic footprint`);
-                        const fpText = `footprint2D (${(w.footprint2D || []).length} pts): ` +
-                            (w.footprint2D || []).map((p, i) => `V${i + 1}[${p[0]}, ${p[1]}]`).join(' → ');
-                        card.appendChild(createEl('div', 'coord-block', fpText));
                     } else {
                         if (w.sideA) {
                             addKv('Side A Normal', `n = [${w.sideA.normal.join(', ')}] (${w.sideA.materialLabel})`);
@@ -2318,7 +2854,6 @@
                         if (w.sideB) {
                             addKv('Side B Normal', `n = [${w.sideB.normal.join(', ')}] (${w.sideB.materialLabel})`);
                         }
-
                         if (w.sideA && Array.isArray(w.sideA.outerLoop)) {
                             const loopText = `outerLoop (${w.sideA.outerLoop.length} pts): ` +
                                 w.sideA.outerLoop.map(p => `[${p[0]}, ${p[1]}, ${p[2]}]`).join(' → ');
@@ -2326,23 +2861,10 @@
                         }
                     }
 
-                    if (w.sideA && Array.isArray(w.sideA.holes) && w.sideA.holes.length > 0) {
-                        const holesText = w.sideA.holes.map(h =>
-                            `hole "${h.id}": ` + (h.loop || []).map(p => `[${p[0]}, ${p[1]}, ${p[2]}]`).join(' → ')
-                        ).join('\n');
-                        card.appendChild(createEl('div', 'coord-block', holesText));
-                    }
-
                     if (typeof WallService.getWindows3D === 'function') {
                         const hostedWins = WallService.getWindows3D({ hostWallId: w.id, activeOnly: true });
                         if (hostedWins.length > 0) {
                             addKv('Hosted 3D Windows', `${hostedWins.length} (${hostedWins.map(hw => hw.id).join(', ')})`);
-                            const winDetailsText = hostedWins.map(hw => {
-                                const jambSummary = (hw.jambFaces3D || []).map(j => `${j.side}:${j.areaM2}m²`).join(', ') || 'none';
-                                return `🪟 ${hw.id} (${hw.widthMm}×${hw.heightMm}mm, ${hw.glassPanes3D.length} panes, jambs: ${jambSummary})\n` +
-                                    `  outerLoop3D: ` + (hw.outerLoop3D || []).map(p => `[${p[0]}, ${p[1]}, ${p[2]}]`).join(' → ');
-                            }).join('\n');
-                            card.appendChild(createEl('div', 'coord-block', winDetailsText));
                         }
                     }
 
@@ -2351,8 +2873,12 @@
             }
 
             // =========================================================================
-            // 7. WIRE UP UI CONTROLS & PRESETS
+            // 7. WIRE UP MENU SWITCHER, UI CONTROLS & PRESETS
             // =========================================================================
+            document.getElementById('tab-btn-walls').addEventListener('click', () => setLeftMenuMode('walls'));
+            document.getElementById('tab-btn-objects').addEventListener('click', () => setLeftMenuMode('objects'));
+            document.getElementById('tab-btn-hide').addEventListener('click', () => setLeftMenuMode('none'));
+
             document.getElementById('dropdown-trigger').addEventListener('click', () => {
                 document.getElementById('dropdown-menu').classList.toggle('collapsed');
             });
@@ -2362,12 +2888,90 @@
                 renderDropdownAndInspector();
             });
 
+            document.getElementById('obj-dropdown-trigger').addEventListener('click', () => {
+                document.getElementById('obj-dropdown-menu').classList.toggle('collapsed');
+            });
+
+            document.getElementById('obj-search-input').addEventListener('input', e => {
+                appState.objectSearchQuery = e.target.value || '';
+                renderDropdownAndInspector();
+            });
+
+            // Global Skeleton & Fronts Controls
+            document.getElementById('toggle-all-fronts').addEventListener('change', e => {
+                setAllFurnitureFronts(e.target.checked);
+            });
+            document.getElementById('toggle-all-skeleton').addEventListener('change', e => {
+                appState.showAllFurnitureSkeleton = e.target.checked;
+                renderDropdownAndInspector();
+                renderScene();
+            });
+            document.getElementById('btn-all-fronts-on').addEventListener('click', () => {
+                setAllFurnitureFronts(true);
+            });
+            document.getElementById('btn-all-fronts-off').addEventListener('click', () => {
+                setAllFurnitureFronts(false);
+            });
+
             function applyPreset(ids) {
                 appState.selectedIds = new Set(ids);
                 renderDropdownAndInspector();
-                focusSelectedWalls();
+                focusSelectedObjects();
             }
 
+            // Menu 2 (Objects) Presets
+            document.getElementById('preset-cab-only').addEventListener('click', () => {
+                appState.selectedIds = new Set(['CAB_KITCHEN_1']);
+                appState.yaw = 112 * Math.PI / 180;
+                appState.pitch = 24 * Math.PI / 180;
+                renderDropdownAndInspector();
+                focusSingleObject(furnitureById['CAB_KITCHEN_1']);
+            });
+            document.getElementById('preset-cab-kitchen').addEventListener('click', () => {
+                appState.selectedIds = new Set(['CAB_KITCHEN_1', 'EW_NORTH_RECESSED', 'GW_3', 'GW_13', 'FLOOR_LOWER']);
+                appState.yaw = 108 * Math.PI / 180;
+                appState.pitch = 24 * Math.PI / 180;
+                renderDropdownAndInspector();
+                focusSingleObject(furnitureById['CAB_KITCHEN_1']);
+                appState.distance = 4.6;
+                renderScene();
+            });
+            document.getElementById('preset-cab-full-house').addEventListener('click', () => {
+                appState.yaw = 42 * Math.PI / 180;
+                appState.pitch = 38 * Math.PI / 180;
+                applyPreset(allWalls.map(w => w.id).concat(['FLOOR_LOWER', 'FLOOR_UPPER', 'TERRACE_UPPER', 'ROOF_GYM', 'ROOF_GARAGE', 'ROOF_UPPER', 'STAIRS_1', 'CAB_KITCHEN_1']));
+            });
+            document.getElementById('preset-cab-clear').addEventListener('click', () => {
+                allFurniture.forEach(fn => appState.selectedIds.delete(fn.id));
+                renderDropdownAndInspector();
+                renderScene();
+            });
+
+            // Menu 2 Camera Buttons
+            document.getElementById('obj-cam-focus').addEventListener('click', () => {
+                const cab = furnitureById['CAB_KITCHEN_1'];
+                if (cab && appState.selectedIds.has(cab.id)) {
+                    focusSingleObject(cab);
+                } else {
+                    focusSelectedObjects();
+                }
+            });
+            document.getElementById('obj-cam-front').addEventListener('click', () => {
+                appState.yaw = 90 * Math.PI / 180; // Looking from South (+Y) toward North (-Y) at the cabinet front
+                appState.pitch = 12 * Math.PI / 180;
+                const cab = furnitureById['CAB_KITCHEN_1'];
+                if (cab) focusSingleObject(cab);
+                else focusSelectedObjects();
+            });
+            document.getElementById('obj-cam-iso').addEventListener('click', () => {
+                appState.yaw = 118 * Math.PI / 180;
+                appState.pitch = 26 * Math.PI / 180;
+                const cab = furnitureById['CAB_KITCHEN_1'];
+                if (cab) focusSingleObject(cab);
+                else focusSelectedObjects();
+            });
+
+            // Menu 1 (Walls & Stairs) Presets
             document.getElementById('preset-upper-slab').addEventListener('click', () => {
                 appState.yaw = 42 * Math.PI / 180;
                 appState.pitch = 38 * Math.PI / 180;
@@ -2391,13 +2995,13 @@
                 applyPreset(allWalls.filter(w => w.floor === 'ground' && w.category === 'internal').map(w => w.id).concat(['STAIRS_1']));
             });
             document.getElementById('preset-ground-all').addEventListener('click', () => {
-                applyPreset(allWalls.filter(w => w.floor === 'ground').map(w => w.id).concat(['FLOOR_LOWER', 'TERRACE_UPPER', 'ROOF_GYM', 'ROOF_GARAGE', 'WALL_BAND', 'STAIRS_1']));
+                applyPreset(allWalls.filter(w => w.floor === 'ground').map(w => w.id).concat(['FLOOR_LOWER', 'TERRACE_UPPER', 'ROOF_GYM', 'ROOF_GARAGE', 'WALL_BAND', 'STAIRS_1', 'CAB_KITCHEN_1']));
             });
             document.getElementById('preset-first-all').addEventListener('click', () => {
                 applyPreset(allWalls.filter(w => w.floor === 'first').map(w => w.id).concat(['FLOOR_UPPER', 'TERRACE_UPPER', 'ROOF_UPPER', 'WALL_BAND', 'STAIRS_1']));
             });
             document.getElementById('preset-all-walls').addEventListener('click', () => {
-                applyPreset(allWalls.map(w => w.id).concat(['FLOOR_LOWER', 'FLOOR_UPPER', 'TERRACE_UPPER', 'ROOF_GYM', 'ROOF_GARAGE', 'ROOF_UPPER', 'STAIRS_1']));
+                applyPreset(allWalls.map(w => w.id).concat(['FLOOR_LOWER', 'FLOOR_UPPER', 'TERRACE_UPPER', 'ROOF_GYM', 'ROOF_GARAGE', 'ROOF_UPPER', 'STAIRS_1', 'CAB_KITCHEN_1']));
             });
             document.getElementById('preset-clear').addEventListener('click', () => {
                 appState.selectedIds.clear();
@@ -2436,42 +3040,42 @@
                 renderScene();
             });
             document.getElementById('slice-y-slider').addEventListener('input', e => {
-                appState.sliceZMm = Number(e.target.value) || 1200;
+                appState.sliceZMm = Number(e.target.value) || 650;
                 document.getElementById('slice-y-label').textContent = `${appState.sliceZMm.toLocaleString()} mm`;
                 renderScene();
             });
 
-            // Camera Preset Buttons (Z-up: yaw=-90 deg is looking from North -Y toward South +Y, so +X grows right)
-            document.getElementById('cam-focus').addEventListener('click', focusSelectedWalls);
+            // Camera Preset Buttons
+            document.getElementById('cam-focus').addEventListener('click', focusSelectedObjects);
             document.getElementById('cam-iso-ne').addEventListener('click', () => {
                 appState.yaw = -115 * Math.PI / 180;
                 appState.pitch = 25 * Math.PI / 180;
-                focusSelectedWalls();
+                focusSelectedObjects();
             });
             document.getElementById('cam-iso-nw').addEventListener('click', () => {
                 appState.yaw = -65 * Math.PI / 180;
                 appState.pitch = 25 * Math.PI / 180;
-                focusSelectedWalls();
+                focusSelectedObjects();
             });
             document.getElementById('cam-north').addEventListener('click', () => {
                 appState.yaw = -90 * Math.PI / 180;
                 appState.pitch = 8 * Math.PI / 180;
-                focusSelectedWalls();
+                focusSelectedObjects();
             });
             document.getElementById('cam-west').addEventListener('click', () => {
                 appState.yaw = 0;
                 appState.pitch = 10 * Math.PI / 180;
-                focusSelectedWalls();
+                focusSelectedObjects();
             });
             document.getElementById('cam-top').addEventListener('click', () => {
                 appState.yaw = -90 * Math.PI / 180;
                 appState.pitch = 88 * Math.PI / 180;
-                focusSelectedWalls();
+                focusSelectedObjects();
             });
 
             // Initialize
             renderDropdownAndInspector();
-            focusSelectedWalls();
+            renderScene();
         })();
     </script>
 </body>

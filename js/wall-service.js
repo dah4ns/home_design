@@ -13,12 +13,15 @@
  */
 (function (root, factory) {
     if (typeof module === 'object' && typeof module.exports === 'object') {
+        let furnData = null;
+        try { furnData = require('../data/furniture.js'); } catch (e) { furnData = null; }
         module.exports = factory(
             require('../data/walls.js'),
             require('../data/views.js'),
             require('./window-store.js'),
             require('../data/windows.js'),
-            require('../data/stairs.js')
+            require('../data/stairs.js'),
+            furnData
         );
     } else {
         root.WallService = factory(
@@ -26,10 +29,11 @@
             root.BUILDING_VIEWS_DATA,
             root.WindowStore,
             root.DEFAULT_WINDOWS_DATA,
-            root.DEFAULT_STAIRS_DATA || root.BUILDING_STAIRS_DATA
+            root.DEFAULT_STAIRS_DATA || root.BUILDING_STAIRS_DATA,
+            root.DEFAULT_FURNITURE_DATA || root.FURNITURE_DATABASE
         );
     }
-}(typeof self !== 'undefined' ? self : this, function (wallsData, viewsData, WindowStore, windowsData, stairsData) {
+}(typeof self !== 'undefined' ? self : this, function (wallsData, viewsData, WindowStore, windowsData, stairsData, furnitureData) {
 
     const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -2196,7 +2200,7 @@
         /**
          * Intersect the 3D Staircase solid (turn block + sloped waist slab + steps)
          * with a horizontal cut plane Z = zSlice, returning the exact 2D polygons
-         * sliced at that elevation (used by both walls_3d.html slice plane and 2D floor plans).
+         * sliced at that elevation (used by both objects_3d.html slice plane and 2D floor plans).
          */
         sliceStair3DAtElevation: function (stairOrId, zSlice) {
             const st = (stairOrId && stairOrId.steps3D) ? stairOrId : this.compileStair3D(stairOrId);
@@ -2597,6 +2601,184 @@
             return {
                 zSlice,
                 polygons2D: [fl.footprint2D]
+            };
+        },
+
+        // =====================================================================
+        // 3D FURNITURE & CABINET B-REP COMPILER (Skeleton + Fronts)
+        // =====================================================================
+        compileFurniture3D: function (furnObjOrId) {
+            const rawList = (furnitureData && Array.isArray(furnitureData.furniture)) ? furnitureData.furniture : [];
+            const raw = (typeof furnObjOrId === 'object' && furnObjOrId)
+                ? furnObjOrId
+                : (rawList.find(item => item.id === furnObjOrId) || rawList[0]);
+            if (!raw) return null;
+
+            function compileBoxPart3D(part, partGroup) {
+                const x0 = Number(part.x0), x1 = Number(part.x1);
+                const y0 = Number(part.y0), y1 = Number(part.y1);
+                const z0 = Number(part.z0), z1 = Number(part.z1);
+
+                const faces3D = [
+                    // Front (South +Y)
+                    {
+                        side: 'south',
+                        normal: [0, 1, 0],
+                        loop3D: [[x0, y1, z0], [x1, y1, z0], [x1, y1, z1], [x0, y1, z1]]
+                    },
+                    // Back (North -Y)
+                    {
+                        side: 'north',
+                        normal: [0, -1, 0],
+                        loop3D: [[x1, y0, z0], [x0, y0, z0], [x0, y0, z1], [x1, y0, z1]]
+                    },
+                    // West (+X)
+                    {
+                        side: 'west',
+                        normal: [1, 0, 0],
+                        loop3D: [[x1, y1, z0], [x1, y0, z0], [x1, y0, z1], [x1, y1, z1]]
+                    },
+                    // East (-X)
+                    {
+                        side: 'east',
+                        normal: [-1, 0, 0],
+                        loop3D: [[x0, y0, z0], [x0, y1, z0], [x0, y1, z1], [x0, y0, z1]]
+                    },
+                    // Top (+Z)
+                    {
+                        side: 'top',
+                        normal: [0, 0, 1],
+                        loop3D: [[x0, y0, z1], [x1, y0, z1], [x1, y1, z1], [x0, y1, z1]]
+                    },
+                    // Bottom (-Z)
+                    {
+                        side: 'bottom',
+                        normal: [0, 0, -1],
+                        loop3D: [[x0, y1, z0], [x1, y1, z0], [x1, y0, z0], [x0, y0, z0]]
+                    }
+                ];
+
+                return {
+                    id: part.id,
+                    name: part.name || part.id,
+                    group: partGroup, // 'skeleton' | 'fronts'
+                    role: part.role || partGroup,
+                    material: part.material || 'carcass_melamine',
+                    colorRgb: Array.isArray(part.colorRgb) ? part.colorRgb : [0.90, 0.87, 0.80],
+                    x0, x1, y0, y1, z0, z1,
+                    widthMm: x1 - x0,
+                    depthMm: y1 - y0,
+                    heightMm: z1 - z0,
+                    footprint2D: [[x0, y0], [x1, y0], [x1, y1], [x0, y1]],
+                    faces3D
+                };
+            }
+
+            const skeletonParts3D = (raw.skeleton || []).map(p => compileBoxPart3D(p, 'skeleton'));
+            const frontParts3D = (raw.fronts || []).map(p => compileBoxPart3D(p, 'fronts'));
+
+            const xMin = Number(raw.x1);
+            const xMax = Number(raw.x2);
+            const yMin = Number(raw.y1);
+            const yMax = Number(raw.y2);
+            const zBot = Number(raw.zBottom || 0);
+            const zTop = Number(raw.zTop || 870);
+
+            const footprint2D = [
+                [xMin, yMin],
+                [xMax, yMin],
+                [xMax, yMax],
+                [xMin, yMax]
+            ];
+
+            const cornerVertices3D = [
+                [xMin, yMin, zBot],
+                [xMax, yMin, zBot],
+                [xMax, yMax, zBot],
+                [xMin, yMax, zBot],
+                [xMin, yMin, zTop],
+                [xMax, yMin, zTop],
+                [xMax, yMax, zTop],
+                [xMin, yMax, zTop]
+            ];
+
+            return {
+                id: raw.id,
+                name: raw.name || raw.id,
+                shortName: raw.shortName || raw.name || raw.id,
+                category: raw.category || 'cabinet',
+                subtype: raw.subtype || 'base_cabinet',
+                floor: raw.floor || 'ground',
+                room: raw.room || '0.13 Kuchnia',
+                hostWallId: raw.hostWallId || 'EW_NORTH_RECESSED',
+                viewId: raw.viewId || 'kitchen_north_wall',
+                x1: xMin,
+                x2: xMax,
+                y1: yMin,
+                y2: yMax,
+                xMin,
+                xMax,
+                yMin,
+                yMax,
+                zBottom: zBot,
+                zTop,
+                widthMm: raw.widthMm || (xMax - xMin),
+                depthMm: raw.depthMm || (yMax - yMin),
+                carcassDepthMm: raw.carcassDepthMm || 580,
+                frontThicknessMm: raw.frontThicknessMm || 20,
+                plinthHeightMm: raw.plinthHeightMm || 150,
+                bodyHeightMm: raw.bodyHeightMm || 720,
+                heightMm: raw.heightMm || (zTop - zBot),
+                boardThicknessMm: raw.boardThicknessMm || 18,
+                normal: raw.normal || [0, 1, 0],
+                specs: raw.specs || '',
+                description: raw.description || '',
+                footprint2D,
+                cornerVertices3D,
+                skeletonParts3D,
+                frontParts3D
+            };
+        },
+
+        getFurniture3D: function () {
+            const rawList = (furnitureData && Array.isArray(furnitureData.furniture)) ? furnitureData.furniture : [];
+            return rawList.map(item => this.compileFurniture3D(item)).filter(Boolean);
+        },
+
+        getFurniture3DById: function (id) {
+            const list = this.getFurniture3D();
+            if (!id) return list[0] || null;
+            return list.find(item => item.id === id) || null;
+        },
+
+        sliceFurniture3DAtElevation: function (furnObjOrId, zSlice, options) {
+            const opts = options || {};
+            const includeFronts = opts.includeFronts !== false;
+            const includeSkeleton = opts.includeSkeleton !== false;
+            const furn = (furnObjOrId && Array.isArray(furnObjOrId.skeletonParts3D))
+                ? furnObjOrId
+                : this.compileFurniture3D(furnObjOrId);
+            if (!furn || zSlice < furn.zBottom || zSlice > furn.zTop) {
+                return { zSlice, polygons2D: [] };
+            }
+            const polygons2D = [];
+            if (includeSkeleton) {
+                furn.skeletonParts3D.forEach(part => {
+                    if (zSlice >= part.z0 && zSlice <= part.z1) {
+                        polygons2D.push(part.footprint2D);
+                    }
+                });
+            }
+            if (includeFronts) {
+                furn.frontParts3D.forEach(part => {
+                    if (zSlice >= part.z0 && zSlice <= part.z1) {
+                        polygons2D.push(part.footprint2D);
+                    }
+                });
+            }
+            return {
+                zSlice,
+                polygons2D
             };
         }
     };

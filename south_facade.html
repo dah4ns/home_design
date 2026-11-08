@@ -1372,7 +1372,7 @@
         };
 
         // Install view-local override on WindowStore so selecting the non-default O5 option on south_facade.html
-        // never mutates the persisted default O5 used by 2D floor plan (floor_plan.html) or 3D views (building_3d.html / walls_3d.html).
+        // never mutates the persisted default O5 used by 2D floor plan (floor_plan.html) or 3D views (building_3d.html / objects_3d.html).
         (function installSouthFacadeLocalO5Override() {
             if (!window.WindowStore || window.WindowStore._hasSouthFacadeO5Override) return;
             const origGet = WindowStore.get.bind(WindowStore);
