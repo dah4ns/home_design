@@ -2611,7 +2611,7 @@
             const rawList = (furnitureData && Array.isArray(furnitureData.furniture)) ? furnitureData.furniture : [];
             const raw = (typeof furnObjOrId === 'object' && furnObjOrId)
                 ? furnObjOrId
-                : (rawList.find(item => item.id === furnObjOrId) || rawList[0]);
+                : (rawList.find(item => item.id === furnObjOrId || (Array.isArray(item.aliasIds) && item.aliasIds.includes(furnObjOrId))) || rawList[0]);
             if (!raw) return null;
 
             function compileBoxPart3D(part, partGroup) {
@@ -2619,7 +2619,7 @@
                 const y0 = Number(part.y0), y1 = Number(part.y1);
                 const z0 = Number(part.z0), z1 = Number(part.z1);
 
-                const faces3D = [
+                const faces3D = Array.isArray(part.faces3D) ? part.faces3D : [
                     // Front (South +Y)
                     {
                         side: 'south',
@@ -2669,7 +2669,9 @@
                     widthMm: x1 - x0,
                     depthMm: y1 - y0,
                     heightMm: z1 - z0,
-                    footprint2D: [[x0, y0], [x1, y0], [x1, y1], [x0, y1]],
+                    footprint2D: Array.isArray(part.footprint2D) ? part.footprint2D : [[x0, y0], [x1, y0], [x1, y1], [x0, y1]],
+                    slicePolygons2D: Array.isArray(part.slicePolygons2D) ? part.slicePolygons2D : null,
+                    wireframeLines3D: Array.isArray(part.wireframeLines3D) ? part.wireframeLines3D : null,
                     faces3D
                 };
             }
@@ -2684,7 +2686,7 @@
             const zBot = Number(raw.zBottom || 0);
             const zTop = Number(raw.zTop || 870);
 
-            const footprint2D = [
+            const footprint2D = Array.isArray(raw.footprint2D) ? raw.footprint2D : [
                 [xMin, yMin],
                 [xMax, yMin],
                 [xMax, yMax],
@@ -2704,6 +2706,7 @@
 
             return {
                 id: raw.id,
+                aliasIds: Array.isArray(raw.aliasIds) ? raw.aliasIds : [],
                 name: raw.name || raw.id,
                 shortName: raw.shortName || raw.name || raw.id,
                 category: raw.category || 'cabinet',
@@ -2724,10 +2727,10 @@
                 zTop,
                 widthMm: raw.widthMm || (xMax - xMin),
                 depthMm: raw.depthMm || (yMax - yMin),
-                carcassDepthMm: raw.carcassDepthMm || 580,
-                frontThicknessMm: raw.frontThicknessMm || 20,
-                plinthHeightMm: raw.plinthHeightMm || 150,
-                bodyHeightMm: raw.bodyHeightMm || 720,
+                carcassDepthMm: raw.carcassDepthMm !== undefined ? raw.carcassDepthMm : 580,
+                frontThicknessMm: raw.frontThicknessMm !== undefined ? raw.frontThicknessMm : 20,
+                plinthHeightMm: raw.plinthHeightMm !== undefined ? raw.plinthHeightMm : 150,
+                bodyHeightMm: raw.bodyHeightMm !== undefined ? raw.bodyHeightMm : 720,
                 heightMm: raw.heightMm || (zTop - zBot),
                 boardThicknessMm: raw.boardThicknessMm || 18,
                 normal: raw.normal || [0, 1, 0],
@@ -2748,7 +2751,7 @@
         getFurniture3DById: function (id) {
             const list = this.getFurniture3D();
             if (!id) return list[0] || null;
-            return list.find(item => item.id === id) || null;
+            return list.find(item => item.id === id || (Array.isArray(item.aliasIds) && item.aliasIds.includes(id))) || null;
         },
 
         sliceFurniture3DAtElevation: function (furnObjOrId, zSlice, options) {
@@ -2765,14 +2768,22 @@
             if (includeSkeleton) {
                 furn.skeletonParts3D.forEach(part => {
                     if (zSlice >= part.z0 && zSlice <= part.z1) {
-                        polygons2D.push(part.footprint2D);
+                        if (Array.isArray(part.slicePolygons2D)) {
+                            part.slicePolygons2D.forEach(poly => polygons2D.push(poly));
+                        } else {
+                            polygons2D.push(part.footprint2D);
+                        }
                     }
                 });
             }
             if (includeFronts) {
                 furn.frontParts3D.forEach(part => {
                     if (zSlice >= part.z0 && zSlice <= part.z1) {
-                        polygons2D.push(part.footprint2D);
+                        if (Array.isArray(part.slicePolygons2D)) {
+                            part.slicePolygons2D.forEach(poly => polygons2D.push(poly));
+                        } else {
+                            polygons2D.push(part.footprint2D);
+                        }
                     }
                 });
             }

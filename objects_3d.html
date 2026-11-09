@@ -240,6 +240,13 @@
             box-shadow: 0 0 14px rgba(245, 158, 11, 0.25);
         }
 
+        .menu-tab-btn.active-settings {
+            background: rgba(16, 185, 129, 0.22);
+            border-color: #10b981;
+            color: #6ee7b7;
+            box-shadow: 0 0 14px rgba(16, 185, 129, 0.25);
+        }
+
         .menu-tab-btn.hide-btn {
             padding: 6px 9px;
             color: #94a3b8;
@@ -726,7 +733,7 @@
             <canvas id="webgl-canvas"></canvas>
             <canvas id="hud-canvas"></canvas>
 
-            <!-- TOP-LEFT MENU SWITCHER (Mutually Exclusive Menus + Hide Both) -->
+            <!-- TOP-LEFT MENU SWITCHER (Mutually Exclusive Menus + Hide All) -->
             <div class="left-menu-switcher" role="tablist" aria-label="Left Control Menu Switcher">
                 <button type="button" class="menu-tab-btn" id="tab-btn-walls" title="Show Select Wall & Stair Objects by ID menu">
                     <span>🧱 Walls &amp; Stairs</span>
@@ -734,7 +741,10 @@
                 <button type="button" class="menu-tab-btn active-objects" id="tab-btn-objects" title="Show Select Objects by ID (Furniture & Cabinets) menu">
                     <span>🗄️ Select Objects by ID</span>
                 </button>
-                <button type="button" class="menu-tab-btn hide-btn" id="tab-btn-hide" title="Hide both left-hand side menus">
+                <button type="button" class="menu-tab-btn" id="tab-btn-settings" title="Show 3D Space & B-Rep Visualization Settings">
+                    <span>⚙️ Settings</span>
+                </button>
+                <button type="button" class="menu-tab-btn hide-btn" id="tab-btn-hide" title="Hide all left-hand side menus">
                     <span id="tab-btn-hide-label">👁️ Hide Menu</span>
                 </button>
             </div>
@@ -781,52 +791,10 @@
                     </div>
                 </div>
 
-                <!-- 3. 3D Space, Axes & B-Rep Overlays -->
+                <!-- 3. Camera Orientation Presets -->
                 <div class="dock-section">
                     <div class="dock-title">
-                        <span>3. 3D Space &amp; B-Rep Visualization</span>
-                    </div>
-                    <label class="toggle-row">
-                        <span>Show Object &amp; Window ID Labels (`UW_SOUTH`, `CAB_KITCHEN_1`)</span>
-                        <input type="checkbox" id="toggle-labels" checked>
-                    </label>
-                    <label class="toggle-row">
-                        <span>Show 3D CAD Windows (Frame + Glass + Jambs)</span>
-                        <input type="checkbox" id="toggle-windows" checked>
-                    </label>
-                    <label class="toggle-row">
-                        <span>Show (X, Y, Z) Coordinate Axes &amp; Ticks</span>
-                        <input type="checkbox" id="toggle-axes" checked>
-                    </label>
-                    <label class="toggle-row">
-                        <span>Show 3D Vertex Coordinates `[x, y, z]`</span>
-                        <input type="checkbox" id="toggle-vertices" checked>
-                    </label>
-                    <label class="toggle-row">
-                        <span>Show Outward Normal Vectors `n = [nx,ny,nz]`</span>
-                        <input type="checkbox" id="toggle-normals" checked>
-                    </label>
-                    <label class="toggle-row">
-                        <span>Show Unselected Objects Ghost Footprint</span>
-                        <input type="checkbox" id="toggle-ghost" checked>
-                    </label>
-                    <label class="toggle-row">
-                        <span>Show Horizontal Slice Plane (`Z = zSlice`)</span>
-                        <input type="checkbox" id="toggle-slice-plane">
-                    </label>
-                    <div class="slider-row" id="slice-slider-row" style="display: none;">
-                        <div class="kv-row">
-                            <span class="kv-key">Cut Plane Height `Z`:</span>
-                            <span class="kv-val" id="slice-y-label">650 mm</span>
-                        </div>
-                        <input type="range" id="slice-y-slider" min="-250" max="6800" step="25" value="650">
-                    </div>
-                </div>
-
-                <!-- 4. Camera Orientation Presets -->
-                <div class="dock-section">
-                    <div class="dock-title">
-                        <span>4. Camera &amp; Viewpoint</span>
+                        <span>3. Camera &amp; Viewpoint</span>
                     </div>
                     <div class="preset-grid three-cols">
                         <button type="button" class="ctrl-btn" id="cam-focus">🎯 Focus Selected</button>
@@ -845,7 +813,7 @@
                 <div class="dock-section">
                     <div class="dock-title">
                         <span>1. Select Objects by ID</span>
-                        <span class="tech-pill amber" id="selected-objects-count-badge">1 selected</span>
+                        <span class="tech-pill amber" id="selected-objects-count-badge">22 selected</span>
                     </div>
 
                     <div class="multiselect-box">
@@ -854,7 +822,7 @@
                             <span>▾</span>
                         </button>
                         <div class="multiselect-menu" id="obj-dropdown-menu">
-                            <input type="text" class="search-input" id="obj-search-input" placeholder="Filter objects by ID, room, or type (e.g. CAB_KITCHEN_1)...">
+                            <input type="text" class="search-input" id="obj-search-input" placeholder="Filter objects by ID, wall, or type (e.g. Vitrine, Zlew, CAB_KITCHEN_W2)...">
                             <div id="obj-options-container"></div>
                         </div>
                     </div>
@@ -892,9 +860,11 @@
                         <span>3. Quick Object &amp; Context Presets</span>
                     </div>
                     <div class="preset-grid">
-                        <button type="button" class="ctrl-btn" id="preset-cab-only" style="grid-column: span 2;">🗄️ CAB_KITCHEN_1 Only (Focus Cabinet)</button>
-                        <button type="button" class="ctrl-btn" id="preset-cab-kitchen" style="grid-column: span 2;">🍳 CAB_KITCHEN_1 + Kitchen Walls &amp; Window O1</button>
-                        <button type="button" class="ctrl-btn" id="preset-cab-full-house">🏢 Cabinet + Full Building</button>
+                        <button type="button" class="ctrl-btn" id="preset-cab-only" style="grid-column: span 2;">🗄️ All Kitchen Cabinets Only (North + West)</button>
+                        <button type="button" class="ctrl-btn" id="preset-cab-kitchen" style="grid-column: span 2;">🍳 All Kitchen Cabinets + Walls &amp; Window O1</button>
+                        <button type="button" class="ctrl-btn" id="preset-cab-north-only">⬆️ North Wall Only (N1..N8)</button>
+                        <button type="button" class="ctrl-btn" id="preset-cab-west-only">⬅️ West Wall Only (W1..UP5)</button>
+                        <button type="button" class="ctrl-btn" id="preset-cab-full-house">🏢 Cabinets + Full Building</button>
                         <button type="button" class="ctrl-btn" id="preset-cab-clear">✖ Clear Objects</button>
                     </div>
                 </div>
@@ -904,10 +874,56 @@
                     <div class="dock-title">
                         <span>4. Camera &amp; Viewpoint</span>
                     </div>
-                    <div class="preset-grid three-cols">
+                    <div class="preset-grid">
                         <button type="button" class="ctrl-btn" id="obj-cam-focus">🎯 Focus Selected</button>
-                        <button type="button" class="ctrl-btn" id="obj-cam-front">🧭 Front (Look N)</button>
-                        <button type="button" class="ctrl-btn" id="obj-cam-iso">📐 Iso Cabinet</button>
+                        <button type="button" class="ctrl-btn" id="obj-cam-iso">📐 Iso L-Kitchen</button>
+                        <button type="button" class="ctrl-btn" id="obj-cam-front">⬆️ Look North Wall</button>
+                        <button type="button" class="ctrl-btn" id="obj-cam-west">⬅️ Look West Wall</button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- MENU 3: SETTINGS (3D SPACE & B-REP VISUALIZATION) -->
+            <aside class="left-dock hidden-menu" id="left-dock-settings">
+                <div class="dock-section">
+                    <div class="dock-title">
+                        <span>3D Space &amp; B-Rep Visualization</span>
+                        <span class="tech-pill">Settings</span>
+                    </div>
+                    <label class="toggle-row">
+                        <span>Show Object &amp; Window ID Labels (`UW_SOUTH`, `CAB_KITCHEN_1`)</span>
+                        <input type="checkbox" id="toggle-labels">
+                    </label>
+                    <label class="toggle-row">
+                        <span>Show 3D CAD Windows (Frame + Glass + Jambs)</span>
+                        <input type="checkbox" id="toggle-windows" checked>
+                    </label>
+                    <label class="toggle-row">
+                        <span>Show (X, Y, Z) Coordinate Axes &amp; Ticks</span>
+                        <input type="checkbox" id="toggle-axes">
+                    </label>
+                    <label class="toggle-row">
+                        <span>Show 3D Vertex Coordinates `[x, y, z]`</span>
+                        <input type="checkbox" id="toggle-vertices">
+                    </label>
+                    <label class="toggle-row">
+                        <span>Show Outward Normal Vectors `n = [nx,ny,nz]`</span>
+                        <input type="checkbox" id="toggle-normals">
+                    </label>
+                    <label class="toggle-row">
+                        <span>Show Unselected Objects Ghost Footprint</span>
+                        <input type="checkbox" id="toggle-ghost">
+                    </label>
+                    <label class="toggle-row">
+                        <span>Show Horizontal Slice Plane (`Z = zSlice`)</span>
+                        <input type="checkbox" id="toggle-slice-plane">
+                    </label>
+                    <div class="slider-row" id="slice-slider-row" style="display: none;">
+                        <div class="kv-row">
+                            <span class="kv-key">Cut Plane Height `Z`:</span>
+                            <span class="kv-val" id="slice-y-label">650 mm</span>
+                        </div>
+                        <input type="range" id="slice-y-slider" min="-250" max="6800" step="25" value="650">
                     </div>
                 </div>
             </aside>
@@ -978,25 +994,25 @@
             // - Y axis: North -> South horizontal axis (second horizontal axis, into depth)
             // - Z axis: Vertical height axis (-220..6,740 mm, pointing UP)
             const appState = {
-                activeLeftMenu: 'objects', // 'walls' | 'objects' | 'none'
-                selectedIds: new Set(['CAB_KITCHEN_1', 'EW_NORTH_RECESSED', 'GW_3', 'GW_13', 'FLOOR_LOWER']),
+                activeLeftMenu: 'objects', // 'walls' | 'objects' | 'settings' | 'none'
+                selectedIds: new Set(allFurniture.map(fn => fn.id).concat(['EW_NORTH_RECESSED', 'GW_3', 'GW_13', 'FLOOR_LOWER'])),
                 searchQuery: '',
                 objectSearchQuery: '',
                 showAllFurnitureSkeleton: true,
                 furnitureFrontsById: initialFrontsById,
-                showLabels: true,
+                showLabels: false,
                 showWindows: true,
-                showAxes: true,
-                showVertices: true,
-                showNormals: true,
-                showGhost: true,
+                showAxes: false,
+                showVertices: false,
+                showNormals: false,
+                showGhost: false,
                 showSlicePlane: false,
                 sliceZMm: 650,
                 // Camera spherical coordinates around Z-up (in meters, 1 m = 1,000 mm)
-                yaw: 112 * Math.PI / 180,
-                pitch: 24 * Math.PI / 180,
-                distance: 4.2,
-                target: { x: 9.215, y: 3.47, z: 0.48 }
+                yaw: 132 * Math.PI / 180,
+                pitch: 22 * Math.PI / 180,
+                distance: 7.4,
+                target: { x: 9.215, y: 5.45, z: 1.25 }
             };
 
             // Distinct palette per wall category/side so multiple selected walls are easy to distinguish
@@ -1987,47 +2003,101 @@
                 // ---------------------------------------------------------------------
                 // C-4. RENDER 3D FURNITURE & CABINET OBJECTS (Skeleton + Fronts)
                 // ---------------------------------------------------------------------
-                allFurniture.forEach(furn => {
+                allFurniture.forEach((furn, fIdx) => {
                     if (!appState.selectedIds.has(furn.id)) return;
 
                     const showFronts = appState.furnitureFrontsById[furn.id] !== false;
                     const showSkeleton = appState.showAllFurnitureSkeleton !== false;
 
-                    // 1. Render Cabinet Skeleton (Plinth + 18mm Carcass Panels)
+                    // 1. Render Cabinet Skeleton (Plinth + 18mm Carcass Panels + 30mm Worktop + Quarter-Arc Circular Shelves)
                     if (showSkeleton && Array.isArray(furn.skeletonParts3D)) {
                         furn.skeletonParts3D.forEach(part => {
                             const rgb = part.colorRgb || [0.93, 0.90, 0.84];
                             const wireColor = (part.role === 'plinth')
                                 ? [0.42, 0.33, 0.27, 0.90]
-                                : [0.56, 0.42, 0.28, 0.92];
+                                : (part.role === 'worktop'
+                                    ? [0.68, 0.60, 0.48, 0.94]
+                                    : [0.56, 0.42, 0.28, 0.92]);
                             (part.faces3D || []).forEach(face => {
                                 pushConvexLoop3D(face.loop3D, face.normal || [0, 0, 1], [rgb[0], rgb[1], rgb[2], 0.98]);
-                                pushLoopLines(face.loop3D, wireColor);
+                                if (!face.noWireframe) {
+                                    pushLoopLines(face.loop3D, wireColor);
+                                }
                             });
+                            if (Array.isArray(part.wireframeLines3D)) {
+                                part.wireframeLines3D.forEach(poly => {
+                                    for (let i = 0; i + 1 < poly.length; i++) {
+                                        pushLine(poly[i], poly[i + 1], wireColor);
+                                    }
+                                });
+                            }
                         });
                     }
 
-                    // 2. Render Removable Cabinet Fronts (Wood Drawer Fronts + Aluminum Handle Rails)
+                    // 2. Render Removable Cabinet Fronts (Wood Fronts + Vitrine Glass + Handle Rails/Bars + Oven & Microwave Fronts + Curved Edge Bands)
                     if (showFronts && Array.isArray(furn.frontParts3D)) {
                         furn.frontParts3D.forEach(part => {
                             const rgb = part.colorRgb || [0.63, 0.48, 0.38];
-                            const isRail = (part.role === 'handle_rail');
-                            const wireColor = isRail
-                                ? [0.60, 0.64, 0.68, 0.95]
-                                : [0.38, 0.26, 0.18, 0.96];
+                            if (part.role === 'vitrine_glass') {
+                                (part.faces3D || []).forEach(face => {
+                                    pushConvexLoop3D(face.loop3D, face.normal || [-1, 0, 0], [rgb[0], rgb[1], rgb[2], 0.34], glassVerts);
+                                    if (!face.noWireframe) {
+                                        pushLoopLines(face.loop3D, [0.22, 0.74, 0.97, 0.92]);
+                                    }
+                                });
+                                return;
+                            }
+
+                            let wireColor = [0.38, 0.26, 0.18, 0.96];
+                            if (part.role === 'handle_rail') {
+                                wireColor = [0.60, 0.64, 0.68, 0.95];
+                            } else if (part.role === 'handle_bar') {
+                                wireColor = [0.20, 0.15, 0.12, 0.98];
+                            } else if (part.role === 'appliance_front') {
+                                wireColor = [0.35, 0.38, 0.42, 0.96];
+                            } else if (part.role === 'appliance_window') {
+                                wireColor = [0.52, 0.58, 0.65, 0.98];
+                            } else if (part.role === 'vitrine_frame') {
+                                wireColor = [0.34, 0.24, 0.15, 0.96];
+                            }
                             (part.faces3D || []).forEach(face => {
                                 pushConvexLoop3D(face.loop3D, face.normal || [0, 1, 0], [rgb[0], rgb[1], rgb[2], 0.99]);
-                                pushLoopLines(face.loop3D, wireColor);
+                                if (!face.noWireframe) {
+                                    pushLoopLines(face.loop3D, wireColor);
+                                }
                             });
+                            if (Array.isArray(part.wireframeLines3D)) {
+                                part.wireframeLines3D.forEach(poly => {
+                                    for (let i = 0; i + 1 < poly.length; i++) {
+                                        pushLine(poly[i], poly[i + 1], wireColor);
+                                    }
+                                });
+                            }
+
+                            if (appState.showLabels && part.role === 'appliance_window') {
+                                const isOven = part.id.indexOf('OVEN') !== -1;
+                                hudLabels.push({
+                                    ptMm: [(part.x0 + part.x1) / 2, part.y1 + 15, (part.z0 + part.z1) / 2],
+                                    text: isOven ? '🔥 Piekarnik (600×600)' : '⚡ Mikrofala (600×450)',
+                                    color: '#f8fafc',
+                                    bg: 'rgba(15, 23, 42, 0.90)',
+                                    fontSize: 9.5
+                                });
+                            }
                         });
                     }
 
                     // 3. Outward Normal Vector Arrow n = [nx, ny, nz] from Cabinet Front Face
                     if (appState.showNormals && Array.isArray(furn.normal)) {
-                        const midX = (furn.xMin + furn.xMax) / 2;
-                        const frontY = showFronts ? furn.yMax : (furn.yMin + furn.carcassDepthMm);
+                        const isWestWallCab = furn.normal[0] < -0.5;
+                        const startX = isWestWallCab
+                            ? (showFronts ? furn.xMin : (furn.xMax - furn.carcassDepthMm))
+                            : (furn.xMin + furn.xMax) / 2;
+                        const startY = isWestWallCab
+                            ? (furn.yMin + furn.yMax) / 2
+                            : (showFronts ? furn.yMax : (furn.yMin + furn.carcassDepthMm));
                         const midZ = (furn.zBottom + furn.zTop) / 2;
-                        const startMm = [midX, frontY, midZ];
+                        const startMm = [startX, startY, midZ];
                         const endMm = [
                             startMm[0] + furn.normal[0] * 420,
                             startMm[1] + furn.normal[1] * 420,
@@ -2057,17 +2127,18 @@
                         });
                     }
 
-                    // 5. Floating 3D Cabinet Badge
+                    // 5. Floating 3D Cabinet Badge (staggered slightly on Z so adjacent 600mm cabinets never overlap)
                     if (appState.showLabels) {
                         const partsStateLabel = (showSkeleton && showFronts)
-                            ? 'Skeleton + Fronts'
+                            ? 'Fronts ON'
                             : (showSkeleton ? 'Skeleton Only' : (showFronts ? 'Fronts Only' : 'Hidden'));
+                        const zOffset = (fIdx % 2 === 0) ? 140 : 280;
                         hudLabels.push({
-                            ptMm: [(furn.xMin + furn.xMax) / 2, (furn.yMin + furn.yMax) / 2, furn.zTop + 180],
-                            text: `🗄️ ${furn.id} (${furn.widthMm}×${furn.depthMm}×${furn.heightMm}mm • ${partsStateLabel})`,
+                            ptMm: [(furn.xMin + furn.xMax) / 2, (furn.yMin + furn.yMax) / 2, furn.zTop + zOffset],
+                            text: `🗄️ ${furn.id} (${furn.widthMm}×${furn.heightMm}mm • ${partsStateLabel})`,
                             color: '#fef3c7',
                             bg: 'rgba(180, 83, 9, 0.94)',
-                            fontSize: 11.0
+                            fontSize: 10.0
                         });
                     }
 
@@ -2316,16 +2387,20 @@
 
                 const wallsDock = document.getElementById('left-dock-walls');
                 const objectsDock = document.getElementById('left-dock-objects');
+                const settingsDock = document.getElementById('left-dock-settings');
                 const btnWalls = document.getElementById('tab-btn-walls');
                 const btnObjects = document.getElementById('tab-btn-objects');
+                const btnSettings = document.getElementById('tab-btn-settings');
                 const btnHide = document.getElementById('tab-btn-hide');
                 const hideLabel = document.getElementById('tab-btn-hide-label');
 
                 wallsDock.classList.toggle('hidden-menu', appState.activeLeftMenu !== 'walls');
                 objectsDock.classList.toggle('hidden-menu', appState.activeLeftMenu !== 'objects');
+                settingsDock.classList.toggle('hidden-menu', appState.activeLeftMenu !== 'settings');
 
                 btnWalls.classList.toggle('active-walls', appState.activeLeftMenu === 'walls');
                 btnObjects.classList.toggle('active-objects', appState.activeLeftMenu === 'objects');
+                btnSettings.classList.toggle('active-settings', appState.activeLeftMenu === 'settings');
                 btnHide.classList.toggle('active-hidden', appState.activeLeftMenu === 'none');
                 hideLabel.textContent = appState.activeLeftMenu === 'none' ? '👁️ Menus Hidden' : '👁️ Hide Menu';
             }
@@ -2577,20 +2652,42 @@
                 const selectedFurnIds = allFurniture.filter(fn => appState.selectedIds.has(fn.id)).map(fn => fn.id);
                 objCountBadge.textContent = `${selectedFurnIds.length} selected`;
                 objTriggerText.textContent = selectedFurnIds.length > 0
-                    ? `Selected: ${selectedFurnIds.join(', ')}`
+                    ? `Selected: ${selectedFurnIds.slice(0, 3).join(', ')}${selectedFurnIds.length > 3 ? ` +${selectedFurnIds.length - 3} more` : ''}`
                     : 'Choose Furniture / Cabinet IDs...';
 
                 const oq = appState.objectSearchQuery.trim().toLowerCase();
-                const matchingFurn = allFurniture.filter(fn => (
-                    !oq ||
-                    fn.id.toLowerCase().includes(oq) ||
-                    fn.name.toLowerCase().includes(oq) ||
-                    (fn.room && fn.room.toLowerCase().includes(oq)) ||
-                    (fn.category && fn.category.toLowerCase().includes(oq))
-                ));
+                const furnGroups = [
+                    {
+                        title: 'Kitchen North Wall (EW_NORTH_RECESSED — CAB_KITCHEN_N1..N8)',
+                        filter: fn => fn.hostWallId === 'EW_NORTH_RECESSED'
+                    },
+                    {
+                        title: 'Kitchen West Wall — Base Cabinets (GW_3 — CAB_KITCHEN_W1..W5)',
+                        filter: fn => fn.hostWallId === 'GW_3' && fn.id.indexOf('CAB_KITCHEN_W') === 0 && fn.subtype !== 'upper_wall_cabinet_2_tier'
+                    },
+                    {
+                        title: 'Kitchen West Wall — 2-Tier Upper Wall Cabinets (GW_3 — CAB_KITCHEN_W_UP1..UP5)',
+                        filter: fn => fn.hostWallId === 'GW_3' && fn.subtype === 'upper_wall_cabinet_2_tier'
+                    },
+                    {
+                        title: 'Dining Room West Wall — 30cm Tall Units & Circular Shelves (GW_3 — CAB_DINING_ROOM_W6..W9)',
+                        filter: fn => fn.hostWallId === 'GW_3' && fn.id.indexOf('CAB_DINING_ROOM_') === 0
+                    }
+                ];
 
-                if (matchingFurn.length > 0) {
-                    objOptionsContainer.appendChild(createEl('div', 'wall-group-header amber', '3D Kitchen Cabinets & Furniture (data/furniture.js)'));
+                furnGroups.forEach(fGrp => {
+                    const matchingFurn = allFurniture.filter(fn => fGrp.filter(fn) && (
+                        !oq ||
+                        fn.id.toLowerCase().includes(oq) ||
+                        fn.name.toLowerCase().includes(oq) ||
+                        (fn.shortName && fn.shortName.toLowerCase().includes(oq)) ||
+                        (fn.hostWallId && fn.hostWallId.toLowerCase().includes(oq)) ||
+                        (fn.room && fn.room.toLowerCase().includes(oq)) ||
+                        (fn.category && fn.category.toLowerCase().includes(oq))
+                    ));
+                    if (matchingFurn.length === 0) return;
+
+                    objOptionsContainer.appendChild(createEl('div', 'wall-group-header amber', fGrp.title));
                     matchingFurn.forEach(fn => {
                         const isChecked = appState.selectedIds.has(fn.id);
                         const row = createEl('label', 'wall-option-row' + (isChecked ? ' checked-amber' : ''));
@@ -2623,7 +2720,7 @@
                         row.appendChild(metaSpan);
                         objOptionsContainer.appendChild(row);
                     });
-                }
+                });
 
                 selectedFurnIds.forEach(id => {
                     const chip = createEl('span', 'wall-chip amber', `🗄️ ${id} ✕`);
@@ -2685,7 +2782,7 @@
                     partCard.appendChild(headerRow);
 
                     const subRow = createEl('div', 'kv-row');
-                    subRow.appendChild(createEl('span', 'kv-key', `${fn.room} (Right of Zmywarka)`));
+                    subRow.appendChild(createEl('span', 'kv-key', `${fn.shortName || fn.name} (${fn.hostWallId})`));
                     subRow.appendChild(createEl('span', 'kv-val', `${fn.skeletonParts3D.length} skel + ${fn.frontParts3D.length} fronts`));
                     partCard.appendChild(subRow);
 
@@ -2704,7 +2801,7 @@
 
                 if (selectedFurn.length === 0 && selectedFloors.length === 0 && selectedStairs.length === 0 && selectedWalls.length === 0) {
                     const emptyCard = createEl('div', 'inspector-wall-card');
-                    emptyCard.appendChild(createEl('div', 'inspector-wall-name', 'No 3D objects selected. Choose CAB_KITCHEN_1 from "Select Objects by ID" or walls/slabs/stairs from "Walls & Stairs".'));
+                    emptyCard.appendChild(createEl('div', 'inspector-wall-name', 'No 3D objects selected. Choose cabinets (CAB_KITCHEN_N1..N8, CAB_KITCHEN_W1..UP5) from "Select Objects by ID" or walls/slabs/stairs from "Walls & Stairs".'));
                     inspectorContainer.appendChild(emptyCard);
                     return;
                 }
@@ -2743,11 +2840,11 @@
                         card.appendChild(r);
                     };
 
-                    addKv('Room & Host Wall', `${fn.room} • ${fn.hostWallId}`);
+                    addKv('Room & Host Wall', `${fn.room} • ${fn.hostWallId} (n = [${fn.normal.join(', ')}])`);
                     addKv('Dimensions (W×D×H)', `${fn.widthMm} × ${fn.depthMm} × ${fn.heightMm} mm (Plinth ${fn.plinthHeightMm} + Body ${fn.bodyHeightMm} mm)`);
                     addKv('3D Bounding Box', `X: ${fn.xMin}..${fn.xMax} | Y: ${fn.yMin}..${fn.yMax} | Z: ${fn.zBottom}..${fn.zTop} mm`);
-                    addKv('Part 1: Skeleton', `${fn.skeletonParts3D.length} B-Rep boxes (${fn.carcassDepthMm} mm deep, ${fn.boardThicknessMm} mm panels + plinth)`);
-                    addKv('Part 2: Fronts', `${fn.frontParts3D.length} B-Rep boxes (2×330mm wood fronts + 2×30mm handle rails, ${frontsOn ? 'VISIBLE' : 'HIDDEN'})`);
+                    addKv('Part 1: Skeleton', `${fn.skeletonParts3D.length} B-Rep boxes (${fn.carcassDepthMm} mm deep, ${fn.boardThicknessMm} mm panels)`);
+                    addKv('Part 2: Fronts', `${fn.frontParts3D.length} B-Rep boxes (${fn.frontThicknessMm} mm thick, ${frontsOn ? 'VISIBLE' : 'HIDDEN'})`);
 
                     const partsBreakdown = [
                         `[SKELETON — ${fn.skeletonParts3D.length} parts]`,
@@ -2877,6 +2974,7 @@
             // =========================================================================
             document.getElementById('tab-btn-walls').addEventListener('click', () => setLeftMenuMode('walls'));
             document.getElementById('tab-btn-objects').addEventListener('click', () => setLeftMenuMode('objects'));
+            document.getElementById('tab-btn-settings').addEventListener('click', () => setLeftMenuMode('settings'));
             document.getElementById('tab-btn-hide').addEventListener('click', () => setLeftMenuMode('none'));
 
             document.getElementById('dropdown-trigger').addEventListener('click', () => {
@@ -2919,27 +3017,69 @@
                 focusSelectedObjects();
             }
 
+            function focusSelectedFurniture() {
+                const selectedFurn = allFurniture.filter(fn => appState.selectedIds.has(fn.id));
+                const list = selectedFurn.length > 0 ? selectedFurn : allFurniture;
+                if (list.length === 0) {
+                    focusSelectedObjects();
+                    return;
+                }
+                let minX = Infinity, maxX = -Infinity;
+                let minY = Infinity, maxY = -Infinity;
+                let minZ = Infinity, maxZ = -Infinity;
+                list.forEach(fn => {
+                    minX = Math.min(minX, fn.xMin);
+                    maxX = Math.max(maxX, fn.xMax);
+                    minY = Math.min(minY, fn.yMin);
+                    maxY = Math.max(maxY, fn.yMax);
+                    minZ = Math.min(minZ, fn.zBottom);
+                    maxZ = Math.max(maxZ, fn.zTop);
+                });
+                appState.target.x = ((minX + maxX) / 2) / 1000;
+                appState.target.y = ((minY + maxY) / 2) / 1000;
+                appState.target.z = ((minZ + maxZ) / 2) / 1000;
+                const spanM = Math.max((maxX - minX) / 1000, (maxY - minY) / 1000, (maxZ - minZ) / 1000);
+                appState.distance = Math.max(2.6, Math.min(12.0, spanM * 1.15));
+                renderScene();
+            }
+
             // Menu 2 (Objects) Presets
             document.getElementById('preset-cab-only').addEventListener('click', () => {
-                appState.selectedIds = new Set(['CAB_KITCHEN_1']);
-                appState.yaw = 112 * Math.PI / 180;
-                appState.pitch = 24 * Math.PI / 180;
+                appState.selectedIds = new Set(allFurniture.map(fn => fn.id));
+                appState.yaw = 132 * Math.PI / 180;
+                appState.pitch = 22 * Math.PI / 180;
                 renderDropdownAndInspector();
-                focusSingleObject(furnitureById['CAB_KITCHEN_1']);
+                focusSelectedFurniture();
             });
             document.getElementById('preset-cab-kitchen').addEventListener('click', () => {
-                appState.selectedIds = new Set(['CAB_KITCHEN_1', 'EW_NORTH_RECESSED', 'GW_3', 'GW_13', 'FLOOR_LOWER']);
-                appState.yaw = 108 * Math.PI / 180;
-                appState.pitch = 24 * Math.PI / 180;
+                appState.selectedIds = new Set(allFurniture.map(fn => fn.id).concat(['EW_NORTH_RECESSED', 'GW_3', 'GW_13', 'FLOOR_LOWER']));
+                appState.yaw = 132 * Math.PI / 180;
+                appState.pitch = 22 * Math.PI / 180;
                 renderDropdownAndInspector();
-                focusSingleObject(furnitureById['CAB_KITCHEN_1']);
-                appState.distance = 4.6;
+                focusSelectedFurniture();
+                appState.distance = 7.4;
                 renderScene();
+            });
+            document.getElementById('preset-cab-north-only').addEventListener('click', () => {
+                const northIds = allFurniture.filter(fn => fn.hostWallId === 'EW_NORTH_RECESSED').map(fn => fn.id);
+                appState.selectedIds = new Set(northIds.concat(['EW_NORTH_RECESSED', 'FLOOR_LOWER']));
+                appState.yaw = 96 * Math.PI / 180;
+                appState.pitch = 16 * Math.PI / 180;
+                renderDropdownAndInspector();
+                focusSelectedFurniture();
+            });
+            document.getElementById('preset-cab-west-only').addEventListener('click', () => {
+                const westIds = allFurniture.filter(fn => fn.hostWallId === 'GW_3').map(fn => fn.id);
+                appState.selectedIds = new Set(westIds.concat(['GW_3', 'FLOOR_LOWER']));
+                appState.yaw = 172 * Math.PI / 180;
+                appState.pitch = 16 * Math.PI / 180;
+                renderDropdownAndInspector();
+                focusSelectedFurniture();
             });
             document.getElementById('preset-cab-full-house').addEventListener('click', () => {
                 appState.yaw = 42 * Math.PI / 180;
                 appState.pitch = 38 * Math.PI / 180;
-                applyPreset(allWalls.map(w => w.id).concat(['FLOOR_LOWER', 'FLOOR_UPPER', 'TERRACE_UPPER', 'ROOF_GYM', 'ROOF_GARAGE', 'ROOF_UPPER', 'STAIRS_1', 'CAB_KITCHEN_1']));
+                applyPreset(allWalls.map(w => w.id).concat(['FLOOR_LOWER', 'FLOOR_UPPER', 'TERRACE_UPPER', 'ROOF_GYM', 'ROOF_GARAGE', 'ROOF_UPPER', 'STAIRS_1']).concat(allFurniture.map(fn => fn.id)));
             });
             document.getElementById('preset-cab-clear').addEventListener('click', () => {
                 allFurniture.forEach(fn => appState.selectedIds.delete(fn.id));
@@ -2949,26 +3089,22 @@
 
             // Menu 2 Camera Buttons
             document.getElementById('obj-cam-focus').addEventListener('click', () => {
-                const cab = furnitureById['CAB_KITCHEN_1'];
-                if (cab && appState.selectedIds.has(cab.id)) {
-                    focusSingleObject(cab);
-                } else {
-                    focusSelectedObjects();
-                }
+                focusSelectedFurniture();
             });
             document.getElementById('obj-cam-front').addEventListener('click', () => {
-                appState.yaw = 90 * Math.PI / 180; // Looking from South (+Y) toward North (-Y) at the cabinet front
-                appState.pitch = 12 * Math.PI / 180;
-                const cab = furnitureById['CAB_KITCHEN_1'];
-                if (cab) focusSingleObject(cab);
-                else focusSelectedObjects();
+                appState.yaw = 90 * Math.PI / 180; // Looking from South (+Y) toward North (-Y) at the Kitchen North Wall
+                appState.pitch = 10 * Math.PI / 180;
+                focusSelectedFurniture();
+            });
+            document.getElementById('obj-cam-west').addEventListener('click', () => {
+                appState.yaw = 180 * Math.PI / 180; // Looking from East (-X) toward West (+X) at the Kitchen West Wall
+                appState.pitch = 10 * Math.PI / 180;
+                focusSelectedFurniture();
             });
             document.getElementById('obj-cam-iso').addEventListener('click', () => {
-                appState.yaw = 118 * Math.PI / 180;
-                appState.pitch = 26 * Math.PI / 180;
-                const cab = furnitureById['CAB_KITCHEN_1'];
-                if (cab) focusSingleObject(cab);
-                else focusSelectedObjects();
+                appState.yaw = 132 * Math.PI / 180;
+                appState.pitch = 22 * Math.PI / 180;
+                focusSelectedFurniture();
             });
 
             // Menu 1 (Walls & Stairs) Presets
@@ -2995,13 +3131,13 @@
                 applyPreset(allWalls.filter(w => w.floor === 'ground' && w.category === 'internal').map(w => w.id).concat(['STAIRS_1']));
             });
             document.getElementById('preset-ground-all').addEventListener('click', () => {
-                applyPreset(allWalls.filter(w => w.floor === 'ground').map(w => w.id).concat(['FLOOR_LOWER', 'TERRACE_UPPER', 'ROOF_GYM', 'ROOF_GARAGE', 'WALL_BAND', 'STAIRS_1', 'CAB_KITCHEN_1']));
+                applyPreset(allWalls.filter(w => w.floor === 'ground').map(w => w.id).concat(['FLOOR_LOWER', 'TERRACE_UPPER', 'ROOF_GYM', 'ROOF_GARAGE', 'WALL_BAND', 'STAIRS_1']).concat(allFurniture.map(fn => fn.id)));
             });
             document.getElementById('preset-first-all').addEventListener('click', () => {
                 applyPreset(allWalls.filter(w => w.floor === 'first').map(w => w.id).concat(['FLOOR_UPPER', 'TERRACE_UPPER', 'ROOF_UPPER', 'WALL_BAND', 'STAIRS_1']));
             });
             document.getElementById('preset-all-walls').addEventListener('click', () => {
-                applyPreset(allWalls.map(w => w.id).concat(['FLOOR_LOWER', 'FLOOR_UPPER', 'TERRACE_UPPER', 'ROOF_GYM', 'ROOF_GARAGE', 'ROOF_UPPER', 'STAIRS_1', 'CAB_KITCHEN_1']));
+                applyPreset(allWalls.map(w => w.id).concat(['FLOOR_LOWER', 'FLOOR_UPPER', 'TERRACE_UPPER', 'ROOF_GYM', 'ROOF_GARAGE', 'ROOF_UPPER', 'STAIRS_1']).concat(allFurniture.map(fn => fn.id)));
             });
             document.getElementById('preset-clear').addEventListener('click', () => {
                 appState.selectedIds.clear();
