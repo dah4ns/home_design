@@ -1231,10 +1231,12 @@
                 attribute vec4 aColor;
                 uniform mat4 uViewProj;
                 varying vec3 vNormal;
+                varying vec3 vWorldPos;
                 varying vec4 vColor;
                 void main() {
                     gl_Position = uViewProj * vec4(aPos, 1.0);
                     vNormal = aNormal;
+                    vWorldPos = aPos;
                     vColor = aColor;
                 }
             `;
@@ -1242,7 +1244,9 @@
             const fsSource = `
                 precision mediump float;
                 varying vec3 vNormal;
+                varying vec3 vWorldPos;
                 varying vec4 vColor;
+                uniform vec3 uEyePos;
                 void main() {
                     vec3 n = normalize(vNormal);
                     vec3 lightDir1 = normalize(vec3(-0.55, -0.45, 0.78));
@@ -1250,7 +1254,16 @@
                     float diff1 = max(dot(n, lightDir1), 0.0);
                     float diff2 = max(dot(n, lightDir2), 0.0);
                     float lighting = 0.42 + 0.42 * diff1 + 0.22 * diff2;
-                    gl_FragColor = vec4(vColor.rgb * lighting, vColor.a);
+                    float spec = 0.0;
+                    if (vColor.a > 0.965 && vColor.a < 0.975) {
+                        vec3 viewDir = normalize(uEyePos - vWorldPos);
+                        vec3 h1 = normalize(lightDir1 + viewDir);
+                        vec3 h2 = normalize(lightDir2 + viewDir);
+                        spec = pow(max(dot(n, h1), 0.0), 40.0) * 0.46 + pow(max(dot(n, h2), 0.0), 22.0) * 0.20;
+                    }
+                    vec3 col = clamp(vColor.rgb * lighting + vec3(spec), 0.0, 1.0);
+                    float outAlpha = (vColor.a > 0.965 && vColor.a < 0.975) ? 0.99 : vColor.a;
+                    gl_FragColor = vec4(col, outAlpha);
                 }
             `;
 
@@ -1433,10 +1446,25 @@
                     }
                 }
 
-                function pushConvexLoop3D(loop3D, normal, rgba, targetArr) {
+                function pushConvexLoop3D(loop3D, normal, rgba, targetArr, vertexNormals3D) {
                     if (!Array.isArray(loop3D) || loop3D.length < 3) return;
+                    const arr = targetArr || meshVerts;
+                    const hasVNormals = Array.isArray(vertexNormals3D) && vertexNormals3D.length === loop3D.length;
                     for (let i = 1; i + 1 < loop3D.length; i++) {
-                        pushTri(loop3D[0], loop3D[i], loop3D[i + 1], normal, rgba, targetArr);
+                        if (hasVNormals) {
+                            const idxList = [0, i, i + 1];
+                            for (let k = 0; k < 3; k++) {
+                                const pt = loop3D[idxList[k]];
+                                const vn = vertexNormals3D[idxList[k]] || normal;
+                                arr.push(
+                                    pt[0] / 1000, pt[1] / 1000, pt[2] / 1000,
+                                    vn[0], vn[1], vn[2],
+                                    rgba[0], rgba[1], rgba[2], rgba[3]
+                                );
+                            }
+                        } else {
+                            pushTri(loop3D[0], loop3D[i], loop3D[i + 1], normal, rgba, targetArr);
+                        }
                     }
                 }
 
@@ -2017,9 +2045,13 @@
                                 ? [0.42, 0.33, 0.27, 0.90]
                                 : (part.role === 'worktop'
                                     ? [0.68, 0.60, 0.48, 0.94]
-                                    : [0.56, 0.42, 0.28, 0.92]);
+                                    : ((part.role === 'sink_basin' || part.role === 'sink_drain' || part.role === 'sink_faucet')
+                                        ? [0.34, 0.39, 0.45, 0.94]
+                                        : [0.56, 0.42, 0.28, 0.92]));
+                            const isMetallicPart = (part.role === 'sink_faucet' || part.role === 'sink_basin' || part.role === 'sink_drain');
+                            const partAlpha = isMetallicPart ? 0.97 : 0.98;
                             (part.faces3D || []).forEach(face => {
-                                pushConvexLoop3D(face.loop3D, face.normal || [0, 0, 1], [rgb[0], rgb[1], rgb[2], 0.98]);
+                                pushConvexLoop3D(face.loop3D, face.normal || [0, 0, 1], [rgb[0], rgb[1], rgb[2], partAlpha], null, face.vertexNormals3D);
                                 if (!face.noWireframe) {
                                     pushLoopLines(face.loop3D, wireColor);
                                 }
@@ -2040,7 +2072,7 @@
                             const rgb = part.colorRgb || [0.63, 0.48, 0.38];
                             if (part.role === 'vitrine_glass') {
                                 (part.faces3D || []).forEach(face => {
-                                    pushConvexLoop3D(face.loop3D, face.normal || [-1, 0, 0], [rgb[0], rgb[1], rgb[2], 0.34], glassVerts);
+                                    pushConvexLoop3D(face.loop3D, face.normal || [-1, 0, 0], [rgb[0], rgb[1], rgb[2], 0.34], glassVerts, face.vertexNormals3D);
                                     if (!face.noWireframe) {
                                         pushLoopLines(face.loop3D, [0.22, 0.74, 0.97, 0.92]);
                                     }
@@ -2060,8 +2092,9 @@
                             } else if (part.role === 'vitrine_frame') {
                                 wireColor = [0.34, 0.24, 0.15, 0.96];
                             }
+                            const frontAlpha = (part.role === 'handle_rail') ? 0.97 : 0.99;
                             (part.faces3D || []).forEach(face => {
-                                pushConvexLoop3D(face.loop3D, face.normal || [0, 1, 0], [rgb[0], rgb[1], rgb[2], 0.99]);
+                                pushConvexLoop3D(face.loop3D, face.normal || [0, 1, 0], [rgb[0], rgb[1], rgb[2], frontAlpha], null, face.vertexNormals3D);
                                 if (!face.noWireframe) {
                                     pushLoopLines(face.loop3D, wireColor);
                                 }
@@ -2174,6 +2207,7 @@
                 if (meshVerts.length > 0) {
                     gl.useProgram(meshProg);
                     gl.uniformMatrix4fv(gl.getUniformLocation(meshProg, 'uViewProj'), false, viewProj);
+                    gl.uniform3f(gl.getUniformLocation(meshProg, 'uEyePos'), eye[0], eye[1], eye[2]);
                     gl.bindBuffer(gl.ARRAY_BUFFER, meshBuffer);
                     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(meshVerts), gl.DYNAMIC_DRAW);
 
@@ -2212,6 +2246,7 @@
                     gl.depthMask(false);
                     gl.useProgram(meshProg);
                     gl.uniformMatrix4fv(gl.getUniformLocation(meshProg, 'uViewProj'), false, viewProj);
+                    gl.uniform3f(gl.getUniformLocation(meshProg, 'uEyePos'), eye[0], eye[1], eye[2]);
                     gl.bindBuffer(gl.ARRAY_BUFFER, meshBuffer);
                     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(glassVerts), gl.DYNAMIC_DRAW);
 
@@ -2658,8 +2693,12 @@
                 const oq = appState.objectSearchQuery.trim().toLowerCase();
                 const furnGroups = [
                     {
+                        title: 'Kitchen Countertop & 90cm Sink Fixture (KITCHEN_COUNTERTOP, KITCHEN_SINK_N2)',
+                        filter: fn => fn.id === 'KITCHEN_COUNTERTOP' || fn.id === 'KITCHEN_SINK_N2'
+                    },
+                    {
                         title: 'Kitchen North Wall (EW_NORTH_RECESSED — CAB_KITCHEN_N1..N8)',
-                        filter: fn => fn.hostWallId === 'EW_NORTH_RECESSED'
+                        filter: fn => fn.hostWallId === 'EW_NORTH_RECESSED' && fn.id.indexOf('CAB_KITCHEN_') === 0
                     },
                     {
                         title: 'Kitchen West Wall — Base Cabinets (GW_3 — CAB_KITCHEN_W1..W5)',
@@ -3069,7 +3108,7 @@
                 focusSelectedFurniture();
             });
             document.getElementById('preset-cab-west-only').addEventListener('click', () => {
-                const westIds = allFurniture.filter(fn => fn.hostWallId === 'GW_3').map(fn => fn.id);
+                const westIds = allFurniture.filter(fn => fn.hostWallId === 'GW_3' || fn.id === 'KITCHEN_COUNTERTOP').map(fn => fn.id);
                 appState.selectedIds = new Set(westIds.concat(['GW_3', 'FLOOR_LOWER']));
                 appState.yaw = 172 * Math.PI / 180;
                 appState.pitch = 16 * Math.PI / 180;

@@ -539,7 +539,7 @@
       <a href="building_3d.html" class="back-link" style="background: rgba(245,158,11,0.14); border-color: rgba(245,158,11,0.3); color: #fcd34d;">3D Orbit</a>
       <div class="title-group">
         <h1>3D Walkthrough &amp; Interior Explorer</h1>
-        <p>Full Facade + Plain White Interior + See-Through Windows</p>
+        <p>Full Facade + Interior + 3D Kitchen &amp; Dining Furniture + See-Through Windows</p>
       </div>
     </div>
 
@@ -551,6 +551,7 @@
       <button class="mode-btn" id="floorGroundBtn" title="Switch to Ground Floor (Parter 0.00 m)">Parter (0.0m)</button>
       <button class="mode-btn" id="floorUpperBtn" title="Switch to Upper Floor (Piętro +3.33 m)">Piętro (+3.33m)</button>
       <div class="mode-sep"></div>
+      <button class="mode-btn active" id="toggleFurnitureTopBtn" title="Toggle 3D Kitchen &amp; Dining Room Furniture, Countertop, Sink &amp; Faucet">🗄️ Furniture: ON</button>
       <button class="mode-btn" id="pointerLockBtn" title="Lock mouse cursor for FPS look-around (Esc to exit)">🎯 Mouse Look</button>
     </div>
 
@@ -634,11 +635,19 @@
       </div>
 
       <div class="toggle-grid">
+        <label class="toggle-chip" title="Show or hide 3D Kitchen &amp; Dining Room Furniture, Stone Countertop, Sink &amp; Faucet">
+          <input type="checkbox" id="showFurnitureToggle" checked>
+          <span>🗄️ Furniture</span>
+        </label>
+        <label class="toggle-chip" title="Show or hide Cabinet Doors, Drawer Fronts &amp; Vitrine Glass to inspect interiors">
+          <input type="checkbox" id="showCabinetFrontsToggle" checked>
+          <span>🚪 Cabinet Fronts</span>
+        </label>
         <label class="toggle-chip" title="Open Front Door Z1 &amp; Garage Door Z2 so you can walk straight inside">
           <input type="checkbox" id="openDoorsToggle" checked>
           <span>🚪 Open Doors</span>
         </label>
-        <label class="toggle-chip" title="Walk through solid walls without collision">
+        <label class="toggle-chip" title="Walk through solid walls and furniture without collision">
           <input type="checkbox" id="ghostModeToggle">
           <span>👻 Ghost Mode</span>
         </label>
@@ -691,6 +700,7 @@
   <!-- Data & Geometry Services -->
   <script src="data/walls.js"></script>
   <script src="data/windows.js"></script>
+  <script src="data/furniture.js"></script>
   <script src="js/wall-service.js"></script>
 
   <script>
@@ -760,8 +770,8 @@
         { id: 'gf_vestibule', label: '0.04 Wiatrołap', x: 17800, y: 9770, footZ: 0, yaw: Math.PI, pitch: -0.02 },
         { id: 'gf_hall_stairs', label: '0.07 Hall & Stairs', x: 15675, y: 10350, footZ: 0, yaw: -1.85, pitch: 0.02 },
         { id: 'gf_living', label: '0.11 Salon (Living)', x: 2800, y: 9200, footZ: 0, yaw: -0.45, pitch: 0.05 },
-        { id: 'gf_dining', label: '0.12 Jadalnia', x: 8800, y: 9200, footZ: 0, yaw: -2.65, pitch: 0.0 },
-        { id: 'gf_kitchen', label: '0.13 Kuchnia', x: 9200, y: 4800, footZ: 0, yaw: 1.85, pitch: -0.02 },
+        { id: 'gf_dining', label: '0.12 Jadalnia', x: 8650, y: 8900, footZ: 0, yaw: -0.58, pitch: -0.04 },
+        { id: 'gf_kitchen', label: '0.13 Kuchnia', x: 9600, y: 5350, footZ: 0, yaw: -1.35, pitch: -0.10 },
         { id: 'gf_study', label: '0.15 Gabinet (NE)', x: 2100, y: 4600, footZ: 0, yaw: -1.25, pitch: 0.0 },
         { id: 'gf_gym', label: '0.10 Siłownia (Gym)', x: 17600, y: 18200, footZ: 0, yaw: -2.25, pitch: 0.0 },
         { id: 'gf_garage', label: '0.01 Garaż', x: 17200, y: 3200, footZ: 0, yaw: 0.0, pitch: -0.02 }
@@ -839,6 +849,7 @@
         'uniform float uUseTex;',
         'uniform float uIsGlass;',
         'uniform float uIsInteriorWall;',
+        'uniform float uIsMetallic;',
         'uniform vec3 uSunDir;',
         'uniform vec3 uCamPos;',
         'uniform sampler2D uSampler;',
@@ -881,6 +892,15 @@
         '  float hemi = 0.5 + 0.5 * n.z;',
         '  float light = 0.46 + 0.34 * dSun + 0.12 * dFill1 + 0.08 * dFill2 + 0.06 * hemi;',
         '  vec3 litColor = base * clamp(light, 0.38, 1.08);',
+        '  if (uIsMetallic > 0.5) {',
+        '    vec3 viewDir = normalize(uCamPos - vWorldPos);',
+        '    vec3 hSun = normalize(lSun + viewDir);',
+        '    vec3 hFill = normalize(lFill1 + viewDir);',
+        '    float spec1 = pow(max(dot(n, hSun), 0.0), 42.0);',
+        '    float spec2 = pow(max(dot(n, hFill), 0.0), 20.0);',
+        '    float fres = pow(1.0 - max(dot(n, viewDir), 0.0), 3.0);',
+        '    litColor = litColor * 0.92 + vec3(0.36, 0.38, 0.40) * spec1 + vec3(0.16, 0.18, 0.20) * spec2 + vec3(0.08, 0.10, 0.12) * fres;',
+        '  }',
         '  gl_FragColor = vec4(litColor, uAlpha);',
         '}'
       ].join('\n');
@@ -908,6 +928,7 @@
       var uUseTexLoc = gl.getUniformLocation(prog, 'uUseTex');
       var uIsGlassLoc = gl.getUniformLocation(prog, 'uIsGlass');
       var uIsInteriorWallLoc = gl.getUniformLocation(prog, 'uIsInteriorWall');
+      var uIsMetallicLoc = gl.getUniformLocation(prog, 'uIsMetallic');
       var uSunDirLoc = gl.getUniformLocation(prog, 'uSunDir');
       var uCamPosLoc = gl.getUniformLocation(prog, 'uCamPos');
       var uSamplerLoc = gl.getUniformLocation(prog, 'uSampler');
@@ -1201,9 +1222,13 @@
           texKey: props.texKey || null,
           isGlass: !!props.isGlass,
           isInteriorWall: !!props.isInteriorWall,
+          isMetallic: !!props.isMetallic,
           isRoof: !!props.isRoof,
           isWallTopCap: !!props.isWallTopCap,
           isTree: !!props.isTree,
+          isFurniture: !!props.isFurniture,
+          isFurnitureFront: !!props.isFurnitureFront,
+          drawMode: props.drawMode || gl.TRIANGLES,
           center: props.center || [10000, 10000, 1500]
         };
       }
@@ -2200,6 +2225,214 @@
         opaqueMeshes.push(uploadMesh(bWoodDoor, { color: [0.22, 0.24, 0.23] }));
         opaqueMeshes.push(uploadMesh(bTreeTrunk, { color: [0.38, 0.26, 0.18], isTree: true }));
         opaqueMeshes.push(uploadMesh(bTreeFoliage, { color: [0.22, 0.42, 0.24], isTree: true }));
+
+        // =====================================================================
+        // 7D. 3D KITCHEN & DINING ROOM FURNITURE, COUNTERTOP, SINK & FAUCET
+        // =====================================================================
+        var furnList = (typeof WallService.getFurniture3D === 'function')
+          ? WallService.getFurniture3D()
+          : [];
+        furnitureItems3D = furnList;
+
+        var furnBuckets = {};
+        var bFurnLinesSkeletonWood = createBuilder();
+        var bFurnLinesSkeletonStone = createBuilder();
+        var bFurnLinesSkeletonMetal = createBuilder();
+        var bFurnLinesFrontWood = createBuilder();
+        var bFurnLinesFrontMetal = createBuilder();
+
+        // Inset furniture vertices 1.5 mm away from room walls/floor so back/side/bottom panels never Z-fight
+        function adjustFurnPt(pt, furnNormal, isFront) {
+          var x = pt[0], y = pt[1], z = pt[2];
+          if (y <= 3171.5) y = 3171.5;
+          if (x >= 11913.5) x = 11913.5;
+          if (x <= 6516.5 && y <= 6300) x = 6516.5;
+          if (z <= 1.5) z = 1.5;
+          if (isFront && furnNormal) {
+            x += (furnNormal[0] || 0) * 0.6;
+            y += (furnNormal[1] || 0) * 0.6;
+            z += (furnNormal[2] || 0) * 0.6;
+          }
+          return [x, y, z];
+        }
+
+        function addFurnLineSeg(b, p0, p1) {
+          b.verts.push(
+            p0[0], p0[1], p0[2], 0, 0, 1, 0, 0,
+            p1[0], p1[1], p1[2], 0, 0, 1, 0, 0
+          );
+        }
+
+        function addFurnFaceLoop(b, loop3D, faceNormal, vertexNormals3D, furnNormal, isFront, lineBuilder) {
+          if (!loop3D || loop3D.length < 3) return;
+          var adj = loop3D.map(function (pt) {
+            return adjustFurnPt(pt, furnNormal, isFront);
+          });
+          var fn = faceNormal || computeFaceNormal(adj[0], adj[1], adj[2]);
+          var hasVN = Array.isArray(vertexNormals3D) && vertexNormals3D.length === adj.length;
+
+          for (var i = 1; i + 1 < adj.length; i++) {
+            var p0 = adj[0], p1 = adj[i], p2 = adj[i + 1];
+            var n0 = hasVN ? vertexNormals3D[0] : fn;
+            var n1 = hasVN ? vertexNormals3D[i] : fn;
+            var n2 = hasVN ? vertexNormals3D[i + 1] : fn;
+            b.verts.push(
+              p0[0], p0[1], p0[2], n0[0], n0[1], n0[2], 0, 0,
+              p1[0], p1[1], p1[2], n1[0], n1[1], n1[2], 1, 0,
+              p2[0], p2[1], p2[2], n2[0], n2[1], n2[2], 1, 1
+            );
+          }
+
+          if (lineBuilder) {
+            for (var k = 0; k < adj.length; k++) {
+              addFurnLineSeg(lineBuilder, adj[k], adj[(k + 1) % adj.length]);
+            }
+          }
+        }
+
+        function processFurniturePart(part, furnNormal, isFront) {
+          var rgb = part.colorRgb || (isFront ? [0.63, 0.48, 0.38] : [0.76, 0.60, 0.42]);
+          var role = part.role || '';
+
+          // Translucent vitrine glass doors go to the back-to-front sorted glass pass
+          if (role === 'vitrine_glass') {
+            (part.faces3D || []).forEach(function (face) {
+              var lp = face.loop3D;
+              if (!lp || lp.length < 3) return;
+              var bGlass = createBuilder();
+              addFurnFaceLoop(bGlass, lp, face.normal || [-1, 0, 0], face.vertexNormals3D, furnNormal, true, bFurnLinesFrontMetal);
+              var cx = 0, cy = 0, cz = 0;
+              for (var k = 0; k < lp.length; k++) {
+                cx += lp[k][0];
+                cy += lp[k][1];
+                cz += lp[k][2];
+              }
+              cx /= lp.length; cy /= lp.length; cz /= lp.length;
+              transparentMeshes.push(uploadMesh(bGlass, {
+                color: [rgb[0], rgb[1], rgb[2]],
+                alpha: 0.28,
+                isGlass: true,
+                isFurniture: true,
+                isFurnitureFront: true,
+                center: [cx, cy, cz]
+              }));
+            });
+            return;
+          }
+
+          var isMetallic = (
+            role === 'sink_faucet' ||
+            role === 'sink_basin' ||
+            role === 'sink_drain' ||
+            role === 'handle_rail' ||
+            role === 'appliance_front' ||
+            role === 'appliance_window'
+          );
+
+          var colorKey =
+            (isFront ? 'F_' : 'S_') +
+            (isMetallic ? 'M_' : 'P_') +
+            Math.round(rgb[0] * 255) + '_' +
+            Math.round(rgb[1] * 255) + '_' +
+            Math.round(rgb[2] * 255);
+
+          if (!furnBuckets[colorKey]) {
+            furnBuckets[colorKey] = {
+              builder: createBuilder(),
+              color: [rgb[0], rgb[1], rgb[2]],
+              isFront: isFront,
+              isMetallic: isMetallic
+            };
+          }
+
+          var lineTarget = isFront
+            ? ((isMetallic || role === 'handle_bar') ? bFurnLinesFrontMetal : bFurnLinesFrontWood)
+            : (isMetallic
+                ? bFurnLinesSkeletonMetal
+                : (role === 'countertop_slab' ? bFurnLinesSkeletonStone : bFurnLinesSkeletonWood));
+
+          var targetBuilder = furnBuckets[colorKey].builder;
+          (part.faces3D || []).forEach(function (face) {
+            var lb = face.noWireframe ? null : lineTarget;
+            addFurnFaceLoop(targetBuilder, face.loop3D, face.normal, face.vertexNormals3D, furnNormal, isFront, lb);
+          });
+
+          if (Array.isArray(part.wireframeLines3D)) {
+            part.wireframeLines3D.forEach(function (poly) {
+              for (var i = 0; i + 1 < poly.length; i++) {
+                addFurnLineSeg(
+                  lineTarget,
+                  adjustFurnPt(poly[i], furnNormal, isFront),
+                  adjustFurnPt(poly[i + 1], furnNormal, isFront)
+                );
+              }
+            });
+          }
+        }
+
+        furnList.forEach(function (furn) {
+          var fn = furn.normal || [0, 1, 0];
+          (furn.skeletonParts3D || []).forEach(function (part) {
+            processFurniturePart(part, fn, false);
+          });
+          (furn.frontParts3D || []).forEach(function (part) {
+            processFurniturePart(part, fn, true);
+          });
+        });
+
+        Object.keys(furnBuckets).forEach(function (key) {
+          var bInfo = furnBuckets[key];
+          if (bInfo.builder.verts.length > 0) {
+            opaqueMeshes.push(uploadMesh(bInfo.builder, {
+              color: bInfo.color,
+              isFurniture: true,
+              isFurnitureFront: bInfo.isFront,
+              isMetallic: bInfo.isMetallic
+            }));
+          }
+        });
+
+        // Upload subtle architectural edge lines for cabinets, drawers, countertop, and appliances
+        if (bFurnLinesSkeletonWood.verts.length > 0) {
+          opaqueMeshes.push(uploadMesh(bFurnLinesSkeletonWood, {
+            color: [0.44, 0.32, 0.21],
+            isFurniture: true,
+            isFurnitureFront: false,
+            drawMode: gl.LINES
+          }));
+        }
+        if (bFurnLinesSkeletonStone.verts.length > 0) {
+          opaqueMeshes.push(uploadMesh(bFurnLinesSkeletonStone, {
+            color: [0.68, 0.65, 0.60],
+            isFurniture: true,
+            isFurnitureFront: false,
+            drawMode: gl.LINES
+          }));
+        }
+        if (bFurnLinesSkeletonMetal.verts.length > 0) {
+          opaqueMeshes.push(uploadMesh(bFurnLinesSkeletonMetal, {
+            color: [0.42, 0.45, 0.49],
+            isFurniture: true,
+            isFurnitureFront: false,
+            drawMode: gl.LINES
+          }));
+        }
+        if (bFurnLinesFrontWood.verts.length > 0) {
+          opaqueMeshes.push(uploadMesh(bFurnLinesFrontWood, {
+            color: [0.36, 0.25, 0.16],
+            isFurniture: true,
+            isFurnitureFront: true,
+            drawMode: gl.LINES
+          }));
+        }
+        if (bFurnLinesFrontMetal.verts.length > 0) {
+          opaqueMeshes.push(uploadMesh(bFurnLinesFrontMetal, {
+            color: [0.32, 0.36, 0.40],
+            isFurniture: true,
+            isFurnitureFront: true,
+            drawMode: gl.LINES
+          }));
+        }
       }
 
       // =========================================================================
@@ -2213,6 +2446,11 @@
       var ghostMode = false;
       var showTrees = true;
       var hideRoof = false;
+      var showFurniture = true;
+      var showCabinetFronts = true;
+      var furnitureItems3D = (typeof WallService.getFurniture3D === 'function')
+        ? WallService.getFurniture3D()
+        : [];
 
       // Player state in canonical mm: start on the West front entry walkway looking at the house
       var footZ = -20;
@@ -2282,6 +2520,23 @@
         // Staircase South balustrade & West entry cheek on Ground Floor (prevents walking sideways into mid-air steps)
         gBoxes.push({ x0: 11910, x1: 15175, y0: 9310, y1: 9380, wallId: 'STAIR_BALUSTRADE_GF' });
         gBoxes.push({ x0: 15135, x1: 15175, y0: 9370, y1: 9640, wallId: 'STAIR_TURN_CHEEK_GF' });
+
+        // Floor-standing kitchen & dining room cabinets block walking when showFurniture is ON
+        if (showFurniture && Array.isArray(furnitureItems3D)) {
+          furnitureItems3D.forEach(function (furn) {
+            if ((furn.zBottom || 0) < 400 && furn.xMin !== undefined && furn.xMax !== undefined) {
+              gBoxes.push({
+                x0: furn.xMin,
+                x1: furn.xMax,
+                y0: furn.yMin,
+                y1: furn.yMax,
+                wallId: furn.id,
+                isFurniture: true
+              });
+            }
+          });
+        }
+
         groundSegments = gBoxes;
 
         var uBoxes = [];
@@ -2680,7 +2935,9 @@
         glassOpacity = parseInt(glassAlphaSlider.value, 10) / 100;
         glassAlphaVal.textContent = glassAlphaSlider.value + '%';
         transparentMeshes.forEach(function (m) {
-          m.alpha = glassOpacity;
+          if (!m.isFurniture) {
+            m.alpha = glassOpacity;
+          }
         });
       });
 
@@ -2708,6 +2965,38 @@
         sunAzimuthDeg = parseInt(sunAngleSlider.value, 10);
         sunAngleVal.textContent = sunAzimuthDeg + '°';
       });
+
+      var showFurnitureToggleEl = document.getElementById('showFurnitureToggle');
+      var toggleFurnitureTopBtnEl = document.getElementById('toggleFurnitureTopBtn');
+      var showCabinetFrontsToggleEl = document.getElementById('showCabinetFrontsToggle');
+
+      function setShowFurnitureState(enabled) {
+        showFurniture = !!enabled;
+        if (showFurnitureToggleEl) showFurnitureToggleEl.checked = showFurniture;
+        if (toggleFurnitureTopBtnEl) {
+          toggleFurnitureTopBtnEl.classList.toggle('active', showFurniture);
+          toggleFurnitureTopBtnEl.textContent = showFurniture ? '🗄️ Furniture: ON' : '🗄️ Furniture: OFF';
+        }
+        buildCollisionSegments();
+      }
+
+      if (showFurnitureToggleEl) {
+        showFurnitureToggleEl.addEventListener('change', function (e) {
+          setShowFurnitureState(e.target.checked);
+        });
+      }
+
+      if (toggleFurnitureTopBtnEl) {
+        toggleFurnitureTopBtnEl.addEventListener('click', function () {
+          setShowFurnitureState(!showFurniture);
+        });
+      }
+
+      if (showCabinetFrontsToggleEl) {
+        showCabinetFrontsToggleEl.addEventListener('change', function (e) {
+          showCabinetFronts = e.target.checked;
+        });
+      }
 
       document.getElementById('openDoorsToggle').addEventListener('change', function (e) {
         openDoorsState = e.target.checked;
@@ -2942,10 +3231,43 @@
           mmCtx.restore();
         }
 
+        // Ground Floor 3D Furniture & Fixtures overlay on Mini-Map
+        if (minimapFloor === 0 && showFurniture && Array.isArray(furnitureItems3D)) {
+          mmCtx.save();
+          furnitureItems3D.forEach(function (furn) {
+            if ((furn.zBottom || 0) > 1000) return; // Skip upper wall cabinets so base footprints are clear
+            var fp = furn.footprint2D;
+            if (Array.isArray(fp) && fp.length >= 3) {
+              mmCtx.beginPath();
+              for (var fi = 0; fi < fp.length; fi++) {
+                var fpt = worldToMinimap(fp[fi][0], fp[fi][1]);
+                if (fi === 0) mmCtx.moveTo(fpt[0], fpt[1]);
+                else mmCtx.lineTo(fpt[0], fpt[1]);
+              }
+              mmCtx.closePath();
+              if (furn.id === 'KITCHEN_SINK_N2') {
+                mmCtx.fillStyle = 'rgba(148, 163, 184, 0.75)';
+                mmCtx.strokeStyle = 'rgba(226, 232, 240, 0.9)';
+              } else if (furn.id === 'KITCHEN_COUNTERTOP') {
+                mmCtx.fillStyle = 'rgba(241, 245, 249, 0.25)';
+                mmCtx.strokeStyle = 'rgba(226, 232, 240, 0.55)';
+              } else {
+                mmCtx.fillStyle = 'rgba(217, 119, 6, 0.36)';
+                mmCtx.strokeStyle = 'rgba(251, 191, 36, 0.68)';
+              }
+              mmCtx.lineWidth = 1;
+              mmCtx.fill();
+              mmCtx.stroke();
+            }
+          });
+          mmCtx.restore();
+        }
+
         // Building walls
         var boxes = (minimapFloor === 1) ? upperSegments : groundSegments;
         mmCtx.fillStyle = 'rgba(255, 255, 255, 0.78)';
         boxes.forEach(function (b) {
+          if (b.isFurniture) return;
           var bx0 = b.x0, bx1 = b.x1, by0 = b.y0, by1 = b.y1;
           if (minimapFloor === 1) {
             // Omit High Living Room double-height exterior walls (UW_EAST, UW_TERRACE_BACK) and invisible guardrail collision boxes
@@ -3141,6 +3463,7 @@
         gl.uniform1f(uAlphaLoc, m.alpha);
         gl.uniform1f(uIsGlassLoc, m.isGlass ? 1.0 : 0.0);
         gl.uniform1f(uIsInteriorWallLoc, m.isInteriorWall ? 1.0 : 0.0);
+        gl.uniform1f(uIsMetallicLoc, m.isMetallic ? 1.0 : 0.0);
 
         if (m.texKey && textures[m.texKey]) {
           gl.uniform1f(uUseTexLoc, 1.0);
@@ -3151,7 +3474,14 @@
           gl.uniform1f(uUseTexLoc, 0.0);
         }
 
-        gl.drawArrays(gl.TRIANGLES, 0, m.count);
+        var mode = m.drawMode || gl.TRIANGLES;
+        if (mode === gl.LINES) {
+          gl.disable(gl.POLYGON_OFFSET_FILL);
+        } else {
+          gl.enable(gl.POLYGON_OFFSET_FILL);
+          gl.polygonOffset(1.0, 1.0);
+        }
+        gl.drawArrays(mode, 0, m.count);
       }
 
       function frame(now) {
@@ -3198,7 +3528,7 @@
         gl.uniform3fv(uSunDirLoc, sunDir);
         gl.uniform3fv(uCamPosLoc, camPos);
 
-        // 1. Opaque Pass (Exterior Facades, Plain Interior Walls, Floors, Stairs, Window Frames)
+        // 1. Opaque Pass (Exterior Facades, Plain Interior Walls, Floors, Stairs, Window Frames, 3D Furniture)
         gl.disable(gl.BLEND);
         gl.depthMask(true);
         for (var i = 0; i < opaqueMeshes.length; i++) {
@@ -3206,6 +3536,8 @@
           if (m.isRoof && hideRoof) continue;
           if (m.isWallTopCap && !hideRoof) continue;
           if (m.isTree && !showTrees) continue;
+          if (m.isFurniture && !showFurniture) continue;
+          if (m.isFurnitureFront && !showCabinetFronts) continue;
           renderMesh(m);
         }
 
@@ -3221,7 +3553,10 @@
         });
 
         for (var j = 0; j < transparentMeshes.length; j++) {
-          renderMesh(transparentMeshes[j]);
+          var tm = transparentMeshes[j];
+          if (tm.isFurniture && !showFurniture) continue;
+          if (tm.isFurnitureFront && !showCabinetFronts) continue;
+          renderMesh(tm);
         }
         gl.depthMask(true);
 
