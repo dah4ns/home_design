@@ -3018,6 +3018,30 @@
                     [95, 6110],
                     [6315, 6110]
                 ]
+            },
+            {
+                id: 'CEILING_KITCHEN_DINING',
+                name: 'CEILING_KITCHEN_DINING — Suspended Ceiling Over 0.13 Kuchnia & 0.12 Jadalnia (+2.80..+2.815 m)',
+                floor: 'ground',
+                category: 'ceiling',
+                zBottom: 2800,
+                zTop: 2815,
+                thickness: 15,
+                areaM2: 42.17,
+                rooms: '0.13 Kuchnia & 0.12 Jadalnia Suspended Ceiling (+2.80..+2.815 m)',
+                specs: 'Single monolithic orthogonal suspended gypsum ceiling • Z = 2,800..2,815 mm (15 mm = 1.5 cm thick starting at 280 cm from the floor) • Aligned flush with FLOOR_UPPER and vertical walls FW_9_EAST (X = 6,315 mm for Y = 6,290..11,200 mm), FW_8_WEST (X = 10,695 mm for Y = 9,370..11,200 mm), Upper Gallery South face (Y = 9,370 mm for X = 10,695..11,910 mm), and Stairwell East face (X = 11,910 mm for Y = 8,360..9,370 mm)',
+                footprint2D: [
+                    [11915, 3170],
+                    [6495, 3170],
+                    [6495, 6290],
+                    [6315, 6290],
+                    [6315, 11200],
+                    [10695, 11200],
+                    [10695, 9370],
+                    [11910, 9370],
+                    [11910, 8360],
+                    [11915, 8360]
+                ]
             }
         ]
     };

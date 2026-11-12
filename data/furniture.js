@@ -2834,13 +2834,300 @@
             description: '90 cm commercial-style brushed stainless steel undermount single-bowl kitchen sink (Zlew) installed inside the wide top cavity of CAB_KITCHEN_N2 beneath the KITCHEN_COUNTERTOP cutout, complete with X-shaped drainage creases on the basin floor, circular perforated basket strainer drain, rear overflow escutcheon, and a tall pull-down spring-coil gooseneck mixer faucet with spray head docking bracket and side lever handle.',
             skeleton: buildKitchenSinkParts(),
             fronts: []
+        },
+
+        // =====================================================================
+        // 25. KITCHEN_ISLAND: Freestanding 2,400 × 1,000 × 920 mm Waterfall Kitchen Island
+        //     with 80 mm Stone Waterfall Countertop & Side Legs, 20 mm Wood Fillers,
+        //     Stacked-Drawer Carcasses (600 + 1,000 + 600 mm on North side, 2,240 mm on South side),
+        //     and 900 mm Flush Induction Hob (Indukcja). Fronts left empty ([]) for later design.
+        // =====================================================================
+        {
+            id: 'KITCHEN_ISLAND',
+            aliasIds: ['ISLAND', 'CAB_KITCHEN_ISLAND'],
+            name: 'KITCHEN_ISLAND — Freestanding Waterfall Kitchen Island & 90cm Induction Hob (2400×1000×920mm)',
+            shortName: 'Kitchen Island (2400×1000×920mm)',
+            category: 'island',
+            subtype: 'kitchen_island_waterfall',
+            floor: 'ground',
+            room: '0.13 Kuchnia',
+            hostWallId: 'EW_NORTH_RECESSED',
+            viewId: 'kitchen_island_front',
+            x1: 7715,
+            x2: 10115,
+            y1: 5420,
+            y2: 6420,
+            zBottom: 0,
+            zTop: 927,
+            widthMm: 2400,
+            depthMm: 1000,
+            carcassDepthMm: 980,
+            frontThicknessMm: 20,
+            plinthHeightMm: 0,
+            plinthRecessMm: 0,
+            bodyHeightMm: 840,
+            worktopThicknessMm: 80,
+            heightMm: 920,
+            boardThicknessMm: BOARD_MM,
+            normal: [0, -1, 0],
+            specs: '2,400 × 1,000 × 920 mm (X = 7,715..10,115 mm, Y = 5,420..6,420 mm, Z = 0..920 mm; 1,650 mm South of North cabinets, 1,200 mm East of West cabinets): 80 mm stone waterfall top & side legs + North side (20 mm filler + 600 + 1,000 + 600 mm 2-drawer cabinets with Gola aluminum handle rails + 20 mm filler) + South side (300 mm deep seating overhang with 2,240 × 840 mm back panel at Y = 6,120 mm, no shelves) + 900 × 520 mm Induction Hob (Indukcja) at Z = 920..927 mm',
+            description: 'Freestanding waterfall kitchen island positioned 1,650 mm South of the North Wall cabinets (Y = 5,420..6,420 mm) and 1,200 mm from both the West Wall base cabinets and East Kitchen wall (X = 7,715..10,115 mm). Comprises an 80 mm thick stone waterfall countertop and 80 mm vertical waterfall side panels (Z = 0..920 mm), three North-facing 2-drawer base cabinets (600 + 1,000 + 600 mm, Z = 0..840 mm split horizontally into 420 + 420 mm tiers with wood drawer fronts and 30 mm Gola aluminum handle rails) flanked by 20 mm brown filler strips, a South-facing 2,240 × 840 mm back panel recessed 300 mm (30 cm) in from the South edge (Y = 6,120 mm) with no shelves, and a centered 900 mm black glass induction hob (Indukcja).',
+            skeleton: (function buildKitchenIslandSkeleton() {
+                const parts = [];
+                const xEastOut = 7715;
+                const xEastIn = 7795;   // 80 mm East waterfall leg (X = 7,715..7,795)
+                const xWestIn = 10035;  // 80 mm West waterfall leg (X = 10,035..10,115)
+                const xWestOut = 10115;
+                const yNorth = 5420;    // North / Kitchen-facing front of island (outer face of 20mm fronts)
+                const yCarcassFront = yNorth + 20; // 5440 mm (carcass front behind 20mm drawer fronts)
+                const yMid = 6020;      // 600 mm deep North cooking cabinet zone (Y = 5,420..6,020)
+                const ySouth = 6420;    // South / Dining-facing edge of island
+                const ySouthBack = ySouth - 300; // 300 mm (30 cm) recessed back panel from South edge (Y = 6,120)
+
+                // 1. 80 mm Stone Waterfall Countertop Slab & East/West Waterfall Side Legs (#E8DCC4)
+                parts.push(
+                    {
+                        id: 'KITCHEN_ISLAND_TOP_SLAB',
+                        name: '80mm Waterfall Stone Countertop Slab (2400×1000×80 mm Blat)',
+                        role: 'countertop_slab',
+                        material: 'stone_worktop',
+                        colorRgb: COLOR_WORKTOP,
+                        x0: xEastOut, x1: xWestOut,
+                        y0: yNorth, y1: ySouth,
+                        z0: 840, z1: 920
+                    },
+                    {
+                        id: 'KITCHEN_ISLAND_EAST_WATERFALL',
+                        name: 'East 80mm Stone Waterfall Side Panel (80×1000×840 mm)',
+                        role: 'countertop_slab',
+                        material: 'stone_worktop',
+                        colorRgb: COLOR_WORKTOP,
+                        x0: xEastOut, x1: xEastIn,
+                        y0: yNorth, y1: ySouth,
+                        z0: 0, z1: 840
+                    },
+                    {
+                        id: 'KITCHEN_ISLAND_WEST_WATERFALL',
+                        name: 'West 80mm Stone Waterfall Side Panel (80×1000×840 mm)',
+                        role: 'countertop_slab',
+                        material: 'stone_worktop',
+                        colorRgb: COLOR_WORKTOP,
+                        x0: xWestIn, x1: xWestOut,
+                        y0: yNorth, y1: ySouth,
+                        z0: 0, z1: 840
+                    }
+                );
+
+                // 2. North-Side 20 mm Wood Filler Strips (Blenda 20×600×840 mm at X = 7,795..7,815 and X = 10,015..10,035)
+                parts.push(
+                    {
+                        id: 'KITCHEN_ISLAND_EAST_FILLER',
+                        name: 'North-East 20mm Wood Filler Panel (20×600×840 mm Blenda)',
+                        role: 'carcass_panel',
+                        material: 'wood_tone',
+                        colorRgb: COLOR_WOOD_FRONT,
+                        x0: 7795, x1: 7815,
+                        y0: yNorth, y1: yMid,
+                        z0: 0, z1: 840
+                    },
+                    {
+                        id: 'KITCHEN_ISLAND_WEST_FILLER',
+                        name: 'North-West 20mm Wood Filler Panel (20×600×840 mm Blenda)',
+                        role: 'carcass_panel',
+                        material: 'wood_tone',
+                        colorRgb: COLOR_WOOD_FRONT,
+                        x0: 10015, x1: 10035,
+                        y0: yNorth, y1: yMid,
+                        z0: 0, z1: 840
+                    }
+                );
+
+                // Helper for the 3 North-facing stacked-drawer base carcasses (600 + 1,000 + 600 mm, Z = 0..840 mm split at Z = 420 mm)
+                function addNorthIslandCarcass(subId, label, cx0, cx1) {
+                    const cw = cx1 - cx0;
+                    parts.push(
+                        {
+                            id: `${subId}_EAST_PANEL`,
+                            name: `${label} — East Side Carcass Panel (18×580×840 mm)`,
+                            role: 'carcass_panel',
+                            material: 'carcass_melamine',
+                            colorRgb: COLOR_CARCASS_SIDE,
+                            x0: cx0, x1: cx0 + BOARD_MM,
+                            y0: yCarcassFront, y1: yMid,
+                            z0: 0, z1: 840
+                        },
+                        {
+                            id: `${subId}_WEST_PANEL`,
+                            name: `${label} — West Side Carcass Panel (18×580×840 mm)`,
+                            role: 'carcass_panel',
+                            material: 'carcass_melamine',
+                            colorRgb: COLOR_CARCASS_SIDE,
+                            x0: cx1 - BOARD_MM, x1: cx1,
+                            y0: yCarcassFront, y1: yMid,
+                            z0: 0, z1: 840
+                        },
+                        {
+                            id: `${subId}_BACK_PANEL`,
+                            name: `${label} — Rear Backing Panel (${cw - 2 * BOARD_MM}×18×840 mm)`,
+                            role: 'carcass_panel',
+                            material: 'carcass_melamine',
+                            colorRgb: COLOR_CARCASS_BACK,
+                            x0: cx0 + BOARD_MM, x1: cx1 - BOARD_MM,
+                            y0: yMid - BOARD_MM, y1: yMid,
+                            z0: 0, z1: 840
+                        },
+                        {
+                            id: `${subId}_BOTTOM_PANEL`,
+                            name: `${label} — Bottom Carcass Panel (${cw - 2 * BOARD_MM}×562×18 mm)`,
+                            role: 'carcass_panel',
+                            material: 'carcass_melamine',
+                            colorRgb: COLOR_CARCASS_SHELF,
+                            x0: cx0 + BOARD_MM, x1: cx1 - BOARD_MM,
+                            y0: yCarcassFront, y1: yMid - BOARD_MM,
+                            z0: 0, z1: BOARD_MM
+                        },
+                        {
+                            id: `${subId}_MID_SHELF`,
+                            name: `${label} — Horizontal 420/420mm Drawer Divider Shelf (${cw - 2 * BOARD_MM}×562×18 mm at Z=420 mm)`,
+                            role: 'carcass_panel',
+                            material: 'carcass_melamine',
+                            colorRgb: COLOR_CARCASS_SHELF,
+                            x0: cx0 + BOARD_MM, x1: cx1 - BOARD_MM,
+                            y0: yCarcassFront + 4, y1: yMid - BOARD_MM,
+                            z0: 411,
+                            z1: 429
+                        },
+                        {
+                            id: `${subId}_TOP_PANEL`,
+                            name: `${label} — Top Carcass Panel (${cw - 2 * BOARD_MM}×562×18 mm)`,
+                            role: 'carcass_panel',
+                            material: 'carcass_melamine',
+                            colorRgb: COLOR_CARCASS_SHELF,
+                            x0: cx0 + BOARD_MM, x1: cx1 - BOARD_MM,
+                            y0: yCarcassFront + 4, y1: yMid - BOARD_MM,
+                            z0: 840 - BOARD_MM, z1: 840
+                        }
+                    );
+                }
+
+                // 3. Three North-Facing Stacked-Drawer Base Carcasses (East 600mm, Center 1000mm, West 600mm)
+                addNorthIslandCarcass('KITCHEN_ISLAND_CAB_N_EAST', 'Island North-East 600mm Cabinet', 7815, 8415);
+                addNorthIslandCarcass('KITCHEN_ISLAND_CAB_N_CENTER', 'Island North-Center 1000mm Hob Cabinet', 8415, 9415);
+                addNorthIslandCarcass('KITCHEN_ISLAND_CAB_N_WEST', 'Island North-West 600mm Cabinet', 9415, 10015);
+
+                // 4. South-Facing (Dining Room Back Side) Back Panel recessed 300 mm (30 cm) from the South edge (Y = 6,120 mm, no shelves)
+                parts.push({
+                    id: 'KITCHEN_ISLAND_SOUTH_BACK_PANEL',
+                    name: 'Island South Recessed Back Panel — 30cm from South Edge (2240×18×840 mm at Y=6102..6120 mm)',
+                    role: 'carcass_panel',
+                    material: 'carcass_melamine',
+                    colorRgb: COLOR_CARCASS_BACK,
+                    x0: xEastIn, x1: xWestIn,
+                    y0: ySouthBack - BOARD_MM, y1: ySouthBack,
+                    z0: 0, z1: 840
+                });
+
+                // 5. 900 × 520 × 7 mm Black Glass-Ceramic Induction Hob (Indukcja, centered at X = 8,915 mm on North cooking side)
+                const hobWireRings = [];
+                const hobZones = [
+                    { cx: 8665, cy: 5650, r: 95 },
+                    { cx: 8665, cy: 5850, r: 75 },
+                    { cx: 9165, cy: 5650, r: 80 },
+                    { cx: 9165, cy: 5850, r: 105 },
+                    { cx: 8915, cy: 5740, r: 115 }
+                ];
+                hobZones.forEach(z => {
+                    const ring = [];
+                    const segs = 20;
+                    for (let i = 0; i <= segs; i++) {
+                        const a = (i / segs) * Math.PI * 2;
+                        ring.push([
+                            Math.round((z.cx + z.r * Math.cos(a)) * 10) / 10,
+                            Math.round((z.cy + z.r * Math.sin(a)) * 10) / 10,
+                            927.5
+                        ]);
+                    }
+                    hobWireRings.push(ring);
+                });
+
+                parts.push({
+                    id: 'KITCHEN_ISLAND_INDUCTION_HOB',
+                    name: '90cm Black Glass-Ceramic Induction Hob (Indukcja 900×520×7 mm, Z=920..927 mm)',
+                    role: 'appliance_front',
+                    material: 'appliance_glass',
+                    colorRgb: COLOR_APPLIANCE_BODY,
+                    x0: 8465, x1: 9365,
+                    y0: 5470, y1: 5990,
+                    z0: 920, z1: 927,
+                    wireframeLines3D: hobWireRings
+                });
+
+                return parts;
+            })(),
+            fronts: (function buildKitchenIslandFronts() {
+                const fParts = [];
+                const yFrontFace = 5420;                   // Flush with North edge of island waterfall frame
+                const yCarcassFront = yFrontFace + 20; // 5440 mm
+
+                function addNorthIslandTwoDrawerFronts(subId, label, cx0, cx1) {
+                    const cw = cx1 - cx0;
+                    fParts.push(
+                        {
+                            id: `${subId}_FRONT_LOWER`,
+                            name: `${label} — Lower Drawer Wood Front (${cw - 4}×20×388 mm)`,
+                            role: 'drawer_front',
+                            material: 'wood_tone',
+                            colorRgb: COLOR_WOOD_FRONT,
+                            x0: cx0 + 2, x1: cx1 - 2,
+                            y0: yFrontFace, y1: yCarcassFront,
+                            z0: 2, z1: 390
+                        },
+                        {
+                            id: `${subId}_RAIL_LOWER`,
+                            name: `${label} — Lower Recessed Aluminum Handle Rail (${cw}×22×30 mm)`,
+                            role: 'handle_rail',
+                            material: 'aluminum_rail',
+                            colorRgb: COLOR_ALU_RAIL,
+                            x0: cx0, x1: cx1,
+                            y0: yFrontFace + 2, y1: yCarcassFront + 4,
+                            z0: 390, z1: 420
+                        },
+                        {
+                            id: `${subId}_FRONT_UPPER`,
+                            name: `${label} — Upper Drawer Wood Front (${cw - 4}×20×388 mm)`,
+                            role: 'drawer_front',
+                            material: 'wood_tone',
+                            colorRgb: COLOR_WOOD_FRONT,
+                            x0: cx0 + 2, x1: cx1 - 2,
+                            y0: yFrontFace, y1: yCarcassFront,
+                            z0: 422, z1: 810
+                        },
+                        {
+                            id: `${subId}_RAIL_UPPER`,
+                            name: `${label} — Upper Recessed Aluminum Handle Rail (${cw}×22×30 mm)`,
+                            role: 'handle_rail',
+                            material: 'aluminum_rail',
+                            colorRgb: COLOR_ALU_RAIL,
+                            x0: cx0, x1: cx1,
+                            y0: yFrontFace + 2, y1: yCarcassFront + 4,
+                            z0: 810, z1: 840
+                        }
+                    );
+                }
+
+                addNorthIslandTwoDrawerFronts('KITCHEN_ISLAND_CAB_N_EAST', 'Island North-East 600mm Cabinet', 7815, 8415);
+                addNorthIslandTwoDrawerFronts('KITCHEN_ISLAND_CAB_N_CENTER', 'Island North-Center 1000mm Hob Cabinet', 8415, 9415);
+                addNorthIslandTwoDrawerFronts('KITCHEN_ISLAND_CAB_N_WEST', 'Island North-West 600mm Cabinet', 9415, 10015);
+
+                return fParts;
+            })()
         }
     ];
 
     return {
         _role: 'DEFAULT_SEED_VALUES',
         entityType: 'furniture',
-        version: '1.2.0-brep',
+        version: '1.3.0-brep',
         metadata: {
             isDefaultSeed: true,
             representation: '3D B-Rep Furniture & Cabinets with separate Skeleton and Fronts parts',

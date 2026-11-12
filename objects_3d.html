@@ -860,8 +860,9 @@
                         <span>3. Quick Object &amp; Context Presets</span>
                     </div>
                     <div class="preset-grid">
-                        <button type="button" class="ctrl-btn" id="preset-cab-only" style="grid-column: span 2;">🗄️ All Kitchen Cabinets Only (North + West)</button>
-                        <button type="button" class="ctrl-btn" id="preset-cab-kitchen" style="grid-column: span 2;">🍳 All Kitchen Cabinets + Walls &amp; Window O1</button>
+                        <button type="button" class="ctrl-btn" id="preset-cab-only" style="grid-column: span 2;">🗄️ All Kitchen Furniture Only (North + West + Island)</button>
+                        <button type="button" class="ctrl-btn" id="preset-cab-kitchen" style="grid-column: span 2;">🍳 All Kitchen + Island + Walls &amp; Window O1</button>
+                        <button type="button" class="ctrl-btn" id="preset-cab-island-only" style="grid-column: span 2;">🏝️ Kitchen Island Only (KITCHEN_ISLAND)</button>
                         <button type="button" class="ctrl-btn" id="preset-cab-north-only">⬆️ North Wall Only (N1..N8)</button>
                         <button type="button" class="ctrl-btn" id="preset-cab-west-only">⬅️ West Wall Only (W1..UP5)</button>
                         <button type="button" class="ctrl-btn" id="preset-cab-full-house">🏢 Cabinets + Full Building</button>
@@ -2001,6 +2002,8 @@
                             badgePt = [4800, 7500, fl.zTop + 260];
                         } else if (fl.id === 'TERRACE_UPPER') {
                             badgePt = [3205, 4640, fl.zTop + 280];
+                        } else if (fl.id === 'CEILING_KITCHEN_DINING') {
+                            badgePt = [9200, 7200, fl.zTop + 240];
                         } else if (fl.id === 'ROOF_GYM') {
                             badgePt = [17700, 15975, fl.zTop + 280];
                         } else if (fl.id === 'ROOF_GARAGE') {
@@ -2525,7 +2528,9 @@
                         const isLower = (!isRoof && (f.id === 'FLOOR_LOWER' || f.floor === 'ground'));
                         const idSpan = createEl('span', 'wall-option-id', `${isRoof ? '🏠' : '🧱'} ${f.id}`);
                         let descLabel = 'Solid Upper Floor Slab (Strop nad parterem +296..+333 cm)';
-                        if (isLower) {
+                        if (f.id === 'CEILING_KITCHEN_DINING') {
+                            descLabel = 'Suspended Ceiling Over 0.13 Kuchnia & 0.12 Jadalnia (+280..+281.5 cm)';
+                        } else if (isLower) {
                             descLabel = 'Solid Lower Floor Slab (Podłoga na gruncie -22..0 cm)';
                         } else if (f.id === 'TERRACE_UPPER') {
                             descLabel = 'NE Terrace & Ceiling Over 0.14/0.15 (+285..+333 cm)';
@@ -2693,8 +2698,8 @@
                 const oq = appState.objectSearchQuery.trim().toLowerCase();
                 const furnGroups = [
                     {
-                        title: 'Kitchen Countertop & 90cm Sink Fixture (KITCHEN_COUNTERTOP, KITCHEN_SINK_N2)',
-                        filter: fn => fn.id === 'KITCHEN_COUNTERTOP' || fn.id === 'KITCHEN_SINK_N2'
+                        title: 'Kitchen Island, Countertop & 90cm Sink (KITCHEN_ISLAND, KITCHEN_COUNTERTOP, KITCHEN_SINK_N2)',
+                        filter: fn => fn.id === 'KITCHEN_ISLAND' || fn.id === 'KITCHEN_COUNTERTOP' || fn.id === 'KITCHEN_SINK_N2'
                     },
                     {
                         title: 'Kitchen North Wall (EW_NORTH_RECESSED — CAB_KITCHEN_N1..N8)',
@@ -3097,6 +3102,15 @@
                 renderDropdownAndInspector();
                 focusSelectedFurniture();
                 appState.distance = 7.4;
+                renderScene();
+            });
+            document.getElementById('preset-cab-island-only').addEventListener('click', () => {
+                appState.selectedIds = new Set(['KITCHEN_ISLAND', 'FLOOR_LOWER']);
+                appState.yaw = 248 * Math.PI / 180;
+                appState.pitch = 24 * Math.PI / 180;
+                renderDropdownAndInspector();
+                focusSelectedFurniture();
+                appState.distance = 3.8;
                 renderScene();
             });
             document.getElementById('preset-cab-north-only').addEventListener('click', () => {

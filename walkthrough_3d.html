@@ -771,7 +771,7 @@
         { id: 'gf_hall_stairs', label: '0.07 Hall & Stairs', x: 15675, y: 10350, footZ: 0, yaw: -1.85, pitch: 0.02 },
         { id: 'gf_living', label: '0.11 Salon (Living)', x: 2800, y: 9200, footZ: 0, yaw: -0.45, pitch: 0.05 },
         { id: 'gf_dining', label: '0.12 Jadalnia', x: 8650, y: 8900, footZ: 0, yaw: -0.58, pitch: -0.04 },
-        { id: 'gf_kitchen', label: '0.13 Kuchnia', x: 9600, y: 5350, footZ: 0, yaw: -1.35, pitch: -0.10 },
+        { id: 'gf_kitchen', label: '0.13 Kuchnia', x: 7100, y: 5050, footZ: 0, yaw: -0.22, pitch: -0.12 },
         { id: 'gf_study', label: '0.15 Gabinet (NE)', x: 2100, y: 4600, footZ: 0, yaw: -1.25, pitch: 0.0 },
         { id: 'gf_gym', label: '0.10 Siłownia (Gym)', x: 17600, y: 18200, footZ: 0, yaw: -2.25, pitch: 0.0 },
         { id: 'gf_garage', label: '0.01 Garaż', x: 17200, y: 3200, footZ: 0, yaw: 0.0, pitch: -0.02 }
@@ -1537,9 +1537,8 @@
             // End-cap segment must be collinear with the other wall's face segment
             var cross = Math.abs((edx * sdy - edy * sdx) / (elen * slen));
             if (cross > 0.05) continue;
-            // Midpoint of end cap must lie on the other wall's face segment within 4 mm
-            var t = ((mx - seg.x1) * sdx + (my - seg.y1) * sdy) / (slen * slen);
-            if (t < -0.02 || t > 1.02) continue;
+            // Midpoint of end cap must lie strictly on the other wall's face segment [0, 1] within 4 mm
+            var t = Math.max(0, Math.min(1, ((mx - seg.x1) * sdx + (my - seg.y1) * sdy) / (slen * slen)));
             var projX = seg.x1 + t * sdx;
             var projY = seg.y1 + t * sdy;
             if (Math.hypot(mx - projX, my - projY) < 4) {
@@ -1815,32 +1814,68 @@
               if (lp && lp.length >= 4) addQuad3D(bPlinth, lp[0], lp[1], lp[2], lp[3], sq.normal);
             });
           } else if (slab.id === 'TERRACE_UPPER') {
-            // TERRACE_UPPER (Z = 2,850..3,330 mm): top gres terrace tiles at Z = 3,330 mm + bottom ceiling for rooms 0.14 & 0.15 at Z = 2,850 mm
-            (slab.topCellQuads3D || []).forEach(function (q) {
-              addQuad3D(bTerrace, q[0], q[1], q[2], q[3], [0, 0, 1], 0, 0, 5.18, 2.45);
-            });
+            // TERRACE_UPPER (Z = 2,850..3,330 mm): top gres terrace tiles stopped at exterior faces of UW_TERRACE_EAST (X=6,115)
+            // and UW_TERRACE_BACK (Y=5,890) so balcony tiles never protrude under O14b or into 1.01 Master Bedroom;
+            // bottom face at Z = 2,850 mm forms the full ceiling over 0.14 Spiżarnia & 0.15 Gabinet (X=95..6,315, Y=3,170..6,110).
+            addQuad3D(bTerrace, [95, 3170, 3330], [6115, 3170, 3330], [6115, 5890, 3330], [95, 5890, 3330], [0, 0, 1], 0, 0, 5.02, 2.27);
             (slab.bottomCellQuads3D || []).forEach(function (q) {
               addQuad3D(bInteriorCeiling, q[0], q[1], q[2], q[3], [0, 0, -1]);
             });
             // Exterior base closure at Z = 3,330..3,430 mm where UW_TERRACE_EAST (X=6,115) & UW_TERRACE_BACK (Y=5,890) start at Z = 3,430 mm
             addQuad3D(bFascia, [6115, 3170, 3330], [6115, 5890, 3330], [6115, 5890, 3430], [6115, 3170, 3430], [-1, 0, 0]);
             addQuad3D(bFascia, [6115, 5890, 3330], [95, 5890, 3330], [95, 5890, 3430], [6115, 5890, 3430], [0, -1, 0]);
+            // Interior base closure at Z = 3,330..3,430 mm along UW_TERRACE_EAST_INT (X=6,495, Y=3,170..6,270) in 1.01 Master Bedroom
+            addQuad3D(bInteriorWall, [6495, 3170, 3330], [6495, 6270, 3330], [6495, 6270, 3430], [6495, 3170, 3430], [1, 0, 0]);
+            // Horizontal window sill / threshold at Z = 3,430 mm under O14b (280 mm exterior fascia X=6,115..6,395 + 100 mm interior white reveal X=6,395..6,495)
+            addQuad3D(bFascia, [6115, 3070, 3430], [6395, 3070, 3430], [6395, 5800, 3430], [6115, 5800, 3430], [0, 0, 1]);
+            addQuad3D(bInteriorReveal, [6395, 3170, 3430], [6495, 3170, 3430], [6495, 5800, 3430], [6395, 5800, 3430], [0, 0, 1]);
+            // Cap 20 mm interior step at Z = 3,430 mm between GW_15_SOUTH (Y=6,290) and UW_TERRACE_BACK_INT (Y=6,270)
+            addQuad3D(bInteriorWall, [95, 6270, 3430], [6495, 6270, 3430], [6495, 6290, 3430], [95, 6290, 3430], [0, 0, 1]);
           } else if (slab.id === 'FLOOR_UPPER') {
             (slab.topCellQuads3D || []).forEach(function (q) {
-              addQuad3D(bFloorUpper, q[0], q[1], q[2], q[3], [0, 0, 1]);
+              // Skip the 180 mm strip (X = 6,315..6,495, Y = 6,270..11,200) buried underneath solid wall FW_9
+              // so bFloorUpper never creates a T-junction seam at Z = 3,330 mm along FW_9_EAST (X = 6,315 mm)
+              var maxX = Math.max(q[0][0], q[1][0], q[2][0], q[3][0]);
+              if (maxX <= 6496) return;
+              // Inset vertices under FW_8 (X=10,695, Y>=9,370) and FW_1b (X=15,535, Y>=8,360) by 5 mm inside the wall
+              var adjQ = q.map(function (pt) {
+                var x = pt[0], y = pt[1], z = pt[2];
+                if (Math.abs(x - 10695) < 2 && y >= 9369) x = 10690;
+                if (Math.abs(x - 15535) < 2 && y >= 8359) x = 15540;
+                return [x, y, z];
+              });
+              addQuad3D(bFloorUpper, adjQ[0], adjQ[1], adjQ[2], adjQ[3], [0, 0, 1]);
             });
             (slab.bottomCellQuads3D || []).forEach(function (q) {
+              // Skip bottom ceiling quads (X <= 11,910) that are enclosed inside the sealed cavity above CEILING_KITCHEN_DINING
+              var maxX = Math.max(q[0][0], q[1][0], q[2][0], q[3][0]);
+              if (maxX <= 11911) return;
               addQuad3D(bInteriorCeiling, q[0], q[1], q[2], q[3], [0, 0, -1]);
             });
-            // Only emit interior void/gallery sideQuads3D (skip outer perimeter edges at Y=3170, Y=11200, X=20325, X=6495 which are covered by WALL_BAND / GW_13)
+            // Only emit interior void/gallery sideQuads3D (skip outer perimeter edges at Y=3170, Y=11200, X=20325, X=6495 and Y=6270 buried in GW_15)
             (slab.sideQuads3D || []).forEach(function (sq) {
               var lp = sq.loop3D;
               if (!lp || lp.length < 4) return;
               var mx = 0.5 * (lp[0][0] + lp[1][0]);
               var my = 0.5 * (lp[0][1] + lp[1][1]);
-              if (Math.abs(my - 3170) < 5 || Math.abs(my - 11200) < 5 || Math.abs(mx - 20325) < 5 || Math.abs(mx - 6495) < 5) return;
+              if (Math.abs(my - 3170) < 5 || Math.abs(my - 11200) < 5 || Math.abs(mx - 20325) < 5 || Math.abs(mx - 6495) < 5 || Math.abs(my - 6270) < 5) return;
               addQuad3D(bInteriorWall, lp[0], lp[1], lp[2], lp[3], sq.normal);
             });
+          } else if (slab.id === 'CEILING_KITCHEN_DINING') {
+            // 15 mm (1.5 cm) Suspended Gypsum Ceiling over 0.13 Kuchnia & 0.12 Jadalnia at Z = 2,800..2,815 mm
+            (slab.bottomCellQuads3D || []).forEach(function (q) {
+              addQuad3D(bInteriorCeiling, q[0], q[1], q[2], q[3], [0, 0, -1]);
+            });
+            // Exterior vertical closure faces (Z = 2,800..2,960 mm) flush with FLOOR_UPPER and vertical walls:
+            // 1) East face overlooking 0.11 Salon (X = 6,315 mm, Y = 6,290..11,200 mm)
+            addQuad3D(bInteriorWall, [6315, 6290, 2800], [6315, 11200, 2800], [6315, 11200, 2960], [6315, 6290, 2960], [-1, 0, 0]);
+            // 2) West face overlooking High Hall aligned with FW_8_WEST (X = 10,695 mm, Y = 9,370..11,200 mm)
+            addQuad3D(bInteriorWall, [10695, 11200, 2800], [10695, 9370, 2800], [10695, 9370, 2960], [10695, 11200, 2960], [1, 0, 0]);
+            // 3) South face under Upper Gallery balustrade (Y = 9,370 mm, X = 10,695..11,910 mm)
+            addQuad3D(bInteriorWall, [10695, 9370, 2800], [11910, 9370, 2800], [11910, 9370, 2960], [10695, 9370, 2960], [0, 1, 0]);
+            // 4) West face at East Stairwell landing (X = 11,910 mm, Y = 8,360..9,370 mm) + 5 mm return to GW_3_EAST at Y = 8,360 mm
+            addQuad3D(bInteriorWall, [11910, 9370, 2800], [11910, 8360, 2800], [11910, 8360, 2960], [11910, 9370, 2960], [1, 0, 0]);
+            addQuad3D(bInteriorWall, [11910, 8360, 2800], [11915, 8360, 2800], [11915, 8360, 2960], [11910, 8360, 2960], [0, -1, 0]);
           } else if (isRoofSlab) {
             var bRoofTop = createBuilder();
             var bRoofCeil = createBuilder();
@@ -3251,6 +3286,9 @@
               } else if (furn.id === 'KITCHEN_COUNTERTOP') {
                 mmCtx.fillStyle = 'rgba(241, 245, 249, 0.25)';
                 mmCtx.strokeStyle = 'rgba(226, 232, 240, 0.55)';
+              } else if (furn.id === 'KITCHEN_ISLAND') {
+                mmCtx.fillStyle = 'rgba(226, 232, 240, 0.38)';
+                mmCtx.strokeStyle = 'rgba(248, 250, 252, 0.85)';
               } else {
                 mmCtx.fillStyle = 'rgba(217, 119, 6, 0.36)';
                 mmCtx.strokeStyle = 'rgba(251, 191, 36, 0.68)';
@@ -3258,6 +3296,15 @@
               mmCtx.lineWidth = 1;
               mmCtx.fill();
               mmCtx.stroke();
+
+              if (furn.id === 'KITCHEN_ISLAND') {
+                var hob0 = worldToMinimap(8465, 5470);
+                var hob1 = worldToMinimap(9365, 5990);
+                mmCtx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+                mmCtx.strokeStyle = 'rgba(148, 163, 184, 0.7)';
+                mmCtx.fillRect(hob0[0], hob0[1], hob1[0] - hob0[0], hob1[1] - hob0[1]);
+                mmCtx.strokeRect(hob0[0], hob0[1], hob1[0] - hob0[0], hob1[1] - hob0[1]);
+              }
             }
           });
           mmCtx.restore();
