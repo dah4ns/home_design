@@ -262,11 +262,14 @@
         const halfW = frameW / 2;
         const halfH = frameH / 2;
 
-        // Keep back plane 1.5 mm proud of wall/floor surface to prevent coplanar Z-fighting
-        const dWall = 1.5;
-        const dFrameFront = 10.5;
-        const dInsertFront = 11.2;
-        const dWellBottom = 4.2;
+        // Keep back plane 1.5 mm proud of wall/floor surface (or 5 mm glass backsplash on GW_3 / EW_NORTH_RECESSED) to prevent Z-fighting
+        const onKitchenWestBacksplash = (!isFloorSocket && rot === 90 && Math.abs(cx - 11915) <= 25 && cy >= 3170 && cy <= 6170 && cz >= 900 && cz <= 1500);
+        const onKitchenNorthBacksplash = (!isFloorSocket && rot === 180 && Math.abs(cy - 3170) <= 25 && cx >= 8315 && cx <= 11915 && cz >= 900 && cz <= 1500);
+        const glassOff = (onKitchenWestBacksplash || onKitchenNorthBacksplash) ? 5.0 : 0.0;
+        const dWall = 1.5 + glassOff;
+        const dFrameFront = 10.5 + glassOff;
+        const dInsertFront = 11.2 + glassOff;
+        const dWellBottom = 4.2 + glassOff;
 
         const skeletonParts3D = [];
         const frontParts3D = [];

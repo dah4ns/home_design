@@ -178,7 +178,48 @@
     <script src="js/coordinate-service.js"></script>
     <script src="js/window-component.js"></script>
     <script src="js/window-editor-modal.js"></script>
+    <script src="js/material-store.js"></script>
     <script>
+        function updateKitchenBacksplashGlass2D() {
+            if (typeof MaterialStore === 'undefined') return;
+            const spec = MaterialStore.getMaterialSpec('KITCHEN_SPLASHBACK_GLASS');
+            if (!spec) return;
+            const isBlack = (spec.id === 'black_glass');
+
+            const fillUrl = isBlack ? 'url(#kitchen-black-glass-grad)' : 'url(#kitchen-white-glass-grad)';
+            const edgeStroke = isBlack ? '#334155' : '#0ea5e9';
+            const bevelStroke = isBlack ? 'rgba(148, 163, 184, 0.35)' : 'rgba(56, 189, 248, 0.65)';
+            const wideStreakOpacity = isBlack ? '0.14' : '0.62';
+            const sharpStreakOpacity = isBlack ? '0.28' : '0.88';
+            const labelColor = isBlack ? '#cbd5e1' : '#0284c7';
+
+            document.querySelectorAll('.kitchen-glass-pane-rect').forEach(el => {
+                el.setAttribute('fill', fillUrl);
+                el.setAttribute('stroke', edgeStroke);
+            });
+            document.querySelectorAll('.kitchen-glass-bevel-rect').forEach(el => {
+                el.setAttribute('stroke', bevelStroke);
+            });
+            document.querySelectorAll('.kitchen-glass-streak').forEach(el => {
+                el.setAttribute('opacity', wideStreakOpacity);
+            });
+            document.querySelectorAll('.kitchen-glass-streak-sharp').forEach(el => {
+                el.setAttribute('opacity', sharpStreakOpacity);
+            });
+            document.querySelectorAll('.kitchen-glass-label').forEach(el => {
+                el.setAttribute('fill', labelColor);
+                el.textContent = '5mm Glass (' + spec.name + ')';
+            });
+
+            const badgeEl = document.getElementById('kitchen-active-glass-badge');
+            if (badgeEl) {
+                badgeEl.textContent = spec.name + ' (' + spec.badgeText + ')';
+                badgeEl.style.background = isBlack ? '#0f172a' : '#e0f2fe';
+                badgeEl.style.color = isBlack ? '#f8fafc' : '#0369a1';
+                badgeEl.style.borderColor = isBlack ? '#334155' : '#7dd3fc';
+            }
+        }
+
         function updateKitchenWindowDimensions(win) {
             if (!win) win = WindowStore.get('O1');
             if (!win) return;
@@ -250,23 +291,46 @@
                 hText.setAttribute('y', (sillY + y) / 2 + 3);
                 hText.textContent = win.height;
             }
+
+            // Update U-shaped Back Wall 5mm Glass Backsplash path around Window O1
+            const outerD = `M 0.4 110.4 L ${x - 0.3} 110.4 L ${x - 0.3} ${sillY + 0.3} L ${x + w + 0.3} ${sillY + 0.3} L ${x + w + 0.3} 110.4 L 359.6 110.4 L 359.6 169.6 L 0.4 169.6 Z`;
+            const bevelD = `M 1.8 111.8 L ${x - 1.6} 111.8 L ${x - 1.6} ${sillY + 1.6} L ${x + w + 1.6} ${sillY + 1.6} L ${x + w + 1.6} 111.8 L 358.2 111.8 L 358.2 168.2 L 1.8 168.2 Z`;
+            document.querySelectorAll('.kitchen-north-glass-path').forEach(el => el.setAttribute('d', outerD));
+            document.querySelectorAll('.kitchen-north-glass-bevel').forEach(el => el.setAttribute('d', bevelD));
         }
 
         window.addEventListener('DOMContentLoaded', function() {
             WindowComponent.autoMountAll();
             updateKitchenWindowDimensions();
+            updateKitchenBacksplashGlass2D();
             WindowStore.subscribe(function(id, updatedWin) {
                 if (id === 'O1' || id === '*') {
                     updateKitchenWindowDimensions(updatedWin);
                 }
             });
+            if (typeof MaterialStore !== 'undefined' && typeof MaterialStore.subscribe === 'function') {
+                MaterialStore.subscribe(function() {
+                    updateKitchenBacksplashGlass2D();
+                });
+            }
         });
     </script>
 </head>
 
 <body>
     <div class="container">
-        <h1>Kitchen</h1>
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; border-bottom: 2px solid #eaeaea; padding-bottom: 12px; margin-bottom: 12px;">
+            <h1 style="border-bottom: none; padding-bottom: 0; margin: 0;">Kitchen</h1>
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <a href="index.html" style="text-decoration: none; font-size: 13px; font-weight: 600; color: #475569; padding: 7px 12px; border-radius: 6px; border: 1px solid #cbd5e1; background: #f8fafc;">← Dashboard</a>
+                <a href="materials.html" style="text-decoration: none; font-size: 13px; font-weight: 600; color: #0284c7; padding: 7px 12px; border-radius: 6px; border: 1px solid #7dd3fc; background: #f0f9ff; display: inline-flex; align-items: center; gap: 6px;">
+                    <span>🎨 Backsplash Material:</span>
+                    <span id="kitchen-active-glass-badge" style="padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; border: 1px solid #7dd3fc; background: #e0f2fe; color: #0369a1;">White Glass</span>
+                </a>
+                <a href="objects_3d.html" style="text-decoration: none; font-size: 13px; font-weight: 600; color: #0f172a; padding: 7px 12px; border-radius: 6px; border: 1px solid #cbd5e1; background: #f1f5f9;">🧱 3D Objects</a>
+                <a href="walkthrough_3d.html" style="text-decoration: none; font-size: 13px; font-weight: 600; color: #0f172a; padding: 7px 12px; border-radius: 6px; border: 1px solid #cbd5e1; background: #f1f5f9;">🚶 3D Walkthrough</a>
+            </div>
+        </div>
         <p class="subtitle">2D Furniture Design based on provided floor plan and visualization. Dimensions in mm.</p>
 
         <!-- Tabs -->
@@ -283,6 +347,21 @@
             <div class="elevation-container">
                 <svg width="1360" height="800" viewBox="-60 -80 680 420">
                     <defs>
+                        <linearGradient id="kitchen-white-glass-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#ffffff" />
+                            <stop offset="22%" stop-color="#eef9ff" />
+                            <stop offset="46%" stop-color="#d8f0fa" />
+                            <stop offset="62%" stop-color="#ffffff" />
+                            <stop offset="82%" stop-color="#e8f6fc" />
+                            <stop offset="100%" stop-color="#c9e8f5" />
+                        </linearGradient>
+                        <linearGradient id="kitchen-black-glass-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#090c12" />
+                            <stop offset="28%" stop-color="#17202e" />
+                            <stop offset="48%" stop-color="#283548" />
+                            <stop offset="62%" stop-color="#0d121a" />
+                            <stop offset="100%" stop-color="#06080c" />
+                        </linearGradient>
                         <pattern id="wood-tone" width="100" height="100" patternUnits="userSpaceOnUse">
                             <rect width="100" height="100" fill="#a17a62" />
                             <path d="M 0 10 Q 25 15 50 10 T 100 10" stroke="#7D5A47" stroke-width="0.8" fill="none"
@@ -355,6 +434,16 @@
                     <line x1="240" y1="173" x2="240" y2="245" stroke="#8E6B47" stroke-width="1" />
                     <!-- Border between 4th and 5th segment from right -->
                     <line x1="300" y1="173" x2="300" y2="245" stroke="#8E6B47" stroke-width="1" />
+                    <!-- 5mm Tempered Glass Backsplash U-Panel on Back Wall around Window O1 -->
+                    <g class="kitchen-north-glass-backsplash-group" onclick="window.location.href='materials.html'" style="cursor: pointer;">
+                        <title>KITCHEN_SPLASHBACK_GLASS_NORTH — 5mm Tempered Glass Backsplash U-Panel around Window O1 (Click to configure in Finishing Materials)</title>
+                        <path class="kitchen-glass-pane-rect kitchen-north-glass-path" d="M 0.4 110.4 L 133.2 110.4 L 133.2 150.3 L 343.8 150.3 L 343.8 110.4 L 359.6 110.4 L 359.6 169.6 L 0.4 169.6 Z" fill="url(#kitchen-white-glass-grad)" stroke="#0ea5e9" stroke-width="1.0" />
+                        <path class="kitchen-glass-bevel-rect kitchen-north-glass-bevel" d="M 1.8 111.8 L 131.9 111.8 L 131.9 151.6 L 345.1 151.6 L 345.1 111.8 L 358.2 111.8 L 358.2 168.2 L 1.8 168.2 Z" fill="none" stroke="rgba(56, 189, 248, 0.65)" stroke-width="0.6" />
+                        <polygon class="kitchen-glass-streak" points="22,111 40,111 14,169 4,169" fill="rgba(255,255,255,0.72)" />
+                        <polygon class="kitchen-glass-streak-sharp" points="46,111 52,111 24,169 18,169" fill="rgba(255,255,255,0.92)" />
+                        <polygon class="kitchen-glass-streak" points="86,111 104,111 76,169 58,169" fill="rgba(255,255,255,0.68)" />
+                        <polygon class="kitchen-glass-streak-sharp" points="215,151 225,151 213,169 203,169" fill="rgba(255,255,255,0.85)" />
+                    </g>
                     <!-- Reusable Window Component: O1 (Kitchen North Wall - Materials) -->
                     <g data-window-component="O1" data-view-id="kitchen_north_wall" data-window-style="interior-materials" id="kitchen-window-view1" onclick="WindowEditorModal.open('O1')" style="cursor: pointer;"></g>
 
@@ -616,7 +705,19 @@
                     <line x1="480" y1="173" x2="480" y2="245" stroke="#8E6B47" stroke-width="1" />
                     
                     <!-- Background -->
-                    <rect x="195" y="110" width="345" height="60" fill="#F5F0E8" />
+                    <rect x="195" y="110" width="45" height="60" fill="#F5F0E8" />
+                    <!-- 5mm Tempered Glass Backsplash (KITCHEN_SPLASHBACK_GLASS: 3000×5×600 mm, Z=900..1500 mm) -->
+                    <g class="kitchen-glass-backsplash-group">
+                        <rect class="kitchen-glass-pane-rect" x="240" y="110" width="300" height="60" fill="url(#kitchen-white-glass-grad)" stroke="#0ea5e9" stroke-width="0.9" />
+                        <rect x="240.6" y="110.5" width="298.8" height="4.5" fill="#ffffff" opacity="0.55" />
+                        <polygon class="kitchen-glass-streak" points="262,170 302,110 326,110 286,170" fill="#ffffff" opacity="0.62" />
+                        <polygon class="kitchen-glass-streak-sharp" points="290,170 330,110 335,110 295,170" fill="#ffffff" opacity="0.88" />
+                        <polygon class="kitchen-glass-streak" points="376,170 416,110 434,110 394,170" fill="#ffffff" opacity="0.62" />
+                        <polygon class="kitchen-glass-streak-sharp" points="400,170 440,110 444,110 404,170" fill="#ffffff" opacity="0.88" />
+                        <polygon class="kitchen-glass-streak" points="472,170 512,110 525,110 485,170" fill="#ffffff" opacity="0.52" />
+                        <rect class="kitchen-glass-bevel-rect" x="241.6" y="111.6" width="296.8" height="56.8" fill="none" stroke="rgba(56, 189, 248, 0.65)" stroke-width="0.45" />
+                        <text class="kitchen-glass-label" x="390" y="121" text-anchor="middle" font-size="5.2" font-weight="600" fill="#0284c7" opacity="0.85">5mm Glass (White Glass)</text>
+                    </g>
                     <rect x="480" y="170" width="60" height="3" fill="#E8DCC4" stroke="#8E6B47" stroke-width="0.5" />
                     <rect x="480" y="173" width="60" height="87" fill="url(#wall-color)" stroke="#8E6B47"
                         stroke-width="0.5" />
@@ -1195,7 +1296,19 @@
             <line x1="480" y1="173" x2="480" y2="245" stroke="#8E6B47" stroke-width="1" />
 
             <!-- Background -->
-            <rect x="195" y="110" width="345" height="60" fill="#F5F0E8" />
+            <rect x="195" y="110" width="45" height="60" fill="#F5F0E8" />
+                    <!-- 5mm Tempered Glass Backsplash (KITCHEN_SPLASHBACK_GLASS: 3000×5×600 mm, Z=900..1500 mm) -->
+                    <g class="kitchen-glass-backsplash-group">
+                        <rect class="kitchen-glass-pane-rect" x="240" y="110" width="300" height="60" fill="url(#kitchen-white-glass-grad)" stroke="#0ea5e9" stroke-width="0.9" />
+                        <rect x="240.6" y="110.5" width="298.8" height="4.5" fill="#ffffff" opacity="0.55" />
+                        <polygon class="kitchen-glass-streak" points="262,170 302,110 326,110 286,170" fill="#ffffff" opacity="0.62" />
+                        <polygon class="kitchen-glass-streak-sharp" points="290,170 330,110 335,110 295,170" fill="#ffffff" opacity="0.88" />
+                        <polygon class="kitchen-glass-streak" points="376,170 416,110 434,110 394,170" fill="#ffffff" opacity="0.62" />
+                        <polygon class="kitchen-glass-streak-sharp" points="400,170 440,110 444,110 404,170" fill="#ffffff" opacity="0.88" />
+                        <polygon class="kitchen-glass-streak" points="472,170 512,110 525,110 485,170" fill="#ffffff" opacity="0.52" />
+                        <rect class="kitchen-glass-bevel-rect" x="241.6" y="111.6" width="296.8" height="56.8" fill="none" stroke="rgba(56, 189, 248, 0.65)" stroke-width="0.45" />
+                        <text class="kitchen-glass-label" x="390" y="121" text-anchor="middle" font-size="5.2" font-weight="600" fill="#0284c7" opacity="0.85">5mm Glass (White Glass)</text>
+                    </g>
             <rect x="480" y="170" width="60" height="3" fill="#E8DCC4" />
             <rect x="480" y="173" width="60" height="87" fill="#F5F0E8" stroke="#8E6B47"
                 stroke-width="0.5" />
@@ -1435,6 +1548,16 @@
             <line x1="60" y1="245" x2="540" y2="245" stroke="#8E6B47" stroke-width="1" />
             <line x1="60" y1="245" x2="60" y2="260" stroke="#8E6B47" stroke-width="1" />
             <line x1="540" y1="245" x2="540" y2="260" stroke="#8E6B47" stroke-width="1" />
+            <!-- 5mm Tempered Glass Backsplash U-Panel on Back Wall around Window O1 -->
+            <g class="kitchen-north-glass-backsplash-group" onclick="window.location.href='materials.html'" style="cursor: pointer;">
+                <title>KITCHEN_SPLASHBACK_GLASS_NORTH — 5mm Tempered Glass Backsplash U-Panel around Window O1 (Click to configure in Finishing Materials)</title>
+                <path class="kitchen-glass-pane-rect kitchen-north-glass-path" d="M 0.4 110.4 L 133.2 110.4 L 133.2 150.3 L 343.8 150.3 L 343.8 110.4 L 359.6 110.4 L 359.6 169.6 L 0.4 169.6 Z" fill="url(#kitchen-white-glass-grad)" stroke="#0ea5e9" stroke-width="1.0" />
+                <path class="kitchen-glass-bevel-rect kitchen-north-glass-bevel" d="M 1.8 111.8 L 131.9 111.8 L 131.9 151.6 L 345.1 151.6 L 345.1 111.8 L 358.2 111.8 L 358.2 168.2 L 1.8 168.2 Z" fill="none" stroke="rgba(56, 189, 248, 0.65)" stroke-width="0.6" />
+                <polygon class="kitchen-glass-streak" points="22,111 40,111 14,169 4,169" fill="rgba(255,255,255,0.72)" />
+                <polygon class="kitchen-glass-streak-sharp" points="46,111 52,111 24,169 18,169" fill="rgba(255,255,255,0.92)" />
+                <polygon class="kitchen-glass-streak" points="86,111 104,111 76,169 58,169" fill="rgba(255,255,255,0.68)" />
+                <polygon class="kitchen-glass-streak-sharp" points="215,151 225,151 213,169 203,169" fill="rgba(255,255,255,0.85)" />
+            </g>
             <!-- Reusable Window Component: O1 (Kitchen North Wall - Electricity) -->
             <g data-window-component="O1" data-view-id="kitchen_north_wall" data-window-style="interior-electricity" id="kitchen-window-view3" onclick="WindowEditorModal.open('O1')" style="cursor: pointer;"></g>
 
@@ -1691,7 +1814,15 @@
             <line x1="480" y1="173" x2="480" y2="245" stroke="#8E6B47" stroke-width="1" />
 
             <!-- Background -->
-            <rect x="195" y="110" width="345" height="60" fill="#F5F0E8" />
+            <rect x="195" y="110" width="45" height="60" fill="#F5F0E8" />
+                    <!-- 5mm Tempered Glass Backsplash (KITCHEN_SPLASHBACK_GLASS: 3000×5×600 mm, Z=900..1500 mm) -->
+                    <g class="kitchen-glass-backsplash-group">
+                        <rect class="kitchen-glass-pane-rect" x="240" y="110" width="300" height="60" fill="url(#kitchen-white-glass-grad)" stroke="#38bdf8" stroke-width="0.9" />
+                        <polygon class="kitchen-glass-streak" points="275,170 315,110 332,110 292,170" fill="#ffffff" opacity="0.55" />
+                        <polygon class="kitchen-glass-streak" points="395,170 435,110 447,110 407,170" fill="#ffffff" opacity="0.55" />
+                        <text class="kitchen-glass-label" x="390" y="136" text-anchor="middle" font-size="6.8" font-weight="700" fill="#0369a1">5mm Tempered Glass (3000×600) — White Glass</text>
+                        <text class="kitchen-glass-sublabel" x="390" y="145" text-anchor="middle" font-size="5.5" font-weight="600" fill="#0284c7">LACOBEL WHITE 9003 • Z = 900..1500 mm</text>
+                    </g>
             <rect x="480" y="170" width="60" height="3" fill="#E8DCC4" />
             <rect x="480" y="173" width="60" height="87" fill="#F5F0E8" stroke="#8E6B47"
                 stroke-width="0.5" />

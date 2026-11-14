@@ -2676,7 +2676,86 @@
                 };
             }
 
-            const skeletonParts3D = (raw.skeleton || []).map(p => compileBoxPart3D(p, 'skeleton'));
+            let activeMatSpec = null;
+            if (typeof MaterialStore !== 'undefined' && typeof MaterialStore.getMaterialSpec === 'function') {
+                activeMatSpec = MaterialStore.getMaterialSpec(raw.id);
+            } else if (typeof globalThis !== 'undefined' && globalThis.MaterialStore && typeof globalThis.MaterialStore.getMaterialSpec === 'function') {
+                activeMatSpec = globalThis.MaterialStore.getMaterialSpec(raw.id);
+            } else if (typeof require === 'function') {
+                try {
+                    const ms = require('./material-store.js');
+                    if (ms && typeof ms.getMaterialSpec === 'function') {
+                        activeMatSpec = ms.getMaterialSpec(raw.id);
+                    }
+                } catch (_e) { /* ignore */ }
+            }
+
+            const skeletonParts3D = (raw.skeleton || []).map(p => {
+                const compiled = compileBoxPart3D(p, 'skeleton');
+                if (activeMatSpec && compiled.role === 'backsplash_glass') {
+                    compiled.material = activeMatSpec.id;
+                    compiled.materialLabel = activeMatSpec.technicalName || activeMatSpec.name;
+                    compiled.colorRgb = activeMatSpec.colorRgb.slice();
+                    compiled.edgeColorRgb = Array.isArray(activeMatSpec.edgeColorRgb) ? activeMatSpec.edgeColorRgb.slice() : [0.32, 0.82, 0.92];
+                    compiled.wireColorRgba = Array.isArray(activeMatSpec.wireColorRgba) ? activeMatSpec.wireColorRgba.slice() : null;
+                    compiled.isReflectiveGlass = true;
+
+                    // Add diamond-polished inner chamfer bevel loop on the West Wall glass pane if not already custom-defined
+                    if (!Array.isArray(p.wireframeLines3D) || p.wireframeLines3D.length === 0) {
+                        const fx = compiled.x0 - 0.3;
+                        const bev = 10;
+                        const yA = compiled.y0 + bev;
+                        const yB = compiled.y1 - bev;
+                        const zA = compiled.z0 + bev;
+                        const zB = compiled.z1 - bev;
+                        compiled.wireframeLines3D = [
+                            [[fx, yA, zA], [fx, yB, zA], [fx, yB, zB], [fx, yA, zB], [fx, yA, zA]]
+                        ];
+                    } else if (raw.id === 'KITCHEN_SPLASHBACK_GLASS_NORTH' && WindowStore && typeof WindowStore.get === 'function') {
+                        try {
+                            const winO1 = WindowStore.get('O1');
+                            if (winO1 && Number.isFinite(Number(winO1.x)) && Number.isFinite(Number(winO1.width))) {
+                                const x0 = 8315;
+                                const x3 = 11910;
+                                const x1 = Math.max(x0 + 40, Math.min(x3 - 100, Number(winO1.x)));
+                                const x2 = Math.max(x1 + 100, Math.min(x3 - 40, Number(winO1.x) + Number(winO1.width)));
+                                const y0 = 3170;
+                                const y1 = 3175;
+                                const z0 = 900;
+                                const z1 = Math.max(z0 + 50, Math.min(1450, Number(winO1.sill) || 1100));
+                                const z2 = 1500;
+                                const b = 14;
+                                compiled.faces3D = [
+                                    { side: 'south_east_wing', normal: [0, 1, 0], noWireframe: true, loop3D: [[x0, y1, z0], [x1, y1, z0], [x1, y1, z2], [x0, y1, z2]] },
+                                    { side: 'south_window_sill', normal: [0, 1, 0], noWireframe: true, loop3D: [[x1, y1, z0], [x2, y1, z0], [x2, y1, z1], [x1, y1, z1]] },
+                                    { side: 'south_west_wing', normal: [0, 1, 0], noWireframe: true, loop3D: [[x2, y1, z0], [x3, y1, z0], [x3, y1, z2], [x2, y1, z2]] },
+                                    { side: 'north_east_wing', normal: [0, -1, 0], noWireframe: true, loop3D: [[x1, y0, z0], [x0, y0, z0], [x0, y0, z2], [x1, y0, z2]] },
+                                    { side: 'north_window_sill', normal: [0, -1, 0], noWireframe: true, loop3D: [[x2, y0, z0], [x1, y0, z0], [x1, y0, z1], [x2, y0, z1]] },
+                                    { side: 'north_west_wing', normal: [0, -1, 0], noWireframe: true, loop3D: [[x3, y0, z0], [x2, y0, z0], [x2, y0, z2], [x3, y0, z2]] },
+                                    { side: 'bottom', normal: [0, 0, -1], noWireframe: true, loop3D: [[x0, y0, z0], [x3, y0, z0], [x3, y1, z0], [x0, y1, z0]] },
+                                    { side: 'east_outer', normal: [-1, 0, 0], noWireframe: true, loop3D: [[x0, y0, z0], [x0, y1, z0], [x0, y1, z2], [x0, y0, z2]] },
+                                    { side: 'top_east', normal: [0, 0, 1], noWireframe: true, loop3D: [[x0, y1, z2], [x1, y1, z2], [x1, y0, z2], [x0, y0, z2]] },
+                                    { side: 'notch_east', normal: [1, 0, 0], noWireframe: true, loop3D: [[x1, y1, z1], [x1, y0, z1], [x1, y0, z2], [x1, y1, z2]] },
+                                    { side: 'top_sill', normal: [0, 0, 1], noWireframe: true, loop3D: [[x1, y1, z1], [x2, y1, z1], [x2, y0, z1], [x1, y0, z1]] },
+                                    { side: 'notch_west', normal: [-1, 0, 0], noWireframe: true, loop3D: [[x2, y0, z1], [x2, y1, z1], [x2, y1, z2], [x2, y0, z2]] },
+                                    { side: 'top_west', normal: [0, 0, 1], noWireframe: true, loop3D: [[x2, y1, z2], [x3, y1, z2], [x3, y0, z2], [x2, y0, z2]] },
+                                    { side: 'west_outer', normal: [1, 0, 0], noWireframe: true, loop3D: [[x3, y1, z0], [x3, y0, z0], [x3, y0, z2], [x3, y1, z2]] }
+                                ];
+                                compiled.wireframeLines3D = [
+                                    [[x0, y1 + 0.2, z0], [x3, y1 + 0.2, z0], [x3, y1 + 0.2, z2], [x2, y1 + 0.2, z2], [x2, y1 + 0.2, z1], [x1, y1 + 0.2, z1], [x1, y1 + 0.2, z2], [x0, y1 + 0.2, z2], [x0, y1 + 0.2, z0]],
+                                    [[x0 + b, y1 + 0.3, z0 + b], [x3 - b, y1 + 0.3, z0 + b], [x3 - b, y1 + 0.3, z2 - b], [x2 + b, y1 + 0.3, z2 - b], [x2 + b, y1 + 0.3, z1 - b], [x1 - b, y1 + 0.3, z1 - b], [x1 - b, y1 + 0.3, z2 - b], [x0 + b, y1 + 0.3, z2 - b], [x0 + b, y1 + 0.3, z0 + b]]
+                                ];
+                            }
+                        } catch (_e) { /* ignore */ }
+                    }
+                } else if (activeMatSpec && compiled.role === 'worktop') {
+                    compiled.material = activeMatSpec.id;
+                    compiled.materialLabel = activeMatSpec.technicalName || activeMatSpec.name;
+                    compiled.colorRgb = activeMatSpec.colorRgb.slice();
+                    compiled.wireColorRgba = Array.isArray(activeMatSpec.wireColorRgba) ? activeMatSpec.wireColorRgba.slice() : null;
+                }
+                return compiled;
+            });
             const frontParts3D = (raw.fronts || []).map(p => compileBoxPart3D(p, 'fronts'));
 
             const xMin = Number(raw.x1);

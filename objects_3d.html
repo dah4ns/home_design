@@ -791,6 +791,7 @@
             </div>
             <nav class="nav-bar">
                 <a href="index.html" class="nav-btn">🏠 Dashboard</a>
+                <a href="materials.html" class="nav-btn" style="border-color: rgba(56,189,248,0.45); color: #7dd3fc;">🎨 Finishing Materials</a>
                 <a href="furniture_layout.html" class="nav-btn" style="border-color: rgba(16,185,129,0.45); color: #6ee7b7;">🛋️ 2D Furniture</a>
                 <a href="kitchen.html" class="nav-btn">🍳 Kitchen 2D</a>
                 <a href="floor_plan.html" class="nav-btn">📐 2D Floor Plan</a>
@@ -901,25 +902,17 @@
                     <div class="selected-chips" id="selected-obj-chips-container"></div>
                 </div>
 
-                <!-- 2. Cabinet Parts: Skeleton & Fronts (Global + Per-Object) -->
+                <!-- 2. Cabinet Parts: Skeleton, Fronts & Backs -->
                 <div class="dock-section">
                     <div class="dock-title">
                         <span>2. Cabinet Parts: Skeleton &amp; Fronts</span>
-                        <span class="tech-pill" id="fronts-summary-pill">Fronts: ON</span>
+                        <span class="tech-pill" id="fronts-summary-pill">Full Cabinets</span>
                     </div>
 
-                    <label class="toggle-row">
-                        <span><strong>Global:</strong> Show Fronts Across All Furniture</span>
-                        <input type="checkbox" id="toggle-all-fronts" checked>
-                    </label>
-                    <label class="toggle-row">
-                        <span><strong>Global:</strong> Show Cabinet Skeleton (Carcass &amp; Plinth)</span>
-                        <input type="checkbox" id="toggle-all-skeleton" checked>
-                    </label>
-
-                    <div class="preset-grid" style="margin-top: 6px;">
-                        <button type="button" class="ctrl-btn" id="btn-all-fronts-on">🚪 Show All Fronts</button>
-                        <button type="button" class="ctrl-btn" id="btn-all-fronts-off">🦴 Skeleton Only (No Fronts)</button>
+                    <div class="preset-grid" style="margin-top: 4px;">
+                        <button type="button" class="ctrl-btn active" id="btn-cab-mode-full" style="grid-column: span 2;">🗄️ Full cabinets</button>
+                        <button type="button" class="ctrl-btn" id="btn-cab-mode-no-fronts" style="grid-column: span 2;">🦴 Skeletons only (no fronts)</button>
+                        <button type="button" class="ctrl-btn" id="btn-cab-mode-no-fronts-backs" style="grid-column: span 2;">🪟 Skeletons only (no fronts &amp; backs)</button>
                     </div>
 
                     <div id="per-object-fronts-container" style="margin-top: 8px;"></div>
@@ -1043,6 +1036,7 @@
     <script src="js/persistence.js"></script>
     <script src="js/room-furniture-store.js"></script>
     <script src="js/socket-store.js"></script>
+    <script src="js/material-store.js"></script>
     <script src="js/window-store.js"></script>
     <script src="js/coordinate-service.js"></script>
     <script src="js/wall-service.js"></script>
@@ -1099,6 +1093,7 @@
                 inspectorFilterQuery: '',
                 hideRightInspector: false,
                 showAllFurnitureSkeleton: true,
+                showCabinetBacks: true,
                 furnitureFrontsById: initialFrontsById,
                 showLabels: false,
                 showWindows: true,
@@ -1360,6 +1355,64 @@
                         vec3 h1 = normalize(lightDir1 + viewDir);
                         vec3 h2 = normalize(lightDir2 + viewDir);
                         spec = pow(max(dot(n, h1), 0.0), 40.0) * 0.46 + pow(max(dot(n, h2), 0.0), 22.0) * 0.20;
+                    }
+                    if (vColor.a > 0.910 && vColor.a < 0.915) {
+                        vec3 viewDir = normalize(uEyePos - vWorldPos);
+                        vec3 refl = reflect(-viewDir, n);
+                        vec3 h1 = normalize(lightDir1 + viewDir);
+                        vec3 h2 = normalize(lightDir2 + viewDir);
+                        float spec1 = pow(max(dot(n, h1), 0.0), 84.0);
+                        float spec2 = pow(max(dot(n, h2), 0.0), 28.0);
+                        float fres = pow(1.0 - max(dot(n, viewDir), 0.0), 2.2);
+                        bool isNorthGlass = (abs(n.y) > abs(n.x));
+                        float uCoord = isNorthGlass ? (15.08 - vWorldPos.x) : vWorldPos.y;
+                        float reflU = isNorthGlass ? (-refl.x) : refl.y;
+                        float diagWide = smoothstep(0.20, 0.92, sin((uCoord * 2.1 + vWorldPos.z * 3.2) + reflU * 2.8 + refl.z * 1.8));
+                        float diagSharp = smoothstep(0.74, 0.992, sin((uCoord * 4.6 + vWorldPos.z * 5.8) + reflU * 4.2));
+                        float diagTwin = smoothstep(0.78, 0.996, sin((uCoord * 8.4 + vWorldPos.z * 9.6) - reflU * 3.4));
+                        float zNorm = clamp((vWorldPos.z - 0.90) / 0.60, 0.0, 1.0);
+                        float edgeDist;
+                        if (isNorthGlass) {
+                            float dOuterX = min(abs(vWorldPos.x - 8.315), abs(11.910 - vWorldPos.x));
+                            float dBotZ = abs(vWorldPos.z - 0.90);
+                            float dTopZ = (vWorldPos.x >= 8.480 && vWorldPos.x <= 10.580) ? abs(1.10 - vWorldPos.z) : abs(1.50 - vWorldPos.z);
+                            float dNotchX = (vWorldPos.z >= 1.085) ? min(abs(vWorldPos.x - 8.480), abs(vWorldPos.x - 10.580)) : 99.0;
+                            edgeDist = min(min(dOuterX, dNotchX), min(dBotZ, dTopZ));
+                        } else {
+                            float edgeDistY = min(abs(vWorldPos.y - 3.17), abs(6.17 - vWorldPos.y));
+                            float edgeDistZ = min(abs(vWorldPos.z - 0.90), abs(1.50 - vWorldPos.z));
+                            edgeDist = min(edgeDistY, edgeDistZ);
+                        }
+                        float edgeRim = 1.0 - smoothstep(0.0, 0.022, edgeDist);
+
+                        if (vColor.r > 0.5) {
+                            // Optiwhite Pure White Tempered Glass (RAL 9003 + Low-Iron Clear Float Sheet)
+                            vec3 porcelainCore = vec3(0.95, 0.98, 1.00);
+                            vec3 skyAquaRefl = vec3(0.68, 0.87, 0.96);
+                            vec3 deepTealRefl = vec3(0.54, 0.79, 0.91);
+                            vec3 warmStoneBounce = vec3(0.93, 0.89, 0.83);
+                            float underCabGlow = smoothstep(0.68, 0.97, zNorm) * (1.0 - smoothstep(0.96, 1.0, zNorm) * 0.45);
+                            float counterBounce = 1.0 - smoothstep(0.0, 0.24, zNorm);
+                            vec3 glassCol = mix(porcelainCore, skyAquaRefl, 0.24 + 0.34 * diagWide + 0.22 * fres);
+                            glassCol = mix(glassCol, warmStoneBounce, counterBounce * 0.26);
+                            glassCol = mix(glassCol, deepTealRefl, (1.0 - diagWide) * 0.16);
+                            // Crisp white diagonal window light streaks + under-cabinet LED glow
+                            float whiteStreak = clamp(diagSharp * 0.65 + diagTwin * 0.52 + spec1 * 0.85 + spec2 * 0.30 + underCabGlow * 0.28, 0.0, 1.0);
+                            glassCol = mix(glassCol, vec3(1.0, 1.0, 1.0), whiteStreak);
+                            // Diamond-polished low-iron aqua bevel edge glow
+                            glassCol = mix(glassCol, vec3(0.28, 0.82, 0.94), edgeRim * 0.68);
+                            gl_FragColor = vec4(clamp(glassCol, 0.0, 1.0), 0.99);
+                            return;
+                        } else {
+                            // Deep Obsidian Black Tempered Glass (RAL 9005)
+                            vec3 envTint = vec3(0.84, 0.93, 1.0);
+                            float reflMix = clamp(fres * 0.24 + diagWide * 0.14 + diagSharp * 0.16 + diagTwin * 0.12 + spec2 * 0.18, 0.0, 0.62);
+                            vec3 glassBase = vColor.rgb * (0.68 + 0.34 * diff1 + 0.18 * diff2);
+                            vec3 glassCol = mix(glassBase, envTint, reflMix) + vec3(0.94, 0.98, 1.0) * (spec1 * 0.58);
+                            glassCol = mix(glassCol, vec3(0.26, 0.44, 0.56), edgeRim * 0.55);
+                            gl_FragColor = vec4(clamp(glassCol, 0.0, 1.0), 0.99);
+                            return;
+                        }
                     }
                     vec3 col = clamp(vColor.rgb * lighting + vec3(spec), 0.0, 1.0);
                     float outAlpha = (vColor.a > 0.965 && vColor.a < 0.975) ? 0.99 : vColor.a;
@@ -2142,16 +2195,20 @@
                     // 1. Render Cabinet Skeleton (Plinth + 18mm Carcass Panels + 30mm Worktop + Quarter-Arc Circular Shelves)
                     if (showSkeleton && Array.isArray(furn.skeletonParts3D)) {
                         furn.skeletonParts3D.forEach(part => {
+                            if (appState.showCabinetBacks === false && isCabinetBackPart(part)) return;
                             const rgb = part.colorRgb || [0.93, 0.90, 0.84];
-                            const wireColor = (part.role === 'plinth')
-                                ? [0.42, 0.33, 0.27, 0.90]
-                                : (part.role === 'worktop'
-                                    ? [0.68, 0.60, 0.48, 0.94]
-                                    : ((part.role === 'sink_basin' || part.role === 'sink_drain' || part.role === 'sink_faucet' || part.role === 'socket_frame' || part.role === 'socket_insert' || part.role === 'socket_shutter')
-                                        ? [0.34, 0.39, 0.45, 0.94]
-                                        : [0.56, 0.42, 0.28, 0.92]));
+                            const isBacksplashGlass = (part.role === 'backsplash_glass' || part.isReflectiveGlass);
+                            const wireColor = isBacksplashGlass
+                                ? (part.wireColorRgba || [0.42, 0.82, 0.92, 0.94])
+                                : ((part.role === 'plinth')
+                                    ? [0.42, 0.33, 0.27, 0.90]
+                                    : (part.role === 'worktop'
+                                        ? [0.68, 0.60, 0.48, 0.94]
+                                        : ((part.role === 'sink_basin' || part.role === 'sink_drain' || part.role === 'sink_faucet' || part.role === 'socket_frame' || part.role === 'socket_insert' || part.role === 'socket_shutter')
+                                            ? [0.34, 0.39, 0.45, 0.94]
+                                            : [0.56, 0.42, 0.28, 0.92])));
                             const isMetallicPart = (part.role === 'sink_faucet' || part.role === 'sink_basin' || part.role === 'sink_drain');
-                            const partAlpha = isMetallicPart ? 0.97 : 0.98;
+                            const partAlpha = isBacksplashGlass ? 0.912 : (isMetallicPart ? 0.97 : 0.98);
                             (part.faces3D || []).forEach(face => {
                                 pushConvexLoop3D(face.loop3D, face.normal || [0, 0, 1], [rgb[0], rgb[1], rgb[2], partAlpha], null, face.vertexNormals3D);
                                 if (!face.noWireframe) {
@@ -2558,32 +2615,49 @@
                 hideLabel.textContent = appState.activeLeftMenu === 'none' ? '👁️ Menus Hidden' : '👁️ Hide Menu';
             }
 
+            function isCabinetBackPart(part) {
+                if (!part) return false;
+                if (part.role === 'back_panel') return true;
+                const pid = String(part.id || '');
+                return /_BACK_(LOWER_)?PANEL$/i.test(pid);
+            }
+
             function syncGlobalFrontsCheckbox() {
-                const globalCb = document.getElementById('toggle-all-fronts');
                 const summaryPill = document.getElementById('fronts-summary-pill');
-                if (!globalCb || allFurniture.length === 0) return;
+                const btnFull = document.getElementById('btn-cab-mode-full');
+                const btnNoFronts = document.getElementById('btn-cab-mode-no-fronts');
+                const btnNoFrontsBacks = document.getElementById('btn-cab-mode-no-fronts-backs');
+                if (allFurniture.length === 0) return;
 
                 let onCount = 0;
                 allFurniture.forEach(fn => {
                     if (appState.furnitureFrontsById[fn.id] !== false) onCount++;
                 });
 
-                if (onCount === allFurniture.length) {
-                    globalCb.checked = true;
-                    globalCb.indeterminate = false;
-                    summaryPill.textContent = 'Fronts: ALL ON';
-                } else if (onCount === 0) {
-                    globalCb.checked = false;
-                    globalCb.indeterminate = false;
-                    summaryPill.textContent = 'Fronts: ALL OFF';
+                const backsOn = appState.showCabinetBacks !== false;
+                const isFullMode = (onCount === allFurniture.length && backsOn);
+                const isNoFrontsMode = (onCount === 0 && backsOn);
+                const isNoFrontsBacksMode = (onCount === 0 && !backsOn);
+
+                if (btnFull) btnFull.classList.toggle('active', isFullMode);
+                if (btnNoFronts) btnNoFronts.classList.toggle('active', isNoFrontsMode);
+                if (btnNoFrontsBacks) btnNoFrontsBacks.classList.toggle('active', isNoFrontsBacksMode);
+
+                if (!summaryPill) return;
+                if (isFullMode) {
+                    summaryPill.textContent = 'Full Cabinets';
+                } else if (isNoFrontsMode) {
+                    summaryPill.textContent = 'No Fronts';
+                } else if (isNoFrontsBacksMode) {
+                    summaryPill.textContent = 'No Fronts & Backs';
                 } else {
-                    globalCb.checked = true;
-                    globalCb.indeterminate = true;
-                    summaryPill.textContent = `Fronts: ${onCount}/${allFurniture.length} ON`;
+                    summaryPill.textContent = `Fronts: ${onCount}/${allFurniture.length}${backsOn ? '' : ' • No Backs'}`;
                 }
             }
 
-            function setAllFurnitureFronts(enableFronts) {
+            function setAllFurnitureFronts(enableFronts, enableBacks = true) {
+                appState.showAllFurnitureSkeleton = true;
+                appState.showCabinetBacks = Boolean(enableBacks);
                 allFurniture.forEach(fn => {
                     appState.furnitureFrontsById[fn.id] = Boolean(enableFronts);
                 });
@@ -2821,8 +2895,8 @@
                         filter: fn => !!fn.isRoomFurniture && !fn.isSocketBundle
                     },
                     {
-                        title: 'Kitchen Island, Countertop & 90cm Sink (KITCHEN_ISLAND, KITCHEN_COUNTERTOP, KITCHEN_SINK_N2)',
-                        filter: fn => fn.id === 'KITCHEN_ISLAND' || fn.id === 'KITCHEN_COUNTERTOP' || fn.id === 'KITCHEN_SINK_N2'
+                        title: 'Kitchen Island, Countertop, 5mm Glass Backsplash & 90cm Sink (KITCHEN_ISLAND, KITCHEN_COUNTERTOP, KITCHEN_SPLASHBACK_GLASS, KITCHEN_SINK_N2)',
+                        filter: fn => fn.id === 'KITCHEN_ISLAND' || fn.id === 'KITCHEN_COUNTERTOP' || fn.id === 'KITCHEN_SPLASHBACK_GLASS' || fn.id === 'KITCHEN_SINK_N2'
                     },
                     {
                         title: 'Kitchen North Wall (EW_NORTH_RECESSED — CAB_KITCHEN_N1..N8)',
@@ -3261,20 +3335,15 @@
                 renderDropdownAndInspector();
             });
 
-            // Global Skeleton & Fronts Controls
-            document.getElementById('toggle-all-fronts').addEventListener('change', e => {
-                setAllFurnitureFronts(e.target.checked);
+            // Global Cabinet Parts Mode Buttons (Full Cabinets / No Fronts / No Fronts & Backs)
+            document.getElementById('btn-cab-mode-full').addEventListener('click', () => {
+                setAllFurnitureFronts(true, true);
             });
-            document.getElementById('toggle-all-skeleton').addEventListener('change', e => {
-                appState.showAllFurnitureSkeleton = e.target.checked;
-                renderDropdownAndInspector();
-                renderScene();
+            document.getElementById('btn-cab-mode-no-fronts').addEventListener('click', () => {
+                setAllFurnitureFronts(false, true);
             });
-            document.getElementById('btn-all-fronts-on').addEventListener('click', () => {
-                setAllFurnitureFronts(true);
-            });
-            document.getElementById('btn-all-fronts-off').addEventListener('click', () => {
-                setAllFurnitureFronts(false);
+            document.getElementById('btn-cab-mode-no-fronts-backs').addEventListener('click', () => {
+                setAllFurnitureFronts(false, false);
             });
 
             function applyPreset(ids) {
@@ -3529,6 +3598,9 @@
             }
             if (typeof SocketStore !== 'undefined' && typeof SocketStore.subscribe === 'function') {
                 SocketStore.subscribe(refreshFurnitureAndSocketsFromStores);
+            }
+            if (typeof MaterialStore !== 'undefined' && typeof MaterialStore.subscribe === 'function') {
+                MaterialStore.subscribe(refreshFurnitureAndSocketsFromStores);
             }
 
             // Initialize

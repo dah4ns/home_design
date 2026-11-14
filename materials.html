@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finishing Materials Configurator — Architectural Schedule</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0b1120;
+      --card-bg: rgba(15, 23, 42, 0.88);
+      --card-border: rgba(148, 163, 184, 0.18);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-sky: #38bdf8;
+      --accent-emerald: #10b981;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at 18% 12%, #1e293b 0%, #0b1120 68%);
+      color: var(--text-main);
+      min-height: 100vh;
+    }
+
+    /* Top Navigation Header */
+    .top-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 14px;
+      padding: 14px 28px;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-badge {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #0ea5e9, #2563eb);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 4px 14px rgba(14, 165, 233, 0.35);
+    }
+
+    .brand-title h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 19px;
+      font-weight: 700;
+      margin: 0;
+      letter-spacing: -0.01em;
+      color: #ffffff;
+    }
+
+    .brand-title p {
+      margin: 2px 0 0 0;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .nav-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 13px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      color: #e2e8f0;
+      background: rgba(30, 41, 59, 0.85);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      transition: all 0.18s ease;
+    }
+
+    .nav-pill:hover {
+      background: rgba(51, 65, 85, 0.95);
+      border-color: var(--accent-sky);
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+
+    .nav-pill.primary {
+      background: rgba(14, 165, 233, 0.18);
+      border-color: rgba(56, 189, 248, 0.45);
+      color: #7dd3fc;
+    }
+
+    /* Main Container */
+    .page-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .panel-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+      padding-bottom: 14px;
+    }
+
+    .panel-header h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-header p {
+      margin: 4px 0 0 0;
+      font-size: 12.5px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    /* Top Interactive Finishing Materials Table */
+    .bom-table-wrap {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    table.bom-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    table.bom-table th {
+      background: rgba(30, 41, 59, 0.92);
+      color: #cbd5e1;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-size: 11px;
+      padding: 13px 16px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+    }
+
+    table.bom-table tbody tr {
+      cursor: pointer;
+      transition: background 0.16s ease;
+    }
+
+    table.bom-table tbody tr:hover {
+      background: rgba(51, 65, 85, 0.45);
+    }
+
+    table.bom-table tbody tr.selected-row {
+      background: rgba(14, 165, 233, 0.14);
+      box-shadow: inset 3px 0 0 var(--accent-sky);
+    }
+
+    table.bom-table td {
+      padding: 15px 16px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+      color: #e2e8f0;
+      vertical-align: middle;
+    }
+
+    table.bom-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .code-tag {
+      display: inline-block;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 11.5px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(56, 189, 248, 0.14);
+      color: #7dd3fc;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
+    .table-material-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 5px 11px;
+      border-radius: 8px;
+      background: rgba(15, 23, 42, 0.72);
+      border: 1px solid rgba(148, 163, 184, 0.24);
+      font-weight: 600;
+      font-size: 12.5px;
+      color: #f8fafc;
+    }
+
+    .mini-swatch {
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .row-select-btn {
+      padding: 6px 12px;
+      border-radius: 7px;
+      font-size: 11.5px;
+      font-weight: 600;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      background: rgba(30, 41, 59, 0.8);
+      color: #cbd5e1;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    tr.selected-row .row-select-btn {
+      background: var(--accent-sky);
+      border-color: var(--accent-sky);
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    /* Bottom Material Selection Panel */
+    .detail-meta-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      background: rgba(30, 41, 59, 0.55);
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      font-size: 12px;
+      color: #cbd5e1;
+    }
+
+    .meta-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-right: 14px;
+    }
+
+    .meta-label {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .meta-val {
+      color: #f8fafc;
+      font-weight: 600;
+    }
+
+    /* Material Option Cards Grid */
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 18px;
+    }
+
+    .option-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 18px;
+      border-radius: 14px;
+      background: rgba(30, 41, 59, 0.65);
+      border: 2px solid rgba(148, 163, 184, 0.22);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: left;
+      color: inherit;
+      font-family: inherit;
+    }
+
+    .option-card:hover {
+      border-color: rgba(56, 189, 248, 0.55);
+      background: rgba(30, 41, 59, 0.9);
+      transform: translateY(-2px);
+    }
+
+    .option-card.active {
+      border-color: var(--accent-sky);
+      background: rgba(14, 165, 233, 0.13);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.35), 0 12px 28px rgba(2, 132, 199, 0.24);
+    }
+
+    /* Realistic Material Swatch Previews */
+    .swatch-visual {
+      height: 124px;
+      border-radius: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Realistic Low-Iron Optiwhite White Glass Swatch */
+    .swatch-visual.swatch-white-glass,
+    .mini-swatch.swatch-white-glass {
+      background: linear-gradient(165deg,
+        #ffffff 0%,
+        #f2fbff 22%,
+        #d6effa 46%,
+        #ffffff 58%,
+        #e6f6fc 78%,
+        #c5e8f7 100%
+      );
+      border: 2px solid #5ce1e6;
+      box-shadow:
+        inset 0 0 0 2px rgba(255, 255, 255, 0.85),
+        inset 0 8px 18px rgba(255, 255, 255, 0.95),
+        inset 0 -10px 18px rgba(14, 165, 233, 0.18),
+        0 6px 18px rgba(14, 165, 233, 0.2);
+    }
+
+    .swatch-visual.swatch-white-glass::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(115deg,
+          transparent 12%,
+          rgba(255, 255, 255, 0.92) 22%,
+          rgba(255, 255, 255, 0.92) 29%,
+          transparent 33%,
+          rgba(125, 211, 252, 0.26) 44%,
+          transparent 54%,
+          rgba(255, 255, 255, 0.96) 62%,
+          rgba(255, 255, 255, 0.96) 65%,
+          transparent 70%
+        );
+      pointer-events: none;
+    }
+
+    .swatch-visual.swatch-white-glass::after {
+      content: '5mm OPTIWHITE TEMPERED GLASS • POLISHED AQUA EDGE';
+      position: absolute;
+      bottom: 8px;
+      right: 10px;
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: #0369a1;
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid rgba(56, 189, 248, 0.55);
+      padding: 3px 8px;
+      border-radius: 999px;
+      backdrop-filter: blur(4px);
+    }
+
+    /* Realistic Deep Obsidian Black Glass Swatch */
+    .swatch-visual.swatch-black-glass,
+    .mini-swatch.swatch-black-glass {
+      background: linear-gradient(160deg,
+        #070a0f 0%,
+        #111827 28%,
+        #243247 46%,
+        #0b0f17 56%,
+        #162030 78%,
+        #05070b 100%
+      );
+      border: 2px solid #475569;
+      box-shadow:
+        inset 0 0 0 1.5px rgba(148, 163, 184, 0.35),
+        inset 0 8px 18px rgba(255, 255, 255, 0.12),
+        0 6px 18px rgba(0, 0, 0, 0.45);
+    }
+
+    .swatch-visual.swatch-black-glass::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(115deg,
+          transparent 16%,
+          rgba(255, 255, 255, 0.24) 24%,
+          rgba(255, 255, 255, 0.24) 29%,
+          transparent 35%,
+          rgba(186, 230, 253, 0.16) 56%,
+          rgba(255, 255, 255, 0.32) 62%,
+          transparent 67%
+        );
+      pointer-events: none;
+    }
+
+    .swatch-visual.swatch-black-glass::after {
+      content: '5mm OBSIDIAN TEMPERED GLASS • MIRROR POLISH';
+      position: absolute;
+      bottom: 8px;
+      right: 10px;
+      font-size: 9.5px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: #e2e8f0;
+      background: rgba(15, 23, 42, 0.82);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 3px 8px;
+      border-radius: 999px;
+    }
+
+    /* Stone Swatches */
+    .swatch-visual.swatch-cashmere-stone,
+    .mini-swatch.swatch-cashmere-stone {
+      background: linear-gradient(135deg, #efe6d5 0%, #e4d5bd 48%, #f3ece0 72%, #d8c6a8 100%);
+      border: 2px solid #c2ad8d;
+    }
+
+    .swatch-visual.swatch-calacatta-stone,
+    .mini-swatch.swatch-calacatta-stone {
+      background:
+        linear-gradient(125deg, transparent 35%, rgba(148, 163, 184, 0.28) 38%, transparent 41%),
+        linear-gradient(155deg, transparent 62%, rgba(148, 163, 184, 0.22) 64%, transparent 67%),
+        linear-gradient(135deg, #ffffff 0%, #f1f5f9 52%, #ffffff 78%, #e2e8f0 100%);
+      border: 2px solid #cbd5e1;
+    }
+
+    .swatch-visual.swatch-anthracite-stone,
+    .mini-swatch.swatch-anthracite-stone {
+      background: linear-gradient(135deg, #27272a 0%, #3f3f46 48%, #18181b 74%, #27272a 100%);
+      border: 2px solid #52525b;
+    }
+
+    .option-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .option-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .option-status-pill {
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.2);
+      color: #cbd5e1;
+    }
+
+    .option-card.active .option-status-pill {
+      background: var(--accent-sky);
+      color: #0f172a;
+    }
+
+    .option-tech-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: #7dd3fc;
+      margin-top: -6px;
+    }
+
+    .option-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header class="top-header">
+    <div class="brand-group">
+      <div class="brand-badge">🎨</div>
+      <div class="brand-title">
+        <h1>Finishing Materials Schedule &amp; Configurator</h1>
+        <p>Select any row in the schedule below to configure its finishing material • Synced with Kitchen 2D, 3D Objects &amp; 3D Walkthrough</p>
+      </div>
+    </div>
+    <nav class="nav-links">
+      <a href="index.html" class="nav-pill">← Dashboard</a>
+      <a href="kitchen.html" class="nav-pill primary">🍳 Kitchen 2D Elevation</a>
+      <a href="objects_3d.html" class="nav-pill primary">🧱 3D Objects Inspector</a>
+      <a href="walkthrough_3d.html" class="nav-pill primary">🚶 3D Walkthrough</a>
+      <a href="floor_plan.html" class="nav-pill">🗺️ 2D Floor Plan</a>
+    </nav>
+  </header>
+
+  <main class="page-container">
+    <!-- 1. TOP SECTION: Interactive Finishing Materials Schedule Table -->
+    <section class="panel-card">
+      <div class="panel-header">
+        <div>
+          <h2>📋 Kitchen Finishing Materials Schedule</h2>
+          <p>Click any element in the table to open its material selector panel below.</p>
+        </div>
+      </div>
+
+      <div class="bom-table-wrap">
+        <table class="bom-table">
+          <thead>
+            <tr>
+              <th>Code / ID</th>
+              <th>Component &amp; Location</th>
+              <th>Exact Dimensions (mm)</th>
+              <th>Qty / Area</th>
+              <th>Selected Material &amp; Finish</th>
+              <th style="text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="schedule-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 2. BOTTOM SECTION: Selected Element Material Configurator Panel -->
+    <section class="panel-card" id="material-selector-panel">
+      <div class="panel-header">
+        <div>
+          <h2 id="detail-panel-title">✨ Select Finishing Material</h2>
+          <p id="detail-panel-subtitle"></p>
+        </div>
+        <span class="code-tag" id="detail-panel-code"></span>
+      </div>
+
+      <div class="detail-meta-bar" id="detail-meta-bar"></div>
+
+      <div class="options-grid" id="material-options-grid"></div>
+    </section>
+  </main>
+
+  <script src="js/material-store.js"></script>
+  <script>
+    (function () {
+      'use strict';
+
+      var selectedObjectId = 'KITCHEN_SPLASHBACK_GLASS';
+
+      function renderPage() {
+        var catalog = MaterialStore.getCatalog();
+        if (!catalog || catalog.length === 0) return;
+
+        var activeCatalogItem = catalog.find(function (c) {
+          return c.objectId === selectedObjectId;
+        }) || catalog[0];
+        selectedObjectId = activeCatalogItem.objectId;
+
+        renderScheduleTable(catalog, selectedObjectId);
+        renderDetailSelectorPanel(activeCatalogItem);
+      }
+
+      function renderScheduleTable(catalog, currentObjectId) {
+        var tbody = document.getElementById('schedule-table-body');
+        if (!tbody) return;
+        tbody.replaceChildren();
+
+        catalog.forEach(function (item) {
+          var isSelected = (item.objectId === currentObjectId);
+          var activeSpec = MaterialStore.getMaterialSpec(item.objectId);
+
+          var tr = document.createElement('tr');
+          if (isSelected) {
+            tr.className = 'selected-row';
+          }
+          tr.addEventListener('click', function () {
+            selectedObjectId = item.objectId;
+            renderPage();
+          });
+
+          // 1. Code / ID
+          var tdCode = document.createElement('td');
+          var codeSpan = document.createElement('span');
+          codeSpan.className = 'code-tag';
+          codeSpan.textContent = item.objectId;
+          tdCode.appendChild(codeSpan);
+          tr.appendChild(tdCode);
+
+          // 2. Component & Location
+          var tdComp = document.createElement('td');
+          var titleDiv = document.createElement('div');
+          titleDiv.style.fontWeight = '600';
+          titleDiv.style.color = '#ffffff';
+          titleDiv.textContent = item.componentLabel || item.name;
+          var subDiv = document.createElement('div');
+          subDiv.style.fontSize = '11.5px';
+          subDiv.style.color = '#94a3b8';
+          subDiv.style.marginTop = '3px';
+          subDiv.textContent = item.positionLabel;
+          tdComp.appendChild(titleDiv);
+          tdComp.appendChild(subDiv);
+          tr.appendChild(tdComp);
+
+          // 3. Exact Dimensions
+          var tdDims = document.createElement('td');
+          tdDims.style.fontFamily = 'ui-monospace, SFMono-Regular, Menlo, monospace';
+          tdDims.style.fontSize = '12px';
+          tdDims.textContent = item.dimensionsLabel;
+          tr.appendChild(tdDims);
+
+          // 4. Qty / Area
+          var tdQty = document.createElement('td');
+          tdQty.textContent = item.qtyAreaLabel;
+          tr.appendChild(tdQty);
+
+          // 5. Selected Material & Finish
+          var tdMat = document.createElement('td');
+          if (activeSpec) {
+            var matPill = document.createElement('span');
+            matPill.className = 'table-material-pill';
+            var swatch = document.createElement('span');
+            swatch.className = 'mini-swatch ' + (activeSpec.swatchClass || '');
+            if (!activeSpec.swatchClass && activeSpec.chipColor) {
+              swatch.style.backgroundColor = activeSpec.chipColor;
+            }
+            var matNameSpan = document.createElement('span');
+            matNameSpan.textContent = activeSpec.name + ' (' + activeSpec.badgeText + ')';
+            matPill.appendChild(swatch);
+            matPill.appendChild(matNameSpan);
+            tdMat.appendChild(matPill);
+          }
+          tr.appendChild(tdMat);
+
+          // 6. Action Button
+          var tdAction = document.createElement('td');
+          tdAction.style.textAlign = 'right';
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'row-select-btn';
+          btn.textContent = isSelected ? '▼ Editing Below' : 'Change Material';
+          tdAction.appendChild(btn);
+          tr.appendChild(tdAction);
+
+          tbody.appendChild(tr);
+        });
+      }
+
+      function renderDetailSelectorPanel(item) {
+        var titleEl = document.getElementById('detail-panel-title');
+        var subEl = document.getElementById('detail-panel-subtitle');
+        var codeEl = document.getElementById('detail-panel-code');
+        var metaBar = document.getElementById('detail-meta-bar');
+        var grid = document.getElementById('material-options-grid');
+
+        var currentMatId = MaterialStore.getMaterialId(item.objectId);
+
+        if (titleEl) {
+          titleEl.textContent = '✨ Select Material for: ' + item.name;
+        }
+        if (subEl) {
+          subEl.textContent = item.fabricationNotes || '';
+        }
+        if (codeEl) {
+          codeEl.textContent = item.objectId;
+        }
+
+        if (metaBar) {
+          metaBar.replaceChildren();
+          var metas = [
+            { label: 'Room:', val: item.room },
+            { label: 'Host Location:', val: item.hostWallId },
+            { label: 'Dimensions:', val: item.dimensionsLabel },
+            { label: '3D Coordinates:', val: item.positionLabel }
+          ];
+          metas.forEach(function (m) {
+            var span = document.createElement('span');
+            span.className = 'meta-item';
+            var lbl = document.createElement('span');
+            lbl.className = 'meta-label';
+            lbl.textContent = m.label;
+            var val = document.createElement('span');
+            val.className = 'meta-val';
+            val.textContent = m.val;
+            span.appendChild(lbl);
+            span.appendChild(val);
+            metaBar.appendChild(span);
+          });
+        }
+
+        if (!grid) return;
+        grid.replaceChildren();
+
+        (item.options || []).forEach(function (opt) {
+          var isActive = (opt.id === currentMatId);
+
+          var card = document.createElement('button');
+          card.type = 'button';
+          card.className = 'option-card' + (isActive ? ' active' : '');
+          card.addEventListener('click', function () {
+            MaterialStore.setMaterial(item.objectId, opt.id);
+            renderPage();
+          });
+
+          var visual = document.createElement('div');
+          visual.className = 'swatch-visual ' + (opt.swatchClass || '');
+          card.appendChild(visual);
+
+          var titleRow = document.createElement('div');
+          titleRow.className = 'option-title-row';
+
+          var titleSpan = document.createElement('span');
+          titleSpan.className = 'option-title';
+          titleSpan.textContent = opt.name;
+
+          var pillSpan = document.createElement('span');
+          pillSpan.className = 'option-status-pill';
+          pillSpan.textContent = isActive ? '✓ SELECTED' : 'CLICK TO SELECT';
+
+          titleRow.appendChild(titleSpan);
+          titleRow.appendChild(pillSpan);
+          card.appendChild(titleRow);
+
+          var techDiv = document.createElement('div');
+          techDiv.className = 'option-tech-name';
+          techDiv.textContent = opt.technicalName;
+          card.appendChild(techDiv);
+
+          var descP = document.createElement('p');
+          descP.className = 'option-desc';
+          descP.textContent = opt.description;
+          card.appendChild(descP);
+
+          grid.appendChild(card);
+        });
+      }
+
+      MaterialStore.subscribe(function () {
+        renderPage();
+      });
+
+      renderPage();
+    })();
+  </script>
+</body>
+</html>

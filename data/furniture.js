@@ -2765,6 +2765,165 @@
         },
 
         // =====================================================================
+        // 23b. KITCHEN_SPLASHBACK_GLASS: 5 mm Tempered Glass Backsplash Pane (Lacobel)
+        //      Mounted on Kitchen West Wall (GW_3, X = 11,910..11,915 mm) above Countertop (Z = 900 mm)
+        //      and below Upper Wall Cabinets CAB_KITCHEN_W_UP1..W_UP5 (Z = 1,500 mm), Y = 3,170..6,170 mm.
+        // =====================================================================
+        {
+            id: 'KITCHEN_SPLASHBACK_GLASS',
+            name: 'KITCHEN_SPLASHBACK_GLASS — Kitchen West Wall 5mm Tempered Glass Backsplash Pane (3000×5×600mm, Z=900..1500mm)',
+            shortName: '5mm Glass Backsplash Pane (West Wall, Z=900..1500)',
+            category: 'backsplash',
+            subtype: 'glass_backsplash_5mm',
+            floor: 'ground',
+            room: '0.13 Kuchnia',
+            hostWallId: 'GW_3',
+            viewId: 'kitchen_west_wall',
+            x1: 11910,
+            x2: 11915,
+            y1: 3170,
+            y2: 6170,
+            zBottom: 900,
+            zTop: 1500,
+            widthMm: 3000,
+            depthMm: 5,
+            carcassDepthMm: 5,
+            frontThicknessMm: 0,
+            plinthHeightMm: 0,
+            plinthRecessMm: 0,
+            bodyHeightMm: 600,
+            heightMm: 600,
+            boardThicknessMm: 5,
+            normal: [-1, 0, 0],
+            specs: '3,000 × 5 × 600 mm tempered Lacobel glass pane (X = 11,910..11,915 mm, Y = 3,170..6,170 mm, Z = 900..1,500 mm) mounted on Kitchen West Wall GW_3 between stone countertop (Z = 900 mm) and upper wall cabinets (Z = 1,500 mm). Configurable material: White Glass / Black Glass.',
+            description: 'Fixed-position 5 mm tempered glass backsplash panel (Lacobel) spanning the full 3,000 mm Kitchen West Wall run (Y = 3,170..6,170 mm) directly above the 30 mm stone countertop (Z = 900 mm) and below the upper wall cabinets CAB_KITCHEN_W_UP1..W_UP5 (Z = 1,500 mm). Finishing material is configurable between White Glass and Black Glass in materials.html.',
+            skeleton: [
+                {
+                    id: 'KITCHEN_SPLASHBACK_GLASS_PANE',
+                    name: '5mm Tempered Lacobel Glass Backsplash Pane (5×3000×600 mm, Z=900..1500 mm)',
+                    role: 'backsplash_glass',
+                    material: 'white_glass',
+                    colorRgb: [0.95, 0.98, 1.00],
+                    x0: 11910, x1: 11915,
+                    y0: 3170, y1: 6170,
+                    z0: 900, z1: 1500
+                }
+            ],
+            fronts: []
+        },
+
+        // =====================================================================
+        // 23c. KITCHEN_SPLASHBACK_GLASS_NORTH: U-Shaped 5 mm Tempered Glass Backsplash Panel
+        //      Mounted on Kitchen Back/North Wall (EW_NORTH_RECESSED, Y = 3,170..3,175 mm)
+        //      spanning X = 8,315..11,910 mm above Countertop (Z = 900 mm) up to Z = 1,500 mm
+        //      with a precision U-shaped cutout under Window O1 (X = 8,480..10,580 mm, Z = 900..1,100 mm).
+        // =====================================================================
+        (function buildKitchenNorthSplashbackItem() {
+            const x0 = 8315;
+            const x1 = 8480;
+            const x2 = 10580;
+            const x3 = 11910;
+            const y0 = 3170;
+            const y1 = 3175;
+            const z0 = 900;
+            const z1 = 1100;
+            const z2 = 1500;
+            const b = 14;
+
+            const faces3D = [
+                // Front U-shaped surface decomposed into 3 seamless convex quads (normal [0, 1, 0])
+                { side: 'south_east_wing', normal: [0, 1, 0], noWireframe: true, loop3D: [[x0, y1, z0], [x1, y1, z0], [x1, y1, z2], [x0, y1, z2]] },
+                { side: 'south_window_sill', normal: [0, 1, 0], noWireframe: true, loop3D: [[x1, y1, z0], [x2, y1, z0], [x2, y1, z1], [x1, y1, z1]] },
+                { side: 'south_west_wing', normal: [0, 1, 0], noWireframe: true, loop3D: [[x2, y1, z0], [x3, y1, z0], [x3, y1, z2], [x2, y1, z2]] },
+                // Back U-shaped surface against wall (normal [0, -1, 0])
+                { side: 'north_east_wing', normal: [0, -1, 0], noWireframe: true, loop3D: [[x1, y0, z0], [x0, y0, z0], [x0, y0, z2], [x1, y0, z2]] },
+                { side: 'north_window_sill', normal: [0, -1, 0], noWireframe: true, loop3D: [[x2, y0, z0], [x1, y0, z0], [x1, y0, z1], [x2, y0, z1]] },
+                { side: 'north_west_wing', normal: [0, -1, 0], noWireframe: true, loop3D: [[x3, y0, z0], [x2, y0, z0], [x2, y0, z2], [x3, y0, z2]] },
+                // 8 perimeter 5 mm thickness rim quads
+                { side: 'bottom', normal: [0, 0, -1], noWireframe: true, loop3D: [[x0, y0, z0], [x3, y0, z0], [x3, y1, z0], [x0, y1, z0]] },
+                { side: 'east_outer', normal: [-1, 0, 0], noWireframe: true, loop3D: [[x0, y0, z0], [x0, y1, z0], [x0, y1, z2], [x0, y0, z2]] },
+                { side: 'top_east', normal: [0, 0, 1], noWireframe: true, loop3D: [[x0, y1, z2], [x1, y1, z2], [x1, y0, z2], [x0, y0, z2]] },
+                { side: 'notch_east', normal: [1, 0, 0], noWireframe: true, loop3D: [[x1, y1, z1], [x1, y0, z1], [x1, y0, z2], [x1, y1, z2]] },
+                { side: 'top_sill', normal: [0, 0, 1], noWireframe: true, loop3D: [[x1, y1, z1], [x2, y1, z1], [x2, y0, z1], [x1, y0, z1]] },
+                { side: 'notch_west', normal: [-1, 0, 0], noWireframe: true, loop3D: [[x2, y0, z1], [x2, y1, z1], [x2, y1, z2], [x2, y0, z2]] },
+                { side: 'top_west', normal: [0, 0, 1], noWireframe: true, loop3D: [[x2, y1, z2], [x3, y1, z2], [x3, y0, z2], [x2, y0, z2]] },
+                { side: 'west_outer', normal: [1, 0, 0], noWireframe: true, loop3D: [[x3, y1, z0], [x3, y0, z0], [x3, y0, z2], [x3, y1, z2]] }
+            ];
+
+            const wireframeLines3D = [
+                // Continuous 8-corner U-shaped outer boundary loop
+                [
+                    [x0, y1 + 0.2, z0],
+                    [x3, y1 + 0.2, z0],
+                    [x3, y1 + 0.2, z2],
+                    [x2, y1 + 0.2, z2],
+                    [x2, y1 + 0.2, z1],
+                    [x1, y1 + 0.2, z1],
+                    [x1, y1 + 0.2, z2],
+                    [x0, y1 + 0.2, z2],
+                    [x0, y1 + 0.2, z0]
+                ],
+                // Continuous 8-corner U-shaped inner diamond-polished bevel loop
+                [
+                    [x0 + b, y1 + 0.3, z0 + b],
+                    [x3 - b, y1 + 0.3, z0 + b],
+                    [x3 - b, y1 + 0.3, z2 - b],
+                    [x2 + b, y1 + 0.3, z2 - b],
+                    [x2 + b, y1 + 0.3, z1 - b],
+                    [x1 - b, y1 + 0.3, z1 - b],
+                    [x1 - b, y1 + 0.3, z2 - b],
+                    [x0 + b, y1 + 0.3, z2 - b],
+                    [x0 + b, y1 + 0.3, z0 + b]
+                ]
+            ];
+
+            return {
+                id: 'KITCHEN_SPLASHBACK_GLASS_NORTH',
+                name: 'KITCHEN_SPLASHBACK_GLASS_NORTH — Kitchen Back Wall U-Shaped 5mm Tempered Glass Backsplash Panel (3595×5×600/200mm around Window O1)',
+                shortName: '5mm Glass Backsplash U-Panel (Back Wall around O1)',
+                category: 'backsplash',
+                subtype: 'glass_backsplash_5mm',
+                floor: 'ground',
+                room: '0.13 Kuchnia',
+                hostWallId: 'EW_NORTH_RECESSED',
+                viewId: 'kitchen_north_wall',
+                x1: x0,
+                x2: x3,
+                y1: y0,
+                y2: y1,
+                zBottom: z0,
+                zTop: z2,
+                widthMm: x3 - x0,
+                depthMm: 5,
+                carcassDepthMm: 5,
+                frontThicknessMm: 0,
+                plinthHeightMm: 0,
+                plinthRecessMm: 0,
+                bodyHeightMm: 600,
+                heightMm: 600,
+                boardThicknessMm: 5,
+                normal: [0, 1, 0],
+                specs: '3,595 × 5 × 600 mm U-shaped tempered Lacobel glass panel (X = 8,315..11,910 mm, Y = 3,170..3,175 mm, Z = 900..1,500 mm with 2,100 × 400 mm window cutout at X = 8,480..10,580 mm, Z = 1,100..1,500 mm under Window O1). Configurable material: White Glass / Black Glass.',
+                description: 'U-shaped 5 mm tempered glass backsplash panel mounted on the Kitchen Back (North) Wall (EW_NORTH_RECESSED) from the West Wall corner (X = 11,910 mm) to the Tall Fridge Cabinet (X = 8,315 mm), rising 600 mm (Z = 900..1,500 mm) on both sides of Window O1 and 200 mm (Z = 900..1,100 mm) beneath the Window O1 sill.',
+                skeleton: [
+                    {
+                        id: 'KITCHEN_SPLASHBACK_GLASS_NORTH_PANE',
+                        name: 'U-Shaped 5mm Tempered Glass Backsplash Pane around Window O1 (3595×5×600/200 mm, Z=900..1500 mm)',
+                        role: 'backsplash_glass',
+                        material: 'white_glass',
+                        colorRgb: [0.95, 0.98, 1.00],
+                        x0: x0, x1: x3,
+                        y0: y0, y1: y1,
+                        z0: z0, z1: z2,
+                        faces3D: faces3D,
+                        wireframeLines3D: wireframeLines3D
+                    }
+                ],
+                fronts: []
+            };
+        })(),
+
+        // =====================================================================
         // 24. KITCHEN_SINK_N2: 90 cm Undermount Stainless Steel Kitchen Sink & Spring Faucet (Zlew)
         //     Mounted inside the wide top opening of CAB_KITCHEN_N2 and the cutout of KITCHEN_COUNTERTOP
         // =====================================================================

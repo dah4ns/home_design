@@ -536,6 +536,7 @@
   <div class="top-bar">
     <div class="brand-pill">
       <a href="index.html" class="back-link">← Dashboard</a>
+      <a href="materials.html" class="back-link" style="background: rgba(56,189,248,0.15); border-color: rgba(56,189,248,0.35); color: #7dd3fc;">🎨 Materials</a>
       <a href="building_3d.html" class="back-link" style="background: rgba(245,158,11,0.14); border-color: rgba(245,158,11,0.3); color: #fcd34d;">3D Orbit</a>
       <a href="furniture_layout.html" class="back-link" style="background: rgba(16,185,129,0.15); border-color: rgba(16,185,129,0.35); color: #6ee7b7;">🛋️ 2D Furniture</a>
       <div class="title-group">
@@ -707,6 +708,7 @@
   <script src="js/persistence.js"></script>
   <script src="js/room-furniture-store.js"></script>
   <script src="js/socket-store.js"></script>
+  <script src="js/material-store.js"></script>
   <script src="js/wall-service.js"></script>
 
   <script>
@@ -856,6 +858,7 @@
         'uniform float uIsGlass;',
         'uniform float uIsInteriorWall;',
         'uniform float uIsMetallic;',
+        'uniform float uIsReflectiveGlass;',
         'uniform vec3 uSunDir;',
         'uniform vec3 uCamPos;',
         'uniform sampler2D uSampler;',
@@ -898,6 +901,58 @@
         '  float hemi = 0.5 + 0.5 * n.z;',
         '  float light = 0.46 + 0.34 * dSun + 0.12 * dFill1 + 0.08 * dFill2 + 0.06 * hemi;',
         '  vec3 litColor = base * clamp(light, 0.38, 1.08);',
+        '  if (uIsReflectiveGlass > 0.5) {',
+        '    vec3 viewDir = normalize(uCamPos - vWorldPos);',
+        '    vec3 refl = reflect(-viewDir, n);',
+        '    vec3 hSun = normalize(lSun + viewDir);',
+        '    vec3 hFill = normalize(lFill1 + viewDir);',
+        '    float spec1 = pow(max(dot(n, hSun), 0.0), 84.0);',
+        '    float spec2 = pow(max(dot(n, hFill), 0.0), 28.0);',
+        '    float fres = pow(1.0 - max(dot(n, viewDir), 0.0), 2.2);',
+        '    bool isNorthGlass = (abs(n.y) > abs(n.x));',
+        '    float uCoord = isNorthGlass ? (15080.0 - vWorldPos.x) : vWorldPos.y;',
+        '    float reflU = isNorthGlass ? (-refl.x) : refl.y;',
+        '    float diagWide = smoothstep(0.20, 0.92, sin((uCoord * 0.0021 + vWorldPos.z * 0.0032) + reflU * 2.8 + refl.z * 1.8));',
+        '    float diagSharp = smoothstep(0.74, 0.992, sin((uCoord * 0.0046 + vWorldPos.z * 0.0058) + reflU * 4.2));',
+        '    float diagTwin = smoothstep(0.78, 0.996, sin((uCoord * 0.0084 + vWorldPos.z * 0.0096) - reflU * 3.4));',
+        '    float zNorm = clamp((vWorldPos.z - 900.0) / 600.0, 0.0, 1.0);',
+        '    float edgeDist;',
+        '    if (isNorthGlass) {',
+        '      float dOuterX = min(abs(vWorldPos.x - 8315.0), abs(11910.0 - vWorldPos.x));',
+        '      float dBotZ = abs(vWorldPos.z - 900.0);',
+        '      float dTopZ = (vWorldPos.x >= 8480.0 && vWorldPos.x <= 10580.0) ? abs(1100.0 - vWorldPos.z) : abs(1500.0 - vWorldPos.z);',
+        '      float dNotchX = (vWorldPos.z >= 1085.0) ? min(abs(vWorldPos.x - 8480.0), abs(vWorldPos.x - 10580.0)) : 9999.0;',
+        '      edgeDist = min(min(dOuterX, dNotchX), min(dBotZ, dTopZ));',
+        '    } else {',
+        '      float edgeDistY = min(abs(vWorldPos.y - 3170.0), abs(6170.0 - vWorldPos.y));',
+        '      float edgeDistZ = min(abs(vWorldPos.z - 900.0), abs(1500.0 - vWorldPos.z));',
+        '      edgeDist = min(edgeDistY, edgeDistZ);',
+        '    }',
+        '    float edgeRim = 1.0 - smoothstep(0.0, 22.0, edgeDist);',
+        '    if (uColor.r > 0.5) {',
+        '      vec3 porcelainCore = vec3(0.95, 0.98, 1.00);',
+        '      vec3 skyAquaRefl = vec3(0.68, 0.87, 0.96);',
+        '      vec3 deepTealRefl = vec3(0.54, 0.79, 0.91);',
+        '      vec3 warmStoneBounce = vec3(0.93, 0.89, 0.83);',
+        '      float underCabGlow = smoothstep(0.68, 0.97, zNorm) * (1.0 - smoothstep(0.96, 1.0, zNorm) * 0.45);',
+        '      float counterBounce = 1.0 - smoothstep(0.0, 0.24, zNorm);',
+        '      vec3 glassCol = mix(porcelainCore, skyAquaRefl, 0.24 + 0.34 * diagWide + 0.22 * fres);',
+        '      glassCol = mix(glassCol, warmStoneBounce, counterBounce * 0.26);',
+        '      glassCol = mix(glassCol, deepTealRefl, (1.0 - diagWide) * 0.16);',
+        '      float whiteStreak = clamp(diagSharp * 0.65 + diagTwin * 0.52 + spec1 * 0.85 + spec2 * 0.30 + underCabGlow * 0.28, 0.0, 1.0);',
+        '      glassCol = mix(glassCol, vec3(1.0, 1.0, 1.0), whiteStreak);',
+        '      glassCol = mix(glassCol, vec3(0.28, 0.82, 0.94), edgeRim * 0.68);',
+        '      gl_FragColor = vec4(clamp(glassCol, 0.0, 1.0), uAlpha);',
+        '      return;',
+        '    } else {',
+        '      vec3 envTint = vec3(0.84, 0.93, 1.0);',
+        '      float reflMix = clamp(fres * 0.24 + diagWide * 0.14 + diagSharp * 0.16 + diagTwin * 0.12 + spec2 * 0.18, 0.0, 0.62);',
+        '      vec3 glassCol = mix(litColor, envTint, reflMix) + vec3(0.94, 0.98, 1.0) * (spec1 * 0.56);',
+        '      glassCol = mix(glassCol, vec3(0.26, 0.44, 0.56), edgeRim * 0.55);',
+        '      gl_FragColor = vec4(clamp(glassCol, 0.0, 1.0), uAlpha);',
+        '      return;',
+        '    }',
+        '  }',
         '  if (uIsMetallic > 0.5) {',
         '    vec3 viewDir = normalize(uCamPos - vWorldPos);',
         '    vec3 hSun = normalize(lSun + viewDir);',
@@ -935,6 +990,7 @@
       var uIsGlassLoc = gl.getUniformLocation(prog, 'uIsGlass');
       var uIsInteriorWallLoc = gl.getUniformLocation(prog, 'uIsInteriorWall');
       var uIsMetallicLoc = gl.getUniformLocation(prog, 'uIsMetallic');
+      var uIsReflectiveGlassLoc = gl.getUniformLocation(prog, 'uIsReflectiveGlass');
       var uSunDirLoc = gl.getUniformLocation(prog, 'uSunDir');
       var uCamPosLoc = gl.getUniformLocation(prog, 'uCamPos');
       var uSamplerLoc = gl.getUniformLocation(prog, 'uSampler');
@@ -1229,6 +1285,7 @@
           isGlass: !!props.isGlass,
           isInteriorWall: !!props.isInteriorWall,
           isMetallic: !!props.isMetallic,
+          isReflectiveGlass: !!props.isReflectiveGlass,
           isRoof: !!props.isRoof,
           isWallTopCap: !!props.isWallTopCap,
           isTree: !!props.isTree,
@@ -2370,6 +2427,7 @@
             return;
           }
 
+          var isReflectiveGlass = (role === 'backsplash_glass' || !!part.isReflectiveGlass);
           var isMetallic = (
             role === 'sink_faucet' ||
             role === 'sink_basin' ||
@@ -2381,7 +2439,7 @@
 
           var colorKey =
             (effectiveFront ? 'F_' : 'S_') +
-            (isMetallic ? 'M_' : 'P_') +
+            (isReflectiveGlass ? 'G_' : (isMetallic ? 'M_' : 'P_')) +
             Math.round(rgb[0] * 255) + '_' +
             Math.round(rgb[1] * 255) + '_' +
             Math.round(rgb[2] * 255);
@@ -2391,13 +2449,14 @@
               builder: createBuilder(),
               color: [rgb[0], rgb[1], rgb[2]],
               isFront: effectiveFront,
-              isMetallic: isMetallic
+              isMetallic: isMetallic,
+              isReflectiveGlass: isReflectiveGlass
             };
           }
 
           var lineTarget = effectiveFront
             ? ((isMetallic || role === 'handle_bar') ? bFurnLinesFrontMetal : bFurnLinesFrontWood)
-            : (isMetallic
+            : ((isMetallic || isReflectiveGlass)
                 ? bFurnLinesSkeletonMetal
                 : ((role === 'countertop_slab' || isUpholstery) ? bFurnLinesSkeletonStone : bFurnLinesSkeletonWood));
 
@@ -2451,7 +2510,8 @@
               color: bInfo.color,
               isFurniture: true,
               isFurnitureFront: bInfo.isFront,
-              isMetallic: bInfo.isMetallic
+              isMetallic: bInfo.isMetallic,
+              isReflectiveGlass: bInfo.isReflectiveGlass
             }));
           }
         });
@@ -2662,6 +2722,11 @@
       }
       if (typeof SocketStore !== 'undefined' && typeof SocketStore.subscribe === 'function') {
         SocketStore.subscribe(function () {
+          buildSceneMeshes();
+        });
+      }
+      if (typeof MaterialStore !== 'undefined' && typeof MaterialStore.subscribe === 'function') {
+        MaterialStore.subscribe(function () {
           buildSceneMeshes();
         });
       }
@@ -3594,6 +3659,7 @@
         gl.uniform1f(uIsGlassLoc, m.isGlass ? 1.0 : 0.0);
         gl.uniform1f(uIsInteriorWallLoc, m.isInteriorWall ? 1.0 : 0.0);
         gl.uniform1f(uIsMetallicLoc, m.isMetallic ? 1.0 : 0.0);
+        gl.uniform1f(uIsReflectiveGlassLoc, m.isReflectiveGlass ? 1.0 : 0.0);
 
         if (m.texKey && textures[m.texKey]) {
           gl.uniform1f(uUseTexLoc, 1.0);
