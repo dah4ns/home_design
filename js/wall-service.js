@@ -2784,8 +2784,10 @@
                     if (zSlice >= part.z0 && zSlice <= part.z1) {
                         if (Array.isArray(part.slicePolygons2D)) {
                             part.slicePolygons2D.forEach(poly => polygons2D.push(poly));
-                        } else {
+                        } else if (Array.isArray(part.footprint2D)) {
                             polygons2D.push(part.footprint2D);
+                        } else if (part.x0 !== undefined && part.x1 !== undefined) {
+                            polygons2D.push([[part.x0, part.y0], [part.x1, part.y0], [part.x1, part.y1], [part.x0, part.y1]]);
                         }
                     }
                 });
@@ -2795,8 +2797,10 @@
                     if (zSlice >= part.z0 && zSlice <= part.z1) {
                         if (Array.isArray(part.slicePolygons2D)) {
                             part.slicePolygons2D.forEach(poly => polygons2D.push(poly));
-                        } else {
+                        } else if (Array.isArray(part.footprint2D)) {
                             polygons2D.push(part.footprint2D);
+                        } else if (part.x0 !== undefined && part.x1 !== undefined) {
+                            polygons2D.push([[part.x0, part.y0], [part.x1, part.y0], [part.x1, part.y1], [part.x0, part.y1]]);
                         }
                     }
                 });
@@ -2805,6 +2809,30 @@
                 zSlice,
                 polygons2D
             };
+        },
+
+        getSockets3D: function (options) {
+            if (typeof SocketStore !== 'undefined' && typeof SocketStore.getAllCompiled3D === 'function') {
+                return SocketStore.getAllCompiled3D(options);
+            }
+            if (typeof globalThis !== 'undefined' && globalThis.SocketStore && typeof globalThis.SocketStore.getAllCompiled3D === 'function') {
+                return globalThis.SocketStore.getAllCompiled3D(options);
+            }
+            if (typeof require === 'function') {
+                try {
+                    const ss = require('./socket-store.js');
+                    if (ss && typeof ss.getAllCompiled3D === 'function') {
+                        return ss.getAllCompiled3D(options);
+                    }
+                } catch (_e) { /* ignore */ }
+            }
+            return [];
+        },
+
+        getSocket3DById: function (id, options) {
+            const list = this.getSockets3D(options);
+            if (!id) return list[0] || null;
+            return list.find(item => item.id === id || item.socketId === id || (Array.isArray(item.memberIds) && item.memberIds.includes(id))) || null;
         }
     };
 

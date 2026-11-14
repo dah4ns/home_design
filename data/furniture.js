@@ -2178,13 +2178,14 @@
         // =====================================================================
 
         // =====================================================================
-        // 9. CAB_KITCHEN_W1: 600 mm North-West Corner Base Unit (x_svg = 480..540)
-        //    Y = 3,170..3,770 mm, X = 11,315..11,915 mm, Z = 0..870 mm
+        // 9–10. CAB_KITCHEN_W1 (merged W1 + W2): 1,200 mm NW Blind-Corner Base Unit (x_svg = 420..540)
+        //       Y = 3,170..4,370 mm, X = 11,315..11,915 mm, Z = 0..870 mm (Empty inside)
         // =====================================================================
         {
             id: 'CAB_KITCHEN_W1',
-            name: 'CAB_KITCHEN_W1 — NW Corner Base Cabinet 600mm (Y=3170..3770)',
-            shortName: 'NW Corner Base Unit 600mm',
+            aliasIds: ['CAB_KITCHEN_W1', 'CAB_KITCHEN_W2'],
+            name: 'CAB_KITCHEN_W1 — NW Corner & West Base Cabinet 1200mm (W1+W2, Y=3170..4370)',
+            shortName: 'NW Corner Base Unit 1200mm (W1+W2)',
             category: 'cabinet',
             subtype: 'corner_base_cabinet',
             floor: 'ground',
@@ -2194,10 +2195,10 @@
             x1: X_WEST_FRONT_FACE,
             x2: X_WEST_WALL,
             y1: 3170,
-            y2: 3770,
+            y2: 4370,
             zBottom: 0,
             zTop: 870,
-            widthMm: 600,
+            widthMm: 1200,
             depthMm: 600,
             carcassDepthMm: 580,
             frontThicknessMm: 20,
@@ -2208,58 +2209,22 @@
             heightMm: 870,
             boardThicknessMm: BOARD_MM,
             normal: [-1, 0, 0],
-            specs: '600 × 600 × 870 mm (150 mm plinth + 720 mm NW corner carcass; topped by unified 30 mm KITCHEN_COUNTERTOP; X = 11,315..11,915 mm, Y = 3,170..3,770 mm)',
-            description: 'North-West corner base cabinet (600 × 600 × 870 mm, x_svg = 480..540) at the intersection of the Kitchen North Wall (EW_NORTH_RECESSED) and Kitchen West Wall (GW_3), topped by the unified L-shaped stone countertop (KITCHEN_COUNTERTOP).',
-            skeleton: buildWestBaseSkeleton('CAB_KITCHEN_W1', 3170, 3770, true, 3170, Y_PLINTH_FRONT),
+            specs: '1,200 × 600 × 870 mm (150 mm plinth + 720 mm unified W1+W2 corner carcass without internal shelves or center divider; topped by unified 30 mm KITCHEN_COUNTERTOP; X = 11,315..11,915 mm, Y = 3,170..4,370 mm)',
+            description: 'Unified 1,200 mm North-West blind-corner base cabinet combining W1 and W2 (1,200 × 600 × 870 mm, x_svg = 420..540, Y = 3,170..4,370 mm) with an open, empty interior cavity (no internal shelves or middle divider panel), topped by the unified L-shaped stone countertop (KITCHEN_COUNTERTOP).',
+            skeleton: buildWestBaseSkeleton('CAB_KITCHEN_W1', 3170, 4370, false, 3170, 4370),
             fronts: [
                 {
                     id: 'CAB_KITCHEN_W1_CORNER_FASCIA',
-                    name: 'NW Corner Base Wood Junction Fascia (20×596×716 mm)',
+                    name: 'NW Corner Base Wood Junction Fascia (20×596×716 mm, Y=3170..3770 mm)',
                     role: 'door_front',
                     material: 'wood_tone',
                     colorRgb: COLOR_WOOD_FRONT,
                     x0: X_WEST_FRONT_FACE, x1: X_WEST_CARCASS_FRONT,
                     y0: 3172, y1: 3768,
                     z0: 152, z1: 868
-                }
+                },
+                ...buildWestTwoDrawerFronts('CAB_KITCHEN_W2', 3770, 4370)
             ]
-        },
-
-        // =====================================================================
-        // 10. CAB_KITCHEN_W2: 600 mm Base 2-Drawer Cabinet (Cab 1, x_svg = 420..480)
-        //     Y = 3,770..4,370 mm, X = 11,315..11,915 mm, Z = 0..870 mm
-        // =====================================================================
-        {
-            id: 'CAB_KITCHEN_W2',
-            name: 'CAB_KITCHEN_W2 — West Base 2-Drawer Cabinet 600mm (Cab 1, Y=3770..4370)',
-            shortName: 'West Base 2-Drawer 600mm (Cab 1)',
-            category: 'cabinet',
-            subtype: 'base_cabinet_2_drawers',
-            floor: 'ground',
-            room: '0.13 Kuchnia',
-            hostWallId: 'GW_3',
-            viewId: 'kitchen_west_wall',
-            x1: X_WEST_FRONT_FACE,
-            x2: X_WEST_WALL,
-            y1: 3770,
-            y2: 4370,
-            zBottom: 0,
-            zTop: 870,
-            widthMm: 600,
-            depthMm: 600,
-            carcassDepthMm: 580,
-            frontThicknessMm: 20,
-            plinthHeightMm: 150,
-            plinthRecessMm: 60,
-            bodyHeightMm: 720,
-            worktopThicknessMm: 0,
-            heightMm: 870,
-            boardThicknessMm: BOARD_MM,
-            normal: [-1, 0, 0],
-            specs: '600 × 600 × 870 mm (150 mm plinth + 720 mm 2-drawer carcass; topped by unified 30 mm KITCHEN_COUNTERTOP; 2 × 330 mm wood fronts + 2 × 30 mm handle rails)',
-            description: 'First 600 mm 2-drawer base cabinet south of the NW corner on the Kitchen West Wall (Cab 1, x_svg = 420..480, Y = 3,770..4,370 mm), topped by the unified L-shaped stone countertop (KITCHEN_COUNTERTOP).',
-            skeleton: buildWestBaseSkeleton('CAB_KITCHEN_W2', 3770, 4370, true, Y_PLINTH_FRONT, 4370),
-            fronts: buildWestTwoDrawerFronts('CAB_KITCHEN_W2', 3770, 4370)
         },
 
         // =====================================================================

@@ -23,18 +23,18 @@
         },
         "socket_pe_shutter": {
             "type": "socket_pe_shutter",
-            "name": "Gniazdo ze stykiem ochronnym i zaślepką",
+            "name": "Gniazdo z klapką (IP44 ze stykiem ochronnym i zaślepką)",
             "shortCode": "GZ",
-            "color": "#ef4444",
+            "color": "#0ea5e9",
             "defaultHeightMm": 300,
             "snapToWall": true,
-            "standard": "PN-EN 60617 / ProfiCAD 1589 (IP44)"
+            "standard": "PN-EN 60617 / ProfiCAD 1589 (IP44 Covered)"
         },
         "socket_floor": {
             "type": "socket_floor",
             "name": "Gniazdo podłogowe",
             "shortCode": "GP",
-            "color": "#ef4444",
+            "color": "#f59e0b",
             "defaultHeightMm": 0,
             "snapToWall": false,
             "standard": "PN-EN 60617 Floor Box"
@@ -54,7 +54,8 @@
                 "xAxis": "East-West axis in mm (-285 to 20,705 mm)",
                 "zAxis": "North-South axis in mm (-290 to 21,130 mm)",
                 "heightMm": "Mounting height above finished floor in mm (e.g. 300 mm for wall sockets, 0 mm for floor sockets)",
-                "rotation": "Orientation angle in degrees (0 = North, 90 = East, 180 = South, 270 = West)"
+                "rotation": "Orientation angle in degrees (0 = North, 90 = East, 180 = South, 270 = West)",
+                "count": "Number of sockets in a multi-gang bundle/frame (1..4, default 1)"
             }
         },
         "catalog": catalog,

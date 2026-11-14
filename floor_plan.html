@@ -562,7 +562,7 @@
                 </div>
                 <div class="slider-row">
                     <label for="zoom-slider">Zoom Scale</label>
-                    <input type="range" id="zoom-slider" min="40" max="400" value="100" oninput="onZoomSliderInput(this.value)">
+                    <input type="range" id="zoom-slider" min="40" max="2500" value="100" oninput="onZoomSliderInput(this.value)">
                     <span class="slider-val" id="zoom-val-label">100%</span>
                 </div>
                 <div class="btn-grid" style="margin-top: 8px;">
@@ -571,7 +571,7 @@
                 </div>
             </div>
 
-            <!-- 2. Page Layout (Stacked vs Side-by-Side) -->
+            <!-- 2. Page Layout (Stacked vs Side-by-Side) & CAD Distance Tool -->
             <div class="section-block">
                 <div class="section-title">
                     <span>📑 Floor Display Layout</span>
@@ -581,6 +581,20 @@
                     <button class="ctrl-btn" id="layout-side" onclick="setPlanLayout('side')">↔️ Side-by-Side</button>
                     <button class="ctrl-btn" id="layout-ground" onclick="setPlanLayout('ground')">Parter Only</button>
                     <button class="ctrl-btn" id="layout-first" onclick="setPlanLayout('first')">Piętro Only</button>
+                </div>
+                <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(148,163,184,0.16); display: flex; flex-direction: column; gap: 6px;">
+                    <div style="display: flex; gap: 6px;">
+                        <button type="button" class="ctrl-btn tool-btn" id="tool-distance" onclick="toggleDistanceTool()" style="flex: 1; justify-content: center; border-color: rgba(16, 185, 129, 0.45);" title="Measure distance between sockets, corners, or any two points (Shortcut: D)">
+                            <span>📏</span> Measure Distance (D)
+                        </button>
+                        <button type="button" class="ctrl-btn" id="btn-clear-distance" onclick="clearDistanceMeasurement()" style="display: none; padding: 6px 10px;" title="Clear active measurement (Esc)">
+                            ✕ Clear
+                        </button>
+                    </div>
+                    <div id="distance-readout-box" style="display: none; background: rgba(15, 23, 42, 0.86); border: 1px solid rgba(16, 185, 129, 0.45); border-radius: 7px; padding: 7px 9px; font-size: 11px; color: #e2e8f0; line-height: 1.45;">
+                        <div id="distance-readout-status" style="color: #34d399; font-weight: 700; margin-bottom: 2px;">Click Point 1 (Socket Center, Corner, or Wall)</div>
+                        <div id="distance-readout-details" style="font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: #94a3b8;">Hover near any corner or individual socket to snap.</div>
+                    </div>
                 </div>
             </div>
 
@@ -597,48 +611,88 @@
                     <button class="ctrl-btn active" id="layer-openings" onclick="togglePlanLayer('openings', this)">🏷️ Window Tags</button>
                     <button class="ctrl-btn active" id="layer-jambs" onclick="togglePlanLayer('jambs', this)">⬛ 200mm Jambs</button>
                     <button class="ctrl-btn active" id="layer-roofs" onclick="togglePlanLayer('roofs', this)">🏠 Overhangs / Roofs</button>
-                    <button class="ctrl-btn active" id="layer-objects" onclick="togglePlanLayer('objects', this)">🔌 Placed Objects</button>
+                    <button class="ctrl-btn active" id="layer-objects" onclick="toggleElectricityLayer()" style="border-color: rgba(239, 68, 68, 0.45);">⚡ Electricity Layer</button>
                 </div>
             </div>
 
-            <!-- 4. Object Placement Palette (Ready for Sockets, Switches & Equipment) -->
+            <!-- 4. Rebuilt Electricity & Multi-Socket Placement Studio -->
             <div class="section-block">
                 <div class="section-title">
-                    <span>🧰 Object Tool Palette</span>
-                    <span id="snap-badge" style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #38bdf8;">Snap: 50mm + Wall</span>
+                    <span>⚡ Electricity &amp; Sockets</span>
+                    <button type="button" class="ctrl-btn active" id="btn-electricity-visibility" onclick="toggleElectricityLayer()" style="padding: 2px 8px; font-size: 10.5px; border-color: rgba(239, 68, 68, 0.45);" title="Show or hide the entire electricity layer (Shortcut: E)">
+                        👁️ Layer: ON
+                    </button>
+                </div>
+
+                <!-- Mode 0: Select / Drag / Move Existing Sockets -->
+                <button class="ctrl-btn tool-btn active" id="tool-select" onclick="setActiveTool('select')" style="width: 100%; margin-bottom: 8px;">
+                    <span>🖐️</span> Select / Drag / Move Sockets (Esc)
+                </button>
+
+                <!-- Step 1: Bundle Count (How many sockets to add together side-by-side) -->
+                <div style="font-size: 11px; color: var(--text-muted); font-weight: 600; margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center;">
+                    <span>1. Sockets in Frame (Side-by-Side):</span>
+                    <span id="bundle-count-badge" style="font-family: 'JetBrains Mono', monospace; color: #f87171; font-weight: 700;">1× Single</span>
+                </div>
+                <div class="btn-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 9px;">
+                    <button type="button" class="ctrl-btn active" id="bundle-cnt-1" onclick="setPlacementBundleCount(1)">1×</button>
+                    <button type="button" class="ctrl-btn" id="bundle-cnt-2" onclick="setPlacementBundleCount(2)">2×</button>
+                    <button type="button" class="ctrl-btn" id="bundle-cnt-3" onclick="setPlacementBundleCount(3)">3×</button>
+                    <button type="button" class="ctrl-btn" id="bundle-cnt-4" onclick="setPlacementBundleCount(4)">4×</button>
+                </div>
+
+                <!-- Step 2: Socket Symbol Type (Click to start placing on Floor Plan) -->
+                <div style="font-size: 11px; color: var(--text-muted); font-weight: 600; margin-bottom: 5px; display: flex; justify-content: space-between; align-items: center;">
+                    <span>2. Click Socket Type to Place on Plan:</span>
+                    <span id="snap-badge" style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #38bdf8;">Wall Snap</span>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 6px;">
-                    <button class="ctrl-btn tool-btn active" id="tool-select" onclick="setActiveTool('select')">
-                        <span>🖐️</span> Select / Pan / Drag Objects
-                    </button>
                     <button class="ctrl-btn tool-btn" id="tool-socket_pe" onclick="setActiveTool('socket_pe')">
-                        <svg width="20" height="20" viewBox="-340 -430 680 470" style="flex-shrink:0;">
+                        <svg width="18" height="18" viewBox="-260 -420 520 460" style="flex-shrink:0;">
                             <line x1="0" y1="0" x2="0" y2="-190" stroke="#ef4444" stroke-width="46" stroke-linecap="butt"/>
                             <line x1="-200" y1="-190" x2="200" y2="-190" stroke="#ef4444" stroke-width="46" stroke-linecap="butt"/>
                             <path d="M -190 -380 A 190 190 0 0 0 190 -380" fill="none" stroke="#ef4444" stroke-width="46" stroke-linecap="butt"/>
                         </svg>
-                        Gniazdo ze stykiem ochronnym
+                        <span><strong>G</strong> • Standard Wall Socket (PE)</span>
                     </button>
                     <button class="ctrl-btn tool-btn" id="tool-socket_pe_shutter" onclick="setActiveTool('socket_pe_shutter')">
-                        <svg width="20" height="20" viewBox="-340 -430 680 470" style="flex-shrink:0;">
-                            <line x1="0" y1="0" x2="0" y2="-190" stroke="#ef4444" stroke-width="46" stroke-linecap="butt"/>
-                            <line x1="-200" y1="-190" x2="200" y2="-190" stroke="#ef4444" stroke-width="46" stroke-linecap="butt"/>
-                            <path d="M -310 -380 L -190 -380 A 190 190 0 0 0 190 -380 L 310 -380" fill="none" stroke="#ef4444" stroke-width="46" stroke-linecap="butt" stroke-linejoin="miter"/>
+                        <svg width="18" height="18" viewBox="-340 -460 680 500" style="flex-shrink:0;">
+                            <line x1="0" y1="0" x2="0" y2="-190" stroke="#38bdf8" stroke-width="44" stroke-linecap="butt"/>
+                            <line x1="-200" y1="-190" x2="200" y2="-190" stroke="#38bdf8" stroke-width="44" stroke-linecap="butt"/>
+                            <path d="M -190 -380 A 190 190 0 0 0 190 -380 Z" fill="rgba(56, 189, 248, 0.32)" stroke="#38bdf8" stroke-width="42" stroke-linejoin="round"/>
+                            <path d="M -310 -300 L -250 -385 L 250 -385 L 310 -300" fill="none" stroke="#38bdf8" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/>
+                            <line x1="-120" y1="-435" x2="120" y2="-435" stroke="#38bdf8" stroke-width="40" stroke-linecap="round"/>
                         </svg>
-                        Gniazdo ze stykiem ochr. i zaślepką
+                        <span><strong>GZ</strong> • Socket with Cover (IP44 Flap)</span>
                     </button>
                     <button class="ctrl-btn tool-btn" id="tool-socket_floor" onclick="setActiveTool('socket_floor')">
-                        <svg width="20" height="20" viewBox="-240 -240 480 480" style="flex-shrink:0;">
-                            <rect x="-200" y="-200" width="400" height="400" fill="none" stroke="#ef4444" stroke-width="42"/>
-                            <line x1="-200" y1="0" x2="200" y2="0" stroke="#ef4444" stroke-width="42" stroke-linecap="butt"/>
-                            <line x1="0" y1="-200" x2="0" y2="0" stroke="#ef4444" stroke-width="42" stroke-linecap="butt"/>
-                            <path d="M -200 200 A 200 200 0 0 1 200 200" fill="none" stroke="#ef4444" stroke-width="42" stroke-linecap="butt"/>
+                        <svg width="18" height="18" viewBox="-240 -240 480 480" style="flex-shrink:0;">
+                            <rect x="-200" y="-200" width="400" height="400" fill="none" stroke="#f59e0b" stroke-width="42"/>
+                            <line x1="-200" y1="0" x2="200" y2="0" stroke="#f59e0b" stroke-width="42" stroke-linecap="butt"/>
+                            <line x1="0" y1="-200" x2="0" y2="0" stroke="#f59e0b" stroke-width="42" stroke-linecap="butt"/>
+                            <path d="M -200 200 A 200 200 0 0 1 200 200" fill="none" stroke="#f59e0b" stroke-width="42" stroke-linecap="butt"/>
                         </svg>
-                        Gniazdo podłogowe
+                        <span><strong>GP</strong> • Floor Box Socket</span>
                     </button>
                 </div>
-                <div class="hint-box" style="margin-top: 8px;">
-                    <strong>Tip:</strong> In <em>Select / Pan</em> mode, drag empty space to pan, scroll wheel to zoom, click any window, internal wall, or placed socket to inspect it, or drag placed sockets to reposition them along walls.
+
+                <!-- Step 3: Default Center Mounting Height Preset + Optional Multi-Place Toggle -->
+                <div style="font-size: 11px; color: var(--text-muted); font-weight: 600; margin: 9px 0 5px 0;">
+                    3. Center Mount Height Above Floor:
+                </div>
+                <div class="btn-grid three-cols" style="margin-bottom: 8px;">
+                    <button type="button" class="ctrl-btn active" id="place-h-300" onclick="setPlacementHeightMm(300)">300 mm</button>
+                    <button type="button" class="ctrl-btn" id="place-h-1150" onclick="setPlacementHeightMm(1150)">1150 mm</button>
+                    <button type="button" class="ctrl-btn" id="place-h-600" onclick="setPlacementHeightMm(600)">600 mm</button>
+                </div>
+
+                <label style="display: flex; align-items: center; gap: 7px; font-size: 11.5px; color: #cbd5e1; cursor: pointer; margin-bottom: 6px;">
+                    <input type="checkbox" id="chk-continuous-place" onchange="planState.continuousPlacement = this.checked" style="accent-color: #38bdf8; width: 14px; height: 14px;">
+                    <span>Keep tool active to place multiple sockets</span>
+                </label>
+
+                <div class="hint-box" style="margin-top: 6px;">
+                    <strong>Tip:</strong> Choose <strong>1×..4×</strong> and click a socket type (<strong>G / GZ / GP</strong>), then click once on a wall to place it — the tool automatically switches back to <em>Select / Drag</em> mode so you can move or adjust it right away.
                 </div>
             </div>
         </aside>
@@ -714,29 +768,46 @@
 
                 <!-- Editable form shown when a placed object (e.g. socket) is selected -->
                 <div id="object-edit-panel" style="display: none; margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(148,163,184,0.18);">
-                    <div class="form-row">
-                        <label for="obj-label-input">Object Label / Circuit Code</label>
-                        <input type="text" class="form-input" id="obj-label-input" maxlength="40" oninput="onSelectedObjectFieldChange()">
+                    <div id="obj-gang-selector-wrap" style="display: none; margin-bottom: 8px;">
+                        <div style="font-size: 11px; color: var(--text-muted); font-weight: 600; margin-bottom: 4px;">
+                            Individual Socket in Bundle (Click to Inspect / Measure):
+                        </div>
+                        <div id="obj-gang-buttons" class="btn-grid" style="grid-template-columns: repeat(4, 1fr);"></div>
                     </div>
                     <div class="btn-grid">
                         <div class="form-row">
-                            <label for="obj-x-input">Plan X (E→W mm)</label>
+                            <label for="obj-label-input">Socket Label</label>
+                            <input type="text" class="form-input" id="obj-label-input" maxlength="40" oninput="onSelectedObjectFieldChange()">
+                        </div>
+                        <div class="form-row">
+                            <label for="obj-count-input">Sockets in Frame (1–4)</label>
+                            <input type="number" class="form-input" id="obj-count-input" min="1" max="4" step="1" value="1" oninput="onSelectedObjectFieldChange()">
+                        </div>
+                    </div>
+                    <div class="btn-grid">
+                        <div class="form-row">
+                            <label for="obj-x-input">Center X (E→W mm)</label>
                             <input type="number" class="form-input" id="obj-x-input" step="10" oninput="onSelectedObjectFieldChange()">
                         </div>
                         <div class="form-row">
-                            <label for="obj-z-input">Plan Z (N→S mm)</label>
+                            <label for="obj-z-input">Center Z (N→S mm)</label>
                             <input type="number" class="form-input" id="obj-z-input" step="10" oninput="onSelectedObjectFieldChange()">
                         </div>
                     </div>
                     <div class="btn-grid">
                         <div class="form-row">
-                            <label for="obj-h-input">Mount Height (mm)</label>
+                            <label for="obj-h-input">Center Mount Height (mm)</label>
                             <input type="number" class="form-input" id="obj-h-input" step="50" oninput="onSelectedObjectFieldChange()">
                         </div>
                         <div class="form-row">
                             <label for="obj-rot-input">Rotation (deg)</label>
                             <input type="number" class="form-input" id="obj-rot-input" step="45" oninput="onSelectedObjectFieldChange()">
                         </div>
+                    </div>
+                    <div style="margin-top: 6px;">
+                        <button type="button" class="ctrl-btn" style="width: 100%; justify-content: center; border-color: rgba(16, 185, 129, 0.45);" onclick="startDistanceFromSelectedSocket()">
+                            📏 Measure Distance from Socket Center
+                        </button>
                     </div>
                     <div class="btn-grid" style="margin-top: 6px;">
                         <button class="ctrl-btn" onclick="rotateSelectedObject(90)">🔄 Rotate 90° (R)</button>
@@ -1395,9 +1466,9 @@
                 },
                 socket_pe_shutter: {
                     type: 'socket_pe_shutter',
-                    name: 'Gniazdo ze stykiem ochronnym i zaślepką',
+                    name: 'Gniazdo z klapką (IP44 ze stykiem ochronnym i zaślepką)',
                     shortCode: 'GZ',
-                    color: '#ef4444',
+                    color: '#0ea5e9',
                     defaultHeightMm: 300,
                     snapToWall: true
                 },
@@ -1405,7 +1476,7 @@
                     type: 'socket_floor',
                     name: 'Gniazdo podłogowe',
                     shortCode: 'GP',
-                    color: '#ef4444',
+                    color: '#f59e0b',
                     defaultHeightMm: 0,
                     snapToWall: false
                 }
@@ -1421,7 +1492,17 @@
             syncFloors: true,
             westOnLeft: true,                // Default true: West (Entrance/Garage/SW Wing) on Left, East on Right, North on Top, South on Bottom
             layout: 'stacked',               // 'stacked' | 'side' | 'ground' | 'first'
-            activeTool: 'select',            // 'select' | object catalog key
+            activeTool: 'select',            // 'select' | 'distance' | object catalog key
+            placementCount: 1,               // 1..4 sockets placed together side-by-side in a bundle
+            placementHeightMm: 300,          // Default wall socket center height above floor in mm
+            continuousPlacement: false,      // Default false: place once, then switch to Select / Drag mode
+            ghostPreview: null,              // { floor, x, z, rot, snappedToWall }
+            measure: {
+                pt1: null,                   // { floor, x, z, heightMm, snapKind, label, objId, gangIndex, gangCount }
+                pt2: null,                   // { floor, x, z, heightMm, snapKind, label, objId, gangIndex, gangCount }
+                hoverPt: null,               // Live snapped point under cursor in 'distance' mode
+                hoverCorner: null            // Live corner highlight when cursor is very close to a corner in any mode
+            },
             layers: {
                 grid: true,
                 dims: true,
@@ -1432,7 +1513,7 @@
                 roofs: true,
                 objects: true
             },
-            selectedItem: { kind: 'opening', id: 'O4' }, // { kind: 'opening'|'object'|'internal_wall', id: string }
+            selectedItem: { kind: 'opening', id: 'O4' }, // { kind: 'opening'|'object'|'internal_wall', id: string, gangIndex?: number }
             placedObjects: [],
             nextObjectSeq: 1
         };
@@ -1525,19 +1606,41 @@
         }
 
         // Load and save placed sockets through SocketStore (backed by PersistenceService)
+        let _isHealingWallRotations = false;
         function loadPlacedObjects() {
             if (typeof SocketStore === 'undefined') return;
-            planState.placedObjects = SocketStore.getAll();
+            const loaded = SocketStore.getAll();
+            let healedAny = false;
+            loaded.forEach(obj => {
+                if (!obj || obj.type === 'socket_floor' || !obj.snappedToWall) return;
+                const snap = snapToFloorWalls(obj.floor, obj.x, obj.z, 85);
+                if (snap && snap.snappedToWall && obj.rotation !== snap.rot) {
+                    obj.rotation = snap.rot;
+                    healedAny = true;
+                }
+            });
+            planState.placedObjects = loaded;
             planState.nextObjectSeq = planState.placedObjects.length + 1;
+            if (healedAny && !_isHealingWallRotations) {
+                _isHealingWallRotations = true;
+                try {
+                    SocketStore.saveAll(loaded);
+                } finally {
+                    _isHealingWallRotations = false;
+                }
+            }
         }
 
         function savePlacedObjects() {
             if (typeof SocketStore === 'undefined') return;
-            planState.placedObjects = SocketStore.saveAll(planState.placedObjects);
+            // SocketStore.saveAll synchronously triggers the SocketStore.subscribe listener,
+            // which calls loadPlacedObjects() and renderAllPlans(). Do not overwrite
+            // planState.placedObjects with a second detached clone afterwards.
+            SocketStore.saveAll(planState.placedObjects);
         }
 
         // Snap a world coordinate (x, z) to nearest inner exterior wall or 120 mm internal wall face if within thresholdMm
-        function snapToFloorWalls(floor, x, z, thresholdMm = 450) {
+        function snapToFloorWalls(floor, x, z, thresholdMm = 500) {
             const innerPoly = (floor === 'ground') ? GROUND_INNER_POLY : FIRST_INNER_POLY;
             let bestDist = thresholdMm;
             let snapped = {
@@ -1554,8 +1657,10 @@
                 const dz = z2 - z1;
                 const lenSq = dx * dx + dz * dz;
                 if (lenSq === 0) continue;
+                const segLen = Math.sqrt(lenSq);
+                const marginT = Math.min(0.25, 35 / segLen);
                 let t = ((x - x1) * dx + (z - z1) * dz) / lenSq;
-                t = Math.max(0.02, Math.min(0.98, t));
+                t = Math.max(marginT, Math.min(1 - marginT, t));
                 const projX = x1 + t * dx;
                 const projZ = z1 + t * dz;
                 const dist = Math.hypot(x - projX, z - projZ);
@@ -1582,24 +1687,26 @@
             }
 
             // Also snap to both faces of 120 mm internal partition walls on this floor
+            // Note: X increases from East (0) to West (20,705).
+            // Therefore on a vertical wall [w.x1, w.x2], w.x1 is the East face (pointing East -X -> 90°)
+            // and w.x2 is the West face (pointing West +X -> 270°).
             const internalList = INTERNAL_WALLS[floor] || [];
             internalList.forEach(w => {
                 if (w.axis === 'z') {
-                    // Vertical internal wall: East face at w.x1 (faces East -> 270°), West face at w.x2 (faces West -> 90°)
-                    const clampedZ = Math.max(w.z1 + 50, Math.min(w.z2 - 50, z));
+                    const clampedZ = Math.max(w.z1 + 35, Math.min(w.z2 - 35, z));
                     const dEast = Math.hypot(x - w.x1, z - clampedZ);
                     if (dEast < bestDist) {
                         bestDist = dEast;
-                        snapped = { x: w.x1, z: Math.round(clampedZ / 10) * 10, rot: 270, snappedToWall: true };
+                        snapped = { x: w.x1, z: Math.round(clampedZ / 10) * 10, rot: 90, snappedToWall: true };
                     }
                     const dWest = Math.hypot(x - w.x2, z - clampedZ);
                     if (dWest < bestDist) {
                         bestDist = dWest;
-                        snapped = { x: w.x2, z: Math.round(clampedZ / 10) * 10, rot: 90, snappedToWall: true };
+                        snapped = { x: w.x2, z: Math.round(clampedZ / 10) * 10, rot: 270, snappedToWall: true };
                     }
                 } else {
                     // Horizontal internal wall: North face at w.z1 (faces North -> 0°), South face at w.z2 (faces South -> 180°)
-                    const clampedX = Math.max(w.x1 + 50, Math.min(w.x2 - 50, x));
+                    const clampedX = Math.max(w.x1 + 35, Math.min(w.x2 - 35, x));
                     const dNorth = Math.hypot(x - clampedX, z - w.z1);
                     if (dNorth < bestDist) {
                         bestDist = dNorth;
@@ -1613,7 +1720,567 @@
                 }
             });
 
+            // Also snap to 3D B-Rep wall sides from WallService (covers stepped walls like GW_14 and upper floor interior faces)
+            if (typeof WallService !== 'undefined' && typeof WallService.getWalls === 'function') {
+                const bRepWalls = WallService.getWalls({ floor });
+                bRepWalls.forEach(bw => {
+                    const candidateSides = (bw.category === 'exterior')
+                        ? (bw.sideB ? [bw.sideB] : [])
+                        : (Array.isArray(bw.sides) && bw.sides.length > 0 ? bw.sides : [bw.sideA, bw.sideB].filter(Boolean));
+                    candidateSides.forEach(side => {
+                        if (!side || !side.p1 || !side.p2 || !side.normal) return;
+                        const sx1 = side.p1[0], sz1 = side.p1[1];
+                        const sx2 = side.p2[0], sz2 = side.p2[1];
+                        const sdx = sx2 - sx1, sdz = sz2 - sz1;
+                        const sLenSq = sdx * sdx + sdz * sdz;
+                        if (sLenSq < 100) return;
+                        const segLen = Math.sqrt(sLenSq);
+                        const marginT = Math.min(0.25, 35 / segLen);
+                        let t = ((x - sx1) * sdx + (z - sz1) * sdz) / sLenSq;
+                        t = Math.max(marginT, Math.min(1 - marginT, t));
+                        const px = sx1 + t * sdx;
+                        const pz = sz1 + t * sdz;
+                        const d = Math.hypot(x - px, z - pz);
+                        if (d < bestDist) {
+                            bestDist = d;
+                            const nx = side.normal[0], nz = side.normal[1];
+                            let sRot = 0;
+                            if (Math.abs(nx) >= Math.abs(nz)) {
+                                sRot = (nx < 0) ? 90 : 270;
+                            } else {
+                                sRot = (nz < 0) ? 0 : 180;
+                            }
+                            snapped = {
+                                x: Math.round(px / 10) * 10,
+                                z: Math.round(pz / 10) * 10,
+                                rot: sRot,
+                                snappedToWall: true
+                            };
+                        }
+                    });
+                });
+            }
+
             return snapped;
+        }
+
+        // Standard European multi-gang center-to-center spacing (71 mm), matching 3D B-Rep compiler
+        const SOCKET_GANG_PITCH_MM = 71;
+
+        // Compute exact world center (cx, cz) and center mount height for each individual socket in a 1..6 gang bundle
+        function getSocketGangCenters(obj) {
+            if (!obj) return [];
+            const cnt = Math.max(1, Math.min(6, Math.round(Number(obj.count) || 1)));
+            const rawRot = Number(obj.rotation) || 0;
+            const rad = (rawRot * Math.PI) / 180;
+            const nx = -Math.sin(rad);
+            const nz = -Math.cos(rad);
+            const isFloor = (obj.type === 'socket_floor');
+            const centerHeightMm = isFloor ? 0 : (Number.isFinite(Number(obj.heightMm)) ? Number(obj.heightMm) : 300);
+            const baseLabel = obj.label || obj.id || 'Socket';
+            const gangs = [];
+
+            for (let i = 0; i < cnt; i++) {
+                const uOffset = (i - (cnt - 1) / 2) * SOCKET_GANG_PITCH_MM;
+                // In canonical symG, local +X maps to (-cos(rawRot), +sin(rawRot)) in world (X, Z) mm
+                const cx = Math.round((obj.x - uOffset * Math.cos(rad)) * 10) / 10;
+                const cz = Math.round((obj.z + uOffset * Math.sin(rad)) * 10) / 10;
+                // Visual symbol center extends ~30 mm into the room along (nx, nz)
+                const hoverX = isFloor ? cx : (cx + nx * 30);
+                const hoverZ = isFloor ? cz : (cz + nz * 30);
+                gangs.push({
+                    objId: obj.id,
+                    floor: obj.floor,
+                    type: obj.type,
+                    gangIndex: i,
+                    gangCount: cnt,
+                    localX: uOffset,
+                    cx,
+                    cz,
+                    hoverX,
+                    hoverZ,
+                    centerHeightMm,
+                    rotation: rawRot,
+                    label: cnt > 1 ? `${baseLabel} [${i + 1}/${cnt}]` : baseLabel
+                });
+            }
+            return gangs;
+        }
+
+        // Find which individual socket index (0..cnt-1) inside a bundle is closest to a world (X, Z) point
+        function findClosestGangIndex(obj, worldX, worldZ) {
+            const gangs = getSocketGangCenters(obj);
+            if (gangs.length <= 1) return 0;
+            let bestIdx = 0;
+            let bestDist = Infinity;
+            gangs.forEach(g => {
+                const d = Math.min(
+                    Math.hypot(worldX - g.cx, worldZ - g.cz),
+                    Math.hypot(worldX - g.hoverX, worldZ - g.hoverZ)
+                );
+                if (d < bestDist) {
+                    bestDist = d;
+                    bestIdx = g.gangIndex;
+                }
+            });
+            return bestIdx;
+        }
+
+        // Find all wall corners along the snapped wall face that bound the room wall span containing (x0, z0)
+        function getWallSpanCornersForSocket(floor, x0, z0, rot) {
+            const normRot = (((Math.round((Number(rot) || 0) / 90) * 90) % 360) + 360) % 360;
+            const innerPoly = (floor === 'ground') ? GROUND_INNER_POLY : FIRST_INNER_POLY;
+            const internalList = INTERNAL_WALLS[floor] || [];
+            const coords = [];
+
+            const addCoord = (val) => {
+                if (!Number.isFinite(val)) return;
+                const rv = Math.round(val * 10) / 10;
+                for (let i = 0; i < coords.length; i++) {
+                    if (Math.abs(coords[i] - rv) <= 3) return;
+                }
+                coords.push(rv);
+            };
+
+            if (normRot === 0 || normRot === 180) {
+                // Horizontal wall face at Z = z0; room inward normal is nz = -1 (North, rot=0) or +1 (South, rot=180)
+                const nz = (normRot === 0) ? -1 : 1;
+
+                for (let i = 0; i < innerPoly.length; i++) {
+                    const [x1, z1] = innerPoly[i];
+                    const [x2, z2] = innerPoly[(i + 1) % innerPoly.length];
+                    if (Math.abs(z1 - z0) <= 22 && Math.abs(z2 - z0) <= 22) {
+                        if (x0 >= Math.min(x1, x2) - 60 && x0 <= Math.max(x1, x2) + 60) {
+                            addCoord(x1);
+                            addCoord(x2);
+                        }
+                    } else if (Math.abs(x1 - x2) <= 22) {
+                        const minZ = Math.min(z1, z2), maxZ = Math.max(z1, z2);
+                        if (z0 >= minZ - 22 && z0 <= maxZ + 22) {
+                            const extendsIntoRoom = (nz > 0) ? (maxZ > z0 + 35) : (minZ < z0 - 35);
+                            if (extendsIntoRoom) addCoord(x1);
+                        }
+                    }
+                }
+
+                internalList.forEach(w => {
+                    if (w.axis === 'x') {
+                        const faceMatch = (normRot === 0 && Math.abs(w.z1 - z0) <= 22) || (normRot === 180 && Math.abs(w.z2 - z0) <= 22);
+                        if (faceMatch && x0 >= w.x1 - 60 && x0 <= w.x2 + 60) {
+                            addCoord(w.x1);
+                            addCoord(w.x2);
+                        }
+                    } else {
+                        const touchesAndExtends = (nz > 0)
+                            ? (w.z1 <= z0 + 25 && w.z2 > z0 + 50)
+                            : (w.z2 >= z0 - 25 && w.z1 < z0 - 50);
+                        if (touchesAndExtends) {
+                            if (Array.isArray(w.solidPolygons2D) && w.solidPolygons2D[0]) {
+                                w.solidPolygons2D[0].forEach(([vx, vz]) => {
+                                    if (Math.abs(vz - z0) <= 25) addCoord(vx);
+                                });
+                            } else {
+                                addCoord(w.x1);
+                                addCoord(w.x2);
+                            }
+                        }
+                    }
+                });
+
+                if (typeof WallService !== 'undefined' && typeof WallService.getWalls === 'function') {
+                    const bRepWalls = WallService.getWalls({ floor });
+                    bRepWalls.forEach(bw => {
+                        const sides = Array.isArray(bw.sides) && bw.sides.length > 0
+                            ? bw.sides
+                            : [bw.sideA, bw.sideB].filter(Boolean);
+                        sides.forEach(side => {
+                            if (!side || !side.p1 || !side.p2) return;
+                            const sx1 = side.p1[0], sz1 = side.p1[1];
+                            const sx2 = side.p2[0], sz2 = side.p2[1];
+                            if (Math.abs(sz1 - z0) <= 22 && Math.abs(sz2 - z0) <= 22) {
+                                if (x0 >= Math.min(sx1, sx2) - 60 && x0 <= Math.max(sx1, sx2) + 60) {
+                                    addCoord(sx1);
+                                    addCoord(sx2);
+                                }
+                            } else if (Math.abs(sx1 - sx2) <= 22) {
+                                const minZ = Math.min(sz1, sz2), maxZ = Math.max(sz1, sz2);
+                                const touchesAndExtends = (nz > 0)
+                                    ? (minZ <= z0 + 25 && maxZ > z0 + 50)
+                                    : (maxZ >= z0 - 25 && minZ < z0 - 50);
+                                if (touchesAndExtends) addCoord(sx1);
+                            }
+                        });
+                    });
+                }
+
+                coords.sort((a, b) => a - b);
+                return { axis: 'x', fixedCoord: z0, normalX: 0, normalZ: nz, cornerCoords: coords };
+            } else {
+                // Vertical wall face at X = x0; room inward normal is nx = -1 (East, rot=90) or +1 (West, rot=270)
+                const nx = (normRot === 90) ? -1 : 1;
+
+                for (let i = 0; i < innerPoly.length; i++) {
+                    const [x1, z1] = innerPoly[i];
+                    const [x2, z2] = innerPoly[(i + 1) % innerPoly.length];
+                    if (Math.abs(x1 - x0) <= 22 && Math.abs(x2 - x0) <= 22) {
+                        if (z0 >= Math.min(z1, z2) - 60 && z0 <= Math.max(z1, z2) + 60) {
+                            addCoord(z1);
+                            addCoord(z2);
+                        }
+                    } else if (Math.abs(z1 - z2) <= 22) {
+                        const minX = Math.min(x1, x2), maxX = Math.max(x1, x2);
+                        if (x0 >= minX - 22 && x0 <= maxX + 22) {
+                            const extendsIntoRoom = (nx > 0) ? (maxX > x0 + 35) : (minX < x0 - 35);
+                            if (extendsIntoRoom) addCoord(z1);
+                        }
+                    }
+                }
+
+                internalList.forEach(w => {
+                    if (w.axis === 'z') {
+                        if (Array.isArray(w.solidPolygons2D) && w.solidPolygons2D[0]) {
+                            const poly = w.solidPolygons2D[0];
+                            for (let i = 0; i < poly.length; i++) {
+                                const [px1, pz1] = poly[i];
+                                const [px2, pz2] = poly[(i + 1) % poly.length];
+                                if (Math.abs(px1 - x0) <= 22 && Math.abs(px2 - x0) <= 22 && z0 >= Math.min(pz1, pz2) - 60 && z0 <= Math.max(pz1, pz2) + 60) {
+                                    addCoord(pz1);
+                                    addCoord(pz2);
+                                }
+                            }
+                        } else {
+                            const faceMatch = (normRot === 90 && Math.abs(w.x1 - x0) <= 22) || (normRot === 270 && Math.abs(w.x2 - x0) <= 22);
+                            if (faceMatch && z0 >= w.z1 - 60 && z0 <= w.z2 + 60) {
+                                addCoord(w.z1);
+                                addCoord(w.z2);
+                            }
+                        }
+                    } else {
+                        const touchesAndExtends = (nx > 0)
+                            ? (w.x1 <= x0 + 25 && w.x2 > x0 + 50)
+                            : (w.x2 >= x0 - 25 && w.x1 < x0 - 50);
+                        if (touchesAndExtends) {
+                            addCoord(w.z1);
+                            addCoord(w.z2);
+                        }
+                    }
+                });
+
+                if (typeof WallService !== 'undefined' && typeof WallService.getWalls === 'function') {
+                    const bRepWalls = WallService.getWalls({ floor });
+                    bRepWalls.forEach(bw => {
+                        const sides = Array.isArray(bw.sides) && bw.sides.length > 0
+                            ? bw.sides
+                            : [bw.sideA, bw.sideB].filter(Boolean);
+                        sides.forEach(side => {
+                            if (!side || !side.p1 || !side.p2) return;
+                            const sx1 = side.p1[0], sz1 = side.p1[1];
+                            const sx2 = side.p2[0], sz2 = side.p2[1];
+                            if (Math.abs(sx1 - x0) <= 22 && Math.abs(sx2 - x0) <= 22) {
+                                if (z0 >= Math.min(sz1, sz2) - 60 && z0 <= Math.max(sz1, sz2) + 60) {
+                                    addCoord(sz1);
+                                    addCoord(sz2);
+                                }
+                            } else if (Math.abs(sz1 - sz2) <= 22) {
+                                const minX = Math.min(sx1, sx2), maxX = Math.max(sx1, sx2);
+                                const touchesAndExtends = (nx > 0)
+                                    ? (minX <= x0 + 25 && maxX > x0 + 50)
+                                    : (maxX >= x0 - 25 && minX < x0 - 50);
+                                if (touchesAndExtends) addCoord(sz1);
+                            }
+                        });
+                    });
+                }
+
+                coords.sort((a, b) => a - b);
+                return { axis: 'z', fixedCoord: x0, normalX: nx, normalZ: 0, cornerCoords: coords };
+            }
+        }
+
+        // Compute live wall-corner rulers from both room corners to the center of the closest socket in the bundle
+        function computeSocketWallCornerRulers(floor, sockObj) {
+            if (!sockObj || !sockObj.snappedToWall || sockObj.type === 'socket_floor') return null;
+            const gangs = getSocketGangCenters(sockObj);
+            if (!gangs.length) return null;
+
+            const rot = sockObj.rotation !== undefined ? sockObj.rotation : (sockObj.rot || 0);
+            const span = getWallSpanCornersForSocket(floor, sockObj.x, sockObj.z, rot);
+            if (!span || span.cornerCoords.length < 2) return null;
+
+            if (span.axis === 'x') {
+                const sortedGangs = gangs.slice().sort((a, b) => a.cx - b.cx);
+                const sockMin = sortedGangs[0];
+                const sockMax = sortedGangs[sortedGangs.length - 1];
+
+                let cMin = span.cornerCoords[0];
+                for (let i = 0; i < span.cornerCoords.length; i++) {
+                    if (span.cornerCoords[i] <= sockObj.x + 2) {
+                        cMin = span.cornerCoords[i];
+                    }
+                }
+                let cMax = span.cornerCoords[span.cornerCoords.length - 1];
+                for (let i = span.cornerCoords.length - 1; i >= 0; i--) {
+                    if (span.cornerCoords[i] >= sockObj.x - 2) {
+                        cMax = span.cornerCoords[i];
+                    }
+                }
+                if (cMax <= cMin + 10) return null;
+
+                const rulerMin = {
+                    corner: { x: cMin, z: span.fixedCoord },
+                    socket: sockMin,
+                    distanceMm: Math.max(0, Math.round((sockMin.cx - cMin) * 10) / 10),
+                    sideLabel: planState.westOnLeft ? 'Right Corner' : 'Left Corner'
+                };
+                const rulerMax = {
+                    corner: { x: cMax, z: span.fixedCoord },
+                    socket: sockMax,
+                    distanceMm: Math.max(0, Math.round((cMax - sockMax.cx) * 10) / 10),
+                    sideLabel: planState.westOnLeft ? 'Left Corner' : 'Right Corner'
+                };
+
+                return {
+                    axis: 'x',
+                    normalX: span.normalX,
+                    normalZ: span.normalZ,
+                    wallLengthMm: Math.round((cMax - cMin) * 10) / 10,
+                    rulerFirst: planState.westOnLeft ? rulerMax : rulerMin,   // Left ruler on screen
+                    rulerSecond: planState.westOnLeft ? rulerMin : rulerMax   // Right ruler on screen
+                };
+            } else {
+                const sortedGangs = gangs.slice().sort((a, b) => a.cz - b.cz);
+                const sockMin = sortedGangs[0];
+                const sockMax = sortedGangs[sortedGangs.length - 1];
+
+                let cMin = span.cornerCoords[0];
+                for (let i = 0; i < span.cornerCoords.length; i++) {
+                    if (span.cornerCoords[i] <= sockObj.z + 2) {
+                        cMin = span.cornerCoords[i];
+                    }
+                }
+                let cMax = span.cornerCoords[span.cornerCoords.length - 1];
+                for (let i = span.cornerCoords.length - 1; i >= 0; i--) {
+                    if (span.cornerCoords[i] >= sockObj.z - 2) {
+                        cMax = span.cornerCoords[i];
+                    }
+                }
+                if (cMax <= cMin + 10) return null;
+
+                const rulerTop = {
+                    corner: { x: span.fixedCoord, z: cMin },
+                    socket: sockMin,
+                    distanceMm: Math.max(0, Math.round((sockMin.cz - cMin) * 10) / 10),
+                    sideLabel: 'Top Corner'
+                };
+                const rulerBottom = {
+                    corner: { x: span.fixedCoord, z: cMax },
+                    socket: sockMax,
+                    distanceMm: Math.max(0, Math.round((cMax - sockMax.cz) * 10) / 10),
+                    sideLabel: 'Bottom Corner'
+                };
+
+                return {
+                    axis: 'z',
+                    normalX: span.normalX,
+                    normalZ: span.normalZ,
+                    wallLengthMm: Math.round((cMax - cMin) * 10) / 10,
+                    rulerFirst: rulerTop,     // Top ruler on screen
+                    rulerSecond: rulerBottom  // Bottom ruler on screen
+                };
+            }
+        }
+
+        // Collect all architectural corners (inner/outer wall vertices, internal partition corners, doorway jambs, window corners)
+        function getFloorCorners(floor) {
+            const rawCorners = [];
+            const addCorner = (x, z, label) => {
+                if (!Number.isFinite(x) || !Number.isFinite(z)) return;
+                const rx = Math.round(x);
+                const rz = Math.round(z);
+                for (let i = 0; i < rawCorners.length; i++) {
+                    if (Math.hypot(rawCorners[i].x - rx, rawCorners[i].z - rz) <= 4) {
+                        return;
+                    }
+                }
+                rawCorners.push({ x: rx, z: rz, label });
+            };
+
+            const innerPoly = (floor === 'ground') ? GROUND_INNER_POLY : FIRST_INNER_POLY;
+            innerPoly.forEach(([x, z]) => addCorner(x, z, 'Inner Wall Corner'));
+
+            const outerPoly = (floor === 'ground') ? GROUND_OUTER_POLY : FIRST_OUTER_POLY;
+            outerPoly.forEach(([x, z]) => addCorner(x, z, 'Outer Facade Corner'));
+
+            const internalList = INTERNAL_WALLS[floor] || [];
+            internalList.forEach(w => {
+                addCorner(w.x1, w.z1, `${w.id} Corner`);
+                addCorner(w.x2, w.z1, `${w.id} Corner`);
+                addCorner(w.x2, w.z2, `${w.id} Corner`);
+                addCorner(w.x1, w.z2, `${w.id} Corner`);
+                const doors = Array.isArray(w.doors) ? w.doors : [];
+                doors.forEach(d => {
+                    if (w.axis === 'z' || w.axis === 'y') {
+                        addCorner(w.x1, d.start, `${w.id} Door Jamb`);
+                        addCorner(w.x2, d.start, `${w.id} Door Jamb`);
+                        addCorner(w.x1, d.end, `${w.id} Door Jamb`);
+                        addCorner(w.x2, d.end, `${w.id} Door Jamb`);
+                    } else {
+                        addCorner(d.start, w.z1, `${w.id} Door Jamb`);
+                        addCorner(d.start, w.z2, `${w.id} Door Jamb`);
+                        addCorner(d.end, w.z1, `${w.id} Door Jamb`);
+                        addCorner(d.end, w.z2, `${w.id} Door Jamb`);
+                    }
+                });
+            });
+
+            if (typeof WallService !== 'undefined' && typeof WallService.getWalls === 'function') {
+                const bRepWalls = WallService.getWalls({ floor });
+                bRepWalls.forEach(bw => {
+                    const sides = Array.isArray(bw.sides) && bw.sides.length > 0
+                        ? bw.sides
+                        : [bw.sideA, bw.sideB].filter(Boolean);
+                    sides.forEach(side => {
+                        if (side && side.p1) addCorner(side.p1[0], side.p1[1], `${bw.id} Corner`);
+                        if (side && side.p2) addCorner(side.p2[0], side.p2[1], `${bw.id} Corner`);
+                    });
+                });
+            }
+
+            PLAN_OPENINGS.filter(op => op.floor === floor).forEach(op => {
+                if (op.axis === 'x') {
+                    const zOuter = op.fixedZ;
+                    const zInner = op.fixedZ + op.inwardSign * WALL_THICKNESS;
+                    addCorner(op.start, zInner, `${op.name} Inner Jamb`);
+                    addCorner(op.end, zInner, `${op.name} Inner Jamb`);
+                    addCorner(op.start, zOuter, `${op.name} Outer Jamb`);
+                    addCorner(op.end, zOuter, `${op.name} Outer Jamb`);
+                } else {
+                    const xOuter = op.fixedX;
+                    const xInner = op.fixedX + op.inwardSign * WALL_THICKNESS;
+                    addCorner(xInner, op.start, `${op.name} Inner Jamb`);
+                    addCorner(xInner, op.end, `${op.name} Inner Jamb`);
+                    addCorner(xOuter, op.start, `${op.name} Outer Jamb`);
+                    addCorner(xOuter, op.end, `${op.name} Outer Jamb`);
+                }
+            });
+
+            return rawCorners;
+        }
+
+        // Find nearest corner within thresholdMm (used to highlight corners when mouse is very close)
+        function findNearestCorner(floor, rawX, rawZ, thresholdMm = 200) {
+            const corners = getFloorCorners(floor);
+            let best = null;
+            let bestDist = thresholdMm;
+            corners.forEach(c => {
+                const d = Math.hypot(rawX - c.x, rawZ - c.z);
+                if (d < bestDist) {
+                    bestDist = d;
+                    best = { floor, x: c.x, z: c.z, label: c.label, dist: d };
+                }
+            });
+            return best;
+        }
+
+        // Resolve CAD DISTANCE snap point:
+        // 1. Individual socket center (even inside a multi-socket bundle!)
+        // 2. Architectural corner (room/wall/opening corner)
+        // 3. Perpendicular or nearest point on wall face
+        // 4. Exact cursor coordinate
+        function resolveMeasureSnapPoint(floor, rawX, rawZ, refPt1 = null) {
+            // 1. Individual socket unit center snap (priority when electricity layer is visible)
+            if (planState.layers.objects) {
+                const floorObjs = planState.placedObjects.filter(o => o.floor === floor);
+                let bestGang = null;
+                let bestGangDist = 145; // 14.5 cm capture radius around individual socket
+                floorObjs.forEach(obj => {
+                    const gangs = getSocketGangCenters(obj);
+                    gangs.forEach(g => {
+                        // Weight hover center slightly so sweeping across a 71 mm bundle cleanly picks each individual socket
+                        const dWallCenter = Math.hypot(rawX - g.cx, rawZ - g.cz);
+                        const dHoverCenter = Math.hypot(rawX - g.hoverX, rawZ - g.hoverZ);
+                        const d = Math.min(dWallCenter, dHoverCenter);
+                        if (d < bestGangDist) {
+                            bestGangDist = d;
+                            bestGang = g;
+                        }
+                    });
+                });
+                if (bestGang) {
+                    return {
+                        floor,
+                        x: bestGang.cx,
+                        z: bestGang.cz,
+                        heightMm: bestGang.centerHeightMm,
+                        snapKind: 'socket',
+                        label: bestGang.label,
+                        objId: bestGang.objId,
+                        gangIndex: bestGang.gangIndex,
+                        gangCount: bestGang.gangCount
+                    };
+                }
+            }
+
+            // 2. Architectural corner snap (when cursor is close to a corner)
+            const nearCorner = findNearestCorner(floor, rawX, rawZ, 220);
+            if (nearCorner) {
+                return {
+                    floor,
+                    x: nearCorner.x,
+                    z: nearCorner.z,
+                    heightMm: null,
+                    snapKind: 'corner',
+                    label: nearCorner.label
+                };
+            }
+
+            // 3. Wall perpendicular / wall face snap
+            const wallSnap = snapToFloorWalls(floor, rawX, rawZ, 120);
+            if (wallSnap && wallSnap.snappedToWall) {
+                if (refPt1 && refPt1.floor === floor) {
+                    const isHorizWall = (wallSnap.rot === 0 || wallSnap.rot === 180);
+                    if (isHorizWall && Math.abs(rawX - refPt1.x) <= 170) {
+                        return {
+                            floor,
+                            x: refPt1.x,
+                            z: wallSnap.z,
+                            heightMm: null,
+                            snapKind: 'wall_perp',
+                            label: '⊥ Wall (Perpendicular)'
+                        };
+                    }
+                    if (!isHorizWall && Math.abs(rawZ - refPt1.z) <= 170) {
+                        return {
+                            floor,
+                            x: wallSnap.x,
+                            z: refPt1.z,
+                            heightMm: null,
+                            snapKind: 'wall_perp',
+                            label: '⊥ Wall (Perpendicular)'
+                        };
+                    }
+                }
+                if (Math.hypot(rawX - wallSnap.x, rawZ - wallSnap.z) <= 85) {
+                    return {
+                        floor,
+                        x: wallSnap.x,
+                        z: wallSnap.z,
+                        heightMm: null,
+                        snapKind: 'wall',
+                        label: 'Wall Face'
+                    };
+                }
+            }
+
+            // 4. Free cursor coordinate
+            return {
+                floor,
+                x: Math.round(rawX),
+                z: Math.round(rawZ),
+                heightMm: null,
+                snapKind: 'point',
+                label: 'Cursor Point'
+            };
         }
 
         // Compute SVG viewBox string for current zoom & pan of a given floor
@@ -1638,6 +2305,11 @@
                 const svg = document.getElementById('svg-' + floor);
                 if (vp && svg) {
                     svg.setAttribute('viewBox', computeViewBoxString(vp, floor));
+                    const objectsG = svg.querySelector('g.layer-objects');
+                    if (objectsG) {
+                        objectsG.replaceChildren();
+                        renderPlacedObjectsForFloor(floor, objectsG);
+                    }
                 }
             });
         }
@@ -2012,7 +2684,110 @@
             }
         }
 
-        // Render user-placed sockets on a floor using ProfiCAD / EN 60617 technical CAD symbols
+        // Draw 1..4 side-by-side realistic-scale (71 mm gang pitch) EN 60617 / ProfiCAD socket symbols along the wall into `symG`
+        function drawSocketUnitsIntoGroup(symG, type, count, strokeColor, sw) {
+            const cnt = Math.max(1, Math.min(6, Math.round(Number(count) || 1)));
+            const isFloorSocket = (type === 'socket_floor');
+            const unitPitch = SOCKET_GANG_PITCH_MM; // 71 mm (7.1 cm) standard European multi-gang center-to-center spacing
+
+            if (isFloorSocket) {
+                const half = 34; // 68 x 68 mm realistic floor box unit placed side-by-side
+                for (let i = 0; i < cnt; i++) {
+                    const xc = (i - (cnt - 1) / 2) * unitPitch;
+                    symG.appendChild(svgEl('rect', {
+                        x: xc - half, y: -half, width: half * 2, height: half * 2,
+                        fill: 'rgba(245, 158, 11, 0.16)', stroke: strokeColor, 'stroke-width': sw
+                    }));
+                    symG.appendChild(svgEl('line', {
+                        x1: xc - half, y1: 0, x2: xc + half, y2: 0,
+                        stroke: strokeColor, 'stroke-width': sw, 'stroke-linecap': 'butt'
+                    }));
+                    symG.appendChild(svgEl('line', {
+                        x1: xc, y1: -half, x2: xc, y2: 0,
+                        stroke: strokeColor, 'stroke-width': sw, 'stroke-linecap': 'butt'
+                    }));
+                    symG.appendChild(svgEl('path', {
+                        d: `M ${xc - half} ${half} A ${half} ${half} 0 0 1 ${xc + half} ${half}`,
+                        fill: 'none',
+                        stroke: strokeColor,
+                        'stroke-width': sw,
+                        'stroke-linecap': 'butt'
+                    }));
+                }
+                return;
+            }
+
+            // Shared wall-plate base bar when multiple sockets (2×..4×) sit side-by-side in one frame
+            if (cnt > 1) {
+                const halfFrameSpan = ((cnt - 1) * unitPitch) / 2 + 32;
+                symG.appendChild(svgEl('line', {
+                    x1: -halfFrameSpan, y1: 0, x2: halfFrameSpan, y2: 0,
+                    stroke: strokeColor, 'stroke-width': sw, 'stroke-linecap': 'round'
+                }));
+            }
+
+            // Realistic-scale wall socket units placed NEXT TO EACH OTHER along the wall (X axis of symG)
+            const r = 27;
+            const barHalf = 30;
+            const yBase = 0;
+            const yBar = -32;
+            const yTop = -59;
+
+            for (let i = 0; i < cnt; i++) {
+                const xc = (i - (cnt - 1) / 2) * unitPitch;
+
+                // 1. Perpendicular stem from wall face (xc, 0) -> (xc, yBar)
+                symG.appendChild(svgEl('line', {
+                    x1: xc, y1: yBase, x2: xc, y2: yBar,
+                    stroke: strokeColor, 'stroke-width': sw, 'stroke-linecap': 'butt'
+                }));
+
+                // 2. Horizontal protective-contact bar (xc - barHalf, yBar) -> (xc + barHalf, yBar)
+                symG.appendChild(svgEl('line', {
+                    x1: xc - barHalf, y1: yBar, x2: xc + barHalf, y2: yBar,
+                    stroke: strokeColor, 'stroke-width': sw, 'stroke-linecap': 'butt'
+                }));
+
+                // 3. Semicircle bowl + Protective Hinged Cover Flap (for GZ / socket_pe_shutter)
+                if (type === 'socket_pe_shutter') {
+                    // Closed & shaded semicircle dome under the protective cover
+                    symG.appendChild(svgEl('path', {
+                        d: `M ${xc - r} ${yTop} A ${r} ${r} 0 0 0 ${xc + r} ${yTop} Z`,
+                        fill: 'rgba(14, 165, 233, 0.36)',
+                        stroke: strokeColor,
+                        'stroke-width': sw,
+                        'stroke-linejoin': 'round'
+                    }));
+                    // Protective hinged cover hood / flap with angled side wings
+                    symG.appendChild(svgEl('path', {
+                        d: `M ${xc - 33} ${yTop + 12} L ${xc - 26} ${yTop - 3} L ${xc + 26} ${yTop - 3} L ${xc + 33} ${yTop + 12}`,
+                        fill: 'none',
+                        stroke: strokeColor,
+                        'stroke-width': sw + 1,
+                        'stroke-linecap': 'round',
+                        'stroke-linejoin': 'round'
+                    }));
+                    // Top cover handle / latch bar above the lid
+                    symG.appendChild(svgEl('line', {
+                        x1: xc - 15, y1: yTop - 11, x2: xc + 15, y2: yTop - 11,
+                        stroke: strokeColor,
+                        'stroke-width': sw,
+                        'stroke-linecap': 'round'
+                    }));
+                } else {
+                    // Standard open socket (G): unfilled semicircle arc
+                    symG.appendChild(svgEl('path', {
+                        d: `M ${xc - r} ${yTop} A ${r} ${r} 0 0 0 ${xc + r} ${yTop}`,
+                        fill: 'none',
+                        stroke: strokeColor,
+                        'stroke-width': sw,
+                        'stroke-linecap': 'butt'
+                    }));
+                }
+            }
+        }
+
+        // Render user-placed sockets on a floor using realistic-scale side-by-side EN 60617 technical CAD symbols
         function renderPlacedObjectsForFloor(floor, objectsGroup) {
             if (!planState.layers.objects) return;
             const list = planState.placedObjects.filter(o => o.floor === floor);
@@ -2022,6 +2797,7 @@
                 const isSelected = (planState.selectedItem && planState.selectedItem.kind === 'object' && planState.selectedItem.id === obj.id);
                 const sx = toSvgX(obj.x);
                 const sz = toSvgZ(obj.z);
+                const cnt = Math.max(1, Math.min(6, Math.round(Number(obj.count) || 1)));
 
                 // Convert world rotation (0=N, 90=E, 180=S, 270=W) to SVG rotation accounting for West/East flip
                 const rawRot = obj.rotation || 0;
@@ -2033,116 +2809,100 @@
                     'data-obj-id': obj.id
                 });
 
-                // Rotated technical symbol group (canonical 0° has wall at (0,0) and symbol extending into room along -Y)
+                // Rotated technical symbol group (canonical 0° has wall at (0,0), sockets side-by-side along X, extending into room along -Y)
                 const symG = svgEl('g', {
                     transform: `rotate(${svgRot})`
                 });
 
                 const isFloorSocket = (obj.type === 'socket_floor');
-                const centerY = isFloorSocket ? 0 : -220;
+                const unitPitch = SOCKET_GANG_PITCH_MM;
+                const totalWidth = cnt * unitPitch;
+                const centerY = isFloorSocket ? 0 : -36;
+                const hitW = Math.max(125, totalWidth + 52);
+                const hitH = isFloorSocket ? 116 : 120;
 
-                // Transparent hit target for easy clicking and dragging of stroke-based CAD icons
-                symG.appendChild(svgEl('circle', {
-                    cx: 0,
-                    cy: centerY,
-                    r: 310,
+                // Transparent hit target pill along the wall for easy clicking and dragging of compact CAD icons
+                symG.appendChild(svgEl('rect', {
+                    x: -hitW / 2,
+                    y: centerY - hitH / 2,
+                    width: hitW,
+                    height: hitH,
+                    rx: 44,
+                    ry: 44,
                     fill: 'rgba(0, 0, 0, 0.001)',
                     stroke: 'none'
                 }));
 
-                // Selection halo around the technical symbol
+                // Selection halo pill around the side-by-side socket bundle
                 if (isSelected) {
-                    symG.appendChild(svgEl('circle', {
-                        cx: 0,
-                        cy: centerY,
-                        r: 340,
-                        fill: 'rgba(56, 189, 248, 0.16)',
-                        stroke: '#38bdf8',
-                        'stroke-width': 24,
-                        'stroke-dasharray': '65,45'
-                    }));
-                }
-
-                const strokeColor = def.color || '#ef4444';
-                const sw = 36;
-
-                if (isFloorSocket) {
-                    // Single-cell 'Gniazdo podłogowe' technical CAD symbol (matching reference graphic):
-                    // 1. Outer square frame (-200,-200) to (200,200)
-                    // 2. Horizontal protective-contact bar across middle (-200,0) -> (200,0)
-                    // 3. Vertical stem in upper half (0,-200) -> (0,0)
-                    // 4. Semicircle in lower half tangent at (0,0) to corners (-200,200) and (200,200)
+                    const selW = hitW + 18;
+                    const selH = hitH + 18;
                     symG.appendChild(svgEl('rect', {
-                        x: -200, y: -200, width: 400, height: 400,
-                        fill: 'none', stroke: strokeColor, 'stroke-width': sw
-                    }));
-                    symG.appendChild(svgEl('line', {
-                        x1: -200, y1: 0, x2: 200, y2: 0,
-                        stroke: strokeColor, 'stroke-width': sw, 'stroke-linecap': 'butt'
-                    }));
-                    symG.appendChild(svgEl('line', {
-                        x1: 0, y1: -200, x2: 0, y2: 0,
-                        stroke: strokeColor, 'stroke-width': sw, 'stroke-linecap': 'butt'
-                    }));
-                    symG.appendChild(svgEl('path', {
-                        d: 'M -200 200 A 200 200 0 0 1 200 200',
-                        fill: 'none',
-                        stroke: strokeColor,
-                        'stroke-width': sw,
-                        'stroke-linecap': 'butt'
-                    }));
-                } else {
-                    // 1. Perpendicular stem from wall (0,0) -> (0,-190)
-                    symG.appendChild(svgEl('line', {
-                        x1: 0, y1: 0, x2: 0, y2: -190,
-                        stroke: strokeColor, 'stroke-width': sw, 'stroke-linecap': 'butt'
+                        x: -selW / 2,
+                        y: centerY - selH / 2,
+                        width: selW,
+                        height: selH,
+                        rx: 50,
+                        ry: 50,
+                        fill: 'rgba(250, 204, 21, 0.14)',
+                        stroke: '#facc15',
+                        'stroke-width': 10,
+                        'stroke-dasharray': '26,18'
                     }));
 
-                    // 2. Horizontal protective-contact bar (-200,-190) -> (200,-190) tangent to semicircle dome
-                    symG.appendChild(svgEl('line', {
-                        x1: -200, y1: -190, x2: 200, y2: -190,
-                        stroke: strokeColor, 'stroke-width': sw, 'stroke-linecap': 'butt'
-                    }));
-
-                    if (obj.type === 'socket_pe_shutter') {
-                        // ProfiCAD 'gniazdo ze stykiem ochronnym i zaślepką':
-                        // Semicircle bowl opening into the room with outward horizontal shutter flanges at both open ends
-                        symG.appendChild(svgEl('path', {
-                            d: 'M -310 -380 L -190 -380 A 190 190 0 0 0 190 -380 L 310 -380',
-                            fill: 'none',
-                            stroke: strokeColor,
-                            'stroke-width': sw,
-                            'stroke-linecap': 'butt',
-                            'stroke-linejoin': 'miter'
-                        }));
-                    } else {
-                        // ProfiCAD 'gniazdo ze stykiem ochronnym' (EN 60617: 11-13-04):
-                        // Semicircle bowl opening into the room
-                        symG.appendChild(svgEl('path', {
-                            d: 'M -190 -380 A 190 190 0 0 0 190 -380',
-                            fill: 'none',
-                            stroke: strokeColor,
-                            'stroke-width': sw,
-                            'stroke-linecap': 'butt'
+                    // Highlight the individual selected socket inside a multi-socket bundle + its exact center point
+                    const activeGangIdx = Math.max(0, Math.min(cnt - 1, Number(planState.selectedItem.gangIndex) || 0));
+                    const activeXc = (activeGangIdx - (cnt - 1) / 2) * unitPitch;
+                    if (cnt > 1) {
+                        symG.appendChild(svgEl('circle', {
+                            cx: activeXc,
+                            cy: isFloorSocket ? 0 : -32,
+                            r: 38,
+                            fill: 'rgba(52, 211, 153, 0.18)',
+                            stroke: '#34d399',
+                            'stroke-width': 8
                         }));
                     }
+                    // Center crosshair marker at the active socket's exact center (activeXc, 0)
+                    symG.appendChild(svgEl('circle', {
+                        cx: activeXc,
+                        cy: 0,
+                        r: 12,
+                        fill: '#34d399',
+                        stroke: '#0f172a',
+                        'stroke-width': 5
+                    }));
                 }
+
+                const baseColor = obj.type === 'socket_pe_shutter'
+                    ? '#38bdf8'
+                    : (obj.type === 'socket_floor' ? '#f59e0b' : (def.color || '#ef4444'));
+                const strokeColor = isSelected ? '#facc15' : baseColor;
+                const sw = 9;
+                drawSocketUnitsIntoGroup(symG, obj.type, cnt, strokeColor, sw);
 
                 g.appendChild(symG);
 
-                // Upright label tag positioned cleanly inside the room beyond the technical icon
+                // Compact upright label tag positioned cleanly inside the room beyond the technical icon
                 if (obj.label) {
                     const rad = (svgRot * Math.PI) / 180;
-                    const dist = isFloorSocket ? 410 : 590;
+                    const dist = isFloorSocket ? 105 : 132;
                     const lx = isFloorSocket ? 0 : Math.round(Math.sin(rad) * dist);
-                    const ly = isFloorSocket ? dist : Math.round(-Math.cos(rad) * dist) + 60;
+                    const ly = isFloorSocket ? dist : Math.round(-Math.cos(rad) * dist) + 24;
+
+                    const labelFill = isSelected
+                        ? '#fde047'
+                        : (obj.type === 'socket_pe_shutter' ? '#7dd3fc' : (obj.type === 'socket_floor' ? '#fde68a' : '#fecaca'));
 
                     g.appendChild(svgEl('text', {
                         x: lx, y: ly,
-                        fill: isSelected ? '#38bdf8' : '#cbd5e1',
+                        fill: labelFill,
+                        stroke: '#0f172a',
+                        'stroke-width': 14,
+                        'paint-order': 'stroke fill',
                         'font-family': 'JetBrains Mono, monospace',
-                        'font-size': 175,
-                        'font-weight': 600,
+                        'font-size': 68,
+                        'font-weight': 700,
                         'text-anchor': 'middle'
                     }, obj.label));
                 }
@@ -2150,12 +2910,565 @@
                 g.addEventListener('mousedown', (e) => {
                     if (e.button !== 0 || planState.activeTool !== 'select') return;
                     e.stopPropagation();
-                    selectPlacedObject(obj.id);
-                    startDraggingPlacedObject(e, obj);
+                    const svg = g.ownerSVGElement;
+                    const worldPt = svg ? clientToWorldMm(svg, e.clientX, e.clientY) : { x: obj.x, z: obj.z };
+                    const clickedGangIdx = findClosestGangIndex(obj, worldPt.x, worldPt.z);
+                    selectPlacedObject(obj.id, clickedGangIdx);
+                    startDraggingPlacedObject(e, obj.id);
                 });
 
                 objectsGroup.appendChild(g);
             });
+
+            // Live translucent ghost preview while placing a new socket or multi-socket bundle
+            if (planState.activeTool !== 'select' && planState.activeTool !== 'distance' && planState.ghostPreview && planState.ghostPreview.floor === floor) {
+                const gp = planState.ghostPreview;
+                const gsx = toSvgX(gp.x);
+                const gsz = toSvgZ(gp.z);
+                const rawRot = gp.rotation !== undefined ? gp.rotation : (gp.rot || 0);
+                const svgRot = planState.westOnLeft ? rawRot : ((360 - rawRot) % 360);
+                const cnt = Math.max(1, Math.min(6, Math.round(Number(planState.placementCount) || 1)));
+                const ghostColor = planState.activeTool === 'socket_pe_shutter'
+                    ? '#38bdf8'
+                    : (planState.activeTool === 'socket_floor' ? '#f59e0b' : '#ef4444');
+
+                const ghostG = svgEl('g', {
+                    transform: `translate(${gsx}, ${gsz})`,
+                    opacity: 0.78,
+                    style: 'pointer-events: none;'
+                });
+                const ghostSymG = svgEl('g', {
+                    transform: `rotate(${svgRot})`
+                });
+                if (gp.snappedToWall) {
+                    ghostSymG.appendChild(svgEl('circle', {
+                        cx: 0, cy: 0, r: 18,
+                        fill: ghostColor,
+                        stroke: '#ffffff',
+                        'stroke-width': 6
+                    }));
+                }
+                drawSocketUnitsIntoGroup(ghostSymG, planState.activeTool, cnt, ghostColor, 9);
+                ghostG.appendChild(ghostSymG);
+                objectsGroup.appendChild(ghostG);
+
+                // Render live wall-corner rulers for the ghost preview socket/bundle while placing on a wall
+                if (gp.snappedToWall && planState.activeTool !== 'socket_floor') {
+                    const def = OBJECT_CATALOG[planState.activeTool] || { shortCode: 'G' };
+                    renderLiveSocketCornerRulers(floor, objectsGroup, {
+                        id: 'GHOST',
+                        floor: floor,
+                        type: planState.activeTool,
+                        count: cnt,
+                        x: gp.x,
+                        z: gp.z,
+                        rotation: rawRot,
+                        snappedToWall: true,
+                        label: def.shortCode
+                    });
+                }
+            } else if (planState.activeTool === 'select' && planState.selectedItem && planState.selectedItem.kind === 'object') {
+                // Also render live wall-corner rulers when an existing wall-mounted socket/bundle is selected or being dragged
+                const selObj = planState.placedObjects.find(o => o.id === planState.selectedItem.id && o.floor === floor);
+                if (selObj && selObj.snappedToWall && selObj.type !== 'socket_floor') {
+                    renderLiveSocketCornerRulers(floor, objectsGroup, selObj);
+                }
+            }
+        }
+
+        // Render live CAD rulers along the wall from the left/top corner to the closest socket center
+        // and from the right/bottom closest socket center to the right/bottom corner
+        function renderLiveSocketCornerRulers(floor, objectsGroup, sockObj) {
+            const rulersInfo = computeSocketWallCornerRulers(floor, sockObj);
+            if (!rulersInfo) return;
+
+            const v = planState.views[floor] || planState.views.ground;
+            const zoom = Math.max(0.4, Number(v.zoom) || 1.0);
+            // Scale factor s: 1.0 at 100% zoom (large, bold 235 mm text matching room titles),
+            // scaling down smoothly as user zooms in so rulers stay ~15-18 px on screen at all zoom levels
+            const s = Math.max(0.08, Math.min(1.15, 1 / Math.pow(Math.max(0.85, zoom), 0.72)));
+
+            // Compute visible SVG viewport bounds so distance callout pills stay visible even at 1000%-2500% zoom
+            const vpEl = document.getElementById('viewport-' + floor);
+            const rect = (vpEl && typeof vpEl.getBoundingClientRect === 'function')
+                ? vpEl.getBoundingClientRect()
+                : { width: 800, height: 550 };
+            const aspect = (rect.width > 0 && rect.height > 0) ? (rect.width / rect.height) : 1.45;
+            const spanZ = 26800 / zoom;
+            const spanX = spanZ * aspect;
+            const centerSvgX = toSvgX(v.panX);
+            const centerSvgZ = toSvgZ(v.panZ);
+            const vMinX = centerSvgX - spanX / 2;
+            const vMaxX = centerSvgX + spanX / 2;
+            const vMinZ = centerSvgZ - spanZ / 2;
+            const vMaxZ = centerSvgZ + spanZ / 2;
+
+            const svgNx = planState.westOnLeft ? -rulersInfo.normalX : rulersInfo.normalX;
+            const svgNz = rulersInfo.normalZ;
+            const offsetDist = Math.max(105, Math.round(440 * s));
+            const witnessExtra = Math.round(80 * s);
+
+            const rulersG = svgEl('g', {
+                class: 'live-socket-corner-rulers',
+                style: 'pointer-events: none;'
+            });
+
+            const rulerConfigs = [
+                { ruler: rulersInfo.rulerFirst, color: '#38bdf8', textColor: '#e0f2fe', idx: 0 },
+                { ruler: rulersInfo.rulerSecond, color: '#34d399', textColor: '#d1fae5', idx: 1 }
+            ];
+
+            const placedBadges = [];
+
+            rulerConfigs.forEach(cfg => {
+                const r = cfg.ruler;
+                if (!r || r.distanceMm < 1) return;
+                const color = cfg.color;
+
+                const cSvgX = toSvgX(r.corner.x);
+                const cSvgZ = toSvgZ(r.corner.z);
+                const sSvgX = toSvgX(r.socket.cx);
+                const sSvgZ = toSvgZ(r.socket.cz);
+
+                const cDimX = cSvgX + svgNx * offsetDist;
+                const cDimZ = cSvgZ + svgNz * offsetDist;
+                const sDimX = sSvgX + svgNx * offsetDist;
+                const sDimZ = sSvgZ + svgNz * offsetDist;
+
+                // 1. Extension witness line from Wall Corner into room
+                rulersG.appendChild(svgEl('line', {
+                    x1: cSvgX,
+                    y1: cSvgZ,
+                    x2: cSvgX + svgNx * (offsetDist + witnessExtra),
+                    y2: cSvgZ + svgNz * (offsetDist + witnessExtra),
+                    stroke: color,
+                    'stroke-width': Math.max(2.2, 20 * s),
+                    'stroke-dasharray': `${Math.max(6, 55 * s)},${Math.max(4, 35 * s)}`,
+                    opacity: 0.95
+                }));
+
+                // 2. Highlighted Corner CAD Square + Crosshair at (cSvgX, cSvgZ)
+                const cBoxHalf = Math.max(10, 72 * s);
+                rulersG.appendChild(svgEl('rect', {
+                    x: cSvgX - cBoxHalf,
+                    y: cSvgZ - cBoxHalf,
+                    width: cBoxHalf * 2,
+                    height: cBoxHalf * 2,
+                    rx: Math.max(3, 14 * s),
+                    fill: 'rgba(15, 23, 42, 0.82)',
+                    stroke: color,
+                    'stroke-width': Math.max(2.5, 22 * s)
+                }));
+                rulersG.appendChild(svgEl('circle', {
+                    cx: cSvgX,
+                    cy: cSvgZ,
+                    r: Math.max(3.5, 22 * s),
+                    fill: '#ffffff',
+                    stroke: color,
+                    'stroke-width': Math.max(1.8, 10 * s)
+                }));
+
+                // 3. Extension witness line from the Closest Socket's Exact Center (sSvgX, sSvgZ) into room
+                rulersG.appendChild(svgEl('line', {
+                    x1: sSvgX,
+                    y1: sSvgZ,
+                    x2: sSvgX + svgNx * (offsetDist + witnessExtra),
+                    y2: sSvgZ + svgNz * (offsetDist + witnessExtra),
+                    stroke: color,
+                    'stroke-width': Math.max(2.2, 20 * s),
+                    'stroke-dasharray': `${Math.max(6, 50 * s)},${Math.max(4, 32 * s)}`,
+                    opacity: 0.98
+                }));
+
+                // Highlight ring on the specific socket in the bundle closest to this corner + center dot on wall
+                const iconRingScale = Math.max(0.55, Math.min(1.0, s));
+                rulersG.appendChild(svgEl('circle', {
+                    cx: toSvgX(r.socket.cx + rulersInfo.normalX * 32),
+                    cy: toSvgZ(r.socket.cz + rulersInfo.normalZ * 32),
+                    r: 36 * iconRingScale,
+                    fill: 'none',
+                    stroke: color,
+                    'stroke-width': Math.max(2.5, 14 * s),
+                    opacity: 0.9
+                }));
+                rulersG.appendChild(svgEl('circle', {
+                    cx: sSvgX,
+                    cy: sSvgZ,
+                    r: Math.max(3.5, 20 * s),
+                    fill: color,
+                    stroke: '#0f172a',
+                    'stroke-width': Math.max(1.5, 8 * s)
+                }));
+
+                // 4. Main Ruler Dimension Line parallel to wall
+                rulersG.appendChild(svgEl('line', {
+                    x1: cDimX,
+                    y1: cDimZ,
+                    x2: sDimX,
+                    y2: sDimZ,
+                    stroke: '#0f172a',
+                    'stroke-width': Math.max(5, 46 * s),
+                    'stroke-linecap': 'round'
+                }));
+                rulersG.appendChild(svgEl('line', {
+                    x1: cDimX,
+                    y1: cDimZ,
+                    x2: sDimX,
+                    y2: sDimZ,
+                    stroke: color,
+                    'stroke-width': Math.max(2.8, 24 * s),
+                    'stroke-linecap': 'round'
+                }));
+
+                // 45° Architectural CAD Tick Marks at both ends of the ruler segment
+                const tickLen = Math.max(7, 56 * s);
+                [[cDimX, cDimZ], [sDimX, sDimZ]].forEach(([tx, tz]) => {
+                    rulersG.appendChild(svgEl('line', {
+                        x1: tx - tickLen,
+                        y1: tz - tickLen,
+                        x2: tx + tickLen,
+                        y2: tz + tickLen,
+                        stroke: '#ffffff',
+                        'stroke-width': Math.max(2.4, 20 * s),
+                        'stroke-linecap': 'round'
+                    }));
+                });
+
+                // 5. Large, High-Contrast Distance Callout Pill (clamped into visible viewport)
+                let labelX = (cDimX + sDimX) / 2;
+                let labelZ = (cDimZ + sDimZ) / 2;
+                const distInt = Math.round(r.distanceMm);
+                const distCm = (r.distanceMm / 10).toFixed(1);
+                const gangTag = r.socket.gangCount > 1 ? ` [#${r.socket.gangIndex + 1}]` : '';
+                const textStr = `${distInt} mm (${distCm} cm)${gangTag}`;
+
+                const fontSize = Math.max(18, 235 * s);
+                const boxW = Math.max(380 * s, textStr.length * (fontSize * 0.62) + 130 * s);
+                const boxH = Math.max(34, 360 * s);
+
+                if (rulersInfo.axis === 'x') {
+                    const segMinX = Math.min(cDimX, sDimX) + boxW * 0.52;
+                    const segMaxX = Math.max(cDimX, sDimX) - boxW * 0.52;
+                    if (segMaxX > segMinX) {
+                        const visMinX = Math.max(segMinX, vMinX + boxW * 0.6);
+                        const visMaxX = Math.min(segMaxX, vMaxX - boxW * 0.6);
+                        if (visMaxX >= visMinX) {
+                            labelX = Math.max(visMinX, Math.min(visMaxX, labelX));
+                        } else {
+                            labelX = Math.max(segMinX, Math.min(segMaxX, labelX));
+                        }
+                    }
+                } else {
+                    const segMinZ = Math.min(cDimZ, sDimZ) + boxH * 0.6;
+                    const segMaxZ = Math.max(cDimZ, sDimZ) - boxH * 0.6;
+                    if (segMaxZ > segMinZ) {
+                        const visMinZ = Math.max(segMinZ, vMinZ + boxH * 0.8);
+                        const visMaxZ = Math.min(segMaxZ, vMaxZ - boxH * 0.8);
+                        if (visMaxZ >= visMinZ) {
+                            labelZ = Math.max(visMinZ, Math.min(visMaxZ, labelZ));
+                        } else {
+                            labelZ = Math.max(segMinZ, Math.min(segMaxZ, labelZ));
+                        }
+                    }
+                }
+
+                // If the second badge would overlap the first badge on a narrow wall at 100% zoom, stagger it into the room
+                if (placedBadges.length > 0) {
+                    const prev = placedBadges[0];
+                    const overlapX = Math.abs(labelX - prev.x) < (boxW + prev.w) * 0.52;
+                    const overlapZ = Math.abs(labelZ - prev.z) < (boxH + prev.h) * 0.55;
+                    if (overlapX && overlapZ) {
+                        labelX += svgNx * (boxH * 1.12);
+                        labelZ += svgNz * (boxH * 1.12);
+                    }
+                }
+                placedBadges.push({ x: labelX, z: labelZ, w: boxW, h: boxH });
+
+                const badgeG = svgEl('g', {
+                    transform: `translate(${labelX}, ${labelZ})`
+                });
+                badgeG.appendChild(svgEl('rect', {
+                    x: -boxW / 2,
+                    y: -boxH / 2,
+                    width: boxW,
+                    height: boxH,
+                    rx: Math.max(8, 68 * s),
+                    fill: 'rgba(15, 23, 42, 0.96)',
+                    stroke: color,
+                    'stroke-width': Math.max(2.4, 20 * s)
+                }));
+                badgeG.appendChild(svgEl('text', {
+                    x: 0,
+                    y: fontSize * 0.35,
+                    fill: cfg.textColor,
+                    'font-family': 'JetBrains Mono, monospace',
+                    'font-size': fontSize,
+                    'font-weight': 700,
+                    'text-anchor': 'middle'
+                }, textStr));
+
+                rulersG.appendChild(badgeG);
+            });
+
+            objectsGroup.appendChild(rulersG);
+        }
+
+        // Helper to draw a CAD snap marker (socket center ring/crosshair, corner square/crosshair, or wall/cursor point)
+        function drawCadSnapMarker(measureG, pt, isLockedAnchor = false) {
+            if (!pt) return;
+            const sx = toSvgX(pt.x);
+            const sz = toSvgZ(pt.z);
+            const color = isLockedAnchor
+                ? '#10b981'
+                : (pt.snapKind === 'socket' ? '#38bdf8' : (pt.snapKind === 'corner' ? '#34d399' : '#facc15'));
+
+            // If snapped to an individual socket (single or inside a bundle), also highlight its visual icon body
+            if (pt.snapKind === 'socket' && pt.objId) {
+                const obj = planState.placedObjects.find(o => o.id === pt.objId);
+                if (obj) {
+                    const cnt = Math.max(1, Math.min(6, Math.round(Number(obj.count) || 1)));
+                    const rawRot = obj.rotation || 0;
+                    const svgRot = planState.westOnLeft ? rawRot : ((360 - rawRot) % 360);
+                    const gIdx = Math.max(0, Math.min(cnt - 1, Number(pt.gangIndex) || 0));
+                    const localXc = (gIdx - (cnt - 1) / 2) * SOCKET_GANG_PITCH_MM;
+                    const isFloor = (obj.type === 'socket_floor');
+
+                    const sockHighlightG = svgEl('g', {
+                        transform: `translate(${toSvgX(obj.x)}, ${toSvgZ(obj.z)}) rotate(${svgRot})`
+                    });
+                    sockHighlightG.appendChild(svgEl('circle', {
+                        cx: localXc,
+                        cy: isFloor ? 0 : -32,
+                        r: 42,
+                        fill: isLockedAnchor ? 'rgba(16, 185, 129, 0.24)' : 'rgba(56, 189, 248, 0.24)',
+                        stroke: color,
+                        'stroke-width': 10
+                    }));
+                    measureG.appendChild(sockHighlightG);
+                }
+            }
+
+            if (pt.snapKind === 'corner') {
+                // Classic CAD Endpoint / Corner Snap Box + Crosshair
+                const halfBox = 44;
+                measureG.appendChild(svgEl('rect', {
+                    x: sx - halfBox,
+                    y: sz - halfBox,
+                    width: halfBox * 2,
+                    height: halfBox * 2,
+                    rx: 8,
+                    fill: 'rgba(16, 185, 129, 0.22)',
+                    stroke: color,
+                    'stroke-width': 12
+                }));
+            } else {
+                // Socket Center or Point Snap Ring
+                measureG.appendChild(svgEl('circle', {
+                    cx: sx,
+                    cy: sz,
+                    r: 34,
+                    fill: 'rgba(15, 23, 42, 0.45)',
+                    stroke: color,
+                    'stroke-width': 10
+                }));
+            }
+
+            // Center precision crosshair + dot
+            const ch = 64;
+            measureG.appendChild(svgEl('line', {
+                x1: sx - ch, y1: sz, x2: sx + ch, y2: sz,
+                stroke: color, 'stroke-width': 8
+            }));
+            measureG.appendChild(svgEl('line', {
+                x1: sx, y1: sz - ch, x2: sx, y2: sz + ch,
+                stroke: color, 'stroke-width': 8
+            }));
+            measureG.appendChild(svgEl('circle', {
+                cx: sx, cy: sz, r: 12,
+                fill: '#ffffff', stroke: color, 'stroke-width': 6
+            }));
+
+            // Compact snap label pill above the marker
+            const tagText = pt.snapKind === 'socket'
+                ? `⚡ ${pt.label} Center (${Math.round(pt.x)}, ${Math.round(pt.z)} • Hc=${pt.heightMm}mm)`
+                : (pt.snapKind === 'corner'
+                    ? `📐 ${pt.label} (${Math.round(pt.x)}, ${Math.round(pt.z)})`
+                    : `${pt.label} (${Math.round(pt.x)}, ${Math.round(pt.z)})`);
+
+            measureG.appendChild(svgEl('text', {
+                x: sx,
+                y: sz - 86,
+                fill: isLockedAnchor ? '#6ee7b7' : '#bae6fd',
+                stroke: '#0f172a',
+                'stroke-width': 18,
+                'paint-order': 'stroke fill',
+                'font-family': 'JetBrains Mono, monospace',
+                'font-size': 78,
+                'font-weight': 700,
+                'text-anchor': 'middle'
+            }, tagText));
+        }
+
+        // Render CAD DISTANCE overlay (corner highlights, individual socket center snaps, rubber-band line, ΔX/ΔZ legs, and distance callout)
+        function renderDistanceMeasurementForFloor(floor, measureG) {
+            if (!measureG) return;
+            measureG.replaceChildren();
+
+            const m = planState.measure;
+            if (!m) return;
+
+            // 1. Highlight nearby corner when mouse is very close to a corner even outside distance mode
+            if (planState.activeTool !== 'distance' && m.hoverCorner && m.hoverCorner.floor === floor) {
+                drawCadSnapMarker(measureG, {
+                    floor,
+                    x: m.hoverCorner.x,
+                    z: m.hoverCorner.z,
+                    snapKind: 'corner',
+                    label: m.hoverCorner.label
+                }, false);
+            }
+
+            // 2. Render live hover snap marker in 'distance' mode (when pt2 is not yet locked, or while hovering for next point)
+            if (planState.activeTool === 'distance' && m.hoverPt && m.hoverPt.floor === floor) {
+                drawCadSnapMarker(measureG, m.hoverPt, false);
+            }
+
+            const p1 = (m.pt1 && m.pt1.floor === floor) ? m.pt1 : null;
+            const p2Target = m.pt2 || (planState.activeTool === 'distance' ? m.hoverPt : null);
+            const p2 = (p2Target && p2Target.floor === floor) ? p2Target : null;
+
+            if (p1) {
+                drawCadSnapMarker(measureG, p1, true);
+            }
+            if (m.pt2 && m.pt2.floor === floor) {
+                drawCadSnapMarker(measureG, m.pt2, true);
+            }
+
+            if (!p1 || !p2) return;
+
+            const sx1 = toSvgX(p1.x);
+            const sz1 = toSvgZ(p1.z);
+            const sx2 = toSvgX(p2.x);
+            const sz2 = toSvgZ(p2.z);
+
+            const dxMm = Math.abs(Math.round((p2.x - p1.x) * 10) / 10);
+            const dzMm = Math.abs(Math.round((p2.z - p1.z) * 10) / 10);
+            const dist2dMm = Math.round(Math.hypot(p2.x - p1.x, p2.z - p1.z) * 10) / 10;
+            if (dist2dMm < 1) return;
+
+            const hasHeights = (p1.heightMm !== null && p1.heightMm !== undefined && p2.heightMm !== null && p2.heightMm !== undefined);
+            const dhMm = hasHeights ? Math.abs(Math.round(p2.heightMm - p1.heightMm)) : 0;
+            const dist3dMm = hasHeights ? (Math.round(Math.hypot(p2.x - p1.x, p2.z - p1.z, dhMm) * 10) / 10) : dist2dMm;
+
+            // 3A. Orthogonal ΔX and ΔZ dashed CAD projection legs when both ΔX and ΔZ are non-zero
+            if (dxMm >= 15 && dzMm >= 15) {
+                measureG.appendChild(svgEl('polyline', {
+                    points: `${sx1},${sz1} ${sx2},${sz1} ${sx2},${sz2}`,
+                    fill: 'none',
+                    stroke: '#38bdf8',
+                    'stroke-width': 10,
+                    'stroke-dasharray': '34,24',
+                    opacity: 0.85
+                }));
+                // Horizontal leg ΔX label
+                measureG.appendChild(svgEl('text', {
+                    x: (sx1 + sx2) / 2,
+                    y: sz1 - 28,
+                    fill: '#7dd3fc',
+                    stroke: '#0f172a',
+                    'stroke-width': 16,
+                    'paint-order': 'stroke fill',
+                    'font-family': 'JetBrains Mono, monospace',
+                    'font-size': 74,
+                    'font-weight': 700,
+                    'text-anchor': 'middle'
+                }, `ΔX = ${Math.round(dxMm).toLocaleString()} mm (${(dxMm / 10).toFixed(1)} cm)`));
+
+                // Vertical leg ΔZ label
+                measureG.appendChild(svgEl('text', {
+                    x: sx2 + 36,
+                    y: (sz1 + sz2) / 2 + 24,
+                    fill: '#7dd3fc',
+                    stroke: '#0f172a',
+                    'stroke-width': 16,
+                    'paint-order': 'stroke fill',
+                    'font-family': 'JetBrains Mono, monospace',
+                    'font-size': 74,
+                    'font-weight': 700,
+                    'text-anchor': 'start'
+                }, `ΔZ = ${Math.round(dzMm).toLocaleString()} mm (${(dzMm / 10).toFixed(1)} cm)`));
+            }
+
+            // 3B. Direct CAD DISTANCE line with high-contrast halo
+            measureG.appendChild(svgEl('line', {
+                x1: sx1, y1: sz1, x2: sx2, y2: sz2,
+                stroke: '#0f172a',
+                'stroke-width': 26,
+                'stroke-linecap': 'round'
+            }));
+            measureG.appendChild(svgEl('line', {
+                x1: sx1, y1: sz1, x2: sx2, y2: sz2,
+                stroke: '#10b981',
+                'stroke-width': 14,
+                'stroke-dasharray': m.pt2 ? 'none' : '42,22',
+                'stroke-linecap': 'round'
+            }));
+
+            // 3C. Central CAD Distance Callout Badge
+            const midX = (sx1 + sx2) / 2;
+            const midZ = (sz1 + sz2) / 2;
+            const primaryText = `📏 ${Math.round(dist2dMm).toLocaleString()} mm (${(dist2dMm / 10).toFixed(1)} cm)`;
+            const secondaryText = hasHeights
+                ? `${p1.label} → ${p2.label} • Center H: ${p1.heightMm}→${p2.heightMm} mm (3D: ${Math.round(dist3dMm).toLocaleString()} mm)`
+                : `${p1.label} → ${p2.label} • ΔX=${Math.round(dxMm)} mm, ΔZ=${Math.round(dzMm)} mm`;
+
+            const boxW = Math.max(920, Math.max(primaryText.length * 64, secondaryText.length * 44) + 140);
+            const boxH = 235;
+            const badgeG = svgEl('g', {
+                transform: `translate(${midX}, ${midZ - 165})`
+            });
+            badgeG.appendChild(svgEl('rect', {
+                x: -boxW / 2,
+                y: -boxH / 2,
+                width: boxW,
+                height: boxH,
+                rx: 42,
+                fill: 'rgba(15, 23, 42, 0.94)',
+                stroke: '#10b981',
+                'stroke-width': 14
+            }));
+            badgeG.appendChild(svgEl('text', {
+                x: 0,
+                y: -18,
+                fill: '#34d399',
+                'font-family': 'JetBrains Mono, monospace',
+                'font-size': 96,
+                'font-weight': 700,
+                'text-anchor': 'middle'
+            }, primaryText));
+            badgeG.appendChild(svgEl('text', {
+                x: 0,
+                y: 68,
+                fill: '#e2e8f0',
+                'font-family': 'JetBrains Mono, monospace',
+                'font-size': 66,
+                'font-weight': 600,
+                'text-anchor': 'middle'
+            }, secondaryText));
+            measureG.appendChild(badgeG);
+        }
+
+        // Fast in-place update of the CAD distance & corner highlight overlay without rebuilding the rest of the SVG
+        function updateDistanceMeasureOverlay(floor) {
+            const svg = document.getElementById('svg-' + floor);
+            if (!svg) return;
+            let measureG = svg.querySelector('.layer-distance-measure');
+            if (!measureG) {
+                measureG = svgEl('g', { class: 'layer-distance-measure', style: 'pointer-events: none;' });
+                svg.appendChild(measureG);
+            }
+            renderDistanceMeasurementForFloor(floor, measureG);
+            updateDistanceReadoutUI();
         }
 
         // Render a complete 2D Floor Plan SVG ('ground' or 'first')
@@ -2418,6 +3731,11 @@
             const objectsG = svgEl('g', { class: 'layer-objects' });
             renderPlacedObjectsForFloor(floor, objectsG);
             svg.appendChild(objectsG);
+
+            // 8. CAD Distance Measurement & Corner/Socket Center Snap Overlay Layer
+            const measureG = svgEl('g', { class: 'layer-distance-measure', style: 'pointer-events: none;' });
+            renderDistanceMeasurementForFloor(floor, measureG);
+            svg.appendChild(measureG);
         }
 
         // Draw a fine double-arrow interior distance line between two wall faces (in cm)
@@ -3298,8 +4616,12 @@
             renderAllPlans();
         }
 
-        function selectPlacedObject(objId) {
-            planState.selectedItem = { kind: 'object', id: objId };
+        function selectPlacedObject(objId, gangIndex = 0) {
+            planState.selectedItem = {
+                kind: 'object',
+                id: objId,
+                gangIndex: Math.max(0, Math.round(Number(gangIndex) || 0))
+            };
             updateInspectorUI();
             renderAllPlans();
         }
@@ -3447,23 +4769,79 @@
                     return;
                 }
                 const def = OBJECT_CATALOG[obj.type] || OBJECT_CATALOG.socket_pe;
+                const count = Math.max(1, Math.min(6, Math.round(Number(obj.count) || 1)));
+                const gangs = getSocketGangCenters(obj);
+                const activeGangIdx = Math.max(0, Math.min(count - 1, Number(planState.selectedItem.gangIndex) || 0));
+                const activeGang = gangs[activeGangIdx] || { cx: obj.x, cz: obj.z, centerHeightMm: obj.heightMm, label: obj.label };
+
                 if (opEditPanelEl) opEditPanelEl.style.display = 'none';
                 editPanelEl.style.display = 'block';
-                pillEl.textContent = def.shortCode;
-                titleEl.textContent = `${obj.label} — ${def.name}`;
-                subEl.textContent = `${obj.floor === 'ground' ? 'Lower Floor (Parter)' : 'Upper Floor (Piętro)'} • Interactive Plan Object`;
+                pillEl.textContent = count > 1 ? `${count}× ${def.shortCode} Bundle (Socket ${activeGangIdx + 1}/${count})` : def.shortCode;
+                titleEl.textContent = `${obj.label} — ${count > 1 ? `${count}-Gang ` : ''}${def.name}`;
+                subEl.textContent = `${obj.floor === 'ground' ? 'Lower Floor (Parter)' : 'Upper Floor (Piętro)'} • Center-Referenced CAD Socket`;
+
+                // Populate individual socket selector buttons when bundle has count > 1
+                const gangWrapEl = document.getElementById('obj-gang-selector-wrap');
+                const gangBtnsEl = document.getElementById('obj-gang-buttons');
+                if (gangWrapEl && gangBtnsEl) {
+                    if (count > 1) {
+                        gangWrapEl.style.display = 'block';
+                        const btns = gangs.map((g, idx) => {
+                            const b = document.createElement('button');
+                            b.type = 'button';
+                            b.className = 'ctrl-btn' + (idx === activeGangIdx ? ' active' : '');
+                            b.style.justifyContent = 'center';
+                            b.style.padding = '4px 6px';
+                            b.style.fontSize = '11px';
+                            b.textContent = `#${idx + 1}/${count}`;
+                            b.title = `${g.label} Center: X=${g.cx} mm, Z=${g.cz} mm`;
+                            b.addEventListener('click', () => selectPlacedObject(obj.id, idx));
+                            return b;
+                        });
+                        gangBtnsEl.replaceChildren(...btns);
+                    } else {
+                        gangWrapEl.style.display = 'none';
+                        gangBtnsEl.replaceChildren();
+                    }
+                }
+
+                const isFloorSocket = (obj.type === 'socket_floor');
+                const hCenter = isFloorSocket ? 0 : (Number.isFinite(Number(obj.heightMm)) ? Number(obj.heightMm) : 300);
+                const hRangeText = isFloorSocket
+                    ? '0 mm (Floor Box Surface)'
+                    : `${hCenter.toLocaleString()} mm (Center • Frame ${Math.max(0, hCenter - 43)}..${hCenter + 43} mm)`;
+
+                const rulersInfo = computeSocketWallCornerRulers(obj.floor, obj);
+                const cornerRows = [];
+                if (rulersInfo) {
+                    const r1 = rulersInfo.rulerFirst;
+                    const r2 = rulersInfo.rulerSecond;
+                    const g1Tag = count > 1 ? ` → Socket #${r1.socket.gangIndex + 1}` : ' → Center';
+                    const g2Tag = count > 1 ? `Socket #${r2.socket.gangIndex + 1} → ` : 'Center → ';
+                    cornerRows.push(
+                        [`${r1.sideLabel}${g1Tag}`, `${Math.round(r1.distanceMm).toLocaleString()} mm (${(r1.distanceMm / 10).toFixed(1)} cm)`],
+                        [`${g2Tag}${r2.sideLabel}`, `${Math.round(r2.distanceMm).toLocaleString()} mm (${(r2.distanceMm / 10).toFixed(1)} cm)`]
+                    );
+                }
 
                 const rows = [
                     ['Object ID', obj.id],
                     ['Type', def.name],
+                    ['Sockets in Frame', `${count}× (${count === 1 ? 'Single 86×86 mm Frame' : `${count}-Gang Frame • ${86 + (count - 1) * 71}×86 mm`})`],
+                    ['Active Socket Center', count > 1
+                        ? `Socket [${activeGangIdx + 1}/${count}]: X = ${activeGang.cx.toLocaleString()} mm, Z = ${activeGang.cz.toLocaleString()} mm`
+                        : `X = ${activeGang.cx.toLocaleString()} mm, Z = ${activeGang.cz.toLocaleString()} mm`],
+                    ...(count > 1 ? [['Frame Midpoint (X, Z)', `X = ${obj.x.toLocaleString()} mm, Z = ${obj.z.toLocaleString()} mm`]] : []),
+                    ...cornerRows,
+                    ['Center Mount Height', hRangeText],
                     ['Floor', obj.floor === 'ground' ? 'Parter (±0.00 m)' : 'Piętro (+3.43 m)'],
-                    ['Position (X, Z)', `X = ${obj.x.toLocaleString()} mm, Z = ${obj.z.toLocaleString()} mm`],
-                    ['Mount Height', `${obj.heightMm.toLocaleString()} mm`],
                     ['Wall Snapped', obj.snappedToWall ? 'Yes (Inner Wall Face)' : 'Free / Grid (50 mm)']
                 ];
                 populateKvRows(kvListEl, rows);
 
                 document.getElementById('obj-label-input').value = obj.label;
+                const countInputEl = document.getElementById('obj-count-input');
+                if (countInputEl) countInputEl.value = String(count);
                 document.getElementById('obj-x-input').value = String(obj.x);
                 document.getElementById('obj-z-input').value = String(obj.z);
                 document.getElementById('obj-h-input').value = String(obj.heightMm);
@@ -3544,19 +4922,23 @@
         function renderPlacedObjectsList() {
             const countEl = document.getElementById('obj-count-label');
             const listEl = document.getElementById('placed-objects-list');
-            countEl.textContent = String(planState.placedObjects.length);
+            const totalUnits = planState.placedObjects.reduce((acc, o) => acc + Math.max(1, Number(o.count) || 1), 0);
+            countEl.textContent = planState.placedObjects.length === totalUnits
+                ? String(planState.placedObjects.length)
+                : `${planState.placedObjects.length} (${totalUnits}×)`;
 
             if (planState.placedObjects.length === 0) {
                 const emptyMsg = document.createElement('div');
                 emptyMsg.style.fontSize = '11.5px';
                 emptyMsg.style.color = '#64748b';
-                emptyMsg.textContent = 'No sockets placed yet. Select a socket type on the left and click on either floor plan.';
+                emptyMsg.textContent = 'No sockets placed yet. Select a socket type and bundle count on the left and click on either floor plan.';
                 listEl.replaceChildren(emptyMsg);
                 return;
             }
 
             const items = planState.placedObjects.map(obj => {
                 const def = OBJECT_CATALOG[obj.type] || OBJECT_CATALOG.socket_pe;
+                const count = Math.max(1, Math.min(6, Math.round(Number(obj.count) || 1)));
                 const isSel = (planState.selectedItem && planState.selectedItem.kind === 'object' && planState.selectedItem.id === obj.id);
                 const btn = document.createElement('button');
                 btn.className = 'ctrl-btn' + (isSel ? ' active' : '');
@@ -3565,7 +4947,7 @@
                 btn.style.padding = '5px 8px';
 
                 const leftSpan = document.createElement('span');
-                leftSpan.textContent = `${obj.label} (${def.shortCode})`;
+                leftSpan.textContent = `${obj.label} (${count > 1 ? `${count}×` : ''}${def.shortCode})`;
                 const rightSpan = document.createElement('span');
                 rightSpan.style.fontFamily = 'JetBrains Mono, monospace';
                 rightSpan.style.fontSize = '10.5px';
@@ -3573,7 +4955,7 @@
 
                 btn.appendChild(leftSpan);
                 btn.appendChild(rightSpan);
-                btn.addEventListener('click', () => selectPlacedObject(obj.id));
+                btn.addEventListener('click', () => selectPlacedObject(obj.id, 0));
                 return btn;
             });
             listEl.replaceChildren(...items);
@@ -3585,16 +4967,25 @@
             if (!obj) return;
 
             const labelVal = document.getElementById('obj-label-input').value.trim();
+            const countInputEl = document.getElementById('obj-count-input');
+            const countVal = countInputEl ? parseInt(countInputEl.value, 10) : NaN;
             const xVal = parseInt(document.getElementById('obj-x-input').value, 10);
             const zVal = parseInt(document.getElementById('obj-z-input').value, 10);
             const hVal = parseInt(document.getElementById('obj-h-input').value, 10);
             const rVal = parseInt(document.getElementById('obj-rot-input').value, 10);
 
             if (labelVal) obj.label = labelVal.slice(0, 40);
+            if (!Number.isNaN(countVal)) obj.count = Math.max(1, Math.min(6, countVal));
             if (!Number.isNaN(xVal)) obj.x = xVal;
             if (!Number.isNaN(zVal)) obj.z = zVal;
             if (!Number.isNaN(hVal)) obj.heightMm = hVal;
-            if (!Number.isNaN(rVal)) obj.rotation = ((rVal % 360) + 360) % 360;
+            if (!Number.isNaN(rVal)) {
+                const newRot = ((rVal % 360) + 360) % 360;
+                if (newRot !== obj.rotation) {
+                    obj.rotation = newRot;
+                    obj.snappedToWall = false;
+                }
+            }
 
             savePlacedObjects();
             updateInspectorUI();
@@ -3606,6 +4997,7 @@
             const obj = planState.placedObjects.find(o => o.id === planState.selectedItem.id);
             if (!obj) return;
             obj.rotation = (((obj.rotation || 0) + deltaDeg) % 360 + 360) % 360;
+            obj.snappedToWall = false;
             savePlacedObjects();
             updateInspectorUI();
             renderAllPlans();
@@ -3629,10 +5021,13 @@
         let draggingObjectState = null;
         let draggingOpeningState = null;
 
-        function startDraggingPlacedObject(e, obj) {
+        function startDraggingPlacedObject(e, objOrId) {
+            const objId = typeof objOrId === 'string' ? objOrId : (objOrId && objOrId.id);
+            const obj = planState.placedObjects.find(o => o.id === objId);
+            if (!obj) return;
             const svg = document.getElementById('svg-' + obj.floor);
             if (!svg) return;
-            draggingObjectState = { obj, svg };
+            draggingObjectState = { objId: obj.id, svg };
         }
 
         function startDraggingOpening(e, op) {
@@ -3654,6 +5049,9 @@
             return [targetFloor];
         }
 
+        const MIN_PLAN_ZOOM = 0.4;
+        const MAX_PLAN_ZOOM = 25.0; // Up to 2500% zoom for close-up inspection of 71 mm electrical socket bundles
+
         function zoomPlanBy(factor, pivotWorld = null, targetFloor = null) {
             const floors = getTargetFloors(targetFloor || planState.activeFloor);
             let displayZoom = 1.0;
@@ -3661,7 +5059,7 @@
             floors.forEach(f => {
                 const v = planState.views[f];
                 const oldZoom = v.zoom;
-                const newZoom = Math.max(0.4, Math.min(4.0, oldZoom * factor));
+                const newZoom = Math.max(MIN_PLAN_ZOOM, Math.min(MAX_PLAN_ZOOM, oldZoom * factor));
                 if (pivotWorld) {
                     const ratio = 1 - (oldZoom / newZoom);
                     v.panX += (pivotWorld.x - v.panX) * ratio;
@@ -3678,7 +5076,7 @@
         }
 
         function onZoomSliderInput(val) {
-            const pct = Math.max(40, Math.min(400, parseInt(val, 10) || 100));
+            const pct = Math.max(Math.round(MIN_PLAN_ZOOM * 100), Math.min(Math.round(MAX_PLAN_ZOOM * 100), parseInt(val, 10) || 100));
             const newZoom = pct / 100;
             const floors = getTargetFloors(planState.activeFloor);
             floors.forEach(f => {
@@ -3741,15 +5139,179 @@
             updateAllViewBoxes();
         }
 
-        function togglePlanLayer(layerKey, btn) {
-            planState.layers[layerKey] = !planState.layers[layerKey];
-            btn.classList.toggle('active', planState.layers[layerKey]);
+        // Update Left Sidebar CAD Distance readout box
+        function updateDistanceReadoutUI() {
+            const boxEl = document.getElementById('distance-readout-box');
+            const statusEl = document.getElementById('distance-readout-status');
+            const detailsEl = document.getElementById('distance-readout-details');
+            const clearBtn = document.getElementById('btn-clear-distance');
+            const distBtn = document.getElementById('tool-distance');
+
+            const isDistMode = (planState.activeTool === 'distance');
+            const m = planState.measure || {};
+            const hasMeasure = !!(m.pt1 || m.pt2);
+
+            if (distBtn) distBtn.classList.toggle('active', isDistMode);
+            if (clearBtn) clearBtn.style.display = (isDistMode || hasMeasure) ? 'inline-flex' : 'none';
+            if (!boxEl || !statusEl || !detailsEl) return;
+
+            if (!isDistMode && !hasMeasure) {
+                boxEl.style.display = 'none';
+                return;
+            }
+            boxEl.style.display = 'block';
+
+            const p1 = m.pt1;
+            const p2 = m.pt2 || (isDistMode ? m.hoverPt : null);
+
+            if (!p1) {
+                statusEl.textContent = '1. Click First Point (Socket Center, Corner, or Wall)';
+                if (m.hoverPt) {
+                    detailsEl.textContent = `Snap: ${m.hoverPt.label} (${Math.round(m.hoverPt.x)}, ${Math.round(m.hoverPt.z)} mm${m.hoverPt.heightMm !== null && m.hoverPt.heightMm !== undefined ? ` • Hc=${m.hoverPt.heightMm} mm` : ''})`;
+                } else {
+                    detailsEl.textContent = 'Hover any socket (or individual socket in a bundle) or corner.';
+                }
+                return;
+            }
+
+            if (!p2 || p2.floor !== p1.floor) {
+                statusEl.textContent = `P1: ${p1.label} (${Math.round(p1.x)}, ${Math.round(p1.z)} mm)`;
+                detailsEl.textContent = '2. Move mouse on the same floor to see live distance, then click Point 2.';
+                return;
+            }
+
+            const dxMm = Math.abs(Math.round((p2.x - p1.x) * 10) / 10);
+            const dzMm = Math.abs(Math.round((p2.z - p1.z) * 10) / 10);
+            const dist2dMm = Math.round(Math.hypot(p2.x - p1.x, p2.z - p1.z) * 10) / 10;
+            const hasHeights = (p1.heightMm !== null && p1.heightMm !== undefined && p2.heightMm !== null && p2.heightMm !== undefined);
+            const dhMm = hasHeights ? Math.abs(Math.round(p2.heightMm - p1.heightMm)) : 0;
+            const dist3dMm = hasHeights ? (Math.round(Math.hypot(p2.x - p1.x, p2.z - p1.z, dhMm) * 10) / 10) : dist2dMm;
+
+            statusEl.textContent = `${m.pt2 ? '📏 Locked' : '📏 Live'}: ${Math.round(dist2dMm).toLocaleString()} mm (${(dist2dMm / 10).toFixed(1)} cm)`;
+            const hInfo = hasHeights
+                ? ` | Center H: ${p1.heightMm}→${p2.heightMm} mm (3D: ${Math.round(dist3dMm).toLocaleString()} mm)`
+                : '';
+            detailsEl.textContent = `${p1.label} → ${p2.label} | ΔX=${Math.round(dxMm)} mm, ΔZ=${Math.round(dzMm)} mm${hInfo}`;
+        }
+
+        function toggleDistanceTool() {
+            if (planState.activeTool === 'distance') {
+                setActiveTool('select');
+            } else {
+                planState.measure.pt1 = null;
+                planState.measure.pt2 = null;
+                planState.measure.hoverPt = null;
+                setActiveTool('distance');
+            }
+        }
+
+        function clearDistanceMeasurement() {
+            planState.measure.pt1 = null;
+            planState.measure.pt2 = null;
+            planState.measure.hoverPt = null;
+            if (planState.activeTool === 'distance') {
+                setActiveTool('select');
+            } else {
+                updateDistanceReadoutUI();
+                renderAllPlans();
+            }
+        }
+
+        function startDistanceFromSelectedSocket() {
+            if (!planState.selectedItem || planState.selectedItem.kind !== 'object') return;
+            const obj = planState.placedObjects.find(o => o.id === planState.selectedItem.id);
+            if (!obj) return;
+            const gangs = getSocketGangCenters(obj);
+            const gIdx = Math.max(0, Math.min(gangs.length - 1, Number(planState.selectedItem.gangIndex) || 0));
+            const g = gangs[gIdx];
+            if (!g) return;
+
+            planState.measure.pt1 = {
+                floor: obj.floor,
+                x: g.cx,
+                z: g.cz,
+                heightMm: g.centerHeightMm,
+                snapKind: 'socket',
+                label: g.label,
+                objId: obj.id,
+                gangIndex: g.gangIndex,
+                gangCount: g.gangCount
+            };
+            planState.measure.pt2 = null;
+            planState.measure.hoverPt = null;
+            setActiveTool('distance');
+        }
+
+        function syncElectricityLayerUI() {
+            const visible = !!planState.layers.objects;
+            const layerBtn = document.getElementById('layer-objects');
+            if (layerBtn) layerBtn.classList.toggle('active', visible);
+            const headerBtn = document.getElementById('btn-electricity-visibility');
+            if (headerBtn) {
+                headerBtn.classList.toggle('active', visible);
+                headerBtn.textContent = visible ? '👁️ Layer: ON' : '🚫 Layer: OFF';
+            }
+        }
+
+        function toggleElectricityLayer() {
+            planState.layers.objects = !planState.layers.objects;
+            syncElectricityLayerUI();
             renderAllPlans();
+        }
+
+        function togglePlanLayer(layerKey, btn) {
+            if (layerKey === 'objects') {
+                toggleElectricityLayer();
+                return;
+            }
+            planState.layers[layerKey] = !planState.layers[layerKey];
+            if (btn) btn.classList.toggle('active', planState.layers[layerKey]);
+            renderAllPlans();
+        }
+
+        function setPlacementBundleCount(n) {
+            const count = Math.max(1, Math.min(4, Math.round(Number(n) || 1)));
+            planState.placementCount = count;
+            const labels = { 1: '1× Single', 2: '2× Double', 3: '3× Triple', 4: '4× Quad' };
+            const badge = document.getElementById('bundle-count-badge');
+            if (badge) badge.textContent = labels[count] || `${count}× Bundle`;
+            [1, 2, 3, 4].forEach(k => {
+                const b = document.getElementById('bundle-cnt-' + k) || document.getElementById('bundle-' + k);
+                if (b) b.classList.toggle('active', k === count);
+            });
+            if (planState.activeTool !== 'select' && planState.activeTool !== 'distance') {
+                renderAllPlans();
+            }
+        }
+
+        function setPlacementHeightMm(hMm) {
+            const val = Math.max(0, Math.round(Number(hMm) || 0));
+            planState.placementHeightMm = val;
+            [300, 1150, 600].forEach(preset => {
+                const b = document.getElementById('place-h-' + preset) || document.getElementById('height-preset-' + preset);
+                if (b) b.classList.toggle('active', preset === val);
+            });
+        }
+
+        function toggleContinuousPlacement(btn) {
+            planState.continuousPlacement = !planState.continuousPlacement;
+            const chk = document.getElementByElementId ? document.getElementById('chk-continuous-place') : document.getElementById('chk-continuous-place');
+            if (chk) chk.checked = planState.continuousPlacement;
+            if (btn) {
+                btn.classList.toggle('active', planState.continuousPlacement);
+            }
         }
 
         function setActiveTool(toolKey) {
             planState.activeTool = toolKey;
-            ['select', 'socket_pe', 'socket_pe_shutter', 'socket_floor'].forEach(k => {
+            if (toolKey === 'select' || toolKey === 'distance') {
+                planState.ghostPreview = null;
+            } else if (toolKey === 'socket_floor') {
+                setPlacementHeightMm(0);
+            } else if (planState.placementHeightMm === 0) {
+                setPlacementHeightMm(300);
+            }
+            ['select', 'distance', 'socket_pe', 'socket_pe_shutter', 'socket_floor'].forEach(k => {
                 const b = document.getElementById('tool-' + k);
                 if (b) b.classList.toggle('active', k === toolKey);
             });
@@ -3757,9 +5319,11 @@
                 const vp = document.getElementById('viewport-' + f);
                 if (vp) vp.classList.toggle('placing-mode', toolKey !== 'select');
             });
+            updateDistanceReadoutUI();
+            renderAllPlans();
         }
 
-        // Attach Mouse Wheel Zoom, Pan, Cursor Readout, and Click-to-Place on both Floor Viewports
+        // Attach Mouse Wheel Zoom, Pan, Cursor Readout, CAD Distance Tool, and Click-to-Place on both Floor Viewports
         function initViewportInteractions() {
             let panDrag = null;
 
@@ -3781,29 +5345,73 @@
                     planState.activeFloor = floor;
                     const worldPt = clientToWorldMm(svg, e.clientX, e.clientY);
 
+                    // CAD DISTANCE Measurement Tool
+                    if (planState.activeTool === 'distance') {
+                        const m = planState.measure;
+                        const refPt1 = (m.pt1 && !m.pt2 && m.pt1.floor === floor) ? m.pt1 : null;
+                        const snapPt = resolveMeasureSnapPoint(floor, worldPt.x, worldPt.z, refPt1);
+
+                        if (!m.pt1 || m.pt2 || m.pt1.floor !== floor) {
+                            m.pt1 = snapPt;
+                            m.pt2 = null;
+                            m.hoverPt = snapPt;
+                        } else {
+                            m.pt2 = snapPt;
+                        }
+
+                        if (snapPt.snapKind === 'socket' && snapPt.objId) {
+                            planState.selectedItem = {
+                                kind: 'object',
+                                id: snapPt.objId,
+                                gangIndex: snapPt.gangIndex || 0
+                            };
+                            updateInspectorUI();
+                        }
+
+                        renderAllPlans();
+                        updateDistanceReadoutUI();
+                        return;
+                    }
+
                     if (planState.activeTool !== 'select') {
-                        // Place new object on this floor
+                        // Place new socket / bundle on this floor
                         const def = OBJECT_CATALOG[planState.activeTool];
                         if (!def) return;
                         const snap = def.snapToWall
-                            ? snapToFloorWalls(floor, worldPt.x, worldPt.z, 550)
+                            ? snapToFloorWalls(floor, worldPt.x, worldPt.z, 650)
                             : { x: Math.round(worldPt.x / 50) * 50, z: Math.round(worldPt.z / 50) * 50, rot: 0, snappedToWall: false };
 
+                        const count = Math.max(1, Math.min(4, Math.round(Number(planState.placementCount) || 1)));
+                        const heightMm = def.type === 'socket_floor'
+                            ? 0
+                            : (typeof planState.placementHeightMm === 'number' ? planState.placementHeightMm : def.defaultHeightMm);
+
+                        const seqNum = planState.placedObjects.filter(o => o.floor === floor).length + 1;
                         const newObj = {
                             id: 'OBJ_' + Date.now() + '_' + (planState.nextObjectSeq++),
                             floor,
                             type: def.type,
-                            label: `${def.shortCode}-${planState.placedObjects.filter(o => o.floor === floor).length + 1}`,
+                            count,
+                            label: `${def.shortCode}-${seqNum}`,
                             x: snap.x,
                             z: snap.z,
-                            heightMm: def.defaultHeightMm,
+                            heightMm,
                             rotation: snap.rot,
                             snappedToWall: snap.snappedToWall
                         };
+                        if (!planState.layers.objects) {
+                            planState.layers.objects = true;
+                            syncElectricityLayerUI();
+                        }
                         planState.placedObjects.push(newObj);
                         savePlacedObjects();
-                        setActiveTool('select');
-                        selectPlacedObject(newObj.id);
+                        if (!planState.continuousPlacement) {
+                            setActiveTool('select');
+                            selectPlacedObject(newObj.id, 0);
+                            startDraggingPlacedObject(e, newObj.id);
+                        } else {
+                            selectPlacedObject(newObj.id, 0);
+                        }
                         return;
                     }
 
@@ -3823,7 +5431,73 @@
 
                 vp.addEventListener('mousemove', (e) => {
                     const worldPt = clientToWorldMm(svg, e.clientX, e.clientY);
-                    cursorEl.textContent = `X: ${worldPt.x.toLocaleString()} mm, Z: ${worldPt.z.toLocaleString()} mm`;
+
+                    // Highlight corner whenever mouse is very close to a corner (<= 190 mm)
+                    const nearCorner = findNearestCorner(floor, worldPt.x, worldPt.z, 190);
+                    const prevCorner = planState.measure.hoverCorner;
+                    const cornerChanged = (!prevCorner && !!nearCorner) ||
+                        (prevCorner && !nearCorner) ||
+                        (prevCorner && nearCorner && (prevCorner.x !== nearCorner.x || prevCorner.z !== nearCorner.z || prevCorner.floor !== nearCorner.floor));
+                    planState.measure.hoverCorner = nearCorner;
+
+                    if (planState.activeTool === 'distance') {
+                        const m = planState.measure;
+                        const refPt1 = (m.pt1 && !m.pt2 && m.pt1.floor === floor) ? m.pt1 : null;
+                        const snapPt = resolveMeasureSnapPoint(floor, worldPt.x, worldPt.z, refPt1);
+                        m.hoverPt = snapPt;
+                        if (m.pt1 && !m.pt2 && m.pt1.floor === floor) {
+                            const dMm = Math.round(Math.hypot(snapPt.x - m.pt1.x, snapPt.z - m.pt1.z));
+                            cursorEl.textContent = `📏 Dist: ${dMm.toLocaleString()} mm (${(dMm / 10).toFixed(1)} cm) • ${snapPt.label} (${Math.round(snapPt.x)}, ${Math.round(snapPt.z)})`;
+                        } else {
+                            cursorEl.textContent = `📏 Snap: ${snapPt.label} • X: ${Math.round(snapPt.x).toLocaleString()} mm, Z: ${Math.round(snapPt.z).toLocaleString()} mm`;
+                        }
+                        updateDistanceMeasureOverlay(floor);
+                        return;
+                    }
+
+                    if (nearCorner) {
+                        cursorEl.textContent = `📐 ${nearCorner.label}: X: ${nearCorner.x.toLocaleString()} mm, Z: ${nearCorner.z.toLocaleString()} mm`;
+                    } else {
+                        cursorEl.textContent = `X: ${worldPt.x.toLocaleString()} mm, Z: ${worldPt.z.toLocaleString()} mm`;
+                    }
+
+                    if (cornerChanged && !draggingObjectState && !draggingOpeningState) {
+                        updateDistanceMeasureOverlay(floor);
+                    }
+
+                    if (planState.activeTool !== 'select' && !draggingObjectState && !draggingOpeningState) {
+                        const def = OBJECT_CATALOG[planState.activeTool];
+                        if (def) {
+                            const snap = def.snapToWall
+                                ? snapToFloorWalls(floor, worldPt.x, worldPt.z, 650)
+                                : { x: Math.round(worldPt.x / 50) * 50, z: Math.round(worldPt.z / 50) * 50, rot: 0, snappedToWall: false };
+                            planState.ghostPreview = {
+                                floor,
+                                type: def.type,
+                                count: planState.placementCount || 1,
+                                x: snap.x,
+                                z: snap.z,
+                                rotation: snap.rot,
+                                snappedToWall: snap.snappedToWall
+                            };
+                            renderFloorPlanSVG(floor);
+                        }
+                    }
+                });
+
+                vp.addEventListener('mouseleave', () => {
+                    if (planState.measure.hoverCorner && planState.measure.hoverCorner.floor === floor) {
+                        planState.measure.hoverCorner = null;
+                        updateDistanceMeasureOverlay(floor);
+                    }
+                    if (planState.activeTool === 'distance' && planState.measure.hoverPt && planState.measure.hoverPt.floor === floor) {
+                        planState.measure.hoverPt = null;
+                        updateDistanceMeasureOverlay(floor);
+                    }
+                    if (planState.ghostPreview && planState.ghostPreview.floor === floor) {
+                        planState.ghostPreview = null;
+                        renderFloorPlanSVG(floor);
+                    }
                 });
             });
 
@@ -3841,11 +5515,16 @@
                 }
 
                 if (draggingObjectState) {
-                    const { obj, svg } = draggingObjectState;
+                    const { objId, svg } = draggingObjectState;
+                    const obj = planState.placedObjects.find(o => o.id === objId);
+                    if (!obj) {
+                        draggingObjectState = null;
+                        return;
+                    }
                     const def = OBJECT_CATALOG[obj.type] || OBJECT_CATALOG.socket_pe;
                     const worldPt = clientToWorldMm(svg, e.clientX, e.clientY);
                     const snap = def.snapToWall
-                        ? snapToFloorWalls(obj.floor, worldPt.x, worldPt.z, 450)
+                        ? snapToFloorWalls(obj.floor, worldPt.x, worldPt.z, 550)
                         : { x: Math.round(worldPt.x / 50) * 50, z: Math.round(worldPt.z / 50) * 50, rot: obj.rotation || 0, snappedToWall: false };
 
                     obj.x = snap.x;
@@ -3885,6 +5564,8 @@
                 }
                 if (draggingObjectState) {
                     savePlacedObjects();
+                    updateInspectorUI();
+                    renderAllPlans();
                     draggingObjectState = null;
                 }
                 if (panDrag) {
@@ -3896,15 +5577,26 @@
             window.addEventListener('resize', () => updateAllViewBoxes());
 
             window.addEventListener('keydown', (e) => {
-                if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT')) return;
-                if (e.key === 'r' || e.key === 'R') {
+                if (e.metaKey || e.ctrlKey || e.altKey) return;
+                if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA')) return;
+                if (e.key === 'd' || e.key === 'D') {
+                    toggleDistanceTool();
+                } else if (e.key === 'r' || e.key === 'R') {
                     if (planState.selectedItem && planState.selectedItem.kind === 'object') {
                         rotateSelectedObject(90);
                     } else {
                         resetPlanView();
                     }
+                } else if (e.key === 'e' || e.key === 'E') {
+                    toggleElectricityLayer();
+                } else if (['1', '2', '3', '4'].includes(e.key)) {
+                    setPlacementBundleCount(parseInt(e.key, 10));
                 } else if (e.key === 'Escape') {
-                    setActiveTool('select');
+                    if (planState.activeTool === 'distance' || planState.measure.pt1 || planState.measure.pt2) {
+                        clearDistanceMeasurement();
+                    } else {
+                        setActiveTool('select');
+                    }
                 } else if (e.key === 'Delete' || e.key === 'Backspace') {
                     if (planState.selectedItem && planState.selectedItem.kind === 'object') {
                         deleteSelectedObject();

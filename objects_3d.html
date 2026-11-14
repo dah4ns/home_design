@@ -301,7 +301,39 @@
             box-shadow: 0 14px 36px rgba(0, 0, 0, 0.55);
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
+        }
+
+        .right-dock.hidden-dock {
+            display: none !important;
+        }
+
+        .right-dock-restore-btn {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            z-index: 21;
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(56, 189, 248, 0.45);
+            border-radius: 9px;
+            padding: 7px 12px;
+            color: #e2e8f0;
+            font-size: 11.5px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.48);
+            display: none;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.14s ease;
+        }
+
+        .right-dock-restore-btn:hover {
+            background: rgba(30, 41, 59, 0.96);
+            border-color: #38bdf8;
+            color: #ffffff;
         }
 
         .dock-section {
@@ -505,6 +537,7 @@
             flex-direction: column;
             gap: 6px;
             margin-top: 6px;
+            overflow: hidden;
         }
 
         .furniture-part-header {
@@ -512,6 +545,42 @@
             justify-content: space-between;
             align-items: center;
             gap: 6px;
+            min-width: 0;
+        }
+
+        .furniture-part-header .wall-option-id {
+            flex: 1 1 auto;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .furniture-part-sub {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 3px 8px;
+            font-size: 11px;
+            line-height: 1.35;
+            min-width: 0;
+        }
+
+        .furniture-part-desc {
+            color: #94a3b8;
+            flex: 1 1 160px;
+            min-width: 0;
+            overflow-wrap: anywhere;
+        }
+
+        .furniture-part-counts {
+            color: #e2e8f0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10.5px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            margin-left: auto;
         }
 
         .fronts-pill-btn {
@@ -523,6 +592,7 @@
             cursor: pointer;
             border: 1px solid;
             transition: all 0.14s ease;
+            white-space: nowrap;
         }
 
         .fronts-pill-btn.on {
@@ -861,6 +931,7 @@
                         <span>3. Quick Object &amp; Context Presets</span>
                     </div>
                     <div class="preset-grid">
+                        <button type="button" class="ctrl-btn" id="preset-sockets-only" style="grid-column: span 2; border-color: rgba(56,189,248,0.55); color: #7dd3fc;">⚡ Electrical Sockets &amp; Multi-Gang Frames</button>
                         <button type="button" class="ctrl-btn" id="preset-sofa-living" style="grid-column: span 2; border-color: rgba(16,185,129,0.45); color: #6ee7b7;">🛋️ Living Room Corner Sofa (SOFA_LIVING_1)</button>
                         <button type="button" class="ctrl-btn" id="preset-cab-only" style="grid-column: span 2;">🗄️ All Furniture Only (Kitchen + Living)</button>
                         <button type="button" class="ctrl-btn" id="preset-cab-kitchen" style="grid-column: span 2;">🍳 All Kitchen + Island + Walls &amp; Window O1</button>
@@ -931,11 +1002,23 @@
                 </div>
             </aside>
 
+            <!-- FLOATING BUTTON TO RESTORE RIGHT INSPECTOR WHEN HIDDEN -->
+            <button type="button" class="right-dock-restore-btn" id="btn-show-inspector" title="Show Selected 3D Object B-Rep Inspector">
+                <span>🔎 Show B-Rep Inspector</span>
+            </button>
+
             <!-- RIGHT INSPECTOR DOCK -->
-            <aside class="right-dock">
-                <div class="dock-title">
+            <aside class="right-dock" id="right-dock-inspector">
+                <div class="dock-title" style="margin-bottom: 4px;">
                     <span>Selected 3D Object B-Rep Inspector</span>
-                    <span class="tech-pill" id="inspector-summary-pill">outerLoop &amp; 3D B-Rep</span>
+                    <div style="display: flex; align-items: center; gap: 6px;">
+                        <span class="tech-pill" id="inspector-summary-pill">outerLoop &amp; 3D B-Rep</span>
+                        <button type="button" class="ctrl-btn" id="btn-hide-inspector" style="padding: 3px 8px; font-size: 10.5px;" title="Hide Selected 3D Object B-Rep Inspector panel">👁️ Hide</button>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 6px; align-items: center; margin-bottom: 2px;">
+                    <input type="text" class="search-input" id="inspector-filter-input" placeholder="🔎 Filter inspector by ID, name, room, or part..." style="margin-bottom: 0; flex: 1;">
+                    <button type="button" class="ctrl-btn" id="btn-clear-inspector-filter" style="padding: 5px 8px; font-size: 11px; display: none;" title="Clear inspector filter">✕</button>
                 </div>
                 <div id="inspector-cards-container" style="display: flex; flex-direction: column; gap: 10px;"></div>
             </aside>
@@ -956,8 +1039,10 @@
     <script src="data/stairs.js"></script>
     <script src="data/furniture.js"></script>
     <script src="data/room_furniture.js"></script>
+    <script src="data/sockets.js"></script>
     <script src="js/persistence.js"></script>
     <script src="js/room-furniture-store.js"></script>
+    <script src="js/socket-store.js"></script>
     <script src="js/window-store.js"></script>
     <script src="js/coordinate-service.js"></script>
     <script src="js/wall-service.js"></script>
@@ -986,7 +1071,15 @@
                 floorById[fl.id] = fl;
             });
 
-            let allFurniture = (typeof WallService.getFurniture3D === 'function') ? WallService.getFurniture3D() : [];
+            function getCombinedFurnitureAndSockets() {
+                const furn = (typeof WallService.getFurniture3D === 'function') ? WallService.getFurniture3D() : [];
+                const socks = (typeof WallService.getSockets3D === 'function')
+                    ? WallService.getSockets3D({ includeSampleIfEmpty: true })
+                    : [];
+                return furn.concat(socks);
+            }
+
+            let allFurniture = getCombinedFurnitureAndSockets();
             const furnitureById = {};
             const initialFrontsById = {};
             allFurniture.forEach(fn => {
@@ -1003,6 +1096,8 @@
                 selectedIds: new Set(allFurniture.map(fn => fn.id).concat(['EW_NORTH_RECESSED', 'GW_3', 'GW_13', 'FLOOR_LOWER'])),
                 searchQuery: '',
                 objectSearchQuery: '',
+                inspectorFilterQuery: '',
+                hideRightInspector: false,
                 showAllFurnitureSkeleton: true,
                 furnitureFrontsById: initialFrontsById,
                 showLabels: false,
@@ -2052,7 +2147,7 @@
                                 ? [0.42, 0.33, 0.27, 0.90]
                                 : (part.role === 'worktop'
                                     ? [0.68, 0.60, 0.48, 0.94]
-                                    : ((part.role === 'sink_basin' || part.role === 'sink_drain' || part.role === 'sink_faucet')
+                                    : ((part.role === 'sink_basin' || part.role === 'sink_drain' || part.role === 'sink_faucet' || part.role === 'socket_frame' || part.role === 'socket_insert' || part.role === 'socket_shutter')
                                         ? [0.34, 0.39, 0.45, 0.94]
                                         : [0.56, 0.42, 0.28, 0.92]));
                             const isMetallicPart = (part.role === 'sink_faucet' || part.role === 'sink_basin' || part.role === 'sink_drain');
@@ -2073,7 +2168,7 @@
                         });
                     }
 
-                    // 2. Render Removable Cabinet Fronts (Wood Fronts + Vitrine Glass + Handle Rails/Bars + Oven & Microwave Fronts + Curved Edge Bands)
+                    // 2. Render Removable Cabinet Fronts (Wood Fronts + Vitrine Glass + Handle Rails/Bars + Oven & Microwave Fronts + Socket Covers)
                     if (showFronts && Array.isArray(furn.frontParts3D)) {
                         furn.frontParts3D.forEach(part => {
                             const rgb = part.colorRgb || [0.63, 0.48, 0.38];
@@ -2098,8 +2193,10 @@
                                 wireColor = [0.52, 0.58, 0.65, 0.98];
                             } else if (part.role === 'vitrine_frame') {
                                 wireColor = [0.34, 0.24, 0.15, 0.96];
+                            } else if (part.role === 'socket_cover' || part.role === 'socket_cover_handle') {
+                                wireColor = [0.12, 0.32, 0.50, 0.96];
                             }
-                            const frontAlpha = (part.role === 'handle_rail') ? 0.97 : 0.99;
+                            const frontAlpha = (part.role === 'handle_rail' || part.role === 'socket_cover') ? 0.97 : 0.99;
                             (part.faces3D || []).forEach(face => {
                                 pushConvexLoop3D(face.loop3D, face.normal || [0, 1, 0], [rgb[0], rgb[1], rgb[2], frontAlpha], null, face.vertexNormals3D);
                                 if (!face.noWireframe) {
@@ -2359,6 +2456,20 @@
                 appState.target.y = ((minY + maxY) / 2) / 1000;
                 appState.target.z = ((minZ + maxZ) / 2) / 1000;
 
+                if (obj.isSocketBundle) {
+                    if (Array.isArray(obj.normal)) {
+                        if (Math.abs(obj.normal[0]) > 0.5 || Math.abs(obj.normal[1]) > 0.5) {
+                            appState.yaw = Math.atan2(obj.normal[1], obj.normal[0]) + 0.25;
+                            appState.pitch = 14 * Math.PI / 180;
+                        } else if (obj.normal[2] > 0.5) {
+                            appState.pitch = 58 * Math.PI / 180;
+                        }
+                    }
+                    appState.distance = 0.55;
+                    renderScene();
+                    return;
+                }
+
                 const rawSpanM = Math.max((maxX - minX) / 1000, (maxY - minY) / 1000, (maxZ - minZ) / 1000, 0.8);
                 appState.distance = Math.max(2.0, rawSpanM * 2.4);
                 renderScene();
@@ -2403,7 +2514,7 @@
             glCanvas.addEventListener('wheel', e => {
                 e.preventDefault();
                 const factor = e.deltaY > 0 ? 1.1 : 0.9;
-                appState.distance = Math.max(0.85, Math.min(75.0, appState.distance * factor));
+                appState.distance = Math.max(0.22, Math.min(75.0, appState.distance * factor));
                 renderScene();
             }, { passive: false });
 
@@ -2702,6 +2813,14 @@
                 const oq = appState.objectSearchQuery.trim().toLowerCase();
                 const furnGroups = [
                     {
+                        title: '⚡ Electrical Sockets & Multi-Gang Frames (data/sockets.js)',
+                        filter: fn => !!fn.isSocketBundle
+                    },
+                    {
+                        title: '🛋️ Living Room & Room Furniture (data/room_furniture.js)',
+                        filter: fn => !!fn.isRoomFurniture && !fn.isSocketBundle
+                    },
+                    {
                         title: 'Kitchen Island, Countertop & 90cm Sink (KITCHEN_ISLAND, KITCHEN_COUNTERTOP, KITCHEN_SINK_N2)',
                         filter: fn => fn.id === 'KITCHEN_ISLAND' || fn.id === 'KITCHEN_COUNTERTOP' || fn.id === 'KITCHEN_SINK_N2'
                     },
@@ -2752,9 +2871,10 @@
                             renderScene();
                         });
 
-                        const idSpan = createEl('span', 'wall-option-id', `🗄️ ${fn.id}`);
+                        const iconPrefix = fn.isSocketBundle ? '⚡' : '🗄️';
+                        const idSpan = createEl('span', 'wall-option-id', `${iconPrefix} ${fn.id}`);
                         const nameSpan = createEl('span', '', fn.shortName || fn.name);
-                        nameSpan.style.color = '#fde68a';
+                        nameSpan.style.color = fn.isSocketBundle ? '#7dd3fc' : '#fde68a';
                         nameSpan.style.fontSize = '11px';
                         nameSpan.style.overflow = 'hidden';
                         nameSpan.style.textOverflow = 'ellipsis';
@@ -2771,7 +2891,9 @@
                 });
 
                 selectedFurnIds.forEach(id => {
-                    const chip = createEl('span', 'wall-chip amber', `🗄️ ${id} ✕`);
+                    const fnObj = furnitureById[id];
+                    const iconPrefix = (fnObj && fnObj.isSocketBundle) ? '⚡' : '🗄️';
+                    const chip = createEl('span', 'wall-chip amber', `${iconPrefix} ${id} ✕`);
                     chip.title = 'Click to remove from selection';
                     chip.addEventListener('click', () => {
                         appState.selectedIds.delete(id);
@@ -2785,12 +2907,13 @@
                 allFurniture.forEach(fn => {
                     const isSelected = appState.selectedIds.has(fn.id);
                     const frontsOn = appState.furnitureFrontsById[fn.id] !== false;
+                    const iconPrefix = fn.isSocketBundle ? '⚡' : '🗄️';
 
                     const partCard = createEl('div', 'furniture-part-card');
                     const headerRow = createEl('div', 'furniture-part-header');
 
-                    const leftInfo = createEl('span', 'wall-option-id', `🗄️ ${fn.id}`);
-                    leftInfo.style.color = isSelected ? '#fde68a' : '#94a3b8';
+                    const leftInfo = createEl('span', 'wall-option-id', `${iconPrefix} ${fn.id}`);
+                    leftInfo.style.color = isSelected ? (fn.isSocketBundle ? '#7dd3fc' : '#fde68a') : '#94a3b8';
 
                     const btnGroup = createEl('div', '');
                     btnGroup.style.display = 'flex';
@@ -2803,7 +2926,7 @@
                         frontsOn ? '🚪 Fronts: ON' : '🦴 Fronts: OFF'
                     );
                     frontsBtn.type = 'button';
-                    frontsBtn.title = 'Toggle fronts for this specific cabinet';
+                    frontsBtn.title = 'Toggle fronts for this specific object';
                     frontsBtn.addEventListener('click', () => {
                         appState.furnitureFrontsById[fn.id] = !frontsOn;
                         if (!appState.selectedIds.has(fn.id)) {
@@ -2823,15 +2946,16 @@
                         focusSingleObject(fn);
                     });
 
+                    btnGroup.style.flexShrink = '0';
                     btnGroup.appendChild(frontsBtn);
                     btnGroup.appendChild(focusBtn);
                     headerRow.appendChild(leftInfo);
                     headerRow.appendChild(btnGroup);
                     partCard.appendChild(headerRow);
 
-                    const subRow = createEl('div', 'kv-row');
-                    subRow.appendChild(createEl('span', 'kv-key', `${fn.shortName || fn.name} (${fn.hostWallId})`));
-                    subRow.appendChild(createEl('span', 'kv-val', `${fn.skeletonParts3D.length} skel + ${fn.frontParts3D.length} fronts`));
+                    const subRow = createEl('div', 'furniture-part-sub');
+                    subRow.appendChild(createEl('span', 'furniture-part-desc', `${fn.shortName || fn.name} (${fn.hostWallId})`));
+                    subRow.appendChild(createEl('span', 'furniture-part-counts', `${fn.skeletonParts3D.length} skel + ${fn.frontParts3D.length} fronts`));
                     partCard.appendChild(subRow);
 
                     perObjFrontsContainer.appendChild(partCard);
@@ -2840,29 +2964,86 @@
                 syncGlobalFrontsCheckbox();
 
                 // -----------------------------------------------------------------
-                // C. RIGHT INSPECTOR DOCK CARDS (FURNITURE, FLOORS, STAIRS, WALLS)
+                // C. RIGHT INSPECTOR DOCK CARDS (FURNITURE, SOCKETS, FLOORS, STAIRS, WALLS)
                 // -----------------------------------------------------------------
-                const selectedFurn = allFurniture.filter(fn => appState.selectedIds.has(fn.id));
-                const selectedFloors = allFloors.filter(f => appState.selectedIds.has(f.id));
-                const selectedStairs = allStairs.filter(s => appState.selectedIds.has(s.id) || appState.selectedIds.has(s.stairId));
-                const selectedWalls = allWalls.filter(w => appState.selectedIds.has(w.id));
+                const allSelectedFurn = allFurniture.filter(fn => appState.selectedIds.has(fn.id));
+                const allSelectedFloors = allFloors.filter(f => appState.selectedIds.has(f.id));
+                const allSelectedStairs = allStairs.filter(s => appState.selectedIds.has(s.id) || appState.selectedIds.has(s.stairId));
+                const allSelectedWalls = allWalls.filter(w => appState.selectedIds.has(w.id));
+                const totalSelectedCount = allSelectedFurn.length + allSelectedFloors.length + allSelectedStairs.length + allSelectedWalls.length;
 
-                if (selectedFurn.length === 0 && selectedFloors.length === 0 && selectedStairs.length === 0 && selectedWalls.length === 0) {
+                const iq = (appState.inspectorFilterQuery || '').trim().toLowerCase();
+                const clearFilterBtn = document.getElementById('btn-clear-inspector-filter');
+                if (clearFilterBtn) {
+                    clearFilterBtn.style.display = iq ? 'inline-flex' : 'none';
+                }
+
+                const selectedFurn = allSelectedFurn.filter(fn => {
+                    if (!iq) return true;
+                    const textBlob = [
+                        fn.id,
+                        fn.name,
+                        fn.shortName,
+                        fn.room,
+                        fn.hostWallId,
+                        fn.category,
+                        fn.subtype,
+                        ...(fn.skeletonParts3D || []).map(p => `${p.id || ''} ${p.name || ''}`),
+                        ...(fn.frontParts3D || []).map(p => `${p.id || ''} ${p.name || ''}`)
+                    ].join(' ').toLowerCase();
+                    return textBlob.includes(iq);
+                });
+
+                const selectedFloors = allSelectedFloors.filter(f => {
+                    if (!iq) return true;
+                    const textBlob = [f.id, f.name, f.category, f.rooms].join(' ').toLowerCase();
+                    return textBlob.includes(iq);
+                });
+
+                const selectedStairs = allSelectedStairs.filter(s => {
+                    if (!iq) return true;
+                    const textBlob = [s.id, s.stairId, s.name, s.rooms, s.cadSpecLabel].join(' ').toLowerCase();
+                    return textBlob.includes(iq);
+                });
+
+                const selectedWalls = allSelectedWalls.filter(w => {
+                    if (!iq) return true;
+                    const textBlob = [w.id, w.name, w.rooms, w.floor, w.category].join(' ').toLowerCase();
+                    return textBlob.includes(iq);
+                });
+
+                const visibleInspectorCount = selectedFurn.length + selectedFloors.length + selectedStairs.length + selectedWalls.length;
+                const inspectorSummaryPill = document.getElementById('inspector-summary-pill');
+                if (inspectorSummaryPill) {
+                    inspectorSummaryPill.textContent = iq
+                        ? `${visibleInspectorCount} / ${totalSelectedCount} shown`
+                        : `${totalSelectedCount} objects`;
+                }
+
+                if (totalSelectedCount === 0) {
                     const emptyCard = createEl('div', 'inspector-wall-card');
-                    emptyCard.appendChild(createEl('div', 'inspector-wall-name', 'No 3D objects selected. Choose cabinets (CAB_KITCHEN_N1..N8, CAB_KITCHEN_W1..UP5) from "Select Objects by ID" or walls/slabs/stairs from "Walls & Stairs".'));
+                    emptyCard.appendChild(createEl('div', 'inspector-wall-name', 'No 3D objects selected. Choose cabinets or electrical sockets from "Select Objects by ID" or walls/slabs/stairs from "Walls & Stairs".'));
                     inspectorContainer.appendChild(emptyCard);
                     return;
                 }
 
-                // 1. Furniture / Cabinet Inspector Cards
+                if (visibleInspectorCount === 0) {
+                    const noMatchCard = createEl('div', 'inspector-wall-card');
+                    noMatchCard.appendChild(createEl('div', 'inspector-wall-name', `No selected 3D objects match filter "${appState.inspectorFilterQuery}". Try another name/ID or click ✕ to clear the filter.`));
+                    inspectorContainer.appendChild(noMatchCard);
+                    return;
+                }
+
+                // 1. Furniture / Cabinet / Socket Inspector Cards
                 selectedFurn.forEach(fn => {
                     const frontsOn = appState.furnitureFrontsById[fn.id] !== false;
+                    const iconPrefix = fn.isSocketBundle ? '⚡' : '🗄️';
                     const card = createEl('div', 'inspector-wall-card');
-                    card.style.borderColor = 'rgba(245, 158, 11, 0.45)';
+                    card.style.borderColor = fn.isSocketBundle ? 'rgba(56, 189, 248, 0.5)' : 'rgba(245, 158, 11, 0.45)';
 
                     const header = createEl('div', 'inspector-wall-header');
-                    const idTitle = createEl('span', 'inspector-wall-id', `🗄️ ${fn.id}`);
-                    idTitle.style.color = '#fbbf24';
+                    const idTitle = createEl('span', 'inspector-wall-id', `${iconPrefix} ${fn.id}`);
+                    idTitle.style.color = fn.isSocketBundle ? '#7dd3fc' : '#fbbf24';
                     header.appendChild(idTitle);
 
                     const toggleFrontsBtn = createEl(
@@ -2889,10 +3070,14 @@
                     };
 
                     addKv('Room & Host Wall', `${fn.room} • ${fn.hostWallId} (n = [${fn.normal.join(', ')}])`);
-                    addKv('Dimensions (W×D×H)', `${fn.widthMm} × ${fn.depthMm} × ${fn.heightMm} mm (Plinth ${fn.plinthHeightMm} + Body ${fn.bodyHeightMm} mm)`);
+                    if (fn.isSocketBundle) {
+                        addKv('Multi-Gang Frame', `${fn.gangCount}-Gang Frame (${fn.widthMm} × ${fn.heightMm} × ${fn.depthMm} mm)`);
+                    } else {
+                        addKv('Dimensions (W×D×H)', `${fn.widthMm} × ${fn.depthMm} × ${fn.heightMm} mm (Plinth ${fn.plinthHeightMm} + Body ${fn.bodyHeightMm} mm)`);
+                    }
                     addKv('3D Bounding Box', `X: ${fn.xMin}..${fn.xMax} | Y: ${fn.yMin}..${fn.yMax} | Z: ${fn.zBottom}..${fn.zTop} mm`);
-                    addKv('Part 1: Skeleton', `${fn.skeletonParts3D.length} B-Rep boxes (${fn.carcassDepthMm} mm deep, ${fn.boardThicknessMm} mm panels)`);
-                    addKv('Part 2: Fronts', `${fn.frontParts3D.length} B-Rep boxes (${fn.frontThicknessMm} mm thick, ${frontsOn ? 'VISIBLE' : 'HIDDEN'})`);
+                    addKv('Part 1: Skeleton', `${fn.skeletonParts3D.length} B-Rep parts (${fn.carcassDepthMm} mm deep)`);
+                    addKv('Part 2: Fronts / Pins', `${fn.frontParts3D.length} B-Rep parts (${fn.frontThicknessMm} mm, ${frontsOn ? 'VISIBLE' : 'HIDDEN'})`);
 
                     const partsBreakdown = [
                         `[SKELETON — ${fn.skeletonParts3D.length} parts]`,
@@ -3025,6 +3210,39 @@
             document.getElementById('tab-btn-settings').addEventListener('click', () => setLeftMenuMode('settings'));
             document.getElementById('tab-btn-hide').addEventListener('click', () => setLeftMenuMode('none'));
 
+            function setRightInspectorVisibility(visible) {
+                appState.hideRightInspector = !visible;
+                const rightDock = document.getElementById('right-dock-inspector');
+                const showBtn = document.getElementById('btn-show-inspector');
+                if (rightDock) rightDock.classList.toggle('hidden-dock', !visible);
+                if (showBtn) showBtn.style.display = visible ? 'none' : 'inline-flex';
+            }
+
+            const btnHideInspector = document.getElementById('btn-hide-inspector');
+            if (btnHideInspector) {
+                btnHideInspector.addEventListener('click', () => setRightInspectorVisibility(false));
+            }
+            const btnShowInspector = document.getElementById('btn-show-inspector');
+            if (btnShowInspector) {
+                btnShowInspector.addEventListener('click', () => setRightInspectorVisibility(true));
+            }
+
+            const inspectorFilterInput = document.getElementById('inspector-filter-input');
+            if (inspectorFilterInput) {
+                inspectorFilterInput.addEventListener('input', e => {
+                    appState.inspectorFilterQuery = e.target.value || '';
+                    renderDropdownAndInspector();
+                });
+            }
+            const btnClearInspectorFilter = document.getElementById('btn-clear-inspector-filter');
+            if (btnClearInspectorFilter) {
+                btnClearInspectorFilter.addEventListener('click', () => {
+                    appState.inspectorFilterQuery = '';
+                    if (inspectorFilterInput) inspectorFilterInput.value = '';
+                    renderDropdownAndInspector();
+                });
+            }
+
             document.getElementById('dropdown-trigger').addEventListener('click', () => {
                 document.getElementById('dropdown-menu').classList.toggle('collapsed');
             });
@@ -3087,15 +3305,29 @@
                 appState.target.y = ((minY + maxY) / 2) / 1000;
                 appState.target.z = ((minZ + maxZ) / 2) / 1000;
                 const spanM = Math.max((maxX - minX) / 1000, (maxY - minY) / 1000, (maxZ - minZ) / 1000);
-                appState.distance = Math.max(2.6, Math.min(12.0, spanM * 1.15));
+                appState.distance = Math.max(1.2, Math.min(12.0, spanM * 1.15));
                 renderScene();
             }
 
             // Menu 2 (Objects) Presets
+            const socketsPresetBtn = document.getElementById('preset-sockets-only');
+            if (socketsPresetBtn) {
+                socketsPresetBtn.addEventListener('click', () => {
+                    const sockObjs = allFurniture.filter(fn => fn.isSocketBundle);
+                    const sockIds = sockObjs.map(fn => fn.id);
+                    appState.selectedIds = new Set(sockIds.concat(['EW_NORTH_RECESSED', 'GW_3', 'FLOOR_LOWER']));
+                    renderDropdownAndInspector();
+                    if (sockObjs.length > 0) {
+                        focusSingleObject(sockObjs[0]);
+                    } else {
+                        focusSelectedFurniture();
+                    }
+                });
+            }
             const sofaBtn = document.getElementById('preset-sofa-living');
             if (sofaBtn) {
                 sofaBtn.addEventListener('click', () => {
-                    const roomIds = allFurniture.filter(fn => fn.isRoomFurniture).map(fn => fn.id);
+                    const roomIds = allFurniture.filter(fn => fn.isRoomFurniture && !fn.isSocketBundle).map(fn => fn.id);
                     const idsToSelect = roomIds.length > 0 ? roomIds.concat(['FLOOR_LOWER', 'GW_14', 'EW_EAST']) : ['SOFA_LIVING_1', 'FLOOR_LOWER'];
                     appState.selectedIds = new Set(idsToSelect);
                     appState.yaw = 52 * Math.PI / 180;
@@ -3278,20 +3510,25 @@
                 focusSelectedObjects();
             });
 
-            if (typeof RoomFurnitureStore !== 'undefined' && typeof RoomFurnitureStore.subscribe === 'function') {
-                RoomFurnitureStore.subscribe(() => {
-                    allFurniture = (typeof WallService.getFurniture3D === 'function') ? WallService.getFurniture3D() : [];
-                    Object.keys(furnitureById).forEach(k => { delete furnitureById[k]; });
-                    allFurniture.forEach(fn => {
-                        furnitureById[fn.id] = fn;
-                        if (appState.furnitureFrontsById[fn.id] === undefined) {
-                            appState.furnitureFrontsById[fn.id] = true;
-                            appState.selectedIds.add(fn.id);
-                        }
-                    });
-                    renderDropdownAndInspector();
-                    renderScene();
+            function refreshFurnitureAndSocketsFromStores() {
+                allFurniture = getCombinedFurnitureAndSockets();
+                Object.keys(furnitureById).forEach(k => { delete furnitureById[k]; });
+                allFurniture.forEach(fn => {
+                    furnitureById[fn.id] = fn;
+                    if (appState.furnitureFrontsById[fn.id] === undefined) {
+                        appState.furnitureFrontsById[fn.id] = true;
+                        appState.selectedIds.add(fn.id);
+                    }
                 });
+                renderDropdownAndInspector();
+                renderScene();
+            }
+
+            if (typeof RoomFurnitureStore !== 'undefined' && typeof RoomFurnitureStore.subscribe === 'function') {
+                RoomFurnitureStore.subscribe(refreshFurnitureAndSocketsFromStores);
+            }
+            if (typeof SocketStore !== 'undefined' && typeof SocketStore.subscribe === 'function') {
+                SocketStore.subscribe(refreshFurnitureAndSocketsFromStores);
             }
 
             // Initialize

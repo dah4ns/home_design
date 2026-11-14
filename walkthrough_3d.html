@@ -703,8 +703,10 @@
   <script src="data/windows.js"></script>
   <script src="data/furniture.js"></script>
   <script src="data/room_furniture.js"></script>
+  <script src="data/sockets.js"></script>
   <script src="js/persistence.js"></script>
   <script src="js/room-furniture-store.js"></script>
+  <script src="js/socket-store.js"></script>
   <script src="js/wall-service.js"></script>
 
   <script>
@@ -2429,6 +2431,19 @@
           });
         });
 
+        var socketList = (typeof WallService.getSockets3D === 'function')
+          ? WallService.getSockets3D()
+          : [];
+        socketList.forEach(function (sock) {
+          var fn = sock.normal || [0, 1, 0];
+          (sock.skeletonParts3D || []).forEach(function (part) {
+            processFurniturePart(part, fn, false, true);
+          });
+          (sock.frontParts3D || []).forEach(function (part) {
+            processFurniturePart(part, fn, false, true);
+          });
+        });
+
         Object.keys(furnBuckets).forEach(function (key) {
           var bInfo = furnBuckets[key];
           if (bInfo.builder.verts.length > 0) {
@@ -2643,6 +2658,11 @@
         RoomFurnitureStore.subscribe(function () {
           buildSceneMeshes();
           buildCollisionSegments();
+        });
+      }
+      if (typeof SocketStore !== 'undefined' && typeof SocketStore.subscribe === 'function') {
+        SocketStore.subscribe(function () {
+          buildSceneMeshes();
         });
       }
 
