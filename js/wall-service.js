@@ -2745,7 +2745,21 @@
 
         getFurniture3D: function () {
             const rawList = (furnitureData && Array.isArray(furnitureData.furniture)) ? furnitureData.furniture : [];
-            return rawList.map(item => this.compileFurniture3D(item)).filter(Boolean);
+            const fixedList = rawList.map(item => this.compileFurniture3D(item)).filter(Boolean);
+            let roomFurnList = [];
+            if (typeof RoomFurnitureStore !== 'undefined' && typeof RoomFurnitureStore.getAllCompiled3D === 'function') {
+                roomFurnList = RoomFurnitureStore.getAllCompiled3D();
+            } else if (typeof globalThis !== 'undefined' && globalThis.RoomFurnitureStore && typeof globalThis.RoomFurnitureStore.getAllCompiled3D === 'function') {
+                roomFurnList = globalThis.RoomFurnitureStore.getAllCompiled3D();
+            } else if (typeof require === 'function') {
+                try {
+                    const rfs = require('./room-furniture-store.js');
+                    if (rfs && typeof rfs.getAllCompiled3D === 'function') {
+                        roomFurnList = rfs.getAllCompiled3D();
+                    }
+                } catch (_e) { /* ignore */ }
+            }
+            return fixedList.concat(roomFurnList);
         },
 
         getFurniture3DById: function (id) {

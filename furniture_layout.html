@@ -1,0 +1,1922 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- TODO(security): Enforce strict Content-Security-Policy and X-Frame-Options headers at the web server level when deployed -->
+    <title>2D Furniture Layout &amp; Configurator — Interactive Room Planner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #090d16;
+            --panel-bg: rgba(15, 23, 42, 0.92);
+            --card-bg: rgba(30, 41, 59, 0.68);
+            --panel-border: rgba(148, 163, 184, 0.2);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-blue: #38bdf8;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* Top Navigation Header */
+        .top-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 10px 18px;
+            background: rgba(15, 23, 42, 0.96);
+            border-bottom: 1px solid var(--panel-border);
+            z-index: 40;
+        }
+
+        .header-title-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .header-title-group h1 {
+            margin: 0;
+            font-size: 17px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            color: #ffffff;
+        }
+
+        .tech-pill {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 3px 9px;
+            border-radius: 999px;
+            background: rgba(16, 185, 129, 0.16);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            white-space: nowrap;
+        }
+
+        .tech-pill.blue {
+            background: rgba(56, 189, 248, 0.15);
+            color: #7dd3fc;
+            border-color: rgba(56, 189, 248, 0.35);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12.5px;
+            font-weight: 600;
+            text-decoration: none;
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            transition: all 0.16s ease;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.14);
+            border-color: var(--accent-blue);
+            transform: translateY(-1px);
+        }
+
+        /* Main 3-Column Workspace */
+        .workspace {
+            display: grid;
+            grid-template-columns: 320px 1fr 350px;
+            gap: 12px;
+            padding: 12px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        @media (max-width: 1280px) {
+            .workspace {
+                grid-template-columns: 280px 1fr 310px;
+            }
+        }
+
+        .side-panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            overflow-y: auto;
+            max-height: 100%;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+        }
+
+        .panel-section {
+            background: var(--card-bg);
+            border: 1px solid rgba(148, 163, 184, 0.15);
+            border-radius: 10px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #cbd5e1;
+        }
+
+        .form-label {
+            font-size: 11.5px;
+            font-weight: 600;
+            color: #cbd5e1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .select-input,
+        .text-input,
+        .num-input {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            color: #f8fafc;
+            border-radius: 7px;
+            padding: 7px 10px;
+            font-family: inherit;
+            font-size: 12.5px;
+            font-weight: 500;
+            outline: none;
+            transition: border-color 0.15s ease;
+        }
+
+        .select-input:focus,
+        .text-input:focus,
+        .num-input:focus {
+            border-color: var(--accent-blue);
+        }
+
+        .catalog-preview {
+            font-size: 11.5px;
+            color: var(--text-muted);
+            line-height: 1.45;
+            background: rgba(15, 23, 42, 0.55);
+            border-radius: 7px;
+            padding: 8px 10px;
+            border: 1px solid rgba(148, 163, 184, 0.12);
+        }
+
+        .btn-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 7px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 11px;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid rgba(148, 163, 184, 0.28);
+            background: rgba(30, 41, 59, 0.85);
+            color: #f1f5f9;
+            transition: all 0.15s ease;
+        }
+
+        .btn:hover {
+            border-color: var(--accent-blue);
+            background: rgba(51, 65, 85, 0.95);
+        }
+
+        .btn.primary {
+            background: rgba(16, 185, 129, 0.22);
+            border-color: rgba(16, 185, 129, 0.55);
+            color: #6ee7b7;
+        }
+
+        .btn.primary:hover {
+            background: rgba(16, 185, 129, 0.34);
+            color: #ffffff;
+        }
+
+        .btn.active-mode {
+            background: rgba(245, 158, 11, 0.25);
+            border-color: #f59e0b;
+            color: #fde68a;
+        }
+
+        .btn.danger {
+            background: rgba(244, 63, 94, 0.16);
+            border-color: rgba(244, 63, 94, 0.4);
+            color: #fda4af;
+        }
+
+        .btn.danger:hover {
+            background: rgba(244, 63, 94, 0.3);
+            color: #ffffff;
+        }
+
+        /* Placed Furniture Items List */
+        .placed-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .placed-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            cursor: pointer;
+            transition: all 0.14s ease;
+        }
+
+        .placed-item:hover {
+            border-color: rgba(56, 189, 248, 0.45);
+            background: rgba(30, 41, 59, 0.9);
+        }
+
+        .placed-item.selected {
+            border-color: var(--accent-blue);
+            background: rgba(56, 189, 248, 0.14);
+            box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.25);
+        }
+
+        .placed-item-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+        }
+
+        .color-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.45);
+            flex-shrink: 0;
+        }
+
+        .placed-item-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #f8fafc;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .placed-item-sub {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10.5px;
+            color: var(--text-muted);
+        }
+
+        /* Center Map Area */
+        .map-shell {
+            position: relative;
+            background: radial-gradient(circle at 50% 45%, #131c31 0%, #090d16 100%);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .map-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 8px 12px;
+            background: rgba(15, 23, 42, 0.88);
+            border-bottom: 1px solid var(--panel-border);
+            z-index: 10;
+        }
+
+        .toolbar-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .floor-tab {
+            padding: 5px 11px;
+            border-radius: 7px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            background: rgba(30, 41, 59, 0.75);
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            color: #cbd5e1;
+        }
+
+        .floor-tab.active {
+            background: rgba(56, 189, 248, 0.2);
+            border-color: var(--accent-blue);
+            color: #ffffff;
+        }
+
+        #floor-map-svg {
+            flex: 1;
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+            display: block;
+        }
+
+        #floor-map-svg:active {
+            cursor: grabbing;
+        }
+
+        #floor-map-svg.placing-cursor {
+            cursor: crosshair;
+        }
+
+        .map-hud-bottom {
+            position: absolute;
+            bottom: 10px;
+            left: 12px;
+            right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            pointer-events: none;
+            gap: 10px;
+        }
+
+        .hud-badge {
+            pointer-events: auto;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid var(--panel-border);
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: #cbd5e1;
+        }
+
+        /* Swatch Grid in Properties Inspector */
+        .swatch-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 6px;
+        }
+
+        .swatch-btn {
+            height: 28px;
+            border-radius: 6px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: transform 0.12s ease, border-color 0.12s ease;
+            position: relative;
+        }
+
+        .swatch-btn:hover {
+            transform: scale(1.06);
+            border-color: #ffffff;
+        }
+
+        .swatch-btn.active {
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.45);
+        }
+
+        .custom-color-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-top: 4px;
+        }
+
+        .color-picker-input {
+            width: 36px;
+            height: 28px;
+            padding: 0;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            border-radius: 6px;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .coord-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .angle-presets {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+        }
+
+        .angle-btn {
+            padding: 4px 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: 6px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            color: #cbd5e1;
+            cursor: pointer;
+        }
+
+        .angle-btn:hover {
+            border-color: var(--accent-blue);
+            color: #ffffff;
+        }
+
+        .spec-table {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            font-size: 11.5px;
+        }
+
+        .spec-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 3px 0;
+            border-bottom: 1px dashed rgba(148, 163, 184, 0.14);
+        }
+
+        .spec-key {
+            color: var(--text-muted);
+        }
+
+        .spec-val {
+            font-family: 'JetBrains Mono', monospace;
+            color: #e2e8f0;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Top Header -->
+    <header class="top-header">
+        <div class="header-title-group">
+            <h1>🛋️ 2D Furniture Layout &amp; Object Configurator</h1>
+            <span class="tech-pill">Drag &amp; Drop • 0°–360° Free Rotation • Dynamic Type Properties</span>
+            <span class="tech-pill blue" id="persistence-status-pill">Saved to LocalStorage</span>
+        </div>
+        <nav class="nav-links">
+            <a href="index.html" class="nav-btn">🏠 Dashboard</a>
+            <a href="walkthrough_3d.html" class="nav-btn" style="border-color: rgba(16,185,129,0.45); color: #6ee7b7;">🚶 View in 3D Walkthrough</a>
+            <a href="objects_3d.html" class="nav-btn" style="border-color: rgba(56,189,248,0.45); color: #7dd3fc;">🧊 3D Objects Inspector</a>
+            <a href="floor_plan.html" class="nav-btn">📐 2D Architectural Plan</a>
+        </nav>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="workspace">
+        <!-- LEFT PANEL: FURNITURE CATALOG DROPDOWN & PLACED LIST -->
+        <aside class="side-panel">
+            <div class="panel-section">
+                <div class="section-header">
+                    <span>1. Select Furniture Type</span>
+                    <span class="tech-pill blue">Catalog</span>
+                </div>
+                <label class="form-label" for="catalog-select">Available Furniture Models:</label>
+                <select id="catalog-select" class="select-input"></select>
+                <div class="catalog-preview" id="catalog-description"></div>
+                <div class="btn-row">
+                    <button type="button" class="btn primary" id="btn-add-to-floor" title="Immediately place selected furniture in the Living Room / active floor">➕ Put on Floor</button>
+                    <button type="button" class="btn" id="btn-place-on-click" title="Click anywhere on the 2D floor map to place this object">🎯 Click Map to Place</button>
+                </div>
+            </div>
+
+            <div class="panel-section" style="flex: 1; min-height: 180px;">
+                <div class="section-header">
+                    <span>2. Placed Furniture on Floor</span>
+                    <span class="tech-pill" id="placed-count-pill">1 item</span>
+                </div>
+                <div class="placed-list" id="placed-items-list"></div>
+            </div>
+
+            <div class="panel-section">
+                <div class="section-header">
+                    <span>3. Quick View &amp; Persistence</span>
+                </div>
+                <div class="btn-row">
+                    <button type="button" class="btn" id="btn-zoom-living">🔍 Living Room (0.11)</button>
+                    <button type="button" class="btn" id="btn-zoom-full">🏠 Full Floor Map</button>
+                </div>
+                <button type="button" class="btn danger" id="btn-reset-defaults">↺ Reset Default Corner Sofa in Living Room</button>
+            </div>
+        </aside>
+
+        <!-- CENTER PANEL: INTERACTIVE 2D MAP -->
+        <main class="map-shell">
+            <div class="map-toolbar">
+                <div class="toolbar-group">
+                    <button type="button" class="floor-tab active" id="tab-floor-ground">Parter (Ground Floor — 0.11 Salon)</button>
+                    <button type="button" class="floor-tab" id="tab-floor-first">Piętro (First Floor)</button>
+                </div>
+                <div class="toolbar-group">
+                    <span class="tech-pill blue" title="Orientation matches 2D Floor Plans: West (Entrance/Garage) on Left, East (0.11 Salon / Garden) on Right">◀ W (Entry) • E (Living / Garden) ▶</span>
+                    <label class="form-label" style="gap: 6px; cursor: pointer; margin-left: 6px;">
+                        <input type="checkbox" id="toggle-wall-distances" checked>
+                        <span>Wall Distance Guides</span>
+                    </label>
+                    <label class="form-label" style="gap: 6px; cursor: pointer; margin-left: 8px;">
+                        <input type="checkbox" id="toggle-fixed-cabinets" checked>
+                        <span>Show Kitchen Cabinets</span>
+                    </label>
+                </div>
+            </div>
+
+            <svg id="floor-map-svg" xmlns="http://www.w3.org/2000/svg" viewBox="7620 2700 13200 9200"></svg>
+
+            <div class="map-hud-bottom">
+                <div class="hud-badge" id="cursor-coords-hud">Cursor: X = — cm, Y = — cm</div>
+                <div class="hud-badge">Drag object to move • Drag ↻ handle to rotate by any angle (0°–360°) • Scroll to zoom</div>
+            </div>
+        </main>
+
+        <!-- RIGHT PANEL: DYNAMIC OBJECT PROPERTIES INSPECTOR -->
+        <aside class="side-panel" id="properties-inspector-panel">
+            <!-- Populated dynamically via safe DOM methods based on selected object & its type schema -->
+        </aside>
+    </div>
+
+    <!-- Canonical Architectural Data & Stores -->
+    <script src="data/walls.js"></script>
+    <script src="data/windows.js"></script>
+    <script src="data/furniture.js"></script>
+    <script src="data/room_furniture.js"></script>
+    <script src="js/persistence.js"></script>
+    <script src="js/room-furniture-store.js"></script>
+    <script src="js/wall-service.js"></script>
+
+    <script>
+        (function () {
+            'use strict';
+
+            const SVG_NS = 'http://www.w3.org/2000/svg';
+
+            // Horizontal coordinate mirror matching floor_plan.html (`westOnLeft = true`):
+            // Canonical worldX = 20,705 mm (West, Entry/Garage) is on the LEFT (svgX = -285),
+            // and canonical worldX = 95..6,315 mm (East, 0.11 Salon Living Room) is on the RIGHT (svgX = 14,105..20,325).
+            function toSvgX(worldX) {
+                return 20420 - worldX;
+            }
+
+            function fromSvgX(svgX) {
+                return 20420 - svgX;
+            }
+
+            // Room zones in canonical world coordinates (mm)
+            const ROOM_ZONES = {
+                ground: [
+                    { id: '0.11 Salon', label: '0.11 Salon (Living Room)', x0: 95, x1: 6315, y0: 6290, y1: 11200, color: 'rgba(16, 185, 129, 0.08)' },
+                    { id: '0.12 Jadalnia', label: '0.12 Jadalnia (Dining)', x0: 6315, x1: 11915, y0: 6290, y1: 11200, color: 'rgba(56, 189, 248, 0.05)' },
+                    { id: '0.13 Kuchnia', label: '0.13 Kuchnia (Kitchen)', x0: 6495, x1: 11915, y0: 3170, y1: 6290, color: 'rgba(245, 158, 11, 0.05)' },
+                    { id: '0.14 Spiżarnia', label: '0.14 Spiżarnia (Pantry)', x0: 4205, x1: 6315, y0: 3170, y1: 6110, color: 'rgba(148, 163, 184, 0.04)' },
+                    { id: '0.15 Gabinet', label: '0.15 Gabinet (Study)', x0: 95, x1: 4205, y0: 3170, y1: 6110, color: 'rgba(56, 189, 248, 0.05)' },
+                    { id: '0.07 Komunikacja', label: '0.07 Hall & Stairs', x0: 11915, x1: 16255, y0: 8360, y1: 11200, color: 'rgba(148, 163, 184, 0.04)' },
+                    { id: '0.04 Wiatrołap', label: '0.04 Wiatrołap', x0: 16255, x1: 18845, y0: 8360, y1: 11220, color: 'rgba(148, 163, 184, 0.04)' },
+                    { id: '0.10 Siłownia', label: '0.10 Siłownia (Gym)', x0: 15075, x1: 20325, y0: 15250, y1: 20750, color: 'rgba(56, 189, 248, 0.05)' },
+                    { id: '0.01 Garaż', label: '0.01 Garaż', x0: 14275, x1: 20325, y0: 90, y1: 6290, color: 'rgba(148, 163, 184, 0.03)' }
+                ],
+                first: [
+                    { id: '1.01 Sypialnia', label: '1.01 Master Bedroom', x0: 6495, x1: 10575, y0: 3170, y1: 6940, color: 'rgba(56, 189, 248, 0.06)' },
+                    { id: '1.08 Garderoba', label: '1.08 Master Wardrobe', x0: 6495, x1: 10575, y0: 7120, y1: 11200, color: 'rgba(16, 185, 129, 0.05)' },
+                    { id: '1.02 Łazienka', label: '1.02 Master Bath', x0: 10695, x1: 13055, y0: 3170, y1: 6940, color: 'rgba(148, 163, 184, 0.04)' },
+                    { id: '1.03 Łazienka', label: '1.03 Upper Bath', x0: 13175, x1: 15435, y0: 3170, y1: 6940, color: 'rgba(148, 163, 184, 0.04)' },
+                    { id: '1.05 Pokój NW', label: '1.05 Bedroom NW', x0: 15555, x1: 20325, y0: 3170, y1: 6940, color: 'rgba(56, 189, 248, 0.06)' },
+                    { id: '1.04 Pokój SW', label: '1.04 Bedroom SW', x0: 15655, x1: 20325, y0: 7120, y1: 11200, color: 'rgba(56, 189, 248, 0.06)' },
+                    { id: '1.06 Antresola', label: '1.06 Upper Gallery', x0: 10695, x1: 15535, y0: 7120, y1: 11200, color: 'rgba(245, 158, 11, 0.05)' }
+                ]
+            };
+
+            function detectRoomName(floor, worldX, worldY) {
+                const zones = ROOM_ZONES[floor] || ROOM_ZONES.ground;
+                for (let i = 0; i < zones.length; i++) {
+                    const z = zones[i];
+                    if (worldX >= z.x0 && worldX <= z.x1 && worldY >= z.y0 && worldY <= z.y1) {
+                        return z.id;
+                    }
+                }
+                return floor === 'first' ? 'Piętro' : 'Parter';
+            }
+
+            // UI State
+            // Default viewBox in SVG coordinates (x = 7620..20820, y = 2700..11900)
+            // focuses directly on Kitchen/Dining (middle) and 0.11 Salon Living Room (right side!)
+            const state = {
+                activeFloor: 'ground',
+                selectedCatalogTypeId: 'corner_sofa_l226',
+                selectedObjectId: 'SOFA_LIVING_1',
+                placingMode: false,
+                showWallDistances: true,
+                showFixedCabinets: true,
+                viewBox: { x: 7620, y: 2700, w: 13200, h: 9200 },
+                interaction: null // { type: 'move' | 'rotate' | 'pan', ... }
+            };
+
+            const svgEl = document.getElementById('floor-map-svg');
+            const catalogSelect = document.getElementById('catalog-select');
+            const catalogDesc = document.getElementById('catalog-description');
+            const placedListEl = document.getElementById('placed-items-list');
+            const placedCountPill = document.getElementById('placed-count-pill');
+            const inspectorPanel = document.getElementById('properties-inspector-panel');
+            const btnPlaceOnClick = document.getElementById('btn-place-on-click');
+            const cursorHud = document.getElementById('cursor-coords-hud');
+
+            function createSvgEl(tag, attrs) {
+                const el = document.createElementNS(SVG_NS, tag);
+                if (attrs) {
+                    Object.keys(attrs).forEach(k => {
+                        el.setAttribute(k, String(attrs[k]));
+                    });
+                }
+                return el;
+            }
+
+            function updateViewBoxAttr() {
+                const vb = state.viewBox;
+                svgEl.setAttribute('viewBox', `${Math.round(vb.x)} ${Math.round(vb.y)} ${Math.round(vb.w)} ${Math.round(vb.h)}`);
+            }
+
+            function clientToSvgPoint(clientX, clientY) {
+                const rect = svgEl.getBoundingClientRect();
+                if (rect.width <= 0 || rect.height <= 0) return { x: 0, y: 0 };
+                const vb = state.viewBox;
+                const scaleX = vb.w / rect.width;
+                const scaleY = vb.h / rect.height;
+                const scale = Math.max(scaleX, scaleY);
+                const actualW = rect.width * scale;
+                const actualH = rect.height * scale;
+                const offsetX = vb.x - (actualW - vb.w) / 2;
+                const offsetY = vb.y - (actualH - vb.h) / 2;
+                return {
+                    x: Math.round(offsetX + (clientX - rect.left) * scale),
+                    y: Math.round(offsetY + (clientY - rect.top) * scale)
+                };
+            }
+
+            // -----------------------------------------------------------------
+            // Curved SVG Path Helpers for Soft Organic Cushions & Pillows
+            // -----------------------------------------------------------------
+            // Builds a plump barrel-curved cushion path with convex sides and rounded corners
+            function makePlumpCushionPath(x, y, w, h, r, bulge) {
+                const cr = Math.min(r, w * 0.35, h * 0.35);
+                const bx = bulge || Math.round(Math.min(w, h) * 0.045);
+                const by = bulge || Math.round(Math.min(w, h) * 0.045);
+                const x0 = x, x1 = x + w, xm = x + w / 2;
+                const y0 = y, y1 = y + h, ym = y + h / 2;
+
+                return [
+                    `M ${x0 + cr} ${y0}`,
+                    `Q ${xm} ${y0 - by} ${x1 - cr} ${y0}`,
+                    `Q ${x1} ${y0} ${x1} ${y0 + cr}`,
+                    `Q ${x1 + bx} ${ym} ${x1} ${y1 - cr}`,
+                    `Q ${x1} ${y1} ${x1 - cr} ${y1}`,
+                    `Q ${xm} ${y1 + by} ${x0 + cr} ${y1}`,
+                    `Q ${x0} ${y1} ${x0} ${y1 - cr}`,
+                    `Q ${x0 - bx} ${ym} ${x0} ${y0 + cr}`,
+                    `Q ${x0} ${y0} ${x0 + cr} ${y0}`,
+                    'Z'
+                ].join(' ');
+            }
+
+            // Builds a smooth curved L-shaped outer sofa contour with rounded outer corner,
+            // rounded wing ends, and a smooth concave inner corner arc
+            function makeCurvedLContourPath(ox, oy, rightWing, leftWing, depth) {
+                const rOut = 155;   // Smooth 15.5 cm outer corner radius
+                const rEnd = 105;   // Smooth 10.5 cm armrest end radius
+                const rIn  = 175;   // Smooth 17.5 cm concave inner L-corner radius
+
+                return [
+                    `M ${ox + rOut} ${oy}`,
+                    `L ${ox + rightWing - rEnd} ${oy}`,
+                    `Q ${ox + rightWing} ${oy} ${ox + rightWing} ${oy + rEnd}`,
+                    `L ${ox + rightWing} ${oy + depth - rEnd}`,
+                    `Q ${ox + rightWing} ${oy + depth} ${ox + rightWing - rEnd} ${oy + depth}`,
+                    `L ${ox + depth + rIn} ${oy + depth}`,
+                    `Q ${ox + depth} ${oy + depth} ${ox + depth} ${oy + depth + rIn}`,
+                    `L ${ox + depth} ${oy + leftWing - rEnd}`,
+                    `Q ${ox + depth} ${oy + leftWing} ${ox + depth - rEnd} ${oy + leftWing}`,
+                    `L ${ox + rEnd} ${oy + leftWing}`,
+                    `Q ${ox} ${oy + leftWing} ${ox} ${oy + leftWing - rEnd}`,
+                    `L ${ox} ${oy + rOut}`,
+                    `Q ${ox} ${oy} ${ox + rOut} ${oy}`,
+                    'Z'
+                ].join(' ');
+            }
+
+            // -----------------------------------------------------------------
+            // 1. Populate Catalog Dropdown
+            // -----------------------------------------------------------------
+            function initCatalogDropdown() {
+                const catalog = RoomFurnitureStore.getCatalog();
+                catalogSelect.replaceChildren();
+                catalog.forEach(item => {
+                    const opt = document.createElement('option');
+                    opt.value = item.typeId;
+                    opt.textContent = `${item.name}`;
+                    if (item.typeId === state.selectedCatalogTypeId) opt.selected = true;
+                    catalogSelect.appendChild(opt);
+                });
+                updateCatalogPreview();
+            }
+
+            function updateCatalogPreview() {
+                const spec = RoomFurnitureStore.getCatalogType(state.selectedCatalogTypeId);
+                if (!spec) return;
+                catalogDesc.textContent = spec.description || '';
+            }
+
+            catalogSelect.addEventListener('change', () => {
+                state.selectedCatalogTypeId = catalogSelect.value;
+                updateCatalogPreview();
+            });
+
+            document.getElementById('btn-add-to-floor').addEventListener('click', () => {
+                const existing = RoomFurnitureStore.getByFloor(state.activeFloor);
+                const offset = (existing.length % 4) * 320;
+                const defaultX = state.activeFloor === 'ground' ? (3150 + offset) : (8400 + offset);
+                const defaultY = state.activeFloor === 'ground' ? (8550 + offset) : (5000 + offset);
+                const added = RoomFurnitureStore.add({
+                    typeId: state.selectedCatalogTypeId,
+                    floor: state.activeFloor,
+                    room: detectRoomName(state.activeFloor, defaultX, defaultY),
+                    x: defaultX,
+                    y: defaultY,
+                    rotation: 0
+                });
+                if (added) {
+                    state.selectedObjectId = added.id;
+                    state.placingMode = false;
+                    btnPlaceOnClick.classList.remove('active-mode');
+                    renderAll();
+                }
+            });
+
+            btnPlaceOnClick.addEventListener('click', () => {
+                state.placingMode = !state.placingMode;
+                btnPlaceOnClick.classList.toggle('active-mode', state.placingMode);
+                svgEl.classList.toggle('placing-cursor', state.placingMode);
+            });
+
+            // -----------------------------------------------------------------
+            // 2. Render Sculpted, Curved Top-Down 2D Graphic of Furniture
+            // -----------------------------------------------------------------
+            function renderFurnitureTopDown2D(inst, isSelected) {
+                const svgCenterX = toSvgX(inst.x);
+                const svgCenterY = inst.y;
+
+                const g = createSvgEl('g', {
+                    'class': 'furniture-node',
+                    'data-id': inst.id,
+                    'transform': `translate(${svgCenterX}, ${svgCenterY}) rotate(${inst.rotation})`
+                });
+                g.style.cursor = 'move';
+
+                const props = inst.properties || {};
+
+                if (inst.typeId === 'corner_sofa_l226') {
+                    // Sculpted, Curved L226x226xH81 cm (or 226x260 cm) Corner Sofa Top-Down Plan
+                    const variant = props.wingVariant || '226x226';
+                    const rightWing = (variant === '226x260') ? 2600 : 2260;
+                    const leftWing = (variant === '260x226') ? 2600 : 2260;
+                    const depth = 710;
+                    const armW = 90;
+                    const armD = 680;
+                    const backT = 105;
+                    const backCushD = 195;
+                    const ox = -rightWing / 2;
+                    const oy = -leftWing / 2;
+
+                    const mainColor = RoomFurnitureStore.sanitizeHexColor(props.upholsteryColor, '#EFEAE1');
+                    const pillowColor = RoomFurnitureStore.sanitizeHexColor(props.pillowColor, '#E2DBD0');
+                    const strokeColor = isSelected ? '#38bdf8' : '#334155';
+
+                    // 1. Curved L-Shape Outer Base Silhouette
+                    g.appendChild(createSvgEl('path', {
+                        d: makeCurvedLContourPath(ox, oy, rightWing, leftWing, depth),
+                        fill: mainColor,
+                        stroke: strokeColor,
+                        'stroke-width': isSelected ? 22 : 14,
+                        'stroke-linejoin': 'round'
+                    }));
+
+                    // 2. Softly Curved Rear Backrest Frame (10.5 cm)
+                    g.appendChild(createSvgEl('path', {
+                        d: makePlumpCushionPath(ox + 12, oy + 6, rightWing - armW - 16, backT - 6, 48, 8),
+                        fill: mainColor, stroke: '#475569', 'stroke-width': 8
+                    }));
+                    g.appendChild(createSvgEl('path', {
+                        d: makePlumpCushionPath(ox + 6, oy + backT - 4, backT - 6, leftWing - armW - backT, 48, 8),
+                        fill: mainColor, stroke: '#475569', 'stroke-width': 8
+                    }));
+
+                    // 3. Plump Barrel-Curved Corner Seat Cushion (with smooth curved inner front corner!)
+                    g.appendChild(createSvgEl('path', {
+                        d: makePlumpCushionPath(ox + backT, oy + backT, depth - backT + 8, depth - backT + 8, 125, 22),
+                        fill: mainColor, stroke: '#64748b', 'stroke-width': 9
+                    }));
+
+                    // 4. Plump Barrel-Curved Modular Seat Cushions & Bolster Backrests — Wing A (70 cm x 52 cm)
+                    const wingASpan = (rightWing - armW) - depth;
+                    const modAW = Math.floor(wingASpan / 2);
+                    for (let i = 0; i < 2; i++) {
+                        const u0 = depth + i * modAW;
+                        const w = (i === 1) ? (rightWing - armW - u0) : modAW;
+                        // Barrel-curved seat cushion
+                        g.appendChild(createSvgEl('path', {
+                            d: makePlumpCushionPath(ox + u0 + 4, oy + backT + 2, w - 8, depth - backT + 6, 95, 24),
+                            fill: mainColor, stroke: '#64748b', 'stroke-width': 9
+                        }));
+                        // Subtle curved front bullnose seam line
+                        g.appendChild(createSvgEl('path', {
+                            d: `M ${ox + u0 + 70} ${oy + depth - 38} Q ${ox + u0 + w / 2} ${oy + depth - 16} ${ox + u0 + w - 70} ${oy + depth - 38}`,
+                            fill: 'none', stroke: 'rgba(71, 85, 105, 0.45)', 'stroke-width': 6, 'stroke-linecap': 'round'
+                        }));
+                        // Plump curved bolster backrest cushion (68 cm wide)
+                        g.appendChild(createSvgEl('path', {
+                            d: makePlumpCushionPath(ox + u0 + 14, oy + backT - 2, w - 28, backCushD - backT + 14, 52, 22),
+                            fill: mainColor, stroke: '#475569', 'stroke-width': 10
+                        }));
+                    }
+
+                    // 5. Plump Barrel-Curved Modular Seat Cushions & Bolster Backrests — Wing B (70 cm x 52 cm)
+                    const wingBSpan = (leftWing - armW) - depth;
+                    const modBW = Math.floor(wingBSpan / 2);
+                    for (let j = 0; j < 2; j++) {
+                        const v0 = depth + j * modBW;
+                        const h = (j === 1) ? (leftWing - armW - v0) : modBW;
+                        // Barrel-curved seat cushion
+                        g.appendChild(createSvgEl('path', {
+                            d: makePlumpCushionPath(ox + backT + 2, oy + v0 + 4, depth - backT + 6, h - 8, 95, 24),
+                            fill: mainColor, stroke: '#64748b', 'stroke-width': 9
+                        }));
+                        // Subtle curved front bullnose seam line
+                        g.appendChild(createSvgEl('path', {
+                            d: `M ${ox + depth - 38} ${oy + v0 + 70} Q ${ox + depth - 16} ${oy + v0 + h / 2} ${ox + depth - 38} ${oy + v0 + h - 70}`,
+                            fill: 'none', stroke: 'rgba(71, 85, 105, 0.45)', 'stroke-width': 6, 'stroke-linecap': 'round'
+                        }));
+                        // Plump curved bolster backrest cushion (68 cm wide)
+                        g.appendChild(createSvgEl('path', {
+                            d: makePlumpCushionPath(ox + backT - 2, oy + v0 + 14, backCushD - backT + 14, h - 28, 52, 22),
+                            fill: mainColor, stroke: '#475569', 'stroke-width': 10
+                        }));
+                    }
+
+                    // 6. Corner Bolster Backrest Cushions
+                    g.appendChild(createSvgEl('path', {
+                        d: makePlumpCushionPath(ox + backT + 8, oy + backT - 2, depth - backT - 14, backCushD - backT + 14, 52, 20),
+                        fill: mainColor, stroke: '#475569', 'stroke-width': 10
+                    }));
+                    g.appendChild(createSvgEl('path', {
+                        d: makePlumpCushionPath(ox + backT - 2, oy + backCushD, backCushD - backT + 14, depth - backCushD - 8, 52, 20),
+                        fill: mainColor, stroke: '#475569', 'stroke-width': 10
+                    }));
+
+                    // 7. Sculpted Capsule Armrests (9 cm x 68 cm) + Left Side Pocket
+                    g.appendChild(createSvgEl('path', {
+                        d: makePlumpCushionPath(ox + rightWing - armW - 4, oy + 15, armW + 4, armD, 46, 12),
+                        fill: mainColor, stroke: '#334155', 'stroke-width': 10
+                    }));
+                    g.appendChild(createSvgEl('path', {
+                        d: makePlumpCushionPath(ox + 15, oy + leftWing - armW - 4, armD, armW + 4, 46, 12),
+                        fill: mainColor, stroke: '#334155', 'stroke-width': 10
+                    }));
+                    // Curved side pocket on Left Armrest
+                    g.appendChild(createSvgEl('path', {
+                        d: makePlumpCushionPath(ox + 185, oy + leftWing - 2, 340, 20, 10, 6),
+                        fill: pillowColor, stroke: '#475569', 'stroke-width': 6
+                    }));
+
+                    // 8. Curved Side Arm Bolster Cushions (65 cm)
+                    g.appendChild(createSvgEl('path', {
+                        d: makePlumpCushionPath(ox + rightWing - armW - 92, oy + 120, 88, 560, 44, 20),
+                        fill: mainColor, stroke: '#475569', 'stroke-width': 9
+                    }));
+                    g.appendChild(createSvgEl('path', {
+                        d: makePlumpCushionPath(ox + 120, oy + leftWing - armW - 92, 560, 88, 44, 20),
+                        fill: mainColor, stroke: '#475569', 'stroke-width': 9
+                    }));
+
+                    // 9. Three Puffed Organic Throw Pillows (40 x 40 cm)
+                    const pCorner = createSvgEl('path', {
+                        d: makePlumpCushionPath(ox + 205, oy + 205, 370, 115, 56, 26),
+                        fill: pillowColor, stroke: '#475569', 'stroke-width': 9,
+                        transform: `rotate(-45 ${ox + 390} ${oy + 262})`
+                    });
+                    g.appendChild(pCorner);
+
+                    g.appendChild(createSvgEl('path', {
+                        d: makePlumpCushionPath(ox + rightWing - armW - 505, oy + backCushD + 4, 385, 108, 54, 24),
+                        fill: pillowColor, stroke: '#475569', 'stroke-width': 9,
+                        transform: `rotate(-8 ${ox + rightWing - armW - 312} ${oy + backCushD + 58})`
+                    }));
+                    g.appendChild(createSvgEl('path', {
+                        d: makePlumpCushionPath(ox + backCushD + 4, oy + leftWing - armW - 505, 108, 385, 54, 24),
+                        fill: pillowColor, stroke: '#475569', 'stroke-width': 9,
+                        transform: `rotate(8 ${ox + backCushD + 58} ${oy + leftWing - armW - 312})`
+                    }));
+
+                    // Dimension labels on selected Corner Sofa matching attached specification diagram
+                    if (isSelected) {
+                        const dimTextTop = createSvgEl('text', {
+                            x: ox + rightWing / 2, y: oy - 65,
+                            fill: '#38bdf8', 'font-size': 105, 'font-weight': '700',
+                            'text-anchor': 'middle', 'font-family': 'JetBrains Mono, monospace'
+                        });
+                        dimTextTop.textContent = `${Math.round(rightWing / 10)} cm`;
+                        g.appendChild(dimTextTop);
+
+                        const dimTextLeft = createSvgEl('text', {
+                            x: ox - 65, y: oy + leftWing / 2,
+                            fill: '#38bdf8', 'font-size': 105, 'font-weight': '700',
+                            'text-anchor': 'middle', 'font-family': 'JetBrains Mono, monospace',
+                            transform: `rotate(-90 ${ox - 65} ${oy + leftWing / 2})`
+                        });
+                        dimTextLeft.textContent = `${Math.round(leftWing / 10)} cm`;
+                        g.appendChild(dimTextLeft);
+                    }
+                } else {
+                    // Other Catalog Types (Chaise Sofa, Armchair, Coffee Table, Dining Table, Media Console)
+                    const compiled = RoomFurnitureStore.compileInstance3D(inst);
+                    const localFp = compiled ? compiled.localFootprint2D : [[-500, -500], [500, -500], [500, 500], [-500, 500]];
+                    const fillCol = (compiled && compiled.carcassColorHex) ? compiled.carcassColorHex : '#D8CFC2';
+                    const accentCol = (compiled && compiled.frontColorHex) ? compiled.frontColorHex : fillCol;
+                    const ptsStr = localFp.map(pt => `${pt[0]},${pt[1]}`).join(' ');
+
+                    g.appendChild(createSvgEl('polygon', {
+                        points: ptsStr,
+                        fill: fillCol,
+                        stroke: isSelected ? '#38bdf8' : '#334155',
+                        'stroke-width': isSelected ? 22 : 14,
+                        'stroke-linejoin': 'round'
+                    }));
+
+                    if (inst.typeId === 'corner_sofa_chaise_l275') {
+                        g.appendChild(createSvgEl('path', {
+                            d: makePlumpCushionPath(-1235, -875, 2470, 175, 65, 18),
+                            fill: accentCol, stroke: '#475569', 'stroke-width': 8
+                        }));
+                    } else if (inst.typeId === 'lounge_armchair_84') {
+                        g.appendChild(createSvgEl('path', {
+                            d: makePlumpCushionPath(-310, -300, 620, 560, 110, 22),
+                            fill: accentCol, stroke: '#475569', 'stroke-width': 8
+                        }));
+                    }
+                }
+
+                // Object Label at Center
+                const labelBg = createSvgEl('rect', {
+                    x: -380, y: -75, width: 760, height: 150, rx: 32,
+                    fill: 'rgba(15, 23, 42, 0.82)',
+                    stroke: isSelected ? '#38bdf8' : 'rgba(148, 163, 184, 0.4)',
+                    'stroke-width': 8
+                });
+                g.appendChild(labelBg);
+
+                const labelTxt = createSvgEl('text', {
+                    x: 0, y: 32,
+                    fill: '#f8fafc',
+                    'font-size': 88,
+                    'font-weight': '700',
+                    'text-anchor': 'middle',
+                    'font-family': 'JetBrains Mono, monospace'
+                });
+                labelTxt.textContent = `${inst.id} (${Math.round(inst.rotation)}°)`;
+                g.appendChild(labelTxt);
+
+                // Selection Bounding Ring & Interactive Rotation Handle (↻)
+                if (isSelected) {
+                    const handleY = -1420;
+                    g.appendChild(createSvgEl('line', {
+                        x1: 0, y1: -150, x2: 0, y2: handleY,
+                        stroke: '#38bdf8',
+                        'stroke-width': 14,
+                        'stroke-dasharray': '28 18'
+                    }));
+
+                    const rotHandleGroup = createSvgEl('g', {
+                        'class': 'rotation-handle',
+                        'data-id': inst.id,
+                        'transform': `translate(0, ${handleY})`
+                    });
+                    rotHandleGroup.style.cursor = 'grab';
+
+                    rotHandleGroup.appendChild(createSvgEl('circle', {
+                        cx: 0, cy: 0, r: 135,
+                        fill: '#0f172a',
+                        stroke: '#38bdf8',
+                        'stroke-width': 18
+                    }));
+
+                    const rotIcon = createSvgEl('text', {
+                        x: 0, y: 38,
+                        fill: '#38bdf8',
+                        'font-size': 125,
+                        'font-weight': '700',
+                        'text-anchor': 'middle'
+                    });
+                    rotIcon.textContent = '↻';
+                    rotHandleGroup.appendChild(rotIcon);
+
+                    g.appendChild(rotHandleGroup);
+                }
+
+                return g;
+            }
+
+            // -----------------------------------------------------------------
+            // 3. Render Mirrored 2D Architectural Map + Placed Furniture
+            // -----------------------------------------------------------------
+            function renderFloorMap() {
+                svgEl.replaceChildren();
+                updateViewBoxAttr();
+
+                const slice = WallService.getFloorPlanSlice(state.activeFloor);
+
+                // Background Grid (every 1000 mm = 100 cm)
+                const gridGroup = createSvgEl('g', { 'class': 'map-grid' });
+                for (let wx = 0; wx <= 21000; wx += 1000) {
+                    const sx = toSvgX(wx);
+                    gridGroup.appendChild(createSvgEl('line', {
+                        x1: sx, y1: 0, x2: sx, y2: 21000,
+                        stroke: (wx % 5000 === 0) ? 'rgba(148, 163, 184, 0.14)' : 'rgba(148, 163, 184, 0.05)',
+                        'stroke-width': (wx % 5000 === 0) ? 14 : 8
+                    }));
+                }
+                for (let wy = 0; wy <= 21000; wy += 1000) {
+                    gridGroup.appendChild(createSvgEl('line', {
+                        x1: -600, y1: wy, x2: 21000, y2: wy,
+                        stroke: (wy % 5000 === 0) ? 'rgba(148, 163, 184, 0.14)' : 'rgba(148, 163, 184, 0.05)',
+                        'stroke-width': (wy % 5000 === 0) ? 14 : 8
+                    }));
+                }
+                svgEl.appendChild(gridGroup);
+
+                // Room Zones & Labels (mapped via toSvgX so 0.11 Salon is on the Right!)
+                const zones = ROOM_ZONES[state.activeFloor] || ROOM_ZONES.ground;
+                const roomGroup = createSvgEl('g', { 'class': 'room-zones' });
+                zones.forEach(z => {
+                    const isLiving = z.id === '0.11 Salon';
+                    const sx0 = Math.min(toSvgX(z.x0), toSvgX(z.x1));
+                    const sx1 = Math.max(toSvgX(z.x0), toSvgX(z.x1));
+                    roomGroup.appendChild(createSvgEl('rect', {
+                        x: sx0,
+                        y: z.y0,
+                        width: sx1 - sx0,
+                        height: z.y1 - z.y0,
+                        fill: z.color,
+                        stroke: isLiving ? 'rgba(16, 185, 129, 0.35)' : 'rgba(148, 163, 184, 0.12)',
+                        'stroke-width': isLiving ? 14 : 8
+                    }));
+
+                    const cx = Math.round((sx0 + sx1) / 2);
+                    const cy = Math.round((z.y0 + z.y1) / 2);
+                    const rt = createSvgEl('text', {
+                        x: cx,
+                        y: cy - 80,
+                        fill: isLiving ? 'rgba(110, 231, 183, 0.55)' : 'rgba(148, 163, 184, 0.38)',
+                        'font-size': 155,
+                        'font-weight': '700',
+                        'text-anchor': 'middle'
+                    });
+                    rt.textContent = z.label;
+                    roomGroup.appendChild(rt);
+
+                    const dimTxt = createSvgEl('text', {
+                        x: cx,
+                        y: cy + 100,
+                        fill: 'rgba(148, 163, 184, 0.3)',
+                        'font-size': 110,
+                        'font-family': 'JetBrains Mono, monospace',
+                        'text-anchor': 'middle'
+                    });
+                    dimTxt.textContent = `${Math.round((z.x1 - z.x0) / 10)} × ${Math.round((z.y1 - z.y0) / 10)} cm`;
+                    roomGroup.appendChild(dimTxt);
+                });
+                svgEl.appendChild(roomGroup);
+
+                // Fixed Kitchen Cabinetry Reference on Ground Floor
+                if (state.activeFloor === 'ground' && state.showFixedCabinets && typeof WallService.getFurniture3D === 'function') {
+                    const fixedGroup = createSvgEl('g', { 'class': 'fixed-kitchen-furniture' });
+                    const allFurn = WallService.getFurniture3D();
+                    allFurn.forEach(fn => {
+                        if (fn.isRoomFurniture) return;
+                        if ((fn.zBottom || 0) > 1000) return;
+                        if (!Array.isArray(fn.footprint2D) || fn.footprint2D.length < 3) return;
+                        const pts = fn.footprint2D.map(p => `${toSvgX(p[0])},${p[1]}`).join(' ');
+                        fixedGroup.appendChild(createSvgEl('polygon', {
+                            points: pts,
+                            fill: fn.id === 'KITCHEN_ISLAND' ? 'rgba(226, 232, 240, 0.22)' : 'rgba(217, 119, 6, 0.2)',
+                            stroke: 'rgba(251, 191, 36, 0.45)',
+                            'stroke-width': 10
+                        }));
+                    });
+                    svgEl.appendChild(fixedGroup);
+                }
+
+                // Architectural Walls (Exterior & Internal, mirrored via toSvgX)
+                const wallsGroup = createSvgEl('g', { 'class': 'architectural-walls' });
+                const allSliceWalls = (slice.exteriorWalls || []).concat(slice.internalWalls || []);
+                allSliceWalls.forEach(w => {
+                    const polys = (Array.isArray(w.solidPolygons2D) && w.solidPolygons2D.length > 0)
+                        ? w.solidPolygons2D
+                        : (Array.isArray(w.footprint2D) ? [w.footprint2D] : []);
+                    polys.forEach(poly => {
+                        if (!Array.isArray(poly) || poly.length < 3) return;
+                        const pts = poly.map(p => `${toSvgX(p[0])},${p[1]}`).join(' ');
+                        wallsGroup.appendChild(createSvgEl('polygon', {
+                            points: pts,
+                            fill: w.category === 'exterior' ? '#334155' : '#475569',
+                            stroke: '#94a3b8',
+                            'stroke-width': 10
+                        }));
+                    });
+
+                    // Windows
+                    (w.openings2D || []).forEach(op => {
+                        if (op.kind !== 'window' || !Array.isArray(op.polygon2D)) return;
+                        const pts = op.polygon2D.map(p => `${toSvgX(p[0])},${p[1]}`).join(' ');
+                        wallsGroup.appendChild(createSvgEl('polygon', {
+                            points: pts,
+                            fill: 'rgba(56, 189, 248, 0.28)',
+                            stroke: '#38bdf8',
+                            'stroke-width': 10
+                        }));
+                    });
+                });
+                svgEl.appendChild(wallsGroup);
+
+                // Placed Movable Room Furniture
+                const furnitureList = RoomFurnitureStore.getByFloor(state.activeFloor);
+                const furnGroup = createSvgEl('g', { 'class': 'placed-room-furniture' });
+
+                furnitureList.forEach(inst => {
+                    const isSelected = inst.id === state.selectedObjectId;
+
+                    // Wall clearance distance guide lines for selected object
+                    if (isSelected && state.showWallDistances) {
+                        const compiled = RoomFurnitureStore.compileInstance3D(inst);
+                        const roomZone = (ROOM_ZONES[state.activeFloor] || []).find(z => z.id === inst.room) ||
+                            (state.activeFloor === 'ground' ? ROOM_ZONES.ground[0] : ROOM_ZONES.first[0]);
+                        if (compiled && roomZone) {
+                            const guideGroup = createSvgEl('g', { 'class': 'wall-distance-guides' });
+                            // Distance to East wall (roomZone.x0, on the right in SVG)
+                            if (compiled.xMin > roomZone.x0) {
+                                const midY = Math.round((compiled.yMin + compiled.yMax) / 2);
+                                const sxWall = toSvgX(roomZone.x0);
+                                const sxObj = toSvgX(compiled.xMin);
+                                guideGroup.appendChild(createSvgEl('line', {
+                                    x1: sxObj, y1: midY, x2: sxWall, y2: midY,
+                                    stroke: '#10b981', 'stroke-width': 10, 'stroke-dasharray': '24 16'
+                                }));
+                                const tE = createSvgEl('text', {
+                                    x: Math.round((sxWall + sxObj) / 2), y: midY - 35,
+                                    fill: '#34d399', 'font-size': 85, 'font-weight': '700',
+                                    'text-anchor': 'middle', 'font-family': 'JetBrains Mono, monospace'
+                                });
+                                tE.textContent = `${Math.round((compiled.xMin - roomZone.x0) / 10)} cm`;
+                                guideGroup.appendChild(tE);
+                            }
+                            // Distance to North wall (roomZone.y0, on top in SVG)
+                            if (compiled.yMin > roomZone.y0) {
+                                const midSvgX = toSvgX(Math.round((compiled.xMin + compiled.xMax) / 2));
+                                guideGroup.appendChild(createSvgEl('line', {
+                                    x1: midSvgX, y1: roomZone.y0, x2: midSvgX, y2: compiled.yMin,
+                                    stroke: '#10b981', 'stroke-width': 10, 'stroke-dasharray': '24 16'
+                                }));
+                                const tN = createSvgEl('text', {
+                                    x: midSvgX + 120, y: Math.round((roomZone.y0 + compiled.yMin) / 2),
+                                    fill: '#34d399', 'font-size': 85, 'font-weight': '700',
+                                    'text-anchor': 'start', 'font-family': 'JetBrains Mono, monospace'
+                                });
+                                tN.textContent = `${Math.round((compiled.yMin - roomZone.y0) / 10)} cm`;
+                                guideGroup.appendChild(tN);
+                            }
+                            furnGroup.appendChild(guideGroup);
+                        }
+                    }
+
+                    furnGroup.appendChild(renderFurnitureTopDown2D(inst, isSelected));
+                });
+
+                svgEl.appendChild(furnGroup);
+            }
+
+            // -----------------------------------------------------------------
+            // 4. Render Left Placed Items List
+            // -----------------------------------------------------------------
+            function renderPlacedList() {
+                const items = RoomFurnitureStore.getByFloor(state.activeFloor);
+                placedCountPill.textContent = `${items.length} ${items.length === 1 ? 'item' : 'items'}`;
+                placedListEl.replaceChildren();
+
+                if (items.length === 0) {
+                    const empty = document.createElement('div');
+                    empty.className = 'catalog-preview';
+                    empty.textContent = 'No furniture placed on this floor yet. Select a model above and click "Put on Floor".';
+                    placedListEl.appendChild(empty);
+                    return;
+                }
+
+                items.forEach(inst => {
+                    const row = document.createElement('div');
+                    row.className = 'placed-item' + (inst.id === state.selectedObjectId ? ' selected' : '');
+
+                    const left = document.createElement('div');
+                    left.className = 'placed-item-left';
+
+                    const dot = document.createElement('span');
+                    dot.className = 'color-dot';
+                    const mainCol = inst.properties.upholsteryColor || inst.properties.topColor || inst.properties.bodyColor || '#EFEAE1';
+                    dot.style.backgroundColor = RoomFurnitureStore.sanitizeHexColor(mainCol, '#EFEAE1');
+                    left.appendChild(dot);
+
+                    const textWrap = document.createElement('div');
+                    textWrap.style.minWidth = '0';
+
+                    const title = document.createElement('div');
+                    title.className = 'placed-item-title';
+                    title.textContent = inst.name;
+                    textWrap.appendChild(title);
+
+                    const sub = document.createElement('div');
+                    sub.className = 'placed-item-sub';
+                    sub.textContent = `${inst.room} • (${Math.round(inst.x / 10)}, ${Math.round(inst.y / 10)} cm) • ${Math.round(inst.rotation)}°`;
+                    textWrap.appendChild(sub);
+
+                    left.appendChild(textWrap);
+                    row.appendChild(left);
+
+                    row.addEventListener('click', () => {
+                        state.selectedObjectId = inst.id;
+                        renderAll();
+                    });
+
+                    placedListEl.appendChild(row);
+                });
+            }
+
+            // -----------------------------------------------------------------
+            // 5. Render Right Dynamic Object Properties Inspector
+            // -----------------------------------------------------------------
+            function renderPropertiesInspector() {
+                inspectorPanel.replaceChildren();
+
+                const inst = RoomFurnitureStore.get(state.selectedObjectId);
+                if (!inst) {
+                    const emptySec = document.createElement('div');
+                    emptySec.className = 'panel-section';
+                    const hdr = document.createElement('div');
+                    hdr.className = 'section-header';
+                    hdr.textContent = 'Object Properties Inspector';
+                    const msg = document.createElement('div');
+                    msg.className = 'catalog-preview';
+                    msg.textContent = 'Click any furniture object on the 2D floor map (or in the list on the left) to inspect and customize its properties, position, and rotation angle.';
+                    emptySec.appendChild(hdr);
+                    emptySec.appendChild(msg);
+                    inspectorPanel.appendChild(emptySec);
+                    return;
+                }
+
+                const spec = RoomFurnitureStore.getCatalogType(inst.typeId);
+
+                // Section A: Object Identity & Type Badge
+                const secIdentity = document.createElement('div');
+                secIdentity.className = 'panel-section';
+
+                const idHeader = document.createElement('div');
+                idHeader.className = 'section-header';
+                const idTitle = document.createElement('span');
+                idTitle.textContent = `Selected: ${inst.id}`;
+                const typeBadge = document.createElement('span');
+                typeBadge.className = 'tech-pill';
+                typeBadge.textContent = spec ? spec.categoryLabel : 'Furniture';
+                idHeader.appendChild(idTitle);
+                idHeader.appendChild(typeBadge);
+                secIdentity.appendChild(idHeader);
+
+                const nameLabel = document.createElement('label');
+                nameLabel.className = 'form-label';
+                nameLabel.textContent = 'Object Label / Name:';
+                const nameInput = document.createElement('input');
+                nameInput.type = 'text';
+                nameInput.className = 'text-input';
+                nameInput.value = inst.name;
+                nameInput.addEventListener('change', () => {
+                    RoomFurnitureStore.update(inst.id, { name: nameInput.value });
+                    renderAll();
+                });
+                secIdentity.appendChild(nameLabel);
+                secIdentity.appendChild(nameInput);
+
+                const roomRow = document.createElement('div');
+                roomRow.className = 'spec-row';
+                const rk = document.createElement('span');
+                rk.className = 'spec-key';
+                rk.textContent = 'Current Room Zone:';
+                const rv = document.createElement('span');
+                rv.className = 'spec-val';
+                rv.textContent = inst.room;
+                roomRow.appendChild(rk);
+                roomRow.appendChild(rv);
+                secIdentity.appendChild(roomRow);
+
+                inspectorPanel.appendChild(secIdentity);
+
+                // Section B: Type-Specific Properties (Varies by Object Type!)
+                if (spec && Array.isArray(spec.propertiesSchema) && spec.propertiesSchema.length > 0) {
+                    const secProps = document.createElement('div');
+                    secProps.className = 'panel-section';
+
+                    const propHeader = document.createElement('div');
+                    propHeader.className = 'section-header';
+                    const propTitle = document.createElement('span');
+                    propTitle.textContent = `${spec.categoryLabel} Properties`;
+                    const schemaPill = document.createElement('span');
+                    schemaPill.className = 'tech-pill blue';
+                    schemaPill.textContent = spec.shortName;
+                    propHeader.appendChild(propTitle);
+                    propHeader.appendChild(schemaPill);
+                    secProps.appendChild(propHeader);
+
+                    spec.propertiesSchema.forEach(field => {
+                        const currentVal = (inst.properties && inst.properties[field.key] !== undefined)
+                            ? inst.properties[field.key]
+                            : field.default;
+
+                        const fieldWrap = document.createElement('div');
+                        fieldWrap.style.display = 'flex';
+                        fieldWrap.style.flexDirection = 'column';
+                        fieldWrap.style.gap = '6px';
+                        fieldWrap.style.marginTop = '4px';
+
+                        const lbl = document.createElement('div');
+                        lbl.className = 'form-label';
+                        const lblName = document.createElement('span');
+                        lblName.textContent = field.label;
+                        const lblVal = document.createElement('span');
+                        lblVal.style.fontFamily = 'JetBrains Mono, monospace';
+                        lblVal.style.fontSize = '11px';
+                        lblVal.style.color = '#38bdf8';
+                        lblVal.textContent = String(currentVal);
+                        lbl.appendChild(lblName);
+                        lbl.appendChild(lblVal);
+                        fieldWrap.appendChild(lbl);
+
+                        if (field.type === 'color_swatches') {
+                            const grid = document.createElement('div');
+                            grid.className = 'swatch-grid';
+                            (field.swatches || []).forEach(sw => {
+                                const btn = document.createElement('button');
+                                btn.type = 'button';
+                                btn.className = 'swatch-btn' + (String(currentVal).toUpperCase() === sw.value.toUpperCase() ? ' active' : '');
+                                btn.style.backgroundColor = sw.value;
+                                btn.title = `${sw.label} (${sw.value})`;
+                                btn.addEventListener('click', () => {
+                                    RoomFurnitureStore.update(inst.id, {
+                                        properties: { [field.key]: sw.value }
+                                    });
+                                    renderAll();
+                                });
+                                grid.appendChild(btn);
+                            });
+                            fieldWrap.appendChild(grid);
+
+                            const customRow = document.createElement('div');
+                            customRow.className = 'custom-color-row';
+                            const customLbl = document.createElement('span');
+                            customLbl.style.fontSize = '11px';
+                            customLbl.style.color = '#94a3b8';
+                            customLbl.textContent = 'Custom Upholstery / Finish Color:';
+                            const colorInput = document.createElement('input');
+                            colorInput.type = 'color';
+                            colorInput.className = 'color-picker-input';
+                            colorInput.value = RoomFurnitureStore.sanitizeHexColor(currentVal, field.default);
+                            colorInput.addEventListener('input', () => {
+                                RoomFurnitureStore.update(inst.id, {
+                                    properties: { [field.key]: colorInput.value }
+                                });
+                                renderFloorMap();
+                                renderPlacedList();
+                                lblVal.textContent = colorInput.value.toUpperCase();
+                            });
+                            colorInput.addEventListener('change', () => {
+                                renderAll();
+                            });
+                            customRow.appendChild(customLbl);
+                            customRow.appendChild(colorInput);
+                            fieldWrap.appendChild(customRow);
+                        } else if (field.type === 'select' && Array.isArray(field.options)) {
+                            const sel = document.createElement('select');
+                            sel.className = 'select-input';
+                            field.options.forEach(o => {
+                                const opt = document.createElement('option');
+                                opt.value = o.value;
+                                opt.textContent = o.label;
+                                if (o.value === currentVal) opt.selected = true;
+                                sel.appendChild(opt);
+                            });
+                            sel.addEventListener('change', () => {
+                                RoomFurnitureStore.update(inst.id, {
+                                    properties: { [field.key]: sel.value }
+                                });
+                                renderAll();
+                            });
+                            fieldWrap.appendChild(sel);
+                        }
+
+                        secProps.appendChild(fieldWrap);
+                    });
+
+                    inspectorPanel.appendChild(secProps);
+                }
+
+                // Section C: Position (X, Y) & Free Rotation Angle (0°..360°)
+                const secTransform = document.createElement('div');
+                secTransform.className = 'panel-section';
+
+                const trHeader = document.createElement('div');
+                trHeader.className = 'section-header';
+                const trTitle = document.createElement('span');
+                trTitle.textContent = 'Position & Rotation (Any Angle)';
+                trHeader.appendChild(trTitle);
+                secTransform.appendChild(trHeader);
+
+                const coordGrid = document.createElement('div');
+                coordGrid.className = 'coord-grid';
+
+                // X Input (cm)
+                const xWrap = document.createElement('div');
+                const xLbl = document.createElement('label');
+                xLbl.className = 'form-label';
+                xLbl.textContent = 'Center X (cm):';
+                const xInput = document.createElement('input');
+                xInput.type = 'number';
+                xInput.className = 'num-input';
+                xInput.step = '1';
+                xInput.value = String(Math.round(inst.x / 10));
+                xInput.addEventListener('change', () => {
+                    const newX = Math.round(Number(xInput.value) * 10);
+                    RoomFurnitureStore.update(inst.id, {
+                        x: newX,
+                        room: detectRoomName(inst.floor, newX, inst.y)
+                    });
+                    renderAll();
+                });
+                xWrap.appendChild(xLbl);
+                xWrap.appendChild(xInput);
+
+                // Y Input (cm)
+                const yWrap = document.createElement('div');
+                const yLbl = document.createElement('label');
+                yLbl.className = 'form-label';
+                yLbl.textContent = 'Center Y (cm):';
+                const yInput = document.createElement('input');
+                yInput.type = 'number';
+                yInput.className = 'num-input';
+                yInput.step = '1';
+                yInput.value = String(Math.round(inst.y / 10));
+                yInput.addEventListener('change', () => {
+                    const newY = Math.round(Number(yInput.value) * 10);
+                    RoomFurnitureStore.update(inst.id, {
+                        y: newY,
+                        room: detectRoomName(inst.floor, inst.x, newY)
+                    });
+                    renderAll();
+                });
+                yWrap.appendChild(yLbl);
+                yWrap.appendChild(yInput);
+
+                coordGrid.appendChild(xWrap);
+                coordGrid.appendChild(yWrap);
+                secTransform.appendChild(coordGrid);
+
+                // Continuous Rotation Slider + Degree Input
+                const rotLabel = document.createElement('div');
+                rotLabel.className = 'form-label';
+                const rotLabelTxt = document.createElement('span');
+                rotLabelTxt.textContent = 'Rotation Angle (0° – 360°):';
+                const rotValSpan = document.createElement('span');
+                rotValSpan.style.fontFamily = 'JetBrains Mono, monospace';
+                rotValSpan.style.color = '#38bdf8';
+                rotValSpan.textContent = `${inst.rotation}°`;
+                rotLabel.appendChild(rotLabelTxt);
+                rotLabel.appendChild(rotValSpan);
+                secTransform.appendChild(rotLabel);
+
+                const rotControlRow = document.createElement('div');
+                rotControlRow.style.display = 'grid';
+                rotControlRow.style.gridTemplateColumns = '1fr 78px';
+                rotControlRow.style.gap = '8px';
+                rotControlRow.style.alignItems = 'center';
+
+                const rotSlider = document.createElement('input');
+                rotSlider.type = 'range';
+                rotSlider.min = '0';
+                rotSlider.max = '360';
+                rotSlider.step = '1';
+                rotSlider.value = String(Math.round(inst.rotation));
+
+                const rotNum = document.createElement('input');
+                rotNum.type = 'number';
+                rotNum.className = 'num-input';
+                rotNum.min = '0';
+                rotNum.max = '360';
+                rotNum.step = '1';
+                rotNum.value = String(inst.rotation);
+
+                rotSlider.addEventListener('input', () => {
+                    const deg = Number(rotSlider.value);
+                    rotNum.value = String(deg);
+                    rotValSpan.textContent = `${deg}°`;
+                    RoomFurnitureStore.update(inst.id, { rotation: deg });
+                    renderFloorMap();
+                    renderPlacedList();
+                });
+
+                rotNum.addEventListener('change', () => {
+                    const deg = RoomFurnitureStore.normalizeAngleDeg(rotNum.value);
+                    rotSlider.value = String(Math.round(deg));
+                    rotNum.value = String(deg);
+                    rotValSpan.textContent = `${deg}°`;
+                    RoomFurnitureStore.update(inst.id, { rotation: deg });
+                    renderAll();
+                });
+
+                rotControlRow.appendChild(rotSlider);
+                rotControlRow.appendChild(rotNum);
+                secTransform.appendChild(rotControlRow);
+
+                // Quick Angle Buttons
+                const angleGrid = document.createElement('div');
+                angleGrid.className = 'angle-presets';
+                [0, 45, 90, 135, 180, 225, 270, 315].forEach(deg => {
+                    const ab = document.createElement('button');
+                    ab.type = 'button';
+                    ab.className = 'angle-btn';
+                    ab.textContent = `${deg}°`;
+                    ab.addEventListener('click', () => {
+                        RoomFurnitureStore.update(inst.id, { rotation: deg });
+                        renderAll();
+                    });
+                    angleGrid.appendChild(ab);
+                });
+                secTransform.appendChild(angleGrid);
+
+                inspectorPanel.appendChild(secTransform);
+
+                // Section D: Attached Specification Plan Dimensions Breakdown (for Corner Sofa)
+                if (inst.typeId === 'corner_sofa_l226' && spec && spec.dimensionsMm) {
+                    const secSpec = document.createElement('div');
+                    secSpec.className = 'panel-section';
+                    const spHdr = document.createElement('div');
+                    spHdr.className = 'section-header';
+                    spHdr.textContent = 'Specification Plan Dimensions';
+                    secSpec.appendChild(spHdr);
+
+                    const table = document.createElement('div');
+                    table.className = 'spec-table';
+                    const rows = [
+                        ['Outer Wing Lengths', inst.properties.wingVariant === '226x260' ? '226 × 260 cm' : (inst.properties.wingVariant === '260x226' ? '260 × 226 cm' : '226 × 226 cm')],
+                        ['Total Height / Seat Height', '81 cm / 43 cm'],
+                        ['Feet Height', '6.5 cm'],
+                        ['Wing Total Depth / Seat Depth', '71 cm / 52 cm'],
+                        ['Backrest Zone Depth', '19 cm'],
+                        ['Armrests (W × D × H)', '9 × 68 × 63 cm'],
+                        ['Seat Modules (4× + Corner)', '70 × 52 cm'],
+                        ['Backrest Cushions', '68 × 44 cm'],
+                        ['Side Arm Cushions (2×)', '65 × 44 cm'],
+                        ['Square Throw Pillows (3×)', '40 × 40 cm']
+                    ];
+                    rows.forEach(pair => {
+                        const r = document.createElement('div');
+                        r.className = 'spec-row';
+                        const k = document.createElement('span');
+                        k.className = 'spec-key';
+                        k.textContent = pair[0];
+                        const v = document.createElement('span');
+                        v.className = 'spec-val';
+                        v.textContent = pair[1];
+                        r.appendChild(k);
+                        r.appendChild(v);
+                        table.appendChild(r);
+                    });
+                    secSpec.appendChild(table);
+                    inspectorPanel.appendChild(secSpec);
+                }
+
+                // Section E: Duplicate & Delete Actions
+                const secActions = document.createElement('div');
+                secActions.className = 'panel-section';
+                const actRow = document.createElement('div');
+                actRow.className = 'btn-row';
+
+                const btnDup = document.createElement('button');
+                btnDup.type = 'button';
+                btnDup.className = 'btn';
+                btnDup.textContent = '📋 Duplicate';
+                btnDup.addEventListener('click', () => {
+                    const copy = RoomFurnitureStore.duplicate(inst.id);
+                    if (copy) {
+                        state.selectedObjectId = copy.id;
+                        renderAll();
+                    }
+                });
+
+                const btnDel = document.createElement('button');
+                btnDel.type = 'button';
+                btnDel.className = 'btn danger';
+                btnDel.textContent = '🗑️ Delete';
+                btnDel.addEventListener('click', () => {
+                    RoomFurnitureStore.remove(inst.id);
+                    const remaining = RoomFurnitureStore.getByFloor(state.activeFloor);
+                    state.selectedObjectId = remaining.length > 0 ? remaining[0].id : null;
+                    renderAll();
+                });
+
+                actRow.appendChild(btnDup);
+                actRow.appendChild(btnDel);
+                secActions.appendChild(actRow);
+                inspectorPanel.appendChild(secActions);
+            }
+
+            function renderAll() {
+                renderFloorMap();
+                renderPlacedList();
+                renderPropertiesInspector();
+            }
+
+            // -----------------------------------------------------------------
+            // 6. Interactive SVG Mouse Drag-and-Drop, Free Rotation & Pan/Zoom
+            // -----------------------------------------------------------------
+            svgEl.addEventListener('mousedown', (e) => {
+                const svgPt = clientToSvgPoint(e.clientX, e.clientY);
+                const worldX = fromSvgX(svgPt.x);
+                const worldY = svgPt.y;
+
+                // Click-to-place mode
+                if (state.placingMode) {
+                    const added = RoomFurnitureStore.add({
+                        typeId: state.selectedCatalogTypeId,
+                        floor: state.activeFloor,
+                        room: detectRoomName(state.activeFloor, worldX, worldY),
+                        x: worldX,
+                        y: worldY,
+                        rotation: 0
+                    });
+                    if (added) {
+                        state.selectedObjectId = added.id;
+                    }
+                    state.placingMode = false;
+                    btnPlaceOnClick.classList.remove('active-mode');
+                    svgEl.classList.remove('placing-cursor');
+                    renderAll();
+                    return;
+                }
+
+                // Check if user clicked on the rotation handle (↻)
+                const rotHandle = e.target.closest ? e.target.closest('.rotation-handle') : null;
+                if (rotHandle) {
+                    const objId = rotHandle.getAttribute('data-id');
+                    const inst = RoomFurnitureStore.get(objId);
+                    if (inst) {
+                        state.selectedObjectId = objId;
+                        state.interaction = {
+                            type: 'rotate',
+                            id: objId,
+                            svgCenterX: toSvgX(inst.x),
+                            svgCenterY: inst.y
+                        };
+                        e.stopPropagation();
+                        e.preventDefault();
+                        return;
+                    }
+                }
+
+                // Check if user clicked on a furniture object to select & drag-move it
+                const furnNode = e.target.closest ? e.target.closest('.furniture-node') : null;
+                if (furnNode) {
+                    const objId = furnNode.getAttribute('data-id');
+                    const inst = RoomFurnitureStore.get(objId);
+                    if (inst) {
+                        state.selectedObjectId = objId;
+                        state.interaction = {
+                            type: 'move',
+                            id: objId,
+                            offsetWorldX: worldX - inst.x,
+                            offsetWorldY: worldY - inst.y
+                        };
+                        renderAll();
+                        e.stopPropagation();
+                        e.preventDefault();
+                        return;
+                    }
+                }
+
+                // Otherwise pan the 2D map
+                state.interaction = {
+                    type: 'pan',
+                    startClientX: e.clientX,
+                    startClientY: e.clientY,
+                    startVbX: state.viewBox.x,
+                    startVbY: state.viewBox.y
+                };
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                const svgPt = clientToSvgPoint(e.clientX, e.clientY);
+                const worldX = fromSvgX(svgPt.x);
+                const worldY = svgPt.y;
+                cursorHud.textContent = `Cursor: X = ${Math.round(worldX / 10)} cm (${worldX} mm), Y = ${Math.round(worldY / 10)} cm (${worldY} mm)`;
+
+                if (!state.interaction) return;
+
+                if (state.interaction.type === 'move') {
+                    const newX = Math.round((worldX - state.interaction.offsetWorldX) / 10) * 10;
+                    const newY = Math.round((worldY - state.interaction.offsetWorldY) / 10) * 10;
+                    const room = detectRoomName(state.activeFloor, newX, newY);
+                    RoomFurnitureStore.update(state.interaction.id, {
+                        x: newX,
+                        y: newY,
+                        room: room
+                    });
+                    renderFloorMap();
+                    renderPlacedList();
+                } else if (state.interaction.type === 'rotate') {
+                    const dx = svgPt.x - state.interaction.svgCenterX;
+                    const dy = svgPt.y - state.interaction.svgCenterY;
+                    // Handle is at (0, -1420) in local SVG coords, so 0° corresponds to North (-Y)
+                    let deg = Math.atan2(dx, -dy) * 180 / Math.PI;
+                    if (e.shiftKey) {
+                        deg = Math.round(deg / 15) * 15;
+                    } else {
+                        deg = Math.round(deg);
+                    }
+                    deg = RoomFurnitureStore.normalizeAngleDeg(deg);
+                    RoomFurnitureStore.update(state.interaction.id, { rotation: deg });
+                    renderFloorMap();
+                    renderPlacedList();
+                } else if (state.interaction.type === 'pan') {
+                    const rect = svgEl.getBoundingClientRect();
+                    if (rect.width > 0 && rect.height > 0) {
+                        const scale = Math.max(state.viewBox.w / rect.width, state.viewBox.h / rect.height);
+                        state.viewBox.x = state.interaction.startVbX - (e.clientX - state.interaction.startClientX) * scale;
+                        state.viewBox.y = state.interaction.startVbY - (e.clientY - state.interaction.startClientY) * scale;
+                        updateViewBoxAttr();
+                    }
+                }
+            });
+
+            window.addEventListener('mouseup', () => {
+                if (state.interaction) {
+                    const hadObjEdit = (state.interaction.type === 'move' || state.interaction.type === 'rotate');
+                    state.interaction = null;
+                    if (hadObjEdit) {
+                        renderPropertiesInspector();
+                    }
+                }
+            });
+
+            svgEl.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const zoomFactor = e.deltaY > 0 ? 1.12 : 0.89;
+                const pt = clientToSvgPoint(e.clientX, e.clientY);
+                const newW = Math.min(28000, Math.max(2800, state.viewBox.w * zoomFactor));
+                const newH = Math.min(24000, Math.max(2200, state.viewBox.h * zoomFactor));
+                const ratioX = (pt.x - state.viewBox.x) / state.viewBox.w;
+                const ratioY = (pt.y - state.viewBox.y) / state.viewBox.h;
+                state.viewBox.w = newW;
+                state.viewBox.h = newH;
+                state.viewBox.x = pt.x - ratioX * newW;
+                state.viewBox.y = pt.y - ratioY * newH;
+                updateViewBoxAttr();
+            }, { passive: false });
+
+            // -----------------------------------------------------------------
+            // 7. Floor Tabs, Zoom Presets & Reset
+            // -----------------------------------------------------------------
+            const tabGround = document.getElementById('tab-floor-ground');
+            const tabFirst = document.getElementById('tab-floor-first');
+
+            tabGround.addEventListener('click', () => {
+                state.activeFloor = 'ground';
+                tabGround.classList.add('active');
+                tabFirst.classList.remove('active');
+                const items = RoomFurnitureStore.getByFloor('ground');
+                state.selectedObjectId = items.length > 0 ? items[0].id : null;
+                renderAll();
+            });
+
+            tabFirst.addEventListener('click', () => {
+                state.activeFloor = 'first';
+                tabFirst.classList.add('active');
+                tabGround.classList.remove('active');
+                const items = RoomFurnitureStore.getByFloor('first');
+                state.selectedObjectId = items.length > 0 ? items[0].id : null;
+                renderAll();
+            });
+
+            document.getElementById('btn-zoom-living').addEventListener('click', () => {
+                state.activeFloor = 'ground';
+                tabGround.classList.add('active');
+                tabFirst.classList.remove('active');
+                state.viewBox = { x: 7620, y: 2700, w: 13200, h: 9200 };
+                renderAll();
+            });
+
+            document.getElementById('btn-zoom-full').addEventListener('click', () => {
+                state.viewBox = { x: -800, y: -600, w: 22200, h: 22200 };
+                updateViewBoxAttr();
+            });
+
+            document.getElementById('btn-reset-defaults').addEventListener('click', () => {
+                RoomFurnitureStore.resetToDefaults();
+                state.activeFloor = 'ground';
+                tabGround.classList.add('active');
+                tabFirst.classList.remove('active');
+                state.selectedObjectId = 'SOFA_LIVING_1';
+                state.viewBox = { x: 7620, y: 2700, w: 13200, h: 9200 };
+                renderAll();
+            });
+
+            document.getElementById('toggle-wall-distances').addEventListener('change', (e) => {
+                state.showWallDistances = e.target.checked;
+                renderFloorMap();
+            });
+
+            document.getElementById('toggle-fixed-cabinets').addEventListener('change', (e) => {
+                state.showFixedCabinets = e.target.checked;
+                renderFloorMap();
+            });
+
+            // Initialize Page
+            initCatalogDropdown();
+            const initialItems = RoomFurnitureStore.getByFloor('ground');
+            if (initialItems.length > 0 && !RoomFurnitureStore.get(state.selectedObjectId)) {
+                state.selectedObjectId = initialItems[0].id;
+            }
+            renderAll();
+        })();
+    </script>
+</body>
+
+</html>

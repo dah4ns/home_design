@@ -537,9 +537,10 @@
     <div class="brand-pill">
       <a href="index.html" class="back-link">← Dashboard</a>
       <a href="building_3d.html" class="back-link" style="background: rgba(245,158,11,0.14); border-color: rgba(245,158,11,0.3); color: #fcd34d;">3D Orbit</a>
+      <a href="furniture_layout.html" class="back-link" style="background: rgba(16,185,129,0.15); border-color: rgba(16,185,129,0.35); color: #6ee7b7;">🛋️ 2D Furniture</a>
       <div class="title-group">
         <h1>3D Walkthrough &amp; Interior Explorer</h1>
-        <p>Full Facade + Interior + 3D Kitchen &amp; Dining Furniture + See-Through Windows</p>
+        <p>Full Facade + Interior + 3D Kitchen, Dining &amp; Living Room Furniture</p>
       </div>
     </div>
 
@@ -701,6 +702,9 @@
   <script src="data/walls.js"></script>
   <script src="data/windows.js"></script>
   <script src="data/furniture.js"></script>
+  <script src="data/room_furniture.js"></script>
+  <script src="js/persistence.js"></script>
+  <script src="js/room-furniture-store.js"></script>
   <script src="js/wall-service.js"></script>
 
   <script>
@@ -769,7 +773,7 @@
       var GROUND_PRESETS = [
         { id: 'gf_vestibule', label: '0.04 Wiatrołap', x: 17800, y: 9770, footZ: 0, yaw: Math.PI, pitch: -0.02 },
         { id: 'gf_hall_stairs', label: '0.07 Hall & Stairs', x: 15675, y: 10350, footZ: 0, yaw: -1.85, pitch: 0.02 },
-        { id: 'gf_living', label: '0.11 Salon (Living)', x: 2800, y: 9200, footZ: 0, yaw: -0.45, pitch: 0.05 },
+        { id: 'gf_living', label: '0.11 Salon (Living)', x: 5250, y: 10350, footZ: 0, yaw: -2.42, pitch: -0.10 },
         { id: 'gf_dining', label: '0.12 Jadalnia', x: 8650, y: 8900, footZ: 0, yaw: -0.58, pitch: -0.04 },
         { id: 'gf_kitchen', label: '0.13 Kuchnia', x: 7100, y: 5050, footZ: 0, yaw: -0.22, pitch: -0.12 },
         { id: 'gf_study', label: '0.15 Gabinet (NE)', x: 2100, y: 4600, footZ: 0, yaw: -1.25, pitch: 0.0 },
@@ -2276,14 +2280,16 @@
         var bFurnLinesFrontWood = createBuilder();
         var bFurnLinesFrontMetal = createBuilder();
 
-        // Inset furniture vertices 1.5 mm away from room walls/floor so back/side/bottom panels never Z-fight
-        function adjustFurnPt(pt, furnNormal, isFront) {
+        // Inset fixed kitchen furniture vertices 1.5 mm away from room walls/floor so back/side/bottom panels never Z-fight
+        function adjustFurnPt(pt, furnNormal, isFront, isRoomFurniture) {
           var x = pt[0], y = pt[1], z = pt[2];
-          if (y <= 3171.5) y = 3171.5;
-          if (x >= 11913.5) x = 11913.5;
-          if (x <= 6516.5 && y <= 6300) x = 6516.5;
+          if (!isRoomFurniture) {
+            if (y <= 3171.5) y = 3171.5;
+            if (x >= 11913.5) x = 11913.5;
+            if (x <= 6516.5 && y <= 6300) x = 6516.5;
+          }
           if (z <= 1.5) z = 1.5;
-          if (isFront && furnNormal) {
+          if (isFront && furnNormal && !isRoomFurniture) {
             x += (furnNormal[0] || 0) * 0.6;
             y += (furnNormal[1] || 0) * 0.6;
             z += (furnNormal[2] || 0) * 0.6;
@@ -2298,10 +2304,10 @@
           );
         }
 
-        function addFurnFaceLoop(b, loop3D, faceNormal, vertexNormals3D, furnNormal, isFront, lineBuilder) {
+        function addFurnFaceLoop(b, loop3D, faceNormal, vertexNormals3D, furnNormal, isFront, lineBuilder, isRoomFurniture) {
           if (!loop3D || loop3D.length < 3) return;
           var adj = loop3D.map(function (pt) {
-            return adjustFurnPt(pt, furnNormal, isFront);
+            return adjustFurnPt(pt, furnNormal, isFront, isRoomFurniture);
           });
           var fn = faceNormal || computeFaceNormal(adj[0], adj[1], adj[2]);
           var hasVN = Array.isArray(vertexNormals3D) && vertexNormals3D.length === adj.length;
@@ -2325,9 +2331,16 @@
           }
         }
 
-        function processFurniturePart(part, furnNormal, isFront) {
+        function processFurniturePart(part, furnNormal, isFront, isRoomFurniture) {
           var rgb = part.colorRgb || (isFront ? [0.63, 0.48, 0.38] : [0.76, 0.60, 0.42]);
           var role = part.role || '';
+          var isUpholstery = (
+            role === 'sofa_cushion' ||
+            role === 'sofa_base' ||
+            role === 'sofa_pillow' ||
+            role === 'sofa_foot'
+          );
+          var effectiveFront = isUpholstery ? false : isFront;
 
           // Translucent vitrine glass doors go to the back-to-front sorted glass pass
           if (role === 'vitrine_glass') {
@@ -2335,7 +2348,7 @@
               var lp = face.loop3D;
               if (!lp || lp.length < 3) return;
               var bGlass = createBuilder();
-              addFurnFaceLoop(bGlass, lp, face.normal || [-1, 0, 0], face.vertexNormals3D, furnNormal, true, bFurnLinesFrontMetal);
+              addFurnFaceLoop(bGlass, lp, face.normal || [-1, 0, 0], face.vertexNormals3D, furnNormal, true, bFurnLinesFrontMetal, isRoomFurniture);
               var cx = 0, cy = 0, cz = 0;
               for (var k = 0; k < lp.length; k++) {
                 cx += lp[k][0];
@@ -2365,7 +2378,7 @@
           );
 
           var colorKey =
-            (isFront ? 'F_' : 'S_') +
+            (effectiveFront ? 'F_' : 'S_') +
             (isMetallic ? 'M_' : 'P_') +
             Math.round(rgb[0] * 255) + '_' +
             Math.round(rgb[1] * 255) + '_' +
@@ -2375,21 +2388,21 @@
             furnBuckets[colorKey] = {
               builder: createBuilder(),
               color: [rgb[0], rgb[1], rgb[2]],
-              isFront: isFront,
+              isFront: effectiveFront,
               isMetallic: isMetallic
             };
           }
 
-          var lineTarget = isFront
+          var lineTarget = effectiveFront
             ? ((isMetallic || role === 'handle_bar') ? bFurnLinesFrontMetal : bFurnLinesFrontWood)
             : (isMetallic
                 ? bFurnLinesSkeletonMetal
-                : (role === 'countertop_slab' ? bFurnLinesSkeletonStone : bFurnLinesSkeletonWood));
+                : ((role === 'countertop_slab' || isUpholstery) ? bFurnLinesSkeletonStone : bFurnLinesSkeletonWood));
 
           var targetBuilder = furnBuckets[colorKey].builder;
           (part.faces3D || []).forEach(function (face) {
             var lb = face.noWireframe ? null : lineTarget;
-            addFurnFaceLoop(targetBuilder, face.loop3D, face.normal, face.vertexNormals3D, furnNormal, isFront, lb);
+            addFurnFaceLoop(targetBuilder, face.loop3D, face.normal, face.vertexNormals3D, furnNormal, effectiveFront, lb, isRoomFurniture);
           });
 
           if (Array.isArray(part.wireframeLines3D)) {
@@ -2397,8 +2410,8 @@
               for (var i = 0; i + 1 < poly.length; i++) {
                 addFurnLineSeg(
                   lineTarget,
-                  adjustFurnPt(poly[i], furnNormal, isFront),
-                  adjustFurnPt(poly[i + 1], furnNormal, isFront)
+                  adjustFurnPt(poly[i], furnNormal, effectiveFront, isRoomFurniture),
+                  adjustFurnPt(poly[i + 1], furnNormal, effectiveFront, isRoomFurniture)
                 );
               }
             });
@@ -2407,11 +2420,12 @@
 
         furnList.forEach(function (furn) {
           var fn = furn.normal || [0, 1, 0];
+          var isRoomFurn = !!furn.isRoomFurniture;
           (furn.skeletonParts3D || []).forEach(function (part) {
-            processFurniturePart(part, fn, false);
+            processFurniturePart(part, fn, false, isRoomFurn);
           });
           (furn.frontParts3D || []).forEach(function (part) {
-            processFurniturePart(part, fn, true);
+            processFurniturePart(part, fn, true, isRoomFurn);
           });
         });
 
@@ -2556,9 +2570,27 @@
         gBoxes.push({ x0: 11910, x1: 15175, y0: 9310, y1: 9380, wallId: 'STAIR_BALUSTRADE_GF' });
         gBoxes.push({ x0: 15135, x1: 15175, y0: 9370, y1: 9640, wallId: 'STAIR_TURN_CHEEK_GF' });
 
-        // Floor-standing kitchen & dining room cabinets block walking when showFurniture is ON
+        // Floor-standing kitchen, dining & living room furniture block walking when showFurniture is ON
         if (showFurniture && Array.isArray(furnitureItems3D)) {
           furnitureItems3D.forEach(function (furn) {
+            if (furn.isRoomFurniture) {
+              if (furn.floor === 'first') return;
+              // Use individual base part bounds so L-shaped corner sofas keep their inner seating space walkable
+              (furn.skeletonParts3D || []).forEach(function (part) {
+                if (part.role === 'sofa_foot') return;
+                if (part.x0 !== undefined && part.x1 !== undefined) {
+                  gBoxes.push({
+                    x0: part.x0,
+                    x1: part.x1,
+                    y0: part.y0,
+                    y1: part.y1,
+                    wallId: furn.id,
+                    isFurniture: true
+                  });
+                }
+              });
+              return;
+            }
             if ((furn.zBottom || 0) < 400 && furn.xMin !== undefined && furn.xMax !== undefined) {
               gBoxes.push({
                 x0: furn.xMin,
@@ -2577,6 +2609,25 @@
         var uBoxes = [];
         addWallBoxes(uBoxes, ufSlice.exteriorWalls, true);
         addWallBoxes(uBoxes, ufSlice.internalWalls, false);
+        if (showFurniture && Array.isArray(furnitureItems3D)) {
+          furnitureItems3D.forEach(function (furn) {
+            if (furn.isRoomFurniture && furn.floor === 'first') {
+              (furn.skeletonParts3D || []).forEach(function (part) {
+                if (part.role === 'sofa_foot') return;
+                if (part.x0 !== undefined && part.x1 !== undefined) {
+                  uBoxes.push({
+                    x0: part.x0,
+                    x1: part.x1,
+                    y0: part.y0,
+                    y1: part.y1,
+                    wallId: furn.id,
+                    isFurniture: true
+                  });
+                }
+              });
+            }
+          });
+        }
         // Upper Floor guardrails around Stairwell (X = 11,910..15,535, Y = 8,360..9,370) and High Hall void (X = 10,695..15,535, Y = 9,370..11,200)
         // Leaves only the East stair landing (X = 11,910, Y = 8,360..9,370) open so user walks smoothly onto the stairs!
         uBoxes.push({ x0: 11910, x1: 15555, y0: 8300, y1: 8365, wallId: 'UPPER_STAIRWELL_NORTH_GUARD' });
@@ -2587,6 +2638,13 @@
       }
 
       buildCollisionSegments();
+
+      if (typeof RoomFurnitureStore !== 'undefined' && typeof RoomFurnitureStore.subscribe === 'function') {
+        RoomFurnitureStore.subscribe(function () {
+          buildSceneMeshes();
+          buildCollisionSegments();
+        });
+      }
 
       var UPPER_FLOOR_POLY = [
         [20325, 3170],
@@ -3266,11 +3324,13 @@
           mmCtx.restore();
         }
 
-        // Ground Floor 3D Furniture & Fixtures overlay on Mini-Map
-        if (minimapFloor === 0 && showFurniture && Array.isArray(furnitureItems3D)) {
+        // 3D Furniture & Fixtures overlay on Mini-Map
+        if (showFurniture && Array.isArray(furnitureItems3D)) {
           mmCtx.save();
           furnitureItems3D.forEach(function (furn) {
-            if ((furn.zBottom || 0) > 1000) return; // Skip upper wall cabinets so base footprints are clear
+            var furnFloorIdx = (furn.floor === 'first') ? 1 : 0;
+            if (furnFloorIdx !== minimapFloor) return;
+            if (!furn.isRoomFurniture && (furn.zBottom || 0) > 1000) return; // Skip upper wall cabinets so base footprints are clear
             var fp = furn.footprint2D;
             if (Array.isArray(fp) && fp.length >= 3) {
               mmCtx.beginPath();
@@ -3280,7 +3340,10 @@
                 else mmCtx.lineTo(fpt[0], fpt[1]);
               }
               mmCtx.closePath();
-              if (furn.id === 'KITCHEN_SINK_N2') {
+              if (furn.isRoomFurniture) {
+                mmCtx.fillStyle = furn.carcassColorHex || 'rgba(239, 234, 225, 0.72)';
+                mmCtx.strokeStyle = 'rgba(56, 189, 248, 0.85)';
+              } else if (furn.id === 'KITCHEN_SINK_N2') {
                 mmCtx.fillStyle = 'rgba(148, 163, 184, 0.75)';
                 mmCtx.strokeStyle = 'rgba(226, 232, 240, 0.9)';
               } else if (furn.id === 'KITCHEN_COUNTERTOP') {
