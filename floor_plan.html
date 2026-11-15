@@ -4677,6 +4677,149 @@
                 stairG.appendChild(balTextEl);
 
                 group.appendChild(stairG);
+
+                // 1b. 2D Orthographic Projection of 3D Basement Staircase in 0.14 Spiżarnia (STAIRS_BASEMENT: 13 × 19,46 × 21,5 cm)
+                if (floor === 'ground') {
+                    const projB = WallService.projectStairTo2DPlan('STAIRS_BASEMENT', { floor });
+                    if (projB && projB.stair3D) {
+                        const isBaseStairSelected = Boolean(
+                            planState.selectedItem &&
+                            planState.selectedItem.kind === 'staircase' &&
+                            planState.selectedItem.id === projB.stair3D.id
+                        );
+
+                        const baseStairG = svgEl('g', {
+                            'data-stair-id': projB.stair3D.id,
+                            style: 'cursor: pointer;'
+                        });
+                        baseStairG.addEventListener('click', (e) => {
+                            if (planState.activeTool !== 'select') return;
+                            e.stopPropagation();
+                            selectStaircase(floor, projB.stair3D.id);
+                        });
+
+                        const bFillSolid = isBaseStairSelected ? 'rgba(14, 165, 233, 0.24)' : 'rgba(217, 119, 6, 0.16)';
+                        const bFillWinder = isBaseStairSelected ? 'rgba(56, 189, 248, 0.28)' : 'rgba(245, 158, 11, 0.21)';
+                        const bStrokeMain = isBaseStairSelected ? '#38bdf8' : '#f59e0b';
+                        const bStrokeRiser = isBaseStairSelected ? '#7dd3fc' : '#fbbf24';
+
+                        // A. L-shaped stairwell opening polygon in FLOOR_LOWER (0.14 Spiżarnia)
+                        baseStairG.appendChild(svgEl('polygon', {
+                            points: polyToPointsAttr(projB.groundSolidStraightPolygon2D),
+                            fill: bFillSolid,
+                            stroke: bStrokeMain,
+                            'stroke-width': isBaseStairSelected ? 18 : 13
+                        }));
+
+                        // B. Treads (Steps 1..6 lower straight + Steps 7..10 winder turn + Steps 11..12 upper straight)
+                        projB.solidTreads2D.forEach(t => {
+                            baseStairG.appendChild(svgEl('polygon', {
+                                points: polyToPointsAttr(t.polygon2D),
+                                fill: t.kind === 'winder' ? bFillWinder : bFillSolid,
+                                stroke: bStrokeMain,
+                                'stroke-width': isBaseStairSelected ? 16 : 11,
+                                'stroke-linejoin': 'round'
+                            }));
+                        });
+
+                        // C. 13 Solid Riser Lines (Steps 1..12 + 13th arrival riser at Z = 4,770 mm)
+                        projB.solidRisers2D.forEach(r => {
+                            baseStairG.appendChild(svgEl('line', {
+                                x1: toSvgX(r.p1[0]),
+                                y1: toSvgZ(r.p1[1]),
+                                x2: toSvgX(r.p2[0]),
+                                y2: toSvgZ(r.p2[1]),
+                                stroke: bStrokeRiser,
+                                'stroke-width': r.stepNumber === 13 ? 16 : 12
+                            }));
+                        });
+
+                        // D. Walking Line with Start Circle at East Step 1 (X = 4,205, Z = 5,640) & North Arrow at Top Riser (X = 5,905, Z = 4,770)
+                        const wlB = projB.walkingLine;
+                        if (wlB.solidPoints2D && wlB.solidPoints2D.length >= 2) {
+                            baseStairG.appendChild(svgEl('polyline', {
+                                points: polyToPointsAttr(wlB.solidPoints2D),
+                                fill: 'none',
+                                stroke: '#fef08a',
+                                'stroke-width': 12,
+                                'stroke-linejoin': 'round'
+                            }));
+                        }
+                        baseStairG.appendChild(svgEl('circle', {
+                            cx: toSvgX(wlB.startCircle2D[0]),
+                            cy: toSvgZ(wlB.startCircle2D[1]),
+                            r: 62,
+                            fill: '#0f172a',
+                            stroke: '#fef08a',
+                            'stroke-width': 12
+                        }));
+                        const [bTipX, bTipZ] = wlB.arrowTip2D;
+                        // Arrowhead pointing North (-Z in SVG / building coordinates) at Z = 4,770 mm
+                        baseStairG.appendChild(svgEl('polyline', {
+                            points: polyToPointsAttr([
+                                [bTipX - 90, bTipZ + 145],
+                                [bTipX, bTipZ],
+                                [bTipX + 90, bTipZ + 145]
+                            ]),
+                            fill: 'none',
+                            stroke: '#fef08a',
+                            'stroke-width': 13,
+                            'stroke-linecap': 'round',
+                            'stroke-linejoin': 'round'
+                        }));
+
+                        // E. Step Numbers & CAD Labels ("13×19,46×21,5" and "wejście do piwnicy")
+                        [
+                            { num: '1', x: 4312, z: 5400 },
+                            { num: '6', x: 5387, z: 5400 },
+                            { num: '7', x: 5720, z: 5420 },
+                            { num: '8', x: 6050, z: 5650 },
+                            { num: '9', x: 6050, z: 5920 },
+                            { num: '10', x: 5680, z: 5800 },
+                            { num: '11', x: 5680, z: 5100 },
+                            { num: '12', x: 5680, z: 4880 }
+                        ].forEach(stLbl => {
+                            const tEl = svgEl('text', {
+                                x: toSvgX(stLbl.x),
+                                y: toSvgZ(stLbl.z),
+                                fill: '#fef3c7',
+                                'font-family': 'JetBrains Mono, monospace',
+                                'font-size': 95,
+                                'font-weight': '700',
+                                'text-anchor': 'middle',
+                                'dominant-baseline': 'middle'
+                            });
+                            tEl.textContent = stLbl.num;
+                            baseStairG.appendChild(tEl);
+                        });
+
+                        const bSpecTextEl = svgEl('text', {
+                            x: toSvgX(projB.labels.specPos2D[0]),
+                            y: toSvgZ(projB.labels.specPos2D[1]),
+                            fill: '#fde68a',
+                            'font-family': 'JetBrains Mono, monospace',
+                            'font-size': 115,
+                            'font-weight': '700',
+                            'text-anchor': 'middle'
+                        });
+                        bSpecTextEl.textContent = projB.labels.cadSpec;
+                        baseStairG.appendChild(bSpecTextEl);
+
+                        const bEntryTextEl = svgEl('text', {
+                            x: toSvgX(projB.labels.balustradePos2D[0]),
+                            y: toSvgZ(projB.labels.balustradePos2D[1]),
+                            fill: '#fcd34d',
+                            'font-family': 'Inter, sans-serif',
+                            'font-size': 105,
+                            'font-weight': '600',
+                            'text-anchor': 'middle'
+                        });
+                        bEntryTextEl.textContent = projB.labels.balustrade;
+                        baseStairG.appendChild(bEntryTextEl);
+
+                        group.appendChild(baseStairG);
+                    }
+                }
             }
 
             if (floor === 'first') {
@@ -4959,11 +5102,22 @@
                 if (opEditPanelEl) opEditPanelEl.style.display = 'none';
 
                 const floor = planState.selectedItem.floor || 'ground';
+                const isBasementStair = st.id === 'STAIRS_BASEMENT';
                 pillEl.textContent = `3D B-Rep Winder Staircase (${st.cadSpecLabel})`;
                 titleEl.textContent = st.name;
                 subEl.textContent = `${floor === 'ground' ? 'Lower Floor (A.02 Parter)' : 'Upper Floor (A.03 Piętro)'} • ${st.rooms}`;
 
-                const rows = [
+                const rows = isBasementStair ? [
+                    ['Staircase ID', `${st.id} (${st.stairId} in data/stairs.js)`],
+                    ['CAD Specification', `${st.cadSpecLabel} (${st.riserCount} risers × ${st.riserHeightMm} mm, ${st.treadCount} treads × ${st.treadDepthMm} mm)`],
+                    ['3D Elevation Span', `Z = ${st.zBottom.toLocaleString()}..${st.zTop} mm (-2.47 m basement to ±0.00 m Spiżarnia)`],
+                    ['X / Y Plan Bounds', `X = ${st.xMin.toLocaleString()}..${st.xMax.toLocaleString()} mm | Z = ${st.yMin.toLocaleString()}..${st.yMax.toLocaleString()} mm`],
+                    ['Lower Straight Flight', `1,290 × 860 mm (Steps 1–6 climbing West from X=4,205 to X=5,495 mm)`],
+                    ['SW Winder Turn', `820 × 860 mm (Steps 7–10 radiating around inner corner [5,495, 5,210])`],
+                    ['Upper Straight Flight', `820 × 440 mm (Steps 11–12 + Riser 13 arrival at Z=4,770 mm ${st.balustradeLabel})`],
+                    ['Waist Slab & Finish', `${st.waistSlabThicknessMm} mm RC waist slab + ${st.plankThicknessMm} mm treads`],
+                    ['Floor Opening', `VOID_SPIZARNIA_STAIRS cut into FLOOR_LOWER in 0.14 Spiżarnia`]
+                ] : [
                     ['Staircase ID', `${st.id} (${st.stairId} in data/stairs.js)`],
                     ['CAD Specification', `${st.cadSpecLabel} (${st.riserCount} risers × ${st.riserHeightMm} mm, ${st.treadCount} treads × ${st.treadDepthMm} mm)`],
                     ['3D Elevation Span', `Z = ${st.zBottom}..${st.zTop.toLocaleString()} mm (+3.33 m finished floor)`],

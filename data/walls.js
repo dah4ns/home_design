@@ -2994,9 +2994,227 @@
                         holes: []
                     }
                 ]
+            },
+
+            // =========================================================================
+            // BASEMENT (PIWNICA, Z = -2,600..-220 mm) — 38 CM EXTERIOR WALLS
+            // =========================================================================
+            {
+                id: 'BW_NORTH',
+                name: 'Basement North Exterior Wall (Directly Below EW_NORTH_RECESSED)',
+                floor: 'basement',
+                category: 'exterior',
+                thickness: 380,
+                zBottom: -2600,
+                zTop: -220,
+                rooms: 'Subgrade Soil (N) ↔ -1 Piwnica',
+                specs: '7,645 × 380 mm (38 cm: 24 cm RC wall + 14 cm thermal insulation) • Directly below EW_NORTH_RECESSED (Y = 2,790..3,170 mm) • Starts under FLOOR_LOWER at Z = -220 mm (-22 cm) and extends 2,380 mm (238 cm) down to Z = -2,600 mm (-260 cm)',
+                openings: [],
+                doors: [],
+                sides: [
+                    {
+                        id: 'BW_NORTH_EXT',
+                        role: 'exterior',
+                        material: 'foundation_insulation',
+                        materialLabel: 'Basement Waterproofing & 14 cm XPS Insulation',
+                        plasterThicknessMm: 0,
+                        normal: [0, -1, 0],
+                        p1: [-285, 2790],
+                        p2: [7360, 2790],
+                        outerLoop: [
+                            [-285, 2790, -2600],
+                            [7360, 2790, -2600],
+                            [7360, 2790, -220],
+                            [-285, 2790, -220]
+                        ],
+                        holes: []
+                    },
+                    {
+                        id: 'BW_NORTH_INT',
+                        role: 'interior',
+                        material: 'plaster_white',
+                        materialLabel: 'Interior Gypsum Plaster (2 cm / 20 mm)',
+                        plasterThicknessMm: 20,
+                        normal: [0, 1, 0],
+                        p1: [6980, 3170],
+                        p2: [95, 3170],
+                        outerLoop: [
+                            [6980, 3170, -2600],
+                            [95, 3170, -2600],
+                            [95, 3170, -220],
+                            [6980, 3170, -220]
+                        ],
+                        holes: []
+                    }
+                ]
+            },
+            {
+                id: 'BW_WEST',
+                name: 'Basement West Exterior Wall',
+                floor: 'basement',
+                category: 'exterior',
+                thickness: 380,
+                zBottom: -2600,
+                zTop: -220,
+                rooms: 'Subgrade Soil (W) ↔ -1 Piwnica (Stairwell)',
+                specs: '3,660 × 380 mm (38 cm: 24 cm RC wall + 14 cm thermal insulation) • 6,885 mm (688.5 cm) clear West of BW_EAST (X = 6,980..7,360 mm) • Z = -2,600..-220 mm (238 cm high)',
+                openings: [],
+                doors: [],
+                sides: [
+                    {
+                        id: 'BW_WEST_EXT',
+                        role: 'exterior',
+                        material: 'foundation_insulation',
+                        materialLabel: 'Basement Waterproofing & 14 cm XPS Insulation',
+                        plasterThicknessMm: 0,
+                        normal: [1, 0, 0],
+                        p1: [7360, 2790],
+                        p2: [7360, 6450],
+                        outerLoop: [
+                            [7360, 2790, -2600],
+                            [7360, 6450, -2600],
+                            [7360, 6450, -220],
+                            [7360, 2790, -220]
+                        ],
+                        holes: []
+                    },
+                    {
+                        id: 'BW_WEST_INT',
+                        role: 'interior',
+                        material: 'plaster_white',
+                        materialLabel: 'Interior Gypsum Plaster (2 cm / 20 mm)',
+                        plasterThicknessMm: 20,
+                        normal: [-1, 0, 0],
+                        p1: [6980, 6070],
+                        p2: [6980, 3170],
+                        outerLoop: [
+                            [6980, 6070, -2600],
+                            [6980, 3170, -2600],
+                            [6980, 3170, -220],
+                            [6980, 6070, -220]
+                        ],
+                        holes: []
+                    }
+                ]
+            },
+            {
+                id: 'BW_SOUTH',
+                name: 'Basement South Exterior Wall',
+                floor: 'basement',
+                category: 'exterior',
+                thickness: 380,
+                zBottom: -2600,
+                zTop: -220,
+                rooms: 'Subgrade Soil (S) ↔ -1 Piwnica',
+                specs: '7,645 × 380 mm (38 cm: 24 cm RC wall + 14 cm thermal insulation) • 2,900 mm (290 cm) clear South of BW_NORTH (Y = 6,070..6,450 mm) • Z = -2,600..-220 mm (238 cm high)',
+                openings: [],
+                doors: [],
+                sides: [
+                    {
+                        id: 'BW_SOUTH_EXT',
+                        role: 'exterior',
+                        material: 'foundation_insulation',
+                        materialLabel: 'Basement Waterproofing & 14 cm XPS Insulation',
+                        plasterThicknessMm: 0,
+                        normal: [0, 1, 0],
+                        p1: [7360, 6450],
+                        p2: [-285, 6450],
+                        outerLoop: [
+                            [7360, 6450, -2600],
+                            [-285, 6450, -2600],
+                            [-285, 6450, -220],
+                            [7360, 6450, -220]
+                        ],
+                        holes: []
+                    },
+                    {
+                        id: 'BW_SOUTH_INT',
+                        role: 'interior',
+                        material: 'plaster_white',
+                        materialLabel: 'Interior Gypsum Plaster (2 cm / 20 mm)',
+                        plasterThicknessMm: 20,
+                        normal: [0, -1, 0],
+                        p1: [95, 6070],
+                        p2: [6980, 6070],
+                        outerLoop: [
+                            [95, 6070, -2600],
+                            [6980, 6070, -2600],
+                            [6980, 6070, -220],
+                            [95, 6070, -220]
+                        ],
+                        holes: []
+                    }
+                ]
+            },
+            {
+                id: 'BW_EAST',
+                name: 'Basement East Exterior Wall (Directly Below EW_EAST_CORE)',
+                floor: 'basement',
+                category: 'exterior',
+                thickness: 380,
+                zBottom: -2600,
+                zTop: -220,
+                rooms: 'Subgrade Soil (E) ↔ -1 Piwnica',
+                specs: '3,660 × 380 mm (38 cm: 24 cm RC wall + 14 cm thermal insulation) • Directly below EW_EAST_CORE (X = -285..95 mm) • Starts under FLOOR_LOWER at Z = -220 mm (-22 cm) and extends 2,380 mm (238 cm) down to Z = -2,600 mm (-260 cm)',
+                openings: [],
+                doors: [],
+                sides: [
+                    {
+                        id: 'BW_EAST_EXT',
+                        role: 'exterior',
+                        material: 'foundation_insulation',
+                        materialLabel: 'Basement Waterproofing & 14 cm XPS Insulation',
+                        plasterThicknessMm: 0,
+                        normal: [-1, 0, 0],
+                        p1: [-285, 6450],
+                        p2: [-285, 2790],
+                        outerLoop: [
+                            [-285, 6450, -2600],
+                            [-285, 2790, -2600],
+                            [-285, 2790, -220],
+                            [-285, 6450, -220]
+                        ],
+                        holes: []
+                    },
+                    {
+                        id: 'BW_EAST_INT',
+                        role: 'interior',
+                        material: 'plaster_white',
+                        materialLabel: 'Interior Gypsum Plaster (2 cm / 20 mm)',
+                        plasterThicknessMm: 20,
+                        normal: [1, 0, 0],
+                        p1: [95, 3170],
+                        p2: [95, 6070],
+                        outerLoop: [
+                            [95, 3170, -2600],
+                            [95, 6070, -2600],
+                            [95, 6070, -220],
+                            [95, 3170, -220]
+                        ],
+                        holes: []
+                    }
+                ]
             }
         ],
         floors: [
+            {
+                id: 'FLOOR_BASEMENT',
+                name: 'FLOOR_BASEMENT — Basement Floor Slab (Podłoga w piwnicy -2.60..-2.47 m)',
+                floor: 'basement',
+                category: 'floor',
+                zBottom: -2600,
+                zTop: -2470,
+                thickness: 130,
+                areaM2: 19.97,
+                rooms: '-1 Piwnica (Strictly Within 38 cm Basement Walls)',
+                specs: 'Single monolithic 4-vertex rectangular slab • Z = -2,600..-2,470 mm (130 mm = 13 cm thick, starting 238 cm below -22 cm and ending 225 cm below -22 cm) • Highlighted strictly within the 38 cm basement walls (X = 95..6,980 mm, Y = 3,170..6,070 mm)',
+                footprint2D: [
+                    [6980, 3170],
+                    [95, 3170],
+                    [95, 6070],
+                    [6980, 6070]
+                ]
+            },
             {
                 id: 'FLOOR_LOWER',
                 name: 'FLOOR_LOWER — Lower Floor Slab (Podłoga na gruncie -0.22..±0.00 m)',
@@ -3005,9 +3223,9 @@
                 zBottom: -220,
                 zTop: 0,
                 thickness: 220,
-                areaM2: 265.95,
-                rooms: 'All Ground Floor Rooms (0.01–0.16) + 38 cm External Walls Footprint',
-                specs: 'Single monolithic 12-vertex orthogonal slab • Z = -220..0 mm (220 mm = 22 cm ground slab & screed structure) • Includes full building outer footprint underneath the 38 cm external walls (X = -285..20,705 mm, Y = -290..21,130 mm)',
+                areaM2: 263.78,
+                rooms: 'All Ground Floor Rooms (0.01–0.16) + 38 cm External Walls Footprint (excluding Spiżarnia Basement Stairwell Opening)',
+                specs: 'Single monolithic 12-vertex orthogonal slab • Z = -220..0 mm (220 mm = 22 cm ground slab & screed structure) • Includes full building outer footprint underneath the 38 cm external walls (X = -285..20,705 mm, Y = -290..21,130 mm) minus the L-shaped basement stairwell opening in 0.14 Spiżarnia',
                 footprint2D: [
                     [20705, -290],
                     [11715, -290],
@@ -3021,6 +3239,27 @@
                     [19225, 11020],
                     [19225, 8560],
                     [20705, 8560]
+                ],
+                holes2D: [
+                    {
+                        id: 'VOID_SPIZARNIA_STAIRS',
+                        name: 'Wejście do piwnicy (0.14 Spiżarnia Basement Stairwell Opening)',
+                        polygon2D: [
+                            [6315, 4770],
+                            [5495, 4770],
+                            [5495, 5210],
+                            [4205, 5210],
+                            [4205, 6070],
+                            [6315, 6070]
+                        ]
+                    }
+                ],
+                excludedVoids: [
+                    {
+                        id: 'VOID_SPIZARNIA_STAIRS',
+                        name: 'Wejście do piwnicy (0.14 Spiżarnia Basement Stairwell Opening)',
+                        x1: 4205, y1: 4770, x2: 6315, y2: 6070
+                    }
                 ]
             },
             {

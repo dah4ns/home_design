@@ -850,6 +850,7 @@
                         <span>2. Quick Wall &amp; Stair Presets</span>
                     </div>
                     <div class="preset-grid">
+                        <button type="button" class="ctrl-btn" id="preset-basement-all" style="grid-column: span 2; border-color: rgba(45,212,191,0.55); color: #5eead4;">🕳️ Basement / Piwnica -1 (BW_* + FLOOR_BASEMENT)</button>
                         <button type="button" class="ctrl-btn" id="preset-upper-slab" style="grid-column: span 2;">🟫 Floor Slabs + Flat Roofs + Stairs</button>
                         <button type="button" class="ctrl-btn" id="preset-stairs-hall">🪜 Stairs + Hall (STAIRS_1, GW_5, GW_7)</button>
                         <button type="button" class="ctrl-btn" id="preset-garage-doors">🚗 Garage + Doors (GW_1, GW_4)</button>
@@ -990,7 +991,7 @@
                             <span class="kv-key">Cut Plane Height `Z`:</span>
                             <span class="kv-val" id="slice-y-label">650 mm</span>
                         </div>
-                        <input type="range" id="slice-y-slider" min="-250" max="6800" step="25" value="650">
+                        <input type="range" id="slice-y-slider" min="-2700" max="6800" step="25" value="650">
                     </div>
                 </div>
             </aside>
@@ -1084,10 +1085,10 @@
             // Right-Handed Z-Up Coordinate System:
             // - X axis: East -> West horizontal axis (grows to the RIGHT when looking from North)
             // - Y axis: North -> South horizontal axis (second horizontal axis, into depth)
-            // - Z axis: Vertical height axis (-220..6,740 mm, pointing UP)
+            // - Z axis: Vertical height axis (-2,600..6,740 mm, pointing UP)
             const appState = {
                 activeLeftMenu: 'objects', // 'walls' | 'objects' | 'settings' | 'none'
-                selectedIds: new Set(allFurniture.map(fn => fn.id).concat(['EW_NORTH_RECESSED', 'GW_3', 'GW_13', 'FLOOR_LOWER'])),
+                selectedIds: new Set(allFurniture.map(fn => fn.id).concat(['EW_NORTH_RECESSED', 'EW_EAST_CORE', 'GW_3', 'GW_13', 'GW_14', 'GW_15', 'FLOOR_LOWER', 'BW_NORTH', 'BW_EAST', 'BW_SOUTH', 'BW_WEST', 'FLOOR_BASEMENT', 'STAIRS_BASEMENT'])),
                 searchQuery: '',
                 objectSearchQuery: '',
                 inspectorFilterQuery: '',
@@ -2024,7 +2025,7 @@
                     });
 
                     if (st.topRiser3D && Array.isArray(st.topRiser3D.loop3D)) {
-                        pushConvexLoop3D(st.topRiser3D.loop3D, [1, 0, 0], [0.95, 0.93, 0.89, 0.98]);
+                        pushConvexLoop3D(st.topRiser3D.loop3D, st.topRiser3D.riserNormal || [1, 0, 0], [0.95, 0.93, 0.89, 0.98]);
                         pushLoopLines(st.topRiser3D.loop3D, [0.98, 0.84, 0.48, 0.96]);
                     }
 
@@ -2053,10 +2054,10 @@
                     }
 
                     if (appState.showVertices) {
+                        const zB = st.zBottom || 0;
                         [
-                            [st.xMax, st.yMax, 0],
-                            [st.xPivot, st.yPivot, 740],
-                            [st.xMax, st.yMin, 555],
+                            [st.xMax, st.yMax, zB],
+                            [st.xPivot, st.yPivot, Math.round((zB + st.zTop) / 2)],
                             [st.xMin, st.yMin, st.zTop],
                             [st.xMin, st.yPivot, st.zTop]
                         ].forEach(pt => {
@@ -2098,17 +2099,24 @@
                     if (!appState.selectedIds.has(fl.id)) return;
 
                     const isRoof = (fl.category === 'roof' || fl.category === 'terrace' || fl.id.startsWith('ROOF_') || fl.id.startsWith('TERRACE_'));
-                    const isLower = (!isRoof && (fl.id === 'FLOOR_LOWER' || fl.floor === 'ground'));
+                    const isBasement = (!isRoof && (fl.id === 'FLOOR_BASEMENT' || fl.floor === 'basement'));
+                    const isLower = (!isRoof && !isBasement && (fl.id === 'FLOOR_LOWER' || fl.floor === 'ground'));
 
                     const topColor = isRoof
                         ? [0.34, 0.44, 0.50, 0.94]
-                        : (isLower ? [0.64, 0.67, 0.71, 0.94] : [0.78, 0.72, 0.63, 0.94]);
+                        : (isBasement
+                            ? [0.16, 0.72, 0.65, 0.96]
+                            : (isLower ? [0.64, 0.67, 0.71, 0.94] : [0.78, 0.72, 0.63, 0.94]));
                     const botColor = isRoof
                         ? [0.46, 0.54, 0.60, 0.94]
-                        : (isLower ? [0.46, 0.50, 0.56, 0.94] : [0.60, 0.64, 0.69, 0.94]);
+                        : (isBasement
+                            ? [0.10, 0.48, 0.44, 0.96]
+                            : (isLower ? [0.46, 0.50, 0.56, 0.94] : [0.60, 0.64, 0.69, 0.94]));
                     const sideColor = isRoof
                         ? [0.38, 0.46, 0.53, 0.94]
-                        : (isLower ? [0.42, 0.47, 0.54, 0.94] : [0.51, 0.56, 0.62, 0.94]);
+                        : (isBasement
+                            ? [0.12, 0.58, 0.52, 0.96]
+                            : (isLower ? [0.42, 0.47, 0.54, 0.94] : [0.51, 0.56, 0.62, 0.94]));
 
                     (fl.topCellQuads3D || []).forEach(quad => {
                         pushConvexLoop3D(quad, [0, 0, 1], topColor);
@@ -2121,21 +2129,27 @@
                     (fl.sideQuads3D || []).forEach(sq => {
                         const sqLoop = sq.loop3D || sq.loop;
                         pushConvexLoop3D(sqLoop, sq.normal, sideColor);
-                        pushLoopLines(sqLoop, [0.35, 0.42, 0.52, 0.85]);
+                        pushLoopLines(sqLoop, isBasement ? [0.20, 0.95, 0.85, 0.95] : [0.35, 0.42, 0.52, 0.85]);
                     });
 
                     if (Array.isArray(fl.topLoop3D)) {
                         const topWireColor = isRoof
                             ? [0.20, 0.83, 0.60, 1.0]
-                            : (isLower ? [0.38, 0.85, 0.98, 1.0] : [0.98, 0.82, 0.35, 1.0]);
+                            : (isBasement
+                                ? [0.25, 0.98, 0.88, 1.0]
+                                : (isLower ? [0.38, 0.85, 0.98, 1.0] : [0.98, 0.82, 0.35, 1.0]));
                         pushLoopLines(fl.topLoop3D, topWireColor);
+                        (fl.holeLoops3D || []).forEach(hl => {
+                            if (Array.isArray(hl.topLoop3D)) pushLoopLines(hl.topLoop3D, topWireColor);
+                            if (Array.isArray(hl.bottomLoop3D)) pushLoopLines(hl.bottomLoop3D, [0.58, 0.64, 0.72, 0.90]);
+                        });
                     }
                     if (Array.isArray(fl.bottomLoop3D)) {
-                        pushLoopLines(fl.bottomLoop3D, [0.58, 0.64, 0.72, 0.90]);
+                        pushLoopLines(fl.bottomLoop3D, isBasement ? [0.18, 0.82, 0.74, 0.95] : [0.58, 0.64, 0.72, 0.90]);
                     }
 
                     if (appState.showVertices && Array.isArray(fl.topLoop3D)) {
-                        const vColor = isRoof ? '#6ee7b7' : (isLower ? '#bae6fd' : '#fef08a');
+                        const vColor = isRoof ? '#6ee7b7' : (isBasement ? '#5eead4' : (isLower ? '#bae6fd' : '#fef08a'));
                         fl.topLoop3D.forEach((pt, idx) => {
                             hudLabels.push({
                                 ptMm: pt,
@@ -2150,7 +2164,9 @@
 
                     if (appState.showLabels) {
                         let badgePt = [13500, 5600, fl.zTop + 320];
-                        if (fl.id === 'FLOOR_LOWER') {
+                        if (fl.id === 'FLOOR_BASEMENT') {
+                            badgePt = [3538, 4620, fl.zTop + 260];
+                        } else if (fl.id === 'FLOOR_LOWER') {
                             badgePt = [4800, 7500, fl.zTop + 260];
                         } else if (fl.id === 'TERRACE_UPPER') {
                             badgePt = [3205, 4640, fl.zTop + 280];
@@ -2166,10 +2182,12 @@
                         hudLabels.push({
                             ptMm: badgePt,
                             text: `${isRoof ? '🏠' : '🧱'} ${fl.id} (Z=${fl.zBottom}..${fl.zTop}mm • ${fl.thickness}mm • ${fl.areaM2} m²)`,
-                            color: isRoof ? '#6ee7b7' : (isLower ? '#bae6fd' : '#fef08a'),
+                            color: isRoof ? '#6ee7b7' : (isBasement ? '#5eead4' : (isLower ? '#bae6fd' : '#fef08a')),
                             bg: isRoof
                                 ? 'rgba(6, 78, 59, 0.94)'
-                                : (isLower ? 'rgba(12, 74, 110, 0.94)' : 'rgba(113, 63, 18, 0.94)'),
+                                : (isBasement
+                                    ? 'rgba(19, 78, 74, 0.94)'
+                                    : (isLower ? 'rgba(12, 74, 110, 0.94)' : 'rgba(113, 63, 18, 0.94)')),
                             fontSize: 11.5
                         });
                     }
@@ -2714,10 +2732,13 @@
                         });
 
                         const isRoof = (f.category === 'roof' || f.category === 'terrace' || f.id.startsWith('ROOF_') || f.id.startsWith('TERRACE_'));
-                        const isLower = (!isRoof && (f.id === 'FLOOR_LOWER' || f.floor === 'ground'));
+                        const isBasement = (!isRoof && (f.id === 'FLOOR_BASEMENT' || f.floor === 'basement'));
+                        const isLower = (!isRoof && !isBasement && (f.id === 'FLOOR_LOWER' || f.floor === 'ground'));
                         const idSpan = createEl('span', 'wall-option-id', `${isRoof ? '🏠' : '🧱'} ${f.id}`);
                         let descLabel = 'Solid Upper Floor Slab (Strop nad parterem +296..+333 cm)';
-                        if (f.id === 'CEILING_KITCHEN_DINING') {
+                        if (isBasement) {
+                            descLabel = 'Basement Floor Slab within BW_* Walls (-260..-247 cm • 13 cm thick)';
+                        } else if (f.id === 'CEILING_KITCHEN_DINING') {
                             descLabel = 'Suspended Ceiling Over 0.13 Kuchnia & 0.12 Jadalnia (+280..+281.5 cm)';
                         } else if (isLower) {
                             descLabel = 'Solid Lower Floor Slab (Podłoga na gruncie -22..0 cm)';
@@ -2731,7 +2752,7 @@
                             descLabel = 'Second Floor Flat Roof (Stropodach nad piętrem +630..+674 cm)';
                         }
                         const nameSpan = createEl('span', '', descLabel);
-                        nameSpan.style.color = isRoof ? '#6ee7b7' : (isLower ? '#bae6fd' : '#fef08a');
+                        nameSpan.style.color = isRoof ? '#6ee7b7' : (isBasement ? '#5eead4' : (isLower ? '#bae6fd' : '#fef08a'));
                         nameSpan.style.fontSize = '11px';
                         nameSpan.style.overflow = 'hidden';
                         nameSpan.style.textOverflow = 'ellipsis';
@@ -2774,14 +2795,18 @@
                         });
 
                         const idSpan = createEl('span', 'wall-option-id', `🪜 ${s.id}`);
-                        const nameSpan = createEl('span', '', 'Main Winder Staircase (Schody)');
-                        nameSpan.style.color = '#fde68a';
+                        const isBaseStair = s.id === 'STAIRS_BASEMENT';
+                        const nameSpan = createEl('span', '', isBaseStair ? 'Spiżarnia Basement Staircase (Wejście do piwnicy)' : 'Main Winder Staircase (Schody)');
+                        nameSpan.style.color = isBaseStair ? '#5eead4' : '#fde68a';
                         nameSpan.style.fontSize = '11px';
                         nameSpan.style.overflow = 'hidden';
                         nameSpan.style.textOverflow = 'ellipsis';
                         nameSpan.style.whiteSpace = 'nowrap';
 
-                        const metaSpan = createEl('span', 'wall-option-meta', `${s.cadSpecLabel} • h=${s.balustradeHeightMm / 10}`);
+                        const metaText = s.balustradeHeightMm > 0
+                            ? `${s.cadSpecLabel} • h=${s.balustradeHeightMm / 10}`
+                            : `${s.cadSpecLabel} • Z=${s.zBottom / 10}..0cm`;
+                        const metaSpan = createEl('span', 'wall-option-meta', metaText);
 
                         row.appendChild(cb);
                         row.appendChild(idSpan);
@@ -2792,6 +2817,7 @@
                 }
 
                 const groups = [
+                    { title: 'Basement (-1 Piwnica) — Exterior Walls (BW_*)', filter: w => w.floor === 'basement' && w.category === 'exterior' },
                     { title: 'Inter-Floor Perimeter Band (Z = 280..343 cm)', filter: w => w.category === 'band' || w.floor === 'band' },
                     { title: 'Ground Floor — Exterior Walls (EW_*)', filter: w => w.floor === 'ground' && w.category === 'exterior' },
                     { title: 'Ground Floor — Internal Walls (GW_*)', filter: w => w.floor === 'ground' && w.category === 'internal' },
@@ -3449,7 +3475,7 @@
             document.getElementById('preset-cab-full-house').addEventListener('click', () => {
                 appState.yaw = 42 * Math.PI / 180;
                 appState.pitch = 38 * Math.PI / 180;
-                applyPreset(allWalls.map(w => w.id).concat(['FLOOR_LOWER', 'FLOOR_UPPER', 'TERRACE_UPPER', 'ROOF_GYM', 'ROOF_GARAGE', 'ROOF_UPPER', 'STAIRS_1']).concat(allFurniture.map(fn => fn.id)));
+                applyPreset(allWalls.map(w => w.id).concat(['FLOOR_BASEMENT', 'FLOOR_LOWER', 'FLOOR_UPPER', 'TERRACE_UPPER', 'ROOF_GYM', 'ROOF_GARAGE', 'ROOF_UPPER', 'STAIRS_1', 'STAIRS_BASEMENT']).concat(allFurniture.map(fn => fn.id)));
             });
             document.getElementById('preset-cab-clear').addEventListener('click', () => {
                 allFurniture.forEach(fn => appState.selectedIds.delete(fn.id));
@@ -3478,10 +3504,18 @@
             });
 
             // Menu 1 (Walls & Stairs) Presets
+            const basementPresetBtn = document.getElementById('preset-basement-all');
+            if (basementPresetBtn) {
+                basementPresetBtn.addEventListener('click', () => {
+                    appState.yaw = -52 * Math.PI / 180;
+                    appState.pitch = 30 * Math.PI / 180;
+                    applyPreset(['BW_NORTH', 'BW_EAST', 'BW_SOUTH', 'BW_WEST', 'FLOOR_BASEMENT', 'FLOOR_LOWER', 'STAIRS_BASEMENT', 'GW_13', 'GW_14', 'GW_15', 'EW_NORTH_RECESSED', 'EW_EAST_CORE']);
+                });
+            }
             document.getElementById('preset-upper-slab').addEventListener('click', () => {
                 appState.yaw = 42 * Math.PI / 180;
                 appState.pitch = 38 * Math.PI / 180;
-                applyPreset(['FLOOR_LOWER', 'FLOOR_UPPER', 'TERRACE_UPPER', 'ROOF_GYM', 'ROOF_GARAGE', 'ROOF_UPPER', 'WALL_BAND', 'STAIRS_1', 'GW_14', 'FW_1b', 'FW_8', 'FW_9']);
+                applyPreset(['FLOOR_BASEMENT', 'FLOOR_LOWER', 'FLOOR_UPPER', 'TERRACE_UPPER', 'ROOF_GYM', 'ROOF_GARAGE', 'ROOF_UPPER', 'WALL_BAND', 'STAIRS_1', 'STAIRS_BASEMENT', 'BW_NORTH', 'BW_EAST', 'BW_SOUTH', 'BW_WEST', 'GW_14', 'FW_1b', 'FW_8', 'FW_9']);
             });
             document.getElementById('preset-stairs-hall').addEventListener('click', () => {
                 appState.yaw = 65 * Math.PI / 180;
@@ -3492,22 +3526,22 @@
                 applyPreset(['EW_GARAGE_NORTH', 'EW_GARAGE_WEST', 'EW_GARAGE_EAST', 'GW_1', 'GW_2', 'GW_4', 'ROOF_GARAGE', 'WALL_BAND']);
             });
             document.getElementById('preset-north-facade').addEventListener('click', () => {
-                applyPreset(['EW_NORTH_RECESSED', 'EW_GARAGE_EAST', 'EW_GARAGE_NORTH', 'WALL_BAND', 'TERRACE_UPPER', 'GW_14', 'UW_TERRACE_BACK', 'UW_TERRACE_EAST', 'UW_NORTH_MAIN']);
+                applyPreset(['BW_NORTH', 'BW_EAST', 'EW_NORTH_RECESSED', 'EW_GARAGE_EAST', 'EW_GARAGE_NORTH', 'WALL_BAND', 'TERRACE_UPPER', 'GW_14', 'UW_TERRACE_BACK', 'UW_TERRACE_EAST', 'UW_NORTH_MAIN']);
             });
             document.getElementById('preset-ground-ext').addEventListener('click', () => {
                 applyPreset(allWalls.filter(w => w.floor === 'ground' && w.category === 'exterior').map(w => w.id));
             });
             document.getElementById('preset-ground-int').addEventListener('click', () => {
-                applyPreset(allWalls.filter(w => w.floor === 'ground' && w.category === 'internal').map(w => w.id).concat(['STAIRS_1']));
+                applyPreset(allWalls.filter(w => w.floor === 'ground' && w.category === 'internal').map(w => w.id).concat(['STAIRS_1', 'STAIRS_BASEMENT']));
             });
             document.getElementById('preset-ground-all').addEventListener('click', () => {
-                applyPreset(allWalls.filter(w => w.floor === 'ground').map(w => w.id).concat(['FLOOR_LOWER', 'TERRACE_UPPER', 'ROOF_GYM', 'ROOF_GARAGE', 'WALL_BAND', 'STAIRS_1']).concat(allFurniture.map(fn => fn.id)));
+                applyPreset(allWalls.filter(w => w.floor === 'ground').map(w => w.id).concat(['FLOOR_LOWER', 'TERRACE_UPPER', 'ROOF_GYM', 'ROOF_GARAGE', 'WALL_BAND', 'STAIRS_1', 'STAIRS_BASEMENT']).concat(allFurniture.map(fn => fn.id)));
             });
             document.getElementById('preset-first-all').addEventListener('click', () => {
                 applyPreset(allWalls.filter(w => w.floor === 'first').map(w => w.id).concat(['FLOOR_UPPER', 'TERRACE_UPPER', 'ROOF_UPPER', 'WALL_BAND', 'STAIRS_1']));
             });
             document.getElementById('preset-all-walls').addEventListener('click', () => {
-                applyPreset(allWalls.map(w => w.id).concat(['FLOOR_LOWER', 'FLOOR_UPPER', 'TERRACE_UPPER', 'ROOF_GYM', 'ROOF_GARAGE', 'ROOF_UPPER', 'STAIRS_1']).concat(allFurniture.map(fn => fn.id)));
+                applyPreset(allWalls.map(w => w.id).concat(['FLOOR_BASEMENT', 'FLOOR_LOWER', 'FLOOR_UPPER', 'TERRACE_UPPER', 'ROOF_GYM', 'ROOF_GARAGE', 'ROOF_UPPER', 'STAIRS_1', 'STAIRS_BASEMENT']).concat(allFurniture.map(fn => fn.id)));
             });
             document.getElementById('preset-clear').addEventListener('click', () => {
                 appState.selectedIds.clear();

@@ -689,7 +689,7 @@
     const WallService = {
         getWalls: function (filter) {
             const rawList = (wallsData && Array.isArray(wallsData.walls)) ? wallsData.walls : [];
-            const floors = ['ground', 'first'];
+            const floors = ['basement', 'ground', 'first'];
             let allCompiled = [];
             floors.forEach(fl => {
                 const floorWalls = rawList.filter(w => w.floor === fl).map(compileWall);
@@ -697,7 +697,7 @@
                 allCompiled = allCompiled.concat(floorWalls);
             });
             const bandOrOtherWalls = rawList
-                .filter(w => w.floor !== 'ground' && w.floor !== 'first')
+                .filter(w => w.floor !== 'basement' && w.floor !== 'ground' && w.floor !== 'first')
                 .map(compileWall);
             allCompiled = allCompiled.concat(bandOrOtherWalls);
 
@@ -726,7 +726,7 @@
          * - plasterSegments2D: exact 2D plaster line & band segments for sides with plasterThicknessMm > 0
          */
         getFloorPlanSlice: function (floor, cutHeightMm = 1200) {
-            const floorDatumZ = (floor === 'first') ? 3430 : 0;
+            const floorDatumZ = (floor === 'first') ? 3430 : ((floor === 'basement') ? -2470 : 0);
             const zSlice = floorDatumZ + cutHeightMm;
             const rawExterior = this.getWalls({ floor, category: 'exterior' });
             const rawInternal = this.getWalls({ floor, category: 'internal' });
@@ -1979,9 +1979,14 @@
          */
         compileStair3D: function (stairOrId) {
             const rawStairsMap = (stairsData && (stairsData.defaultStairs || stairsData.stairs)) || {};
-            const rawStair = (typeof stairOrId === 'object' && stairOrId)
-                ? stairOrId
-                : (rawStairsMap[stairOrId] || rawStairsMap.main_staircase || {});
+            let rawStair = null;
+            if (typeof stairOrId === 'object' && stairOrId) {
+                rawStair = stairOrId;
+            } else if (stairOrId === 'STAIRS_BASEMENT' || stairOrId === 'basement_staircase') {
+                rawStair = rawStairsMap.basement_staircase || null;
+            } else {
+                rawStair = rawStairsMap[stairOrId] || rawStairsMap.main_staircase || {};
+            }
 
             const spec = (rawStair && rawStair.brep3D) ? rawStair.brep3D : {
                 id: 'STAIRS_1',
@@ -2100,6 +2105,400 @@
                     });
                 }
                 return { topLoop, botLoop, sideQuads };
+            }
+
+            if (spec.id === 'STAIRS_BASEMENT' || spec.stairId === 'basement_staircase') {
+                const zBase = Number(spec.zBottom); // -2470
+                const zGround = Number(spec.zTop);  // 0
+                const xMin = Number(spec.xMin) || 4205;
+                const xPivot = Number(spec.xPivot) || 5495;
+                const xMax = Number(spec.xMax) || 6315;
+                const yMin = Number(spec.yMin) || 4770;
+                const yPivot = Number(spec.yPivot) || 5210;
+                const yMax = Number(spec.yMax) || 6070;
+                const lowerTreadD = Number(spec.treadDepthMm) || 215;
+                const upperTreadD = Number(spec.upperTreadDepthMm) || 220;
+
+                const bSteps3D = [];
+
+                // 1. Lower 6 Straight Treads (Steps 1..6) climbing West (+X) from X = 4,205 to X = 5,495 mm
+                for (let k = 0; k < 6; k++) {
+                    const stepNum = k + 1;
+                    const xEast = xMin + k * lowerTreadD;
+                    const xWest = xMin + (k + 1) * lowerTreadD;
+                    const zBottom = zBase + k * riserH;
+                    const zTop = zBase + (k + 1) * riserH;
+                    const zConcreteBottom = zBottom - plankH;
+                    const zConcreteTop = zTop - plankH;
+                    const poly2D = [
+                        [xEast, yPivot],
+                        [xWest, yPivot],
+                        [xWest, yMax],
+                        [xEast, yMax]
+                    ];
+                    const plank = buildExtrudedPolygonFaces(poly2D, zConcreteTop, zTop);
+                    const riserQuad3D = {
+                        loop3D: [
+                            [xEast, yMax, zBottom],
+                            [xEast, yPivot, zBottom],
+                            [xEast, yPivot, zConcreteTop],
+                            [xEast, yMax, zConcreteTop]
+                        ],
+                        normal: [-1, 0, 0]
+                    };
+                    const concreteFaces3D = [
+                        {
+                            loop3D: [
+                                [xEast, yPivot, Math.max(zBase, zConcreteBottom)],
+                                [xWest, yPivot, zConcreteTop],
+                                [xEast, yPivot, zConcreteTop]
+                            ],
+                            normal: [0, -1, 0]
+                        },
+                        {
+                            loop3D: [
+                                [xEast, yMax, Math.max(zBase, zConcreteBottom)],
+                                [xEast, yMax, zConcreteTop],
+                                [xWest, yMax, zConcreteTop]
+                            ],
+                            normal: [0, 1, 0]
+                        }
+                    ];
+                    bSteps3D.push({
+                        stepNumber: stepNum,
+                        kind: 'straight_lower',
+                        xEast,
+                        xWest,
+                        zBottom,
+                        zTop,
+                        zConcreteBottom: Math.max(zBase, zConcreteBottom),
+                        zConcreteTop,
+                        riserLine2D: [[xEast, yPivot], [xEast, yMax]],
+                        riserNormal: [-1, 0, 0],
+                        treadPolygon2D: poly2D,
+                        treadLoop3D: plank.topLoop,
+                        plankBottomLoop3D: plank.botLoop,
+                        plankSideQuads3D: plank.sideQuads,
+                        riserQuad3D,
+                        concreteFaces3D
+                    });
+                }
+
+                // 2. 4 Winder Turn Treads (Steps 7..10) in 82 × 90 cm SW Corner (X = 5,495..6,315, Y = 5,210..6,070)
+                const winderDefs = [
+                    {
+                        stepNumber: 7,
+                        riserLine2D: [[xPivot, yPivot], [xPivot, yMax]],
+                        riserNormal: [-1, 0, 0],
+                        treadPolygon2D: [[xPivot, yPivot], [5980, yMax], [xPivot, yMax]]
+                    },
+                    {
+                        stepNumber: 8,
+                        riserLine2D: [[xPivot, yPivot], [5980, yMax]],
+                        riserNormal: [-0.871, 0.491, 0],
+                        treadPolygon2D: [[xPivot, yPivot], [xMax, yMax], [5980, yMax]]
+                    },
+                    {
+                        stepNumber: 9,
+                        riserLine2D: [[xPivot, yPivot], [xMax, yMax]],
+                        riserNormal: [-0.723, 0.691, 0],
+                        treadPolygon2D: [[xPivot, yPivot], [xMax, 5640], [xMax, yMax]]
+                    },
+                    {
+                        stepNumber: 10,
+                        riserLine2D: [[xPivot, yPivot], [xMax, 5640]],
+                        riserNormal: [-0.464, 0.886, 0],
+                        treadPolygon2D: [[xPivot, yPivot], [xMax, yPivot], [xMax, 5640]]
+                    }
+                ];
+
+                winderDefs.forEach((wd, idx) => {
+                    const stepNum = wd.stepNumber;
+                    const zBottom = zBase + (stepNum - 1) * riserH;
+                    const zTop = zBase + stepNum * riserH;
+                    const zConcreteTop = zTop - plankH;
+                    const zConcreteBottom = zBottom - waistH;
+                    const plank = buildExtrudedPolygonFaces(wd.treadPolygon2D, zConcreteTop, zTop);
+                    const r1 = wd.riserLine2D[0];
+                    const r2 = wd.riserLine2D[1];
+                    const riserQuad3D = {
+                        loop3D: [
+                            [r2[0], r2[1], zBottom],
+                            [r1[0], r1[1], zBottom],
+                            [r1[0], r1[1], zConcreteTop],
+                            [r2[0], r2[1], zConcreteTop]
+                        ],
+                        normal: wd.riserNormal
+                    };
+                    const concreteFaces3D = [];
+                    const poly = wd.treadPolygon2D;
+                    if (poly.length >= 3) {
+                        const pA = poly[1];
+                        const pB = poly[2];
+                        concreteFaces3D.push({
+                            loop3D: [
+                                [pB[0], pB[1], zConcreteBottom],
+                                [pA[0], pA[1], zConcreteBottom],
+                                [pA[0], pA[1], zConcreteTop],
+                                [pB[0], pB[1], zConcreteTop]
+                            ],
+                            normal: idx < 2 ? [0, 1, 0] : [1, 0, 0]
+                        });
+                    }
+                    bSteps3D.push({
+                        stepNumber: stepNum,
+                        kind: 'winder',
+                        zBottom,
+                        zTop,
+                        zConcreteBottom,
+                        zConcreteTop,
+                        riserLine2D: wd.riserLine2D,
+                        riserNormal: wd.riserNormal,
+                        treadPolygon2D: wd.treadPolygon2D,
+                        treadLoop3D: plank.topLoop,
+                        plankBottomLoop3D: plank.botLoop,
+                        plankSideQuads3D: plank.sideQuads,
+                        riserQuad3D,
+                        concreteFaces3D
+                    });
+                });
+
+                // 3. Upper 2 Straight Treads (Steps 11..12) climbing North (-Y) from Y = 5,210 to Y = 4,770 mm
+                for (let m = 0; m < 2; m++) {
+                    const stepNum = 11 + m;
+                    const ySouth = yPivot - m * upperTreadD;
+                    const yNorth = yPivot - (m + 1) * upperTreadD;
+                    const zBottom = zBase + (stepNum - 1) * riserH;
+                    const zTop = zBase + stepNum * riserH;
+                    const zConcreteBottom = zBottom - plankH;
+                    const zConcreteTop = zTop - plankH;
+                    const poly2D = [
+                        [xPivot, yNorth],
+                        [xMax, yNorth],
+                        [xMax, ySouth],
+                        [xPivot, ySouth]
+                    ];
+                    const plank = buildExtrudedPolygonFaces(poly2D, zConcreteTop, zTop);
+                    const riserQuad3D = {
+                        loop3D: [
+                            [xPivot, ySouth, zBottom],
+                            [xMax, ySouth, zBottom],
+                            [xMax, ySouth, zConcreteTop],
+                            [xPivot, ySouth, zConcreteTop]
+                        ],
+                        normal: [0, 1, 0]
+                    };
+                    const concreteFaces3D = [
+                        {
+                            loop3D: [
+                                [xPivot, ySouth, zConcreteBottom],
+                                [xPivot, yNorth, zConcreteTop],
+                                [xPivot, ySouth, zConcreteTop]
+                            ],
+                            normal: [-1, 0, 0]
+                        },
+                        {
+                            loop3D: [
+                                [xMax, ySouth, zConcreteBottom],
+                                [xMax, ySouth, zConcreteTop],
+                                [xMax, yNorth, zConcreteTop]
+                            ],
+                            normal: [1, 0, 0]
+                        }
+                    ];
+                    bSteps3D.push({
+                        stepNumber: stepNum,
+                        kind: 'straight_upper',
+                        yNorth,
+                        ySouth,
+                        zBottom,
+                        zTop,
+                        zConcreteBottom,
+                        zConcreteTop,
+                        riserLine2D: [[xPivot, ySouth], [xMax, ySouth]],
+                        riserNormal: [0, 1, 0],
+                        treadPolygon2D: poly2D,
+                        treadLoop3D: plank.topLoop,
+                        plankBottomLoop3D: plank.botLoop,
+                        plankSideQuads3D: plank.sideQuads,
+                        riserQuad3D,
+                        concreteFaces3D
+                    });
+                }
+
+                // 4. Final Arrival Riser 13 at Y = 4,770 mm (Z = -190 -> 0 mm)
+                const zRiser13Bot = zGround - riserH; // -190
+                const bTopRiser3D = {
+                    stepNumber: 13,
+                    kind: 'arrival_riser',
+                    y: yMin,
+                    zBottom: zRiser13Bot,
+                    zTop: zGround,
+                    riserLine2D: [[xPivot, yMin], [xMax, yMin]],
+                    riserNormal: [0, 1, 0],
+                    loop3D: [
+                        [xPivot, yMin, zRiser13Bot],
+                        [xMax, yMin, zRiser13Bot],
+                        [xMax, yMin, zGround],
+                        [xPivot, yMin, zGround]
+                    ]
+                };
+
+                // 5. Monolithic Reinforced Concrete Waist Slab (lower flight + winder + upper flight)
+                const zLowerStartTop = zBase + riserH - plankH; // -2320
+                const zLowerStartBot = zBase; // -2470
+                const zLowerEndTop = zBase + 6 * riserH - plankH; // -1370
+                const zLowerEndBot = zLowerEndTop - waistH; // -1530
+                const zTurnTop = zBase + 10 * riserH - plankH; // -610
+                const zTurnBot = zTurnTop - waistH; // -770
+                const zUpperEndTop = zGround - riserH - plankH; // -230
+                const zUpperEndBot = zUpperEndTop - waistH; // -390
+
+                const bWaistSlab3D = {
+                    thicknessMm: waistH,
+                    zEastTop: zLowerStartTop,
+                    zEastBot: zLowerStartBot,
+                    zWestTop: zLowerEndTop,
+                    zWestBot: zLowerEndBot,
+                    faces3D: [
+                        // Lower flight sloped soffit (X = 4205..5495, Y = 5210..6070)
+                        {
+                            id: 'lower_soffit',
+                            normal: [0.66, 0, -0.75],
+                            loop3D: [
+                                [xMin, yPivot, zLowerStartBot],
+                                [xMin, yMax, zLowerStartBot],
+                                [xPivot, yMax, zLowerEndBot],
+                                [xPivot, yPivot, zLowerEndBot]
+                            ]
+                        },
+                        // Lower flight North cheek (Y = 5210)
+                        {
+                            id: 'lower_north',
+                            normal: [0, -1, 0],
+                            loop3D: [
+                                [xMin, yPivot, zLowerStartBot],
+                                [xPivot, yPivot, zLowerEndBot],
+                                [xPivot, yPivot, zLowerEndTop],
+                                [xMin, yPivot, zLowerStartTop]
+                            ]
+                        },
+                        // Lower flight South cheek (Y = 6070)
+                        {
+                            id: 'lower_south',
+                            normal: [0, 1, 0],
+                            loop3D: [
+                                [xMin, yMax, zLowerStartBot],
+                                [xMin, yMax, zLowerStartTop],
+                                [xPivot, yMax, zLowerEndTop],
+                                [xPivot, yMax, zLowerEndBot]
+                            ]
+                        },
+                        // Winder corner sloped soffit (X = 5495..6315, Y = 5210..6070)
+                        {
+                            id: 'turn_soffit',
+                            normal: [0.45, 0.45, -0.77],
+                            loop3D: [
+                                [xPivot, yPivot, zLowerEndBot],
+                                [xPivot, yMax, zLowerEndBot],
+                                [xMax, yMax, zTurnBot],
+                                [xMax, yPivot, zTurnBot]
+                            ]
+                        },
+                        // Upper flight sloped soffit (X = 5495..6315, Y = 4770..5210)
+                        {
+                            id: 'upper_soffit',
+                            normal: [0, -0.65, -0.76],
+                            loop3D: [
+                                [xPivot, yPivot, zTurnBot],
+                                [xMax, yPivot, zTurnBot],
+                                [xMax, yMin, zUpperEndBot],
+                                [xPivot, yMin, zUpperEndBot]
+                            ]
+                        },
+                        // Upper flight East cheek (X = 5495, Y = 4770..5210)
+                        {
+                            id: 'upper_east',
+                            normal: [-1, 0, 0],
+                            loop3D: [
+                                [xPivot, yPivot, zTurnBot],
+                                [xPivot, yMin, zUpperEndBot],
+                                [xPivot, yMin, zUpperEndTop],
+                                [xPivot, yPivot, zTurnTop]
+                            ]
+                        },
+                        // Upper flight West cheek (X = 6315, Y = 4770..5210)
+                        {
+                            id: 'upper_west',
+                            normal: [1, 0, 0],
+                            loop3D: [
+                                [xMax, yPivot, zTurnBot],
+                                [xMax, yPivot, zTurnTop],
+                                [xMax, yMin, zUpperEndTop],
+                                [xMax, yMin, zUpperEndBot]
+                            ]
+                        }
+                    ]
+                };
+
+                const bFootprint2D = [
+                    [xMax, yMin],
+                    [xPivot, yMin],
+                    [xPivot, yPivot],
+                    [xMin, yPivot],
+                    [xMin, yMax],
+                    [xMax, yMax]
+                ];
+
+                return {
+                    id: 'STAIRS_BASEMENT',
+                    stairId: 'basement_staircase',
+                    name: spec.name || 'STAIRS_BASEMENT — Spiżarnia Basement Staircase (13×19,46×21,5)',
+                    cadSpecLabel: spec.cadSpecLabel || '13×19,46×21,5',
+                    balustradeLabel: spec.balustradeLabel || 'wejście do piwnicy',
+                    floor: 'basement',
+                    connectsFloors: ['basement', 'ground'],
+                    category: 'staircase',
+                    rooms: spec.rooms || '-1 Piwnica -> 0.14 Spiżarnia',
+                    southWallId: 'BW_SOUTH',
+                    westWallId: 'GW_13',
+                    eastWallId: 'GW_14',
+                    x1: xMin,
+                    x2: xMax,
+                    y1: yMin,
+                    y2: yMax,
+                    xMin,
+                    xPivot,
+                    xTurnMid: spec.xTurnMid || 5905,
+                    xMax,
+                    yMin,
+                    yPivot,
+                    yTurnMid: spec.yTurnMid || 5640,
+                    yMax,
+                    zBottom: zBase,
+                    zTop: zGround,
+                    flightWidthMm: yMax - yPivot,
+                    turnWidthMm: xMax - xPivot,
+                    riserCount: 13,
+                    treadCount: 12,
+                    turnStepsCount: 4,
+                    straightTreadsCount: 8,
+                    straightRisersCount: 9,
+                    riserHeightMm: riserH,
+                    treadDepthMm: lowerTreadD,
+                    plankThicknessMm: plankH,
+                    waistSlabThicknessMm: waistH,
+                    balustradeHeightMm: 0,
+                    balustradeThicknessMm: 0,
+                    planCutLine2D: spec.planCutLine2D || [[5150, 5210], [5495, 6070]],
+                    footprint2D: bFootprint2D,
+                    steps3D: bSteps3D,
+                    topRiser3D: bTopRiser3D,
+                    waistSlab3D: bWaistSlab3D,
+                    balustrade3D: null,
+                    walkingLine3D: spec.walkingLine3D,
+                    materials: rawStair.materials || {}
+                };
             }
 
             const steps3D = [];
@@ -2503,12 +2902,18 @@
         },
 
         getStairs3D: function () {
-            return [this.compileStair3D('main_staircase')];
+            return [
+                this.compileStair3D('main_staircase'),
+                this.compileStair3D('basement_staircase')
+            ];
         },
 
         getStair3DById: function (id) {
             if (!id || id === 'STAIRS_1' || id === 'main_staircase') {
                 return this.compileStair3D('main_staircase');
+            }
+            if (id === 'STAIRS_BASEMENT' || id === 'basement_staircase') {
+                return this.compileStair3D('basement_staircase');
             }
             return null;
         },
@@ -2521,6 +2926,16 @@
         sliceStair3DAtElevation: function (stairOrId, zSlice) {
             const st = (stairOrId && stairOrId.steps3D) ? stairOrId : this.compileStair3D(stairOrId);
             const polygons2D = [];
+
+            if (st.id === 'STAIRS_BASEMENT') {
+                st.steps3D.forEach(step => {
+                    const zMinStep = (step.zConcreteBottom !== undefined) ? step.zConcreteBottom : (step.zBottom - 160);
+                    if (zSlice >= zMinStep && zSlice <= step.zTop) {
+                        polygons2D.push(step.treadPolygon2D.map(p => [p[0], p[1]]));
+                    }
+                });
+                return { zSlice, polygons2D };
+            }
 
             // 1. Check 4 turn steps (each extends from Z = 0 to step.zTop)
             st.steps3D.forEach(step => {
@@ -2548,22 +2963,109 @@
         },
 
         /**
-         * Project the 3D Staircase onto the 2D Floor Plan for either 'ground' (Parter)
-         * or 'first' (Piętro) using standard architectural 2D section conventions:
-         * - Ground Floor ('ground'):
-         *   * Shows the 4-step winder turn in the West bay (X = 15,175..16,175, Y = 8,360..9,640)
-         *     and the lower straight steps (Steps 5..9) with SOLID lines below the diagonal cut line.
-         *   * Clips Step 10 along the diagonal break line [[13690, 8360], [13420, 9370]].
-         *   * Shows Steps 10..18 East of the diagonal cut line (passing overhead above the WC door D_GW7_2)
-         *     with DASHED lines so the WC doorway and swing arc underneath remain clearly readable.
-         * - Upper Floor ('first'):
-         *   * Looking down into the stairwell from +3.33 m: all 17 treads and 18 risers are visible
-         *     from above and rendered with SOLID lines, arriving at X = 11,665 mm.
+         * Project the 3D Staircase onto the 2D Floor Plan for 'basement', 'ground' (Parter),
+         * or 'first' (Piętro) using standard architectural 2D section conventions.
          */
         projectStairTo2DPlan: function (stairOrId, options) {
             const opts = options || {};
             const floor = opts.floor || 'ground';
             const st = (stairOrId && stairOrId.steps3D) ? stairOrId : this.compileStair3D(stairOrId);
+
+            if (st.id === 'STAIRS_BASEMENT') {
+                const solidRisers2D = [];
+                const dashedRisers2D = [];
+                const solidTreads2D = [];
+                const dashedTreads2D = [];
+
+                if (floor === 'ground') {
+                    // Looking down from Ground Floor (0.14 Spiżarnia) into the basement stairwell opening:
+                    // all 12 treads and 13 risers are visible and drawn with SOLID lines.
+                    st.steps3D.forEach(s => {
+                        solidTreads2D.push({
+                            stepNumber: s.stepNumber,
+                            kind: s.kind,
+                            zTop: s.zTop,
+                            polygon2D: s.treadPolygon2D
+                        });
+                        solidRisers2D.push({
+                            stepNumber: s.stepNumber,
+                            p1: s.riserLine2D[0],
+                            p2: s.riserLine2D[1]
+                        });
+                    });
+                    if (st.topRiser3D) {
+                        solidRisers2D.push({
+                            stepNumber: st.topRiser3D.stepNumber,
+                            p1: st.topRiser3D.riserLine2D[0],
+                            p2: st.topRiser3D.riserLine2D[1]
+                        });
+                    }
+                } else {
+                    // Basement floor ('basement'): Steps 1..5 solid, Steps 6..13 dashed above cut line
+                    st.steps3D.forEach(s => {
+                        if (s.stepNumber <= 5) {
+                            solidTreads2D.push({ stepNumber: s.stepNumber, kind: s.kind, zTop: s.zTop, polygon2D: s.treadPolygon2D });
+                            solidRisers2D.push({ stepNumber: s.stepNumber, p1: s.riserLine2D[0], p2: s.riserLine2D[1] });
+                        } else {
+                            dashedTreads2D.push({ stepNumber: s.stepNumber, kind: s.kind, zTop: s.zTop, polygon2D: s.treadPolygon2D });
+                            dashedRisers2D.push({ stepNumber: s.stepNumber, p1: s.riserLine2D[0], p2: s.riserLine2D[1] });
+                        }
+                    });
+                    if (st.topRiser3D) {
+                        dashedRisers2D.push({
+                            stepNumber: st.topRiser3D.stepNumber,
+                            p1: st.topRiser3D.riserLine2D[0],
+                            p2: st.topRiser3D.riserLine2D[1]
+                        });
+                    }
+                }
+
+                const yMidLower = Math.round((st.yPivot + st.yMax) / 2); // 5640
+                const xMidUpper = Math.round((st.xPivot + st.xMax) / 2); // 5905
+
+                return {
+                    stair3D: st,
+                    floor,
+                    footprint2D: st.footprint2D,
+                    turnBoxPolygon2D: [
+                        [st.xPivot, st.yMax],
+                        [st.xMax, st.yMax],
+                        [st.xMax, st.yMin],
+                        [st.xPivot, st.yMin]
+                    ],
+                    fullStraightPolygon2D: [
+                        [st.xMin, st.yPivot],
+                        [st.xPivot, st.yPivot],
+                        [st.xPivot, st.yMax],
+                        [st.xMin, st.yMax]
+                    ],
+                    groundSolidStraightPolygon2D: st.footprint2D,
+                    groundDashedStraightPolygon2D: [],
+                    cutLine2D: floor === 'basement' ? st.planCutLine2D : null,
+                    solidTreads2D,
+                    dashedTreads2D,
+                    solidRisers2D,
+                    dashedRisers2D,
+                    balustradeLoop2D: null,
+                    walkingLine: {
+                        startCircle2D: [st.xMin, yMidLower],
+                        solidPoints2D: [
+                            [st.xMin, yMidLower],
+                            [xMidUpper, yMidLower],
+                            [xMidUpper, st.yMin]
+                        ],
+                        dashedPoints2D: [],
+                        arrowTip2D: [xMidUpper, st.yMin],
+                        arrowDir: 'north'
+                    },
+                    labels: {
+                        cadSpec: st.cadSpecLabel,
+                        balustrade: st.balustradeLabel,
+                        specPos2D: [5150, 5600],
+                        balustradePos2D: [5905, 4960]
+                    }
+                };
+            }
 
             // Diagonal cut line on Ground Floor: X(y) from (13690, 8360) to (13420, 9370)
             const cutP1 = st.planCutLine2D[0]; // [13690, 8360]
@@ -2749,14 +3251,16 @@
                 });
 
             const poly2D = raw.footprint2D || [];
+            const holes2D = Array.isArray(raw.holes2D) ? raw.holes2D : [];
             const zBot = (raw.zBottom !== undefined && raw.zBottom !== null) ? Number(raw.zBottom) : 2960;
             const zTop = (raw.zTop !== undefined && raw.zTop !== null) ? Number(raw.zTop) : 3330;
             const thick = (raw.thickness !== undefined && raw.thickness !== null) ? Number(raw.thickness) : (zTop - zBot);
 
             const topLoop3D = poly2D.map(p => [p[0], p[1], zTop]);
             const bottomLoop3D = poly2D.slice().reverse().map(p => [p[0], p[1], zBot]);
+            const holeLoops3D = [];
 
-            // 12 vertical perimeter faces around the slab boundary
+            // Vertical perimeter faces around the slab outer boundary
             const sideQuads3D = [];
             for (let i = 0; i < poly2D.length; i++) {
                 const a = poly2D[i];
@@ -2782,7 +3286,44 @@
                 });
             }
 
-            // Rectilinear 2D cell decomposition of the non-convex orthogonal footprint
+            // Vertical interior reveal faces around each stairwell/void hole in holes2D
+            holes2D.forEach((hole, hIdx) => {
+                const hPoly = Array.isArray(hole) ? hole : (hole.polygon2D || []);
+                if (hPoly.length < 3) return;
+                holeLoops3D.push({
+                    id: hole.id || `HOLE_${hIdx + 1}`,
+                    topLoop3D: hPoly.map(p => [p[0], p[1], zTop]),
+                    bottomLoop3D: hPoly.slice().reverse().map(p => [p[0], p[1], zBot])
+                });
+                for (let i = 0; i < hPoly.length; i++) {
+                    const a = hPoly[i];
+                    const b = hPoly[(i + 1) % hPoly.length];
+                    const dx = b[0] - a[0];
+                    const dy = b[1] - a[1];
+                    const len = Math.hypot(dx, dy) || 1;
+                    // Inward normal pointing into the hole opening
+                    const normal = [
+                        Math.round((dy / len) * 1000) / 1000,
+                        Math.round((-dx / len) * 1000) / 1000,
+                        0
+                    ];
+                    sideQuads3D.push({
+                        edgeIndex: poly2D.length + i,
+                        isHoleEdge: true,
+                        holeId: hole.id || `HOLE_${hIdx + 1}`,
+                        lengthMm: Math.round(len),
+                        normal,
+                        loop3D: [
+                            [b[0], b[1], zBot],
+                            [a[0], a[1], zBot],
+                            [a[0], a[1], zTop],
+                            [b[0], b[1], zTop]
+                        ]
+                    });
+                }
+            });
+
+            // Rectilinear 2D cell decomposition of the non-convex orthogonal footprint minus holes2D
             function pointInPoly2D(x, y, loop) {
                 let inside = false;
                 for (let i = 0, j = loop.length - 1; i < loop.length; j = i++) {
@@ -2800,6 +3341,13 @@
             poly2D.forEach(p => {
                 xSet.add(p[0]);
                 ySet.add(p[1]);
+            });
+            holes2D.forEach(hole => {
+                const hPoly = Array.isArray(hole) ? hole : (hole.polygon2D || []);
+                hPoly.forEach(p => {
+                    xSet.add(p[0]);
+                    ySet.add(p[1]);
+                });
             });
             const xCoords = Array.from(xSet).sort((a, b) => a - b);
             const yCoords = Array.from(ySet).sort((a, b) => a - b);
@@ -2820,6 +3368,15 @@
                     if (y1 - y0 < 1) continue;
                     const ym = (y0 + y1) / 2;
                     if (!pointInPoly2D(xm, ym, poly2D)) continue;
+                    let insideHole = false;
+                    for (let h = 0; h < holes2D.length; h++) {
+                        const hPoly = Array.isArray(holes2D[h]) ? holes2D[h] : (holes2D[h].polygon2D || []);
+                        if (hPoly.length >= 3 && pointInPoly2D(xm, ym, hPoly)) {
+                            insideHole = true;
+                            break;
+                        }
+                    }
+                    if (insideHole) continue;
 
                     const areaMm2 = (x1 - x0) * (y1 - y0);
                     totalAreaMm2 += areaMm2;
@@ -2867,6 +3424,8 @@
                 rooms: raw.rooms || '',
                 specs: raw.specs || '',
                 footprint2D: poly2D,
+                holes2D,
+                holeLoops3D,
                 excludedVoids: raw.excludedVoids || [],
                 topLoop3D,
                 bottomLoop3D,
@@ -2881,6 +3440,7 @@
             const rawFloors = (wallsData && Array.isArray(wallsData.floors)) ? wallsData.floors : [];
             if (rawFloors.length === 0) {
                 return [
+                    this.compileFloor3D('FLOOR_BASEMENT'),
                     this.compileFloor3D('FLOOR_LOWER'),
                     this.compileFloor3D('FLOOR_UPPER'),
                     this.compileFloor3D('ROOF_GYM'),
@@ -2914,9 +3474,14 @@
             if (!fl || zSlice < fl.zBottom || zSlice > fl.zTop) {
                 return { zSlice, polygons2D: [] };
             }
+            const polys = [fl.footprint2D];
+            (fl.holes2D || []).forEach(h => {
+                const hp = Array.isArray(h) ? h : (h.polygon2D || []);
+                if (hp.length >= 3) polys.push(hp);
+            });
             return {
                 zSlice,
-                polygons2D: [fl.footprint2D]
+                polygons2D: polys
             };
         },
 

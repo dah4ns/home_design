@@ -132,6 +132,85 @@
                     [11910, 8865, 3330]
                 ]
             }
+        },
+        "basement_staircase": {
+            "id": "basement_staircase",
+            "name": "Basement Staircase (Wejście do piwnicy 13×19,46×21,5)",
+            "room": "0.14 Spiżarnia / -1 Piwnica",
+            "viewId": "stairs_spizarnia_basement",
+            "flooring_height": -2470,
+            "width": 900,
+            "step_height": 190,
+            "step_length": 215,
+            "plank_height": 40,
+            "stair_slab": 160,
+            "total_risers": 13,
+            "turn_steps_count": 4,
+            "straight_risers_count": 9,
+            "straight_treads_count": 8,
+            "horizontal_gain": 1720,
+            "elevation_gain": 2470,
+            "total_rise": 2470,
+            "top_floor_elevation": 0,
+            "balustrade_height": 0,
+            "show_planks": true,
+            "line_thickness": 1.0,
+            "materials": {
+                "structure": "Reinforced concrete monolithic core (C20/25)",
+                "riserFinish": "Mineral plaster / paint matching interior wall",
+                "treadPlank": "Gres / solid oak tread finish 40 mm",
+                "soffit": "Smooth gypsum plaster painted warm off-white"
+            },
+            "description": "L-shaped winder staircase connecting -1 Piwnica (Z = -2,470 mm) and 0.14 Spiżarnia (Z = 0 mm): 6 lower straight treads (129 cm = 6 × 21.5 cm) along the South wall (X = 4,205..5,495 mm), 4 winder treads in the 82 × 90 cm SW corner (X = 5,495..6,315 mm, Y = 5,210..6,070 mm), and 2 upper straight treads (43 cm = 2 × 21.5 cm, Y = 4,770..5,210 mm) arriving at Z = 0 mm next to door D_GW13_1.",
+            "brep3D": {
+                "id": "STAIRS_BASEMENT",
+                "stairId": "basement_staircase",
+                "name": "STAIRS_BASEMENT — Spiżarnia Basement Staircase (Wejście do piwnicy 13×19,46×21,5)",
+                "cadSpecLabel": "13×19,46×21,5",
+                "balustradeLabel": "wejście do piwnicy",
+                "floor": "basement",
+                "connectsFloors": ["basement", "ground"],
+                "rooms": "-1 Piwnica -> 0.14 Spiżarnia",
+                "southWallId": "BW_SOUTH",
+                "westWallId": "GW_13",
+                "eastWallId": "GW_14",
+                "xMin": 4205,
+                "xPivot": 5495,
+                "xTurnMid": 5905,
+                "xMax": 6315,
+                "yMin": 4770,
+                "yPivot": 5210,
+                "yTurnMid": 5640,
+                "yMax": 6070,
+                "zBottom": -2470,
+                "zTop": 0,
+                "upperFloorDatumZ": 0,
+                "flightWidthMm": 860,
+                "turnWidthMm": 820,
+                "riserCount": 13,
+                "treadCount": 12,
+                "lowerStraightTreadsCount": 6,
+                "turnStepsCount": 4,
+                "upperStraightTreadsCount": 2,
+                "riserHeightMm": 190,
+                "treadDepthMm": 215,
+                "upperTreadDepthMm": 220,
+                "plankThicknessMm": 40,
+                "waistSlabThicknessMm": 160,
+                "balustradeHeightMm": 0,
+                "balustradeThicknessMm": 0,
+                "planCutLine2D": [
+                    [5150, 5210],
+                    [5495, 6070]
+                ],
+                "walkingLine3D": [
+                    [4205, 5640, -2470],
+                    [5495, 5640, -1330],
+                    [5905, 5640, -950],
+                    [5905, 5210, -570],
+                    [5905, 4770, 0]
+                ]
+            }
         }
     };
 

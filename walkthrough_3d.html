@@ -550,6 +550,7 @@
       <button class="mode-btn" id="modeFlyBtn" title="Free 3D flight in any direction">🛸 Free-Fly</button>
       <button class="mode-btn" id="modeOrbitBtn" title="Orbit turntable around the house">🌐 Orbit</button>
       <div class="mode-sep"></div>
+      <button class="mode-btn" id="floorBasementBtn" title="Switch to Basement (Piwnica -2.47 m)">Piwnica (-2.47m)</button>
       <button class="mode-btn" id="floorGroundBtn" title="Switch to Ground Floor (Parter 0.00 m)">Parter (0.0m)</button>
       <button class="mode-btn" id="floorUpperBtn" title="Switch to Upper Floor (Piętro +3.33 m)">Piętro (+3.33m)</button>
       <div class="mode-sep"></div>
@@ -574,7 +575,7 @@
 
     <div>
       <div class="section-title">
-        <span>🏠 Ground Floor (Parter 296 cm)</span>
+        <span>🏠 Ground Floor &amp; Basement</span>
       </div>
       <div class="preset-grid" id="groundPresets"></div>
     </div>
@@ -670,6 +671,7 @@
     <div class="minimap-header">
       <span class="section-title" style="margin:0;">🧭 Interactive Mini-Map</span>
       <div class="minimap-tabs">
+        <button class="mm-tab" id="mmBasementTab">Piwnica</button>
         <button class="mm-tab active" id="mmGroundTab">Parter</button>
         <button class="mm-tab" id="mmUpperTab">Piętro</button>
       </div>
@@ -702,6 +704,7 @@
   <!-- Data & Geometry Services -->
   <script src="data/walls.js"></script>
   <script src="data/windows.js"></script>
+  <script src="data/stairs.js"></script>
   <script src="data/furniture.js"></script>
   <script src="data/room_furniture.js"></script>
   <script src="data/sockets.js"></script>
@@ -764,7 +767,7 @@
       // Canonical coordinates in mm:
       // X: East (-285) -> West (20,705)
       // Y: North (-290) -> South (21,130)
-      // Z: Vertical Elevation (0 = Ground Floor, 3330 = Upper Floor)
+      // Z: Vertical Elevation (-2470 = Basement, 0 = Ground Floor, 3330 = Upper Floor)
       var EXTERIOR_PRESETS = [
         { id: 'ext_west_entry', label: '🚶 Front Entry Path', x: 24800, y: 9800, footZ: -20, yaw: Math.PI, pitch: 0.04 },
         { id: 'ext_ne_garden', label: '🌳 NE Garden View', x: -6500, y: -2500, footZ: -145, yaw: 0.65, pitch: 0.06 },
@@ -780,6 +783,8 @@
         { id: 'gf_living', label: '0.11 Salon (Living)', x: 5250, y: 10350, footZ: 0, yaw: -2.42, pitch: -0.10 },
         { id: 'gf_dining', label: '0.12 Jadalnia', x: 8650, y: 8900, footZ: 0, yaw: -0.58, pitch: -0.04 },
         { id: 'gf_kitchen', label: '0.13 Kuchnia', x: 7100, y: 5050, footZ: 0, yaw: -0.22, pitch: -0.12 },
+        { id: 'gf_pantry', label: '0.14 Spiżarnia (Stairs)', x: 5905, y: 3850, footZ: 0, yaw: 1.57, pitch: -0.35 },
+        { id: 'bf_basement', label: '-1 Piwnica (Basement)', x: 2600, y: 4600, footZ: -2470, yaw: 0.25, pitch: 0.05 },
         { id: 'gf_study', label: '0.15 Gabinet (NE)', x: 2100, y: 4600, footZ: 0, yaw: -1.25, pitch: 0.0 },
         { id: 'gf_gym', label: '0.10 Siłownia (Gym)', x: 17600, y: 18200, footZ: 0, yaw: -2.25, pitch: 0.0 },
         { id: 'gf_garage', label: '0.01 Garaż', x: 17200, y: 3200, footZ: 0, yaw: 0.0, pitch: -0.02 }
@@ -795,6 +800,8 @@
       ];
 
       var ROOM_DEFINITIONS = [
+        // Basement room (-1 Piwnica)
+        { floor: -1, name: '-1 Piwnica (Basement)', x0: 95, x1: 6980, y0: 3170, y1: 6070 },
         // Ground Floor rooms (exact coordinates from data/walls.js)
         { floor: 0, name: '0.01 Garaż (Double Garage)', x0: 14275, x1: 20325, y0: 90, y1: 6290 },
         { floor: 0, name: '0.02 Magazyn (Storage)', x0: 12095, x1: 14095, y0: 90, y1: 2990 },
@@ -1572,11 +1579,11 @@
         }
 
         // Skip horizontal reveal caps on slab/band interface planes that are already capped by
-        // FLOOR_LOWER (Z=0), WALL_BAND (Z=2800 and Z=3430), TERRACE_UPPER (Z=2850), FLOOR_UPPER/ROOF_GARAGE/ROOF_GYM (Z=2960), or FLOOR_UPPER (Z=3330)
+        // FLOOR_LOWER (Z=-220 and Z=0), WALL_BAND (Z=2800 and Z=3430), TERRACE_UPPER (Z=2850), FLOOR_UPPER/ROOF_GARAGE/ROOF_GYM (Z=2960), or FLOOR_UPPER (Z=3330)
         function isSharedHorizontalInterface(p1, p2) {
           if (Math.abs(p1[2] - p2[2]) >= 1) return false;
           var z = Math.round(p1[2]);
-          if (z === 0 || z === 2850 || z === 2960 || z === 3330) return true;
+          if (z === -220 || z === 0 || z === 2850 || z === 2960 || z === 3330) return true;
           if (isExteriorWall && (z === 2800 || z === 3430)) return true;
           if (!isExteriorWall && wall.id === 'GW_15' && z === 3430) return true;
           return false;
@@ -1715,7 +1722,11 @@
         // -----------------------------------------------------------------------
         // A. SITE ENVIRONMENT (LAWN, DRIVEWAY, TERRACES, PLINTH, TREES)
         // -----------------------------------------------------------------------
-        addBoxZUp(bLawn, -20000, -18000, -190, 42000, 38000, -145, 2500);
+        // Carve out the NE Basement perimeter (X = -285..7,360 mm, Y = 2,790..6,450 mm) so the lawn never covers the basement or stairwell opening
+        addBoxZUp(bLawn, -20000, -18000, -190, 42000, 2790, -145, 2500);
+        addBoxZUp(bLawn, -20000, 6450, -190, 42000, 38000, -145, 2500);
+        addBoxZUp(bLawn, -20000, 2790, -190, -285, 6450, -145, 2500);
+        addBoxZUp(bLawn, 7360, 2790, -190, 42000, 6450, -145, 2500);
 
         // West Driveway & Pedestrian Front Entry Walkway (top + vertical curbs only, omitting buried bottom at Z = -145)
         addOpenVerticalBoxZUp(bDriveway, 20325, 90, -145, 36000, 7000, -40, 1800);
@@ -1793,9 +1804,10 @@
             });
             return;
           }
+          var isBasementWall = (w.id.indexOf('BW_') === 0 || w.floor === 'basement');
           var isUpperWall = (w.id.indexOf('UW_') === 0 || w.id.indexOf('FW_') === 0);
-          var zMin = isUpperWall ? 3330 : 0;
-          var zMax = isUpperWall ? 6300 : 2960;
+          var zMin = isBasementWall ? -2600 : (isUpperWall ? 3330 : 0);
+          var zMax = isBasementWall ? -220 : (isUpperWall ? 6300 : 2960);
           if (Array.isArray(w.sides) && w.sides.length > 2) {
             w.sides.forEach(function (s) {
               allWallFaceSegments.push({
@@ -1835,10 +1847,15 @@
             return;
           }
 
+          var isBW = w.id.indexOf('BW_') === 0;
           var isEW = w.id.indexOf('EW_') === 0;
           var isUW = w.id.indexOf('UW_') === 0;
 
-          if (isEW) {
+          if (isBW) {
+            addWallFace3D(bPlinth, w.sideA, 1600, 1600, false, 0);
+            addWallFace3D(bInteriorWall, w.sideB, 1600, 1600, false, 0);
+            addWallReveals3D(bPlinth, bInteriorWall, bInteriorReveal, bUpperWallCapFascia, bUpperWallCapWhite, w, true, allWallFaceSegments);
+          } else if (isEW) {
             addWallFace3D(bLowerFacade, w.sideA, 1600, 1600, false, 0);
             addWallFace3D(bInteriorWall, w.sideB, 1600, 1600, false, 0);
             addWallReveals3D(bFascia, bInteriorWall, bInteriorReveal, bUpperWallCapFascia, bUpperWallCapWhite, w, true, allWallFaceSegments);
@@ -1859,22 +1876,25 @@
         });
 
         // -----------------------------------------------------------------------
-        // C. FLOOR & ROOF SLABS (FLOOR_LOWER, FLOOR_UPPER, TERRACE_UPPER, ROOF_*)
+        // C. FLOOR & ROOF SLABS (FLOOR_BASEMENT, FLOOR_LOWER, FLOOR_UPPER, TERRACE_UPPER, ROOF_*)
         // -----------------------------------------------------------------------
         var floors3D = WallService.getFloors3D();
         floors3D.forEach(function (slab) {
           var isRoofSlab = slab.id.indexOf('ROOF_') === 0;
 
-          if (slab.id === 'FLOOR_LOWER') {
+          if (slab.id === 'FLOOR_BASEMENT' || slab.id === 'FLOOR_LOWER') {
             (slab.topCellQuads3D || []).forEach(function (q) {
               addQuad3D(bFloorLower, q[0], q[1], q[2], q[3], [0, 0, 1]);
             });
             (slab.bottomCellQuads3D || []).forEach(function (q) {
-              addQuad3D(bPlinth, q[0], q[1], q[2], q[3], [0, 0, -1]);
+              // Underside of FLOOR_LOWER at Z = -220 mm forms the white interior ceiling over -1 Piwnica
+              var targetBot = (slab.id === 'FLOOR_LOWER') ? bInteriorCeiling : bPlinth;
+              addQuad3D(targetBot, q[0], q[1], q[2], q[3], [0, 0, -1]);
             });
             (slab.sideQuads3D || []).forEach(function (sq) {
               var lp = sq.loop3D;
-              if (lp && lp.length >= 4) addQuad3D(bPlinth, lp[0], lp[1], lp[2], lp[3], sq.normal);
+              var targetSide = sq.isHoleEdge ? bInteriorWall : bPlinth;
+              if (lp && lp.length >= 4) addQuad3D(targetSide, lp[0], lp[1], lp[2], lp[3], sq.normal);
             });
           } else if (slab.id === 'TERRACE_UPPER') {
             // TERRACE_UPPER (Z = 2,850..3,330 mm): top gres terrace tiles stopped at exterior faces of UW_TERRACE_EAST (X=6,115)
@@ -1992,8 +2012,10 @@
         // -----------------------------------------------------------------------
         cachedStairs3D = WallService.getStairs3D();
         cachedStairs3D.forEach(function (st) {
-          // Inset stair vertices by 3 mm from surrounding walls/slabs (GW_7 y=8360, GW_5 x=16175, FLOOR_UPPER x=11910, FLOOR_LOWER z=0)
+          var isMainStair = (st.id === 'STAIRS_1');
+          // Inset STAIRS_1 vertices by 3 mm from surrounding walls/slabs (GW_7 y=8360, GW_5 x=16175, FLOOR_UPPER x=11910, FLOOR_LOWER z=0)
           function insetStairPt3D(pt) {
+            if (!isMainStair) return [pt[0], pt[1], pt[2]];
             var x = pt[0];
             var y = pt[1];
             var z = pt[2];
@@ -2005,6 +2027,7 @@
           }
 
           function insetStairPt2D(pt) {
+            if (!isMainStair) return [pt[0], pt[1]];
             var x = pt[0];
             var y = pt[1];
             if (x >= 16174) x = 16172;
@@ -2027,17 +2050,19 @@
 
           // 1. Sloped Concrete Waist Slab (soffit, north, south; East stairwell wall x=11910 is already drawn by FLOOR_UPPER)
           if (st.waistSlab3D && st.waistSlab3D.faces3D) {
-            var visibleWaistFaces = st.waistSlab3D.faces3D.filter(function (f) {
-              return f.id !== 'east' && f.id !== 'top' && f.id !== 'west';
-            });
-            addLoopList(bStairConcrete, visibleWaistFaces, true);
+            var visibleWaistFaces = isMainStair
+              ? st.waistSlab3D.faces3D.filter(function (f) {
+                  return f.id !== 'east' && f.id !== 'top' && f.id !== 'west';
+                })
+              : st.waistSlab3D.faces3D;
+            addLoopList(bStairConcrete, visibleWaistFaces, isMainStair);
           }
 
           // 2. Individual Steps: Concrete core cheeks + Recessed vertical riser + 40 mm Solid Oak Tread
           var nosingOverhangMm = 8;
           (st.steps3D || []).forEach(function (step) {
             // 2a. Exterior concrete step cheeks (North/South triangles on straight flight, hallway cheek on turn block)
-            addLoopList(bStairConcrete, step.concreteFaces3D, true);
+            addLoopList(bStairConcrete, step.concreteFaces3D, isMainStair);
 
             // 2b. Vertical plaster riser (zBottom -> zConcreteTop), recessed 8 mm behind the 40 mm oak tread nosing
             var rn = step.riserNormal || [1, 0, 0];
@@ -2046,7 +2071,7 @@
               var r2 = insetStairPt2D(step.riserLine2D[1]);
               var r1Back = [r1[0] - rn[0] * nosingOverhangMm, r1[1] - rn[1] * nosingOverhangMm];
               var r2Back = [r2[0] - rn[0] * nosingOverhangMm, r2[1] - rn[1] * nosingOverhangMm];
-              var zRiserBot = Math.max(2, step.zBottom);
+              var zRiserBot = isMainStair ? Math.max(2, step.zBottom) : step.zBottom;
               var zRiserTop = step.zConcreteTop;
 
               addQuad3D(
@@ -2071,7 +2096,9 @@
 
             // 2c. Visible perimeter side edges of the 40 mm solid oak tread (skipping internal back edge against next riser)
             var sideQuads = step.plankSideQuads3D || [];
-            if (step.stepNumber >= 5) {
+            if (!isMainStair) {
+              addLoopList(bStairOak, sideQuads, false);
+            } else if (step.stepNumber >= 5) {
               // Straight step: edge 0 = West nosing, edge 1 = South hallway, edge 3 = North wall; skip edge 2 (East back edge)
               [0, 1, 3].forEach(function (idx) {
                 if (sideQuads[idx]) addLoopList(bStairOak, [sideQuads[idx]], true);
@@ -2585,12 +2612,24 @@
       var orbitTarget = [10200, 10500, 2200];
       var orbitDist = 26000;
 
+      var basementSegments = [];
       var groundSegments = [];
       var upperSegments = [];
 
       function buildCollisionSegments() {
         var gfSlice = WallService.getFloorPlanSlice('ground');
         var ufSlice = WallService.getFloorPlanSlice('first');
+
+        // Basement collision walls (-1 Piwnica: X = 95..6,980 mm, Y = 3,170..6,070 mm inside 38 cm BW_* walls)
+        basementSegments = [
+          { x0: -285, x1: 7360, y0: 2790, y1: 3170, wallId: 'BW_NORTH' },
+          { x0: -285, x1: 95, y0: 2790, y1: 6450, wallId: 'BW_EAST' },
+          { x0: -285, x1: 7360, y0: 6070, y1: 6450, wallId: 'BW_SOUTH' },
+          { x0: 6980, x1: 7360, y0: 2790, y1: 6450, wallId: 'BW_WEST' },
+          // North/West cheek of STAIRS_BASEMENT so player enters/exits at East bottom step (X = 4,205, Y = 5,210..6,070)
+          { x0: 4205, x1: 6315, y0: 5150, y1: 5210, wallId: 'STAIRS_BASEMENT_NORTH_CHEEK' },
+          { x0: 6315, x1: 6395, y0: 4770, y1: 6070, wallId: 'STAIRS_BASEMENT_WEST_CHEEK' }
+        ];
 
         function addWallBoxes(boxes, wallList, isExterior) {
           (wallList || []).forEach(function (w) {
@@ -2786,9 +2825,80 @@
         return inStraight || inTurn;
       }
 
-      // Determine floor elevation Z at (x, y) given currentFootZ (handles STAIRS_1 climbing/descending with zero drop-outs!)
+      // Continuous, gap-free elevation along the L-shaped STAIRS_BASEMENT footprint in 0.14 Spiżarnia (X = 4,205..6,315, Y = 4,770..6,070)
+      function computeContinuousBasementStairZ(x, y) {
+        // 1. Upper straight flight (X = 5,495..6,315, Y <= 5,210): Z = 0 mm (at Y = 4,770) -> -570 mm (at Y = 5,210)
+        if (y <= 5210 && x >= 5450) {
+          var tUpper = Math.max(0, Math.min(1, (y - 4770) / (5210 - 4770)));
+          return -570 * tUpper;
+        }
+        // 2. SW Winder turn bay (X >= 5,495, Y > 5,210): fan angle around inner corner [5,495, 5,210], Z = -570 -> -1,330 mm
+        if (x >= 5495) {
+          var dx = Math.max(1, x - 5495);
+          var dy = Math.max(0, y - 5210);
+          var theta = Math.atan2(dy, dx); // 0 at Y = 5,210 (North) -> PI/2 at X = 5,495 (East)
+          var tWinder = Math.max(0, Math.min(1, theta / (Math.PI * 0.5)));
+          return -570 + tWinder * (-1330 - (-570));
+        }
+        // 3. Lower straight flight (X = 4,205..5,495, Y = 5,210..6,070): Z = -1,330 mm (at X = 5,495) -> -2,470 mm (at X = 4,205)
+        var tLower = Math.max(0, Math.min(1, (5495 - x) / (5495 - 4205)));
+        return -1330 + tLower * (-2470 - (-1330));
+      }
+
+      function isInBasementStairFootprint(x, y, pad) {
+        var p = pad || 0;
+        var inUpperAndTurn = (x >= 5495 - p && x <= 6315 + p && y >= 4770 - p && y <= 6070 + p);
+        var inLower = (x >= 4205 - p && x <= 5495 + p && y >= 5210 - p && y <= 6070 + p);
+        return inUpperAndTurn || inLower;
+      }
+
+      // Compute camera Z with automatic headroom ducking under FLOOR_LOWER (Z = -220 mm) when walking down STAIRS_BASEMENT
+      function computeCameraEyeZ(x, y, curFootZ) {
+        var rawEyeZ = curFootZ + eyeHeightMm;
+        if (curFootZ < -220) {
+          // Inside the open vertical upper stairwell shaft (X = 5,520..6,315, Y = 4,770..6,070) there is full headroom up to Z = +2,850 mm;
+          // Once stepping East under GW_14_STEP_SOUTH / FLOOR_LOWER (X < 5,650), smoothly duck eye Z below Z = -220 mm ceiling!
+          if (x < 5650) {
+            var blend = Math.max(0, Math.min(1, (5650 - x) / 220));
+            var duckedMaxZ = -340;
+            var allowedMaxZ = rawEyeZ * (1 - blend) + Math.min(rawEyeZ, duckedMaxZ) * blend;
+            return Math.min(rawEyeZ, allowedMaxZ);
+          }
+        }
+        return rawEyeZ;
+      }
+
+      // Determine floor elevation Z at (x, y) given currentFootZ (handles STAIRS_1 and STAIRS_BASEMENT with zero drop-outs!)
       function computeTargetFloorZ(x, y, curFootZ) {
-        // 1. Check if actively on the staircase (curFootZ between 90 and 3,240 mm)
+        // 0A. Check if actively on the Basement Staircase STAIRS_BASEMENT (curFootZ between -2,390 and -60 mm)
+        var activelyOnBasementStairs = (curFootZ < -60 && curFootZ > -2390);
+        if (activelyOnBasementStairs) {
+          // Exiting top of basement stairs into 0.14 Spiżarnia (Y <= 4,775 near top riser)
+          if (y <= 4775 && x >= 5450 && x <= 6350 && curFootZ > -420) {
+            return 0;
+          }
+          // Exiting bottom of basement stairs into -1 Piwnica (X <= 4,230 near Step 1)
+          if (x <= 4230 && y >= 5150 && y <= 6090 && curFootZ < -2100) {
+            return -2470;
+          }
+          return computeContinuousBasementStairZ(x, y);
+        }
+
+        // 0B. Check if currently in the Basement (-1 Piwnica, curFootZ <= -2,390 mm)
+        if (curFootZ <= -2390) {
+          // Entering bottom of STAIRS_BASEMENT from -1 Piwnica (X = 4,180..5,495, Y = 5,210..6,070)
+          if (x >= 4180 && x <= 5550 && y >= 5200 && y <= 6075) {
+            return computeContinuousBasementStairZ(x, y);
+          }
+          return -2470;
+        }
+
+        // 0C. Entering top of STAIRS_BASEMENT from 0.14 Spiżarnia on Ground Floor (X = 5,495..6,315, Y = 4,750..6,070)
+        if (curFootZ >= -60 && curFootZ <= 90 && x >= 5495 && x <= 6315 && y >= 4750 && y <= 6070) {
+          return computeContinuousBasementStairZ(x, y);
+        }
+
+        // 1. Check if actively on the main staircase STAIRS_1 (curFootZ between 90 and 3,240 mm)
         var activelyOnStairs = (curFootZ > 90 && curFootZ < 3240);
         if (activelyOnStairs) {
           // Exiting bottom of stairs into Ground Floor Hall (Y >= 9,610 near bottom step)
@@ -2803,12 +2913,12 @@
           return computeContinuousStairZ(x, y);
         }
 
-        // 2. Entering the staircase from Ground Floor (bottom entry at X = 15,175..16,175, Y = 9,300..9,660)
+        // 2. Entering STAIRS_1 from Ground Floor (bottom entry at X = 15,175..16,175, Y = 9,300..9,660)
         if (curFootZ <= 90 && x >= 15150 && x <= 16180 && y >= 9250 && y <= 9650) {
           return computeContinuousStairZ(x, y);
         }
 
-        // 3. Entering the staircase from Upper Floor (top landing at X = 11,910..12,450, Y = 8,360..9,370)
+        // 3. Entering STAIRS_1 from Upper Floor (top landing at X = 11,910..12,450, Y = 8,360..9,370)
         if (curFootZ >= 3240 && x >= 11910 && x <= 12450 && y >= 8350 && y <= 9375) {
           return computeContinuousStairZ(x, y);
         }
@@ -2853,6 +2963,31 @@
 
       // Build active collision boxes for the player's current elevation (including dedicated stair channel walls)
       function getActiveCollisionBoxes(curFootZ) {
+        if (curFootZ < -60 && curFootZ > -2390) {
+          // Player is actively on STAIRS_BASEMENT: L-shaped stairwell channel walls guide player smoothly between Spiżarnia and Piwnica
+          var bStairBoxes = [
+            // West stairwell wall GW_13_EAST (X = 6,315 mm)
+            { x0: 6315, x1: 6495, y0: 3170, y1: 6250 },
+            // South basement wall BW_SOUTH_INT (Y = 6,070 mm)
+            { x0: 3800, x1: 6495, y0: 6070, y1: 6450 },
+            // East upper flight wall GW_14_UPPER_WEST (X = 5,375..5,495 mm for Y = 3,170..5,210 mm)
+            { x0: 5375, x1: 5495, y0: 3170, y1: 5210 },
+            // North lower flight wall GW_14_STEP_SOUTH (X = 4,000..5,495 mm, Y = 5,090..5,210 mm)
+            { x0: 4000, x1: 5495, y0: 5090, y1: 5210 }
+          ];
+          // While on upper flight or winders (curFootZ > -1,450), block East end of lower flight
+          if (curFootZ > -1450) {
+            bStairBoxes.push({ x0: 4085, x1: 4205, y0: 5210, y1: 6150 });
+          }
+          // While on lower flight (curFootZ < -1,100), block North exit of upper flight
+          if (curFootZ < -1100) {
+            bStairBoxes.push({ x0: 5495, x1: 6350, y0: 4650, y1: 4770 });
+          }
+          return bStairBoxes;
+        }
+        if (curFootZ <= -2390) {
+          return basementSegments;
+        }
         if (curFootZ > 90 && curFootZ < 3240) {
           // Player is actively on STAIRS_1: channel walls keep the player safely inside the L-shaped staircase
           var sBoxes = [
@@ -2885,7 +3020,7 @@
         }
 
         var boxes = getActiveCollisionBoxes(curFootZ);
-        var radius = 195; // 19.5 cm player collision radius (fits easily through 80-90 cm doors & 100 cm stairs)
+        var radius = 195; // 19.5 cm player collision radius (fits easily through 80-90 cm doors & 82-100 cm stairs)
 
         var totalDx = targetX - oldX;
         var totalDy = targetY - oldY;
@@ -2943,15 +3078,21 @@
 
       // Detect current room / exterior area name for HUD badge
       function detectRoomName(x, y, z) {
+        if (isInBasementStairFootprint(x, y, 100) && z < -60 && z > -2390) {
+          return '🪜 STAIRS_BASEMENT (Spiżarnia ↔ Piwnica)';
+        }
         if (isInStairFootprint(x, y, 120) && z > 90 && z < 3250) {
           return '🪜 STAIRS_1 (Oak Winder Staircase)';
         }
-        var floorIdx = (z >= 2650) ? 1 : 0;
+        var floorIdx = (z <= -1000) ? -1 : ((z >= 2650) ? 1 : 0);
         for (var i = 0; i < ROOM_DEFINITIONS.length; i++) {
           var r = ROOM_DEFINITIONS[i];
           if (r.floor === floorIdx && x >= r.x0 && x <= r.x1 && y >= r.y0 && y <= r.y1) {
             return r.name;
           }
+        }
+        if (z <= -1000) {
+          return '-1 Piwnica (Basement)';
         }
         if (z >= 2650) {
           return 'Upper Level — Exterior View';
@@ -2997,7 +3138,7 @@
         footZ = p.footZ;
         camPos[0] = p.x;
         camPos[1] = p.y;
-        camPos[2] = p.footZ + eyeHeightMm;
+        camPos[2] = computeCameraEyeZ(camPos[0], camPos[1], footZ);
         camYaw = p.yaw;
         camPitch = p.pitch || 0;
 
@@ -3010,12 +3151,14 @@
       var modeWalkBtn = document.getElementById('modeWalkBtn');
       var modeFlyBtn = document.getElementById('modeFlyBtn');
       var modeOrbitBtn = document.getElementById('modeOrbitBtn');
+      var floorBasementBtn = document.getElementById('floorBasementBtn');
       var floorGroundBtn = document.getElementById('floorGroundBtn');
       var floorUpperBtn = document.getElementById('floorUpperBtn');
       var pointerLockBtn = document.getElementById('pointerLockBtn');
+      var mmBasementTab = document.getElementById('mmBasementTab');
       var mmGroundTab = document.getElementById('mmGroundTab');
       var mmUpperTab = document.getElementById('mmUpperTab');
-      var minimapFloor = 0; // 0 = Ground, 1 = Upper
+      var minimapFloor = 0; // -1 = Basement, 0 = Ground, 1 = Upper
 
       function setNavMode(mode) {
         navMode = mode;
@@ -3028,7 +3171,7 @@
           orbitDist = Math.max(8000, Math.hypot(camPos[0] - orbitTarget[0], camPos[1] - orbitTarget[1], camPos[2] - orbitTarget[2]));
         } else if (mode === 'walk') {
           footZ = computeTargetFloorZ(camPos[0], camPos[1], footZ);
-          camPos[2] = footZ + eyeHeightMm;
+          camPos[2] = computeCameraEyeZ(camPos[0], camPos[1], footZ);
         }
       }
 
@@ -3037,18 +3180,36 @@
       modeOrbitBtn.addEventListener('click', function () { setNavMode('orbit'); });
 
       function updateFloorTabHighlight() {
+        var isBasement = (footZ <= -1000);
         var isUpper = (footZ >= 2650);
-        floorGroundBtn.classList.toggle('active', !isUpper);
+        var isGround = (!isBasement && !isUpper);
+        if (floorBasementBtn) floorBasementBtn.classList.toggle('active', isBasement);
+        floorGroundBtn.classList.toggle('active', isGround);
         floorUpperBtn.classList.toggle('active', isUpper);
-        minimapFloor = isUpper ? 1 : 0;
+        minimapFloor = isBasement ? -1 : (isUpper ? 1 : 0);
+        if (mmBasementTab) mmBasementTab.classList.toggle('active', minimapFloor === -1);
         mmGroundTab.classList.toggle('active', minimapFloor === 0);
         mmUpperTab.classList.toggle('active', minimapFloor === 1);
       }
       updateFloorTabHighlight();
 
+      if (floorBasementBtn) {
+        floorBasementBtn.addEventListener('click', function () {
+          footZ = -2470;
+          // Place user inside -1 Piwnica facing the basement stairs if currently outside basement footprint
+          if (camPos[0] < 95 || camPos[0] > 6980 || camPos[1] < 3170 || camPos[1] > 6070 || isInBasementStairFootprint(camPos[0], camPos[1], 0)) {
+            camPos[0] = 2800;
+            camPos[1] = 4800;
+            camYaw = 0.25;
+          }
+          camPos[2] = computeCameraEyeZ(camPos[0], camPos[1], footZ);
+          updateFloorTabHighlight();
+        });
+      }
+
       floorGroundBtn.addEventListener('click', function () {
         footZ = 0;
-        camPos[2] = footZ + eyeHeightMm;
+        camPos[2] = computeCameraEyeZ(camPos[0], camPos[1], footZ);
         updateFloorTabHighlight();
       });
 
@@ -3059,18 +3220,29 @@
           camPos[0] = 11350;
           camPos[1] = 8600;
         }
-        camPos[2] = footZ + eyeHeightMm;
+        camPos[2] = computeCameraEyeZ(camPos[0], camPos[1], footZ);
         updateFloorTabHighlight();
       });
 
+      if (mmBasementTab) {
+        mmBasementTab.addEventListener('click', function () {
+          minimapFloor = -1;
+          mmBasementTab.classList.add('active');
+          mmGroundTab.classList.remove('active');
+          mmUpperTab.classList.remove('active');
+        });
+      }
+
       mmGroundTab.addEventListener('click', function () {
         minimapFloor = 0;
+        if (mmBasementTab) mmBasementTab.classList.remove('active');
         mmGroundTab.classList.add('active');
         mmUpperTab.classList.remove('active');
       });
 
       mmUpperTab.addEventListener('click', function () {
         minimapFloor = 1;
+        if (mmBasementTab) mmBasementTab.classList.remove('active');
         mmUpperTab.classList.add('active');
         mmGroundTab.classList.remove('active');
       });
@@ -3266,7 +3438,7 @@
           camPos[1] = resolved[1];
           if (navMode === 'walk') {
             footZ = computeTargetFloorZ(camPos[0], camPos[1], footZ);
-            camPos[2] = footZ + eyeHeightMm;
+            camPos[2] = computeCameraEyeZ(camPos[0], camPos[1], footZ);
             updateFloorTabHighlight();
           }
         }
@@ -3302,6 +3474,9 @@
 
       // Check whether a world point (wx, wy) is selectable on the active mini-map floor
       function isSelectableMinimapPoint(wx, wy, floorIdx) {
+        if (floorIdx === -1) {
+          return (wx >= 95 && wx <= 6980 && wy >= 3170 && wy <= 6070);
+        }
         if (floorIdx === 1) {
           // On Upper Floor mini-map: only walkable FLOOR_UPPER slab (which excludes High Living Room & High Hall void),
           // STAIRS_1 staircase, or NE Covered Upper Terrace (TERRACE_UPPER) are selectable.
@@ -3321,7 +3496,13 @@
         }
         camPos[0] = wpt[0];
         camPos[1] = wpt[1];
-        if (minimapFloor === 1) {
+        if (minimapFloor === -1) {
+          if (isInBasementStairFootprint(camPos[0], camPos[1], 0)) {
+            footZ = computeContinuousBasementStairZ(camPos[0], camPos[1]);
+          } else {
+            footZ = -2470;
+          }
+        } else if (minimapFloor === 1) {
           if (!ptInPoly2D(camPos[0], camPos[1], UPPER_FLOOR_POLY) && isInStairFootprint(camPos[0], camPos[1], 0)) {
             footZ = computeContinuousStairZ(camPos[0], camPos[1]);
           } else {
@@ -3330,7 +3511,7 @@
         } else {
           footZ = computeTargetFloorZ(camPos[0], camPos[1], 0);
         }
-        camPos[2] = footZ + eyeHeightMm;
+        camPos[2] = computeCameraEyeZ(camPos[0], camPos[1], footZ);
         if (navMode === 'orbit') setNavMode('walk');
         updateFloorTabHighlight();
       }
@@ -3360,7 +3541,13 @@
         mmCtx.fillStyle = '#0c111a';
         mmCtx.fillRect(0, 0, w, h);
 
-        if (minimapFloor === 1) {
+        if (minimapFloor === -1) {
+          // Subtle walkable Basement slab fill (X = 95..6,980, Y = 3,170..6,070)
+          var bf0 = worldToMinimap(95, 3170);
+          var bf1 = worldToMinimap(6980, 6070);
+          mmCtx.fillStyle = 'rgba(56, 189, 248, 0.08)';
+          mmCtx.fillRect(bf0[0], bf0[1], bf1[0] - bf0[0], bf1[1] - bf0[1]);
+        } else if (minimapFloor === 1) {
           // 1. Subtle walkable Upper Floor slab fill (UPPER_FLOOR_POLY)
           mmCtx.save();
           mmCtx.beginPath();
@@ -3459,7 +3646,7 @@
         }
 
         // Building walls
-        var boxes = (minimapFloor === 1) ? upperSegments : groundSegments;
+        var boxes = (minimapFloor === -1) ? basementSegments : ((minimapFloor === 1) ? upperSegments : groundSegments);
         mmCtx.fillStyle = 'rgba(255, 255, 255, 0.78)';
         boxes.forEach(function (b) {
           if (b.isFurniture) return;
@@ -3485,12 +3672,21 @@
           mmCtx.fillRect(p0[0], p0[1], Math.max(2, p1[0] - p0[0]), Math.max(2, p1[1] - p0[1]));
         });
 
-        // Staircase indicator
-        var st0 = worldToMinimap(11910, 8360);
-        var st1 = worldToMinimap(16175, 9640);
-        mmCtx.strokeStyle = 'rgba(245, 158, 11, 0.7)';
-        mmCtx.lineWidth = 2;
-        mmCtx.strokeRect(st0[0], st0[1], st1[0] - st0[0], st1[1] - st0[1]);
+        // Staircase indicators
+        if (minimapFloor >= 0) {
+          var st0 = worldToMinimap(11910, 8360);
+          var st1 = worldToMinimap(16175, 9640);
+          mmCtx.strokeStyle = 'rgba(245, 158, 11, 0.7)';
+          mmCtx.lineWidth = 2;
+          mmCtx.strokeRect(st0[0], st0[1], st1[0] - st0[0], st1[1] - st0[1]);
+        }
+        if (minimapFloor <= 0) {
+          var bst0 = worldToMinimap(4205, 4770);
+          var bst1 = worldToMinimap(6315, 6070);
+          mmCtx.strokeStyle = 'rgba(245, 158, 11, 0.75)';
+          mmCtx.lineWidth = 1.8;
+          mmCtx.strokeRect(bst0[0], bst0[1], bst1[0] - bst0[0], bst1[1] - bst0[1]);
+        }
 
         // Player position & FOV viewing cone
         var pp = worldToMinimap(camPos[0], camPos[1]);
@@ -3638,13 +3834,13 @@
               // Smooth step interpolation for natural stair climbing
               footZ += (targetFloor - footZ) * Math.min(1, dt * 12);
             }
-            camPos[2] = footZ + eyeHeightMm;
+            camPos[2] = computeCameraEyeZ(camPos[0], camPos[1], footZ);
             updateFloorTabHighlight();
           }
         } else if (navMode === 'walk') {
           var targetZ = computeTargetFloorZ(camPos[0], camPos[1], footZ);
           footZ += (targetZ - footZ) * Math.min(1, dt * 10);
-          camPos[2] = footZ + eyeHeightMm;
+          camPos[2] = computeCameraEyeZ(camPos[0], camPos[1], footZ);
         }
       }
 
