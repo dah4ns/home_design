@@ -1147,9 +1147,9 @@
                     id: 'GW_15', name: 'GW_15 (Spiżarnia & Gabinet South Wall)',
                     axis: 'x', x1: 95, z1: 6110, x2: 6495, z2: 6290,
                     rooms: '0.14 Spiżarnia & 0.15 Gabinet (294 cm) ↔ 0.11 Salon',
-                    specs: '6,400 × 180 mm (18 cm structural wall) • 2,940 mm (294 cm) South of North inner wall (Z = 3,170 mm); 93 cm + 90×210 cm door + 457 cm',
+                    specs: '6,400 × 180 mm (18 cm structural wall) • 2,940 mm (294 cm) South of North inner wall (Z = 3,170 mm); 10 cm + 90×210 cm door + 540 cm',
                     doors: [
-                        { start: 1025, end: 1925, swingDir: -1, hingeStart: true }
+                        { start: 195, end: 1095, swingDir: -1, hingeStart: true }
                     ]
                 }
             ],
@@ -1858,39 +1858,72 @@
                 coords.push(rv);
             };
 
-            if (typeof WallService !== 'undefined' && typeof WallService.getWalls === 'function') {
-                const bRepWalls = WallService.getWalls({ floor });
-                const allSides = [];
+            if (typeof WallService !== 'undefined' && typeof WallService.getFloorPlanSlice === 'function') {
+                const slice = WallService.getFloorPlanSlice(floor, 1200);
+                const bRepWalls = (slice.exteriorWalls || []).concat(slice.internalWalls || []);
+                const rawSpans = [];
                 const horizPlasterBands = [];
                 const vertPlasterBands = [];
 
                 bRepWalls.forEach(bw => {
+                    const segsBySideId = {};
+                    (bw.plasterSegments2D || []).forEach(seg => {
+                        if (!seg || !seg.sideId || !Array.isArray(seg.plasterLine) || seg.plasterLine.length < 2) return;
+                        if (!segsBySideId[seg.sideId]) segsBySideId[seg.sideId] = [];
+                        segsBySideId[seg.sideId].push(seg);
+                    });
+
                     const sides = (bw.category === 'exterior')
                         ? ((Array.isArray(bw.sides) && bw.sides.length > 0)
                             ? bw.sides.filter(s => s && s.role === 'interior')
                             : [bw.sideB].filter(Boolean))
                         : (Array.isArray(bw.sides) && bw.sides.length > 0 ? bw.sides : [bw.sideA, bw.sideB].filter(Boolean));
+
                     sides.forEach(side => {
                         if (!side || !side.p1 || !side.p2) return;
                         const sp1 = side.plasterP1 || side.p1;
                         const sp2 = side.plasterP2 || side.p2;
                         const pThick = Number(side.plasterThicknessMm) || 0;
-                        allSides.push({ wall: bw, side, sp1, sp2, rawP1: side.p1, rawP2: side.p2, pThick });
+                        const isHoriz = Math.abs(side.normal[1]) >= Math.abs(side.normal[0]);
+                        const nSign = isHoriz ? (side.normal[1] >= 0 ? 1 : -1) : (side.normal[0] >= 0 ? 1 : -1);
+                        const fixedCoord = isHoriz ? sp1[1] : sp1[0];
+                        let tMin = isHoriz ? Math.min(sp1[0], sp2[0]) : Math.min(sp1[1], sp2[1]);
+                        let tMax = isHoriz ? Math.max(sp1[0], sp2[0]) : Math.max(sp1[1], sp2[1]);
+
+                        let sMin = Infinity;
+                        let sMax = -Infinity;
+                        const sideSegs = segsBySideId[side.id];
+                        if (sideSegs && sideSegs.length > 0) {
+                            sideSegs.forEach(seg => {
+                                const [[px1, pz1], [px2, pz2]] = seg.plasterLine;
+                                const c1 = isHoriz ? px1 : pz1;
+                                const c2 = isHoriz ? px2 : pz2;
+                                if (Math.min(c1, c2) < sMin) sMin = Math.min(c1, c2);
+                                if (Math.max(c1, c2) > sMax) sMax = Math.max(c1, c2);
+                            });
+                            if (sMin < sMax) {
+                                // Apply flush/miter extensions or perpendicular wall trims (<= 250 mm),
+                                // while preserving full room spans when a corner window (> 250 mm) is at the end
+                                if (sMin < tMin || (sMin - tMin) <= 250) tMin = sMin;
+                                if (sMax > tMax || (tMax - sMax) <= 250) tMax = sMax;
+                            }
+                        }
+
+                        rawSpans.push({ isHoriz, nSign, fixedCoord, tMin, tMax, sMin, sMax, pThick });
 
                         if (pThick > 0) {
-                            const isHoriz = Math.abs(side.normal[1]) >= Math.abs(side.normal[0]);
                             if (isHoriz) {
                                 horizPlasterBands.push({
-                                    xMin: Math.min(sp1[0], sp2[0]),
-                                    xMax: Math.max(sp1[0], sp2[0]),
+                                    xMin: Math.min(tMin, sp1[0], sp2[0]),
+                                    xMax: Math.max(tMax, sp1[0], sp2[0]),
                                     zMin: Math.min(side.p1[1], sp1[1]),
                                     zMax: Math.max(side.p1[1], sp1[1]),
                                     plastZ: sp1[1]
                                 });
                             } else {
                                 vertPlasterBands.push({
-                                    zMin: Math.min(sp1[1], sp2[1]),
-                                    zMax: Math.max(sp1[1], sp2[1]),
+                                    zMin: Math.min(tMin, sp1[1], sp2[1]),
+                                    zMax: Math.max(tMax, sp1[1], sp2[1]),
                                     xMin: Math.min(side.p1[0], sp1[0]),
                                     xMax: Math.max(side.p1[0], sp1[0]),
                                     plastX: sp1[0]
@@ -1920,23 +1953,61 @@
                     return zVal;
                 };
 
+                rawSpans.forEach(s => {
+                    if (s.isHoriz) {
+                        if (!(s.sMin < s.sMax && (s.sMin < s.tMin || (s.sMin - s.tMin) <= 250))) {
+                            s.tMin = adjustXForVertPlaster(s.tMin, s.fixedCoord);
+                        }
+                        if (!(s.sMin < s.sMax && (s.sMax > s.tMax || (s.tMax - s.sMax) <= 250))) {
+                            s.tMax = adjustXForVertPlaster(s.tMax, s.fixedCoord);
+                        }
+                    } else {
+                        if (!(s.sMin < s.sMax && (s.sMin < s.tMin || (s.sMin - s.tMin) <= 250))) {
+                            s.tMin = adjustZForHorizPlaster(s.tMin, s.fixedCoord);
+                        }
+                        if (!(s.sMin < s.sMax && (s.sMax > s.tMax || (s.tMax - s.sMax) <= 250))) {
+                            s.tMax = adjustZForHorizPlaster(s.tMax, s.fixedCoord);
+                        }
+                    }
+                });
+
+                const mergedSpans = [];
+                rawSpans.slice().sort((a, b) => a.tMin - b.tMin).forEach(s => {
+                    let merged = false;
+                    for (let i = 0; i < mergedSpans.length; i++) {
+                        const m = mergedSpans[i];
+                        if (
+                            m.isHoriz === s.isHoriz &&
+                            m.nSign === s.nSign &&
+                            Math.abs(m.fixedCoord - s.fixedCoord) <= 5 &&
+                            s.tMin <= m.tMax + 25 &&
+                            s.tMax >= m.tMin - 25
+                        ) {
+                            m.tMin = Math.min(m.tMin, s.tMin);
+                            m.tMax = Math.max(m.tMax, s.tMax);
+                            merged = true;
+                            break;
+                        }
+                    }
+                    if (!merged) {
+                        mergedSpans.push({ ...s });
+                    }
+                });
+
                 if (normRot === 0 || normRot === 180) {
                     const nz = (normRot === 0) ? -1 : 1;
-                    allSides.forEach(({ sp1, sp2 }) => {
-                        const sx1 = sp1[0], sz1 = sp1[1];
-                        const sx2 = sp2[0], sz2 = sp2[1];
-                        if (Math.abs(sz1 - z0) <= 25 && Math.abs(sz2 - z0) <= 25) {
-                            if (x0 >= Math.min(sx1, sx2) - 60 && x0 <= Math.max(sx1, sx2) + 60) {
-                                addCoord(adjustXForVertPlaster(sx1, z0));
-                                addCoord(adjustXForVertPlaster(sx2, z0));
+                    mergedSpans.forEach(s => {
+                        if (s.isHoriz) {
+                            if (Math.abs(s.fixedCoord - z0) <= 25 && x0 >= s.tMin - 60 && x0 <= s.tMax + 60) {
+                                addCoord(s.tMin);
+                                addCoord(s.tMax);
                             }
-                        } else if (Math.abs(sx1 - sx2) <= 22) {
-                            const minZ = Math.min(sz1, sz2), maxZ = Math.max(sz1, sz2);
+                        } else {
                             const touchesAndExtends = (nz > 0)
-                                ? (minZ <= z0 + 25 && maxZ > z0 + 50)
-                                : (maxZ >= z0 - 25 && minZ < z0 - 50);
+                                ? (s.tMin <= z0 + 25 && s.tMax > z0 + 50)
+                                : (s.tMax >= z0 - 25 && s.tMin < z0 - 50);
                             if (touchesAndExtends) {
-                                addCoord(sx1);
+                                addCoord(s.fixedCoord);
                             }
                         }
                     });
@@ -1944,21 +2015,18 @@
                     return { axis: 'x', fixedCoord: z0, normalX: 0, normalZ: nz, cornerCoords: coords };
                 } else {
                     const nx = (normRot === 90) ? -1 : 1;
-                    allSides.forEach(({ sp1, sp2 }) => {
-                        const sx1 = sp1[0], sz1 = sp1[1];
-                        const sx2 = sp2[0], sz2 = sp2[1];
-                        if (Math.abs(sx1 - x0) <= 25 && Math.abs(sx2 - x0) <= 25) {
-                            if (z0 >= Math.min(sz1, sz2) - 60 && z0 <= Math.max(sz1, sz2) + 60) {
-                                addCoord(adjustZForHorizPlaster(sz1, x0));
-                                addCoord(adjustZForHorizPlaster(sz2, x0));
+                    mergedSpans.forEach(s => {
+                        if (!s.isHoriz) {
+                            if (Math.abs(s.fixedCoord - x0) <= 25 && z0 >= s.tMin - 60 && z0 <= s.tMax + 60) {
+                                addCoord(s.tMin);
+                                addCoord(s.tMax);
                             }
-                        } else if (Math.abs(sz1 - sz2) <= 22) {
-                            const minX = Math.min(sx1, sx2), maxX = Math.max(sx1, sx2);
+                        } else {
                             const touchesAndExtends = (nx > 0)
-                                ? (minX <= x0 + 25 && maxX > x0 + 50)
-                                : (maxX >= x0 - 25 && minX < x0 - 50);
+                                ? (s.tMin <= x0 + 25 && s.tMax > x0 + 50)
+                                : (s.tMax >= x0 - 25 && s.tMin < x0 - 50);
                             if (touchesAndExtends) {
-                                addCoord(sz1);
+                                addCoord(s.fixedCoord);
                             }
                         }
                     });
@@ -2168,19 +2236,31 @@
             };
 
             // 1. Register all 2 cm plaster corners & plastered doorway jambs first from WallService floor slice
+            // (merging collinear touching plaster segments so straight-wall seams do not register as corners)
             const horizPlasterAt = [];
             const vertPlasterAt = [];
             if (typeof WallService !== 'undefined' && typeof WallService.getFloorPlanSlice === 'function') {
                 const slice = WallService.getFloorPlanSlice(floor, 1200);
                 const allSlicedWalls = (slice.exteriorWalls || []).concat(slice.internalWalls || []);
+                const rawPlasterLines = [];
                 allSlicedWalls.forEach(w => {
                     const segs = Array.isArray(w.plasterSegments2D) ? w.plasterSegments2D : [];
                     if (segs.length > 0) plasteredWallIds.add(w.id);
                     segs.forEach(seg => {
                         if (Array.isArray(seg.plasterLine) && seg.plasterLine.length === 2) {
                             const [[px1, pz1], [px2, pz2]] = seg.plasterLine;
-                            addCorner(px1, pz1, `${w.id} Plaster Corner`, true, false);
-                            addCorner(px2, pz2, `${w.id} Plaster Corner`, true, false);
+                            const isHoriz = Math.abs(pz1 - pz2) <= 1;
+                            const nSign = isHoriz
+                                ? ((seg.normal && seg.normal[1] >= 0) ? 1 : -1)
+                                : ((seg.normal && seg.normal[0] >= 0) ? 1 : -1);
+                            rawPlasterLines.push({
+                                wallId: w.id,
+                                isHoriz,
+                                nSign,
+                                fixedCoord: isHoriz ? pz1 : px1,
+                                tMin: isHoriz ? Math.min(px1, px2) : Math.min(pz1, pz2),
+                                tMax: isHoriz ? Math.max(px1, px2) : Math.max(pz1, pz2)
+                            });
                         }
                     });
                     (w.sides || []).forEach(side => {
@@ -2205,6 +2285,39 @@
                             }
                         }
                     });
+                });
+
+                const mergedPlasterLines = [];
+                rawPlasterLines.sort((a, b) => a.tMin - b.tMin).forEach(pl => {
+                    let merged = false;
+                    for (let i = 0; i < mergedPlasterLines.length; i++) {
+                        const m = mergedPlasterLines[i];
+                        if (
+                            m.isHoriz === pl.isHoriz &&
+                            m.nSign === pl.nSign &&
+                            Math.abs(m.fixedCoord - pl.fixedCoord) <= 2 &&
+                            pl.tMin <= m.tMax + 2 &&
+                            pl.tMax >= m.tMin - 2
+                        ) {
+                            m.tMin = Math.min(m.tMin, pl.tMin);
+                            m.tMax = Math.max(m.tMax, pl.tMax);
+                            merged = true;
+                            break;
+                        }
+                    }
+                    if (!merged) {
+                        mergedPlasterLines.push({ ...pl });
+                    }
+                });
+
+                mergedPlasterLines.forEach(mpl => {
+                    if (mpl.isHoriz) {
+                        addCorner(mpl.tMin, mpl.fixedCoord, `${mpl.wallId} Plaster Corner`, true, false);
+                        addCorner(mpl.tMax, mpl.fixedCoord, `${mpl.wallId} Plaster Corner`, true, false);
+                    } else {
+                        addCorner(mpl.fixedCoord, mpl.tMin, `${mpl.wallId} Plaster Corner`, true, false);
+                        addCorner(mpl.fixedCoord, mpl.tMax, `${mpl.wallId} Plaster Corner`, true, false);
+                    }
                 });
             }
 
@@ -4144,10 +4257,10 @@
                 drawWallThicknessDim(group, 4205, 5680, 4085, 5680, 1);
                 drawWallSpanDim(group, 4085, 5680, 95, 5680, 1);
 
-                // 3a) GW_15 horizontal segments: 457 cm left wall + 90 cm door (H=210 cm) + 93 cm right pier = 640 cm
-                drawWallSpanDim(group, 6495, 6440, 1925, 6440, 1);
-                drawWallSpanDim(group, 1925, 6440, 1025, 6440, 1);
-                drawWallSpanDim(group, 1025, 6440, 95, 6440, 1);
+                // 3a) GW_15 horizontal segments: 540 cm left wall + 90 cm door (H=210 cm) + 10 cm right pier = 640 cm
+                drawWallSpanDim(group, 6495, 6440, 1095, 6440, 1);
+                drawWallSpanDim(group, 1095, 6440, 195, 6440, 1);
+                drawWallSpanDim(group, 195, 6440, 95, 6440, 1);
 
                 // 3b) Garage South Wall GW_4 segment West of GW_1 (335 cm, X = 17625..14275 at Z = 6150 mm)
                 drawWallSpanDim(group, 17625, 6150, 14275, 6150, -1);

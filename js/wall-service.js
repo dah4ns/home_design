@@ -748,117 +748,256 @@
                 return next;
             }
 
-            function computePlasterSegmentsForWall(w) {
-                const segments = [];
-                if (!Array.isArray(w.sides)) return segments;
+            // 1. Collect solid 2D rectangles of all internal walls on the floor
+            const internalRects = [];
+            rawInternal.forEach(w => {
+                if (Array.isArray(w.collisionBoxes2D) && w.collisionBoxes2D.length > 0) {
+                    w.collisionBoxes2D.forEach(box => {
+                        internalRects.push({
+                            wallId: w.id,
+                            axis: w.axis,
+                            x1: Math.min(box.x0, box.x1),
+                            y1: Math.min(box.y0, box.y1),
+                            x2: Math.max(box.x0, box.x1),
+                            y2: Math.max(box.y0, box.y1)
+                        });
+                    });
+                } else if (Array.isArray(w.solidPolygons2D) && w.solidPolygons2D.length > 0) {
+                    w.solidPolygons2D.forEach(poly => {
+                        const xs = poly.map(p => p[0]);
+                        const ys = poly.map(p => p[1]);
+                        internalRects.push({
+                            wallId: w.id,
+                            axis: w.axis,
+                            x1: Math.min(...xs),
+                            y1: Math.min(...ys),
+                            x2: Math.max(...xs),
+                            y2: Math.max(...ys)
+                        });
+                    });
+                } else {
+                    internalRects.push({
+                        wallId: w.id,
+                        axis: w.axis,
+                        x1: w.x1,
+                        y1: w.y1,
+                        x2: w.x2,
+                        y2: w.y2
+                    });
+                }
+            });
 
+            // 2. Collect all plastered side records across the floor
+            const plasterSides = [];
+            allFloorWalls.forEach(w => {
+                if (!Array.isArray(w.sides)) return;
                 w.sides.forEach(side => {
                     const pThick = Number(side.plasterThicknessMm) || 0;
                     if (pThick <= 0) return;
 
                     const isHoriz = Math.abs(side.normal[1]) >= Math.abs(side.normal[0]);
                     const sideAxis = isHoriz ? 'x' : 'y';
-                    const sideScan = sliceFace3DAtElevation(side.outerLoop3D, [], sideAxis, zSlice);
-                    let intervals = sideScan.solidIntervals.slice();
-
-                    // Trim plaster intervals against perpendicular walls that abut this wall face
+                    const nDir = isHoriz ? side.normal[1] : side.normal[0];
                     const baseCoord = isHoriz ? side.p1[1] : side.p1[0];
-                    const offsetCoord = baseCoord + (isHoriz ? side.normal[1] : side.normal[0]) * pThick;
-                    const bandMin = Math.min(baseCoord, offsetCoord);
-                    const bandMax = Math.max(baseCoord, offsetCoord);
+                    const offsetCoord = baseCoord + nDir * pThick;
 
-                    allFloorWalls.forEach(other => {
-                        if (other.id === w.id) return;
-                        const otherHoriz = (other.axis === 'x');
-                        if (otherHoriz === isHoriz) return;
-
-                        if (isHoriz) {
-                            // Horizontal plastered face (e.g., EW_NORTH_RECESSED_INT at Y=3170..3190):
-                            // check if vertical wall `other` strictly overlaps Y = [bandMin, bandMax]
-                            if (other.y1 < bandMax - 0.5 && other.y2 > bandMin + 0.5) {
-                                let cutStart = (other.plasteredX1 !== undefined) ? other.plasteredX1 : other.x1;
-                                let cutEnd = (other.plasteredX2 !== undefined) ? other.plasteredX2 : other.x2;
-                                if (other.sideA && other.sideB) {
-                                    const ptA = (Math.abs(other.sideA.p1[1] - baseCoord) <= Math.abs(other.sideA.p2[1] - baseCoord))
-                                        ? (other.sideA.plasterP1 || other.sideA.p1)
-                                        : (other.sideA.plasterP2 || other.sideA.p2);
-                                    const ptB = (Math.abs(other.sideB.p1[1] - baseCoord) <= Math.abs(other.sideB.p2[1] - baseCoord))
-                                        ? (other.sideB.plasterP1 || other.sideB.p1)
-                                        : (other.sideB.plasterP2 || other.sideB.p2);
-                                    cutStart = Math.min(ptA[0], ptB[0]);
-                                    cutEnd = Math.max(ptA[0], ptB[0]);
-                                }
-                                intervals = subtractIntervalList(intervals, cutStart, cutEnd);
-                            }
-                        } else {
-                            // Vertical plastered face (e.g., GW_3 at X=11915 or 12095, GW_13 at X=6315 or 6495):
-                            // check if horizontal wall `other` overlaps X = [bandMin, bandMax]
-                            let ox1 = (other.plasteredX1 !== undefined) ? other.plasteredX1 : other.x1;
-                            let ox2 = (other.plasteredX2 !== undefined) ? other.plasteredX2 : other.x2;
-                            let oy1 = (other.plasteredY1 !== undefined) ? other.plasteredY1 : other.y1;
-                            let oy2 = (other.plasteredY2 !== undefined) ? other.plasteredY2 : other.y2;
-                            if (other.category === 'exterior') {
-                                // Use the interior plastered face of the exterior wall if it has plaster
-                                const intSide = (other.sides || []).find(s => s.role === 'interior');
-                                if (intSide) {
-                                    ox1 = Math.min(intSide.p1[0], intSide.p2[0]);
-                                    ox2 = Math.max(intSide.p1[0], intSide.p2[0]);
-                                    const intY = intSide.p1[1];
-                                    const intPlaster = Number(intSide.plasterThicknessMm) || 0;
-                                    oy1 = Math.min(intY, intY + intSide.normal[1] * intPlaster);
-                                    oy2 = Math.max(intY, intY + intSide.normal[1] * intPlaster);
-                                }
-                            }
-                            if (ox1 < bandMax - 0.5 && ox2 > bandMin + 0.5) {
-                                intervals = subtractIntervalList(intervals, oy1, oy2);
-                            }
-                        }
+                    // Cut out floor-level openings (zMin <= floorDatumZ + 50, such as terrace doors O5 or entrance doors)
+                    const floorLevelHoles = (side.holes3D || []).filter(h => {
+                        const loop = Array.isArray(h) ? h : (h && (h.loop3D || h.loop));
+                        if (!Array.isArray(loop) || loop.length === 0) return false;
+                        const minZ = Math.min(...loop.map(pt => pt[2]));
+                        return minZ <= floorDatumZ + 50;
                     });
+                    const sideScan = sliceFace3DAtElevation(side.outerLoop3D, floorLevelHoles, sideAxis, zSlice);
+                    const intervals = sideScan.solidIntervals.map(([a, b]) => [a, b]);
 
-                    intervals.forEach(([cStart, cEnd]) => {
-                        if (cEnd - cStart <= 1) return;
-                        if (isHoriz) {
-                            segments.push({
-                                wallId: w.id,
-                                sideId: side.id,
-                                axis: 'x',
-                                normal: side.normal,
-                                thicknessMm: pThick,
-                                wallLine: [[cStart, baseCoord], [cEnd, baseCoord]],
-                                plasterLine: [[cStart, offsetCoord], [cEnd, offsetCoord]],
-                                polygon2D: [
-                                    [cStart, baseCoord],
-                                    [cEnd, baseCoord],
-                                    [cEnd, offsetCoord],
-                                    [cStart, offsetCoord]
-                                ]
-                            });
-                        } else {
-                            segments.push({
-                                wallId: w.id,
-                                sideId: side.id,
-                                axis: 'y',
-                                normal: side.normal,
-                                thicknessMm: pThick,
-                                wallLine: [[baseCoord, cStart], [baseCoord, cEnd]],
-                                plasterLine: [[offsetCoord, cStart], [offsetCoord, cEnd]],
-                                polygon2D: [
-                                    [baseCoord, cStart],
-                                    [offsetCoord, cStart],
-                                    [offsetCoord, cEnd],
-                                    [baseCoord, cEnd]
-                                ]
-                            });
-                        }
+                    const rawMin = Math.min(side.p1[isHoriz ? 0 : 1], side.p2[isHoriz ? 0 : 1]);
+                    const rawMax = Math.max(side.p1[isHoriz ? 0 : 1], side.p2[isHoriz ? 0 : 1]);
+
+                    plasterSides.push({
+                        wallId: w.id,
+                        sideId: side.id,
+                        normal: side.normal,
+                        isHoriz,
+                        nDir,
+                        pThick,
+                        baseCoord,
+                        offsetCoord,
+                        bandMin: Math.min(baseCoord, offsetCoord),
+                        bandMax: Math.max(baseCoord, offsetCoord),
+                        rawMin,
+                        rawMax,
+                        intervals
                     });
                 });
+            });
 
-                return segments;
-            }
+            // 3. Extend plastered faces across flush perpendicular internal wall end-caps (L-corners & T-junctions)
+            plasterSides.forEach(ps => {
+                if (ps.intervals.length === 0) return;
+                internalRects.forEach(rect => {
+                    if (rect.wallId === ps.wallId) return;
+                    const rectIsHoriz = (rect.axis === 'x');
+                    if (rectIsHoriz === ps.isHoriz) return;
+
+                    if (ps.isHoriz) {
+                        const flushEdge = (ps.nDir > 0) ? rect.y2 : rect.y1;
+                        if (Math.abs(flushEdge - ps.baseCoord) <= 1) {
+                            const alreadyCovered = plasterSides.some(other =>
+                                other !== ps && other.isHoriz && other.nDir === ps.nDir &&
+                                Math.abs(other.baseCoord - ps.baseCoord) <= 1 &&
+                                other.rawMin < rect.x2 - 1 && other.rawMax > rect.x1 + 1
+                            );
+                            if (alreadyCovered) return;
+
+                            if (Math.abs(rect.x2 - ps.rawMin) <= 1 && Math.abs(ps.intervals[0][0] - ps.rawMin) <= 1) {
+                                ps.intervals[0][0] = rect.x1;
+                                ps.rawMin = rect.x1;
+                            }
+                            const lastIdx = ps.intervals.length - 1;
+                            if (Math.abs(rect.x1 - ps.rawMax) <= 1 && Math.abs(ps.intervals[lastIdx][1] - ps.rawMax) <= 1) {
+                                ps.intervals[lastIdx][1] = rect.x2;
+                                ps.rawMax = rect.x2;
+                            }
+                        }
+                    } else {
+                        const flushEdge = (ps.nDir > 0) ? rect.x2 : rect.x1;
+                        if (Math.abs(flushEdge - ps.baseCoord) <= 1) {
+                            const alreadyCovered = plasterSides.some(other =>
+                                other !== ps && !other.isHoriz && other.nDir === ps.nDir &&
+                                Math.abs(other.baseCoord - ps.baseCoord) <= 1 &&
+                                other.rawMin < rect.y2 - 1 && other.rawMax > rect.y1 + 1
+                            );
+                            if (alreadyCovered) return;
+
+                            if (Math.abs(rect.y2 - ps.rawMin) <= 1 && Math.abs(ps.intervals[0][0] - ps.rawMin) <= 1) {
+                                ps.intervals[0][0] = rect.y1;
+                                ps.rawMin = rect.y1;
+                            }
+                            const lastIdx = ps.intervals.length - 1;
+                            if (Math.abs(rect.y1 - ps.rawMax) <= 1 && Math.abs(ps.intervals[lastIdx][1] - ps.rawMax) <= 1) {
+                                ps.intervals[lastIdx][1] = rect.y2;
+                                ps.rawMax = rect.y2;
+                            }
+                        }
+                    }
+                });
+            });
+
+            // 4. Trim intervals against solid internal wall bodies and perpendicular plastered sides (Concave corners & T-junctions)
+            plasterSides.forEach(ps => {
+                internalRects.forEach(rect => {
+                    if (rect.wallId === ps.wallId) return;
+                    if (ps.isHoriz) {
+                        if (rect.y1 < ps.bandMax - 0.5 && rect.y2 > ps.bandMin + 0.5) {
+                            ps.intervals = subtractIntervalList(ps.intervals, rect.x1, rect.x2);
+                        }
+                    } else {
+                        if (rect.x1 < ps.bandMax - 0.5 && rect.x2 > ps.bandMin + 0.5) {
+                            ps.intervals = subtractIntervalList(ps.intervals, rect.y1, rect.y2);
+                        }
+                    }
+                });
+
+                plasterSides.forEach(other => {
+                    if (other.isHoriz === ps.isHoriz) return;
+                    if (
+                        other.rawMin < ps.bandMax - 0.5 &&
+                        other.rawMax > ps.bandMin + 0.5 &&
+                        ps.rawMin < other.bandMax - 0.5 &&
+                        ps.rawMax > other.bandMin + 0.5
+                    ) {
+                        ps.intervals = subtractIntervalList(ps.intervals, other.bandMin, other.bandMax);
+                    }
+                });
+            });
+
+            // 5. Build raw segment objects and miter 270° convex (reflex) corners so plaster lines meet at (baseX + nX*pThick, baseY + nY*pThick)
+            const rawSegments = [];
+            plasterSides.forEach(ps => {
+                ps.intervals.forEach(([cStart, cEnd]) => {
+                    if (cEnd - cStart <= 1) return;
+                    rawSegments.push({
+                        wallId: ps.wallId,
+                        sideId: ps.sideId,
+                        isHoriz: ps.isHoriz,
+                        nDir: ps.nDir,
+                        normal: ps.normal,
+                        thicknessMm: ps.pThick,
+                        baseCoord: ps.baseCoord,
+                        offsetCoord: ps.offsetCoord,
+                        wStart: cStart,
+                        wEnd: cEnd,
+                        pStart: cStart,
+                        pEnd: cEnd
+                    });
+                });
+            });
+
+            const horizSegs = rawSegments.filter(s => s.isHoriz);
+            const vertSegs = rawSegments.filter(s => !s.isHoriz);
+            horizSegs.forEach(h => {
+                vertSegs.forEach(v => {
+                    // Check if horizontal segment endpoint meets vertical segment baseX, and vertical endpoint meets horizontal baseY
+                    const hAtStart = Math.abs(h.wStart - v.baseCoord) <= 1;
+                    const hAtEnd = Math.abs(h.wEnd - v.baseCoord) <= 1;
+                    const vAtStart = Math.abs(v.wStart - h.baseCoord) <= 1;
+                    const vAtEnd = Math.abs(v.wEnd - h.baseCoord) <= 1;
+                    if (!(hAtStart || hAtEnd) || !(vAtStart || vAtEnd)) return;
+
+                    // Convex corner condition: each segment extends into the opposite side of the other's outward normal
+                    const horizBehindVert = (hAtStart && v.nDir < 0) || (hAtEnd && v.nDir > 0);
+                    const vertBehindHoriz = (vAtStart && h.nDir < 0) || (vAtEnd && h.nDir > 0);
+                    if (horizBehindVert && vertBehindHoriz) {
+                        if (hAtStart) h.pStart = v.offsetCoord;
+                        if (hAtEnd) h.pEnd = v.offsetCoord;
+                        if (vAtStart) v.pStart = h.offsetCoord;
+                        if (vAtEnd) v.pEnd = h.offsetCoord;
+                    }
+                });
+            });
+
+            const plasterSegmentsByWallId = {};
+            rawSegments.forEach(s => {
+                if (!plasterSegmentsByWallId[s.wallId]) plasterSegmentsByWallId[s.wallId] = [];
+                if (s.isHoriz) {
+                    plasterSegmentsByWallId[s.wallId].push({
+                        wallId: s.wallId,
+                        sideId: s.sideId,
+                        axis: 'x',
+                        normal: s.normal,
+                        thicknessMm: s.thicknessMm,
+                        wallLine: [[s.wStart, s.baseCoord], [s.wEnd, s.baseCoord]],
+                        plasterLine: [[s.pStart, s.offsetCoord], [s.pEnd, s.offsetCoord]],
+                        polygon2D: [
+                            [s.wStart, s.baseCoord],
+                            [s.wEnd, s.baseCoord],
+                            [s.pEnd, s.offsetCoord],
+                            [s.pStart, s.offsetCoord]
+                        ]
+                    });
+                } else {
+                    plasterSegmentsByWallId[s.wallId].push({
+                        wallId: s.wallId,
+                        sideId: s.sideId,
+                        axis: 'y',
+                        normal: s.normal,
+                        thicknessMm: s.thicknessMm,
+                        wallLine: [[s.baseCoord, s.wStart], [s.baseCoord, s.wEnd]],
+                        plasterLine: [[s.offsetCoord, s.pStart], [s.offsetCoord, s.pEnd]],
+                        polygon2D: [
+                            [s.baseCoord, s.wStart],
+                            [s.offsetCoord, s.pStart],
+                            [s.offsetCoord, s.pEnd],
+                            [s.baseCoord, s.wEnd]
+                        ]
+                    });
+                }
+            });
 
             function sliceWall(w) {
                 const slicedOpenings = w.openings.filter(op => op.active && op.zMin <= zSlice && op.zMax >= zSlice);
-                const plasterSegments2D = computePlasterSegmentsForWall(w);
+                const plasterSegments2D = plasterSegmentsByWallId[w.id] || [];
                 if (Array.isArray(w.solidPolygons2D) && w.solidPolygons2D.length > 0) {
                     const inSlice = (zSlice >= w.zBottom && zSlice <= w.zTop);
                     return Object.assign({}, w, {
