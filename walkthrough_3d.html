@@ -2366,13 +2366,15 @@
         var bFurnLinesFrontWood = createBuilder();
         var bFurnLinesFrontMetal = createBuilder();
 
-        // Inset fixed kitchen furniture vertices 1.5 mm away from room walls/floor so back/side/bottom panels never Z-fight
+        // Inset fixed kitchen & pantry furniture vertices 1.5 mm away from room walls/floor so back/side/bottom panels never Z-fight
         function adjustFurnPt(pt, furnNormal, isFront, isRoomFurniture) {
           var x = pt[0], y = pt[1], z = pt[2];
           if (!isRoomFurniture) {
             if (y <= 3171.5) y = 3171.5;
             if (x >= 11913.5) x = 11913.5;
-            if (x <= 6516.5 && y <= 6300) x = 6516.5;
+            if (x >= 6505 && x <= 6516.5 && y <= 6300) x = 6516.5;
+            if (x >= 6313.5 && x <= 6320 && y <= 6110) x = 6313.5;
+            if (x >= 4450 && x <= 4456.5 && y <= 5210) x = 4456.5;
           }
           if (z <= 1.5) z = 1.5;
           if (isFront && furnNormal && !isRoomFurniture) {
@@ -2461,7 +2463,8 @@
             role === 'sink_drain' ||
             role === 'handle_rail' ||
             role === 'appliance_front' ||
-            role === 'appliance_window'
+            role === 'appliance_window' ||
+            role === 'appliance_led'
           );
 
           var colorKey =
@@ -3624,6 +3627,9 @@
               } else if (furn.id === 'KITCHEN_ISLAND') {
                 mmCtx.fillStyle = 'rgba(226, 232, 240, 0.38)';
                 mmCtx.strokeStyle = 'rgba(248, 250, 252, 0.85)';
+              } else if (furn.id === 'PANTRY_FRIDGE') {
+                mmCtx.fillStyle = 'rgba(71, 85, 105, 0.78)';
+                mmCtx.strokeStyle = 'rgba(203, 213, 225, 0.92)';
               } else {
                 mmCtx.fillStyle = 'rgba(217, 119, 6, 0.36)';
                 mmCtx.strokeStyle = 'rgba(251, 191, 36, 0.68)';

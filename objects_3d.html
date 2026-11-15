@@ -927,7 +927,9 @@
                     <div class="preset-grid">
                         <button type="button" class="ctrl-btn" id="preset-sockets-only" style="grid-column: span 2; border-color: rgba(56,189,248,0.55); color: #7dd3fc;">⚡ Electrical Sockets &amp; Multi-Gang Frames</button>
                         <button type="button" class="ctrl-btn" id="preset-sofa-living" style="grid-column: span 2; border-color: rgba(16,185,129,0.45); color: #6ee7b7;">🛋️ Living Room Corner Sofa (SOFA_LIVING_1)</button>
-                        <button type="button" class="ctrl-btn" id="preset-cab-only" style="grid-column: span 2;">🗄️ All Furniture Only (Kitchen + Living)</button>
+                        <button type="button" class="ctrl-btn" id="preset-cab-pantry" style="grid-column: span 2; border-color: rgba(245,158,11,0.55); color: #fcd34d;">🥫 Pantry Room (0.14 Spiżarnia — Fridge + Shelves)</button>
+                        <button type="button" class="ctrl-btn" id="preset-cab-pantry-fridge" style="grid-column: span 2; border-color: rgba(148,163,184,0.55); color: #e2e8f0;">❄️ Pantry Samsung Refrigerator (PANTRY_FRIDGE)</button>
+                        <button type="button" class="ctrl-btn" id="preset-cab-only" style="grid-column: span 2;">🗄️ All Furniture Only (Kitchen + Pantry + Living)</button>
                         <button type="button" class="ctrl-btn" id="preset-cab-kitchen" style="grid-column: span 2;">🍳 All Kitchen + Island + Walls &amp; Window O1</button>
                         <button type="button" class="ctrl-btn" id="preset-cab-island-only" style="grid-column: span 2;">🏝️ Kitchen Island Only (KITCHEN_ISLAND)</button>
                         <button type="button" class="ctrl-btn" id="preset-cab-north-only">⬆️ North Wall Only (N1..N8)</button>
@@ -2216,17 +2218,26 @@
                             if (appState.showCabinetBacks === false && isCabinetBackPart(part)) return;
                             const rgb = part.colorRgb || [0.93, 0.90, 0.84];
                             const isBacksplashGlass = (part.role === 'backsplash_glass' || part.isReflectiveGlass);
-                            const wireColor = isBacksplashGlass
-                                ? (part.wireColorRgba || [0.42, 0.82, 0.92, 0.94])
-                                : ((part.role === 'plinth')
-                                    ? [0.42, 0.33, 0.27, 0.90]
-                                    : (part.role === 'worktop'
-                                        ? [0.68, 0.60, 0.48, 0.94]
-                                        : ((part.role === 'sink_basin' || part.role === 'sink_drain' || part.role === 'sink_faucet' || part.role === 'socket_frame' || part.role === 'socket_insert' || part.role === 'socket_shutter')
-                                            ? [0.34, 0.39, 0.45, 0.94]
-                                            : [0.56, 0.42, 0.28, 0.92])));
-                            const isMetallicPart = (part.role === 'sink_faucet' || part.role === 'sink_basin' || part.role === 'sink_drain');
-                            const partAlpha = isBacksplashGlass ? 0.912 : (isMetallicPart ? 0.97 : 0.98);
+                            const isMetallicPart = (
+                                part.role === 'sink_faucet' ||
+                                part.role === 'sink_basin' ||
+                                part.role === 'sink_drain' ||
+                                part.role === 'appliance_front' ||
+                                part.role === 'appliance_window' ||
+                                part.role === 'appliance_led'
+                            );
+                            const wireColor = Array.isArray(part.wireColorRgba)
+                                ? part.wireColorRgba
+                                : (isBacksplashGlass
+                                    ? [0.42, 0.82, 0.92, 0.94]
+                                    : ((part.role === 'plinth')
+                                        ? [0.42, 0.33, 0.27, 0.90]
+                                        : (part.role === 'worktop'
+                                            ? [0.68, 0.60, 0.48, 0.94]
+                                            : ((isMetallicPart || part.role === 'socket_frame' || part.role === 'socket_insert' || part.role === 'socket_shutter')
+                                                ? [0.34, 0.39, 0.45, 0.94]
+                                                : [0.56, 0.42, 0.28, 0.92]))));
+                            const partAlpha = isBacksplashGlass ? 0.912 : (isMetallicPart ? 0.985 : 0.98);
                             (part.faces3D || []).forEach(face => {
                                 pushConvexLoop3D(face.loop3D, face.normal || [0, 0, 1], [rgb[0], rgb[1], rgb[2], partAlpha], null, face.vertexNormals3D);
                                 if (!face.noWireframe) {
@@ -2302,10 +2313,13 @@
                     // 3. Outward Normal Vector Arrow n = [nx, ny, nz] from Cabinet Front Face
                     if (appState.showNormals && Array.isArray(furn.normal)) {
                         const isWestWallCab = furn.normal[0] < -0.5;
+                        const isEastWallCab = furn.normal[0] > 0.5;
                         const startX = isWestWallCab
                             ? (showFronts ? furn.xMin : (furn.xMax - furn.carcassDepthMm))
-                            : (furn.xMin + furn.xMax) / 2;
-                        const startY = isWestWallCab
+                            : (isEastWallCab
+                                ? (showFronts ? furn.xMax : (furn.xMin + furn.carcassDepthMm))
+                                : (furn.xMin + furn.xMax) / 2);
+                        const startY = (isWestWallCab || isEastWallCab)
                             ? (furn.yMin + furn.yMax) / 2
                             : (showFronts ? furn.yMax : (furn.yMin + furn.carcassDepthMm));
                         const midZ = (furn.zBottom + furn.zTop) / 2;
@@ -2939,6 +2953,10 @@
                     {
                         title: 'Dining Room West Wall — 30cm Tall Units & Circular Shelves (GW_3 — CAB_DINING_ROOM_W6..W9)',
                         filter: fn => fn.hostWallId === 'GW_3' && fn.id.indexOf('CAB_DINING_ROOM_') === 0
+                    },
+                    {
+                        title: '🥫 Pantry Room (0.14 Spiżarnia — PANTRY_FRIDGE, CAB_PANTRY_E1..E4, CAB_PANTRY_E_UP1..UP3)',
+                        filter: fn => fn.room === '0.14 Spiżarnia' || fn.id === 'PANTRY_FRIDGE' || fn.id.indexOf('CAB_PANTRY_') === 0
                     }
                 ];
 
@@ -3431,6 +3449,29 @@
                     focusSelectedFurniture();
                 });
             }
+            const pantryBtn = document.getElementById('preset-cab-pantry');
+            if (pantryBtn) {
+                pantryBtn.addEventListener('click', () => {
+                    const pantryIds = allFurniture.filter(fn => fn.room === '0.14 Spiżarnia' || fn.id === 'PANTRY_FRIDGE' || fn.id.indexOf('CAB_PANTRY_') === 0).map(fn => fn.id);
+                    appState.selectedIds = new Set(pantryIds.concat(['EW_NORTH_RECESSED', 'GW_13', 'GW_14', 'FLOOR_LOWER', 'STAIRS_BASEMENT']));
+                    appState.yaw = 135 * Math.PI / 180;
+                    appState.pitch = 24 * Math.PI / 180;
+                    renderDropdownAndInspector();
+                    focusSelectedFurniture();
+                });
+            }
+            const pantryFridgeBtn = document.getElementById('preset-cab-pantry-fridge');
+            if (pantryFridgeBtn) {
+                pantryFridgeBtn.addEventListener('click', () => {
+                    appState.selectedIds = new Set(['PANTRY_FRIDGE', 'EW_NORTH_RECESSED', 'GW_13', 'FLOOR_LOWER']);
+                    appState.yaw = 108 * Math.PI / 180;
+                    appState.pitch = 16 * Math.PI / 180;
+                    renderDropdownAndInspector();
+                    focusSelectedFurniture();
+                    appState.distance = 2.1;
+                    renderScene();
+                });
+            }
             document.getElementById('preset-cab-only').addEventListener('click', () => {
                 appState.selectedIds = new Set(allFurniture.map(fn => fn.id));
                 appState.yaw = 132 * Math.PI / 180;
@@ -3457,7 +3498,7 @@
                 renderScene();
             });
             document.getElementById('preset-cab-north-only').addEventListener('click', () => {
-                const northIds = allFurniture.filter(fn => fn.hostWallId === 'EW_NORTH_RECESSED').map(fn => fn.id);
+                const northIds = allFurniture.filter(fn => fn.hostWallId === 'EW_NORTH_RECESSED' && fn.room !== '0.14 Spiżarnia').map(fn => fn.id);
                 appState.selectedIds = new Set(northIds.concat(['EW_NORTH_RECESSED', 'FLOOR_LOWER']));
                 appState.yaw = 96 * Math.PI / 180;
                 appState.pitch = 16 * Math.PI / 180;

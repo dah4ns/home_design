@@ -3546,6 +3546,8 @@
                     role: part.role || partGroup,
                     material: part.material || 'carcass_melamine',
                     colorRgb: Array.isArray(part.colorRgb) ? part.colorRgb : [0.90, 0.87, 0.80],
+                    wireColorRgba: Array.isArray(part.wireColorRgba) ? part.wireColorRgba : null,
+                    isReflectiveGlass: !!part.isReflectiveGlass,
                     x0, x1, y0, y1, z0, z1,
                     widthMm: x1 - x0,
                     depthMm: y1 - y0,

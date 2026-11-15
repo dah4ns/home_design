@@ -3245,13 +3245,864 @@
 
                 return fParts;
             })()
-        }
+        },
+
+        // =====================================================================
+        // 26. PANTRY_FRIDGE: Freestanding 600 × 600 × 1,900 mm Samsung Brushed Graphite
+        //     Upright Refrigerator / Freezer (Zamrażarka) on North Wall of 0.14 Spiżarnia
+        //     Inspired by attached reference photos: dark matte charcoal cabinet body with
+        //     stepped top rear housing, magnetic gasket reveal, thick beveled brushed-graphite
+        //     steel door, raised silver SAMSUNG badge, recessed black glass digital control panel
+        //     displaying "-19 °C" LED readout + Wi-Fi/leaf icons + "< O >" touch controls,
+        //     smooth cylindrical vertical bar handle with top/bottom standoff brackets, and leveling feet.
+        // =====================================================================
+        (function buildPantryFridgeObject() {
+            const fx0 = 5715, fx1 = 6315; // 600 mm width in NW corner of 0.14 Spiżarnia (flush with GW_13_EAST at X=6315)
+            const fy0 = 3170, fy1 = 3770; // 600 mm total body + door depth from EW_NORTH_RECESSED_INT (Y=3170)
+            const fz0 = 0, fz1 = 1900;    // 1,900 mm total height
+
+            const COLOR_FRIDGE_CASING = [0.17, 0.19, 0.22];       // Matte dark charcoal insulated cabinet sides & top
+            const COLOR_FRIDGE_GASKET = [0.10, 0.11, 0.13];       // Deep shadow accordion door seal
+            const COLOR_FRIDGE_DOOR_FACE = [0.24, 0.27, 0.31];    // Brushed graphite / black stainless steel door front
+            const COLOR_FRIDGE_DOOR_BEVEL = [0.31, 0.35, 0.40];   // Specular brushed edge bevel highlight
+            const COLOR_FRIDGE_HANDLE_BAR = [0.30, 0.34, 0.39];   // Anodized dark gunmetal tubular bar handle
+            const COLOR_FRIDGE_HANDLE_MOUNT = [0.38, 0.42, 0.47]; // Brushed metallic handle standoffs & end caps
+            const COLOR_FRIDGE_BADGE = [0.84, 0.87, 0.91];        // Brushed silver-chrome SAMSUNG logo badge
+            const COLOR_FRIDGE_BEZEL = [0.13, 0.15, 0.18];        // Recessed control panel bezel frame
+            const COLOR_FRIDGE_GLASS = [0.05, 0.06, 0.08];        // Pitch-black tempered glass LED display screen
+            const COLOR_FRIDGE_LED = [0.95, 0.99, 1.00];          // Crisp glowing white LED 7-segment readout (-19 °C)
+            const WIRE_FRIDGE_DARK = [0.34, 0.38, 0.44, 0.92];
+            const WIRE_FRIDGE_LED = [0.95, 0.99, 1.00, 0.98];
+
+            // Helper for smooth cylindrical tubes (leveling feet, vertical bar handle, horizontal standoffs)
+            function buildFridgeTubePart(opts) {
+                const spine = opts.spine || [];
+                const numSegs = opts.numSegs || 22;
+                const faces3D = [];
+                const wireframeLines3D = opts.wireframeLines3D ? opts.wireframeLines3D.slice() : [];
+                let minX = Infinity, maxX = -Infinity;
+                let minY = Infinity, maxY = -Infinity;
+                let minZ = Infinity, maxZ = -Infinity;
+
+                const tangents = [];
+                for (let i = 0; i < spine.length; i++) {
+                    let iPrev = i;
+                    while (iPrev > 0 && Math.hypot(spine[i][0] - spine[iPrev][0], spine[i][1] - spine[iPrev][1], spine[i][2] - spine[iPrev][2]) < 0.05) iPrev--;
+                    let iNext = i;
+                    while (iNext < spine.length - 1 && Math.hypot(spine[iNext][0] - spine[i][0], spine[iNext][1] - spine[i][1], spine[iNext][2] - spine[i][2]) < 0.05) iNext++;
+                    let tx = spine[iNext][0] - spine[iPrev][0];
+                    let ty = spine[iNext][1] - spine[iPrev][1];
+                    let tz = spine[iNext][2] - spine[iPrev][2];
+                    const len = Math.hypot(tx, ty, tz) || 1;
+                    tangents.push([tx / len, ty / len, tz / len]);
+                }
+
+                const rings = [];
+                for (let i = 0; i < spine.length; i++) {
+                    const [px, py, pz, r] = spine[i];
+                    const T = tangents[i];
+                    const ref = (Math.abs(T[0]) < 0.85) ? [1, 0, 0] : [0, 1, 0];
+                    let vx = T[1] * ref[2] - T[2] * ref[1];
+                    let vy = T[2] * ref[0] - T[0] * ref[2];
+                    let vz = T[0] * ref[1] - T[1] * ref[0];
+                    const vLen = Math.hypot(vx, vy, vz) || 1;
+                    vx /= vLen; vy /= vLen; vz /= vLen;
+                    let ux = vy * T[2] - vz * T[1];
+                    let uy = vz * T[0] - vx * T[2];
+                    let uz = vx * T[1] - vy * T[0];
+                    const uLen = Math.hypot(ux, uy, uz) || 1;
+                    ux /= uLen; uy /= uLen; uz /= uLen;
+
+                    const ringPts = [];
+                    const ringNormals = [];
+                    for (let k = 0; k < numSegs; k++) {
+                        const ang = (k / numSegs) * Math.PI * 2;
+                        const ca = Math.cos(ang), sa = Math.sin(ang);
+                        const nx = ca * ux + sa * vx;
+                        const ny = ca * uy + sa * vy;
+                        const nz = ca * uz + sa * vz;
+                        const vx3 = Math.round((px + r * nx) * 100) / 100;
+                        const vy3 = Math.round((py + r * ny) * 100) / 100;
+                        const vz3 = Math.round((pz + r * nz) * 100) / 100;
+                        ringPts.push([vx3, vy3, vz3]);
+                        ringNormals.push([nx, ny, nz]);
+                        if (vx3 < minX) minX = vx3;
+                        if (vx3 > maxX) maxX = vx3;
+                        if (vy3 < minY) minY = vy3;
+                        if (vy3 > maxY) maxY = vy3;
+                        if (vz3 < minZ) minZ = vz3;
+                        if (vz3 > maxZ) maxZ = vz3;
+                    }
+                    rings.push({ pts: ringPts, normals: ringNormals, T, r });
+                }
+
+                for (let i = 0; i + 1 < rings.length; i++) {
+                    const rA = rings[i], rB = rings[i + 1];
+                    const distCenters = Math.hypot(
+                        spine[i + 1][0] - spine[i][0],
+                        spine[i + 1][1] - spine[i][1],
+                        spine[i + 1][2] - spine[i][2]
+                    );
+                    const dr = rB.r - rA.r;
+                    if (distCenters < 0.02 && Math.abs(dr) < 0.02) continue;
+                    const hyp = Math.hypot(distCenters, dr) || 1;
+                    const wRad = distCenters / hyp;
+                    const wTan = -dr / hyp;
+                    for (let k = 0; k < numSegs; k++) {
+                        const kNext = (k + 1) % numSegs;
+                        const p00 = rA.pts[k], p10 = rA.pts[kNext], p11 = rB.pts[kNext], p01 = rB.pts[k];
+                        const n00 = [rA.normals[k][0] * wRad + rA.T[0] * wTan, rA.normals[k][1] * wRad + rA.T[1] * wTan, rA.normals[k][2] * wRad + rA.T[2] * wTan];
+                        const n10 = [rA.normals[kNext][0] * wRad + rA.T[0] * wTan, rA.normals[kNext][1] * wRad + rA.T[1] * wTan, rA.normals[kNext][2] * wRad + rA.T[2] * wTan];
+                        const n11 = [rB.normals[kNext][0] * wRad + rB.T[0] * wTan, rB.normals[kNext][1] * wRad + rB.T[1] * wTan, rB.normals[kNext][2] * wRad + rB.T[2] * wTan];
+                        const n01 = [rB.normals[k][0] * wRad + rB.T[0] * wTan, rB.normals[k][1] * wRad + rB.T[1] * wTan, rB.normals[k][2] * wRad + rB.T[2] * wTan];
+                        const avgNx = (n00[0] + n10[0] + n11[0] + n01[0]) / 4;
+                        const avgNy = (n00[1] + n10[1] + n11[1] + n01[1]) / 4;
+                        const avgNz = (n00[2] + n10[2] + n11[2] + n01[2]) / 4;
+                        const avgLen = Math.hypot(avgNx, avgNy, avgNz) || 1;
+                        faces3D.push({
+                            side: 'curved',
+                            noWireframe: true,
+                            normal: [avgNx / avgLen, avgNy / avgLen, avgNz / avgLen],
+                            vertexNormals3D: [n00, n10, n11, n01],
+                            loop3D: [p00, p10, p11, p01]
+                        });
+                    }
+                }
+
+                if (opts.capStart && rings.length > 0 && rings[0].r > 0.2) {
+                    const T0 = rings[0].T;
+                    faces3D.push({ side: 'cap_start', noWireframe: true, normal: [-T0[0], -T0[1], -T0[2]], loop3D: rings[0].pts.slice().reverse() });
+                }
+                if (opts.capEnd && rings.length > 0 && rings[rings.length - 1].r > 0.2) {
+                    const TN = rings[rings.length - 1].T;
+                    faces3D.push({ side: 'cap_end', noWireframe: true, normal: [TN[0], TN[1], TN[2]], loop3D: rings[rings.length - 1].pts.slice() });
+                }
+                (opts.ringWireframeIndices || []).forEach(idx => {
+                    if (rings[idx]) wireframeLines3D.push(rings[idx].pts.concat([rings[idx].pts[0]]));
+                });
+
+                return {
+                    id: opts.id,
+                    name: opts.name,
+                    role: opts.role || 'appliance_front',
+                    material: opts.material || 'stainless_steel',
+                    colorRgb: opts.colorRgb || COLOR_FRIDGE_HANDLE_BAR,
+                    wireColorRgba: opts.wireColorRgba || WIRE_FRIDGE_DARK,
+                    x0: Math.floor(minX), x1: Math.ceil(maxX),
+                    y0: Math.floor(minY), y1: Math.ceil(maxY),
+                    z0: Math.floor(minZ), z1: Math.ceil(maxZ),
+                    faces3D,
+                    wireframeLines3D
+                };
+            }
+
+            const skeletonParts = [];
+
+            // 1. Recessed Lower Chassis Base & Adjustable Leveling Feet (Z = 0..30 mm)
+            skeletonParts.push(
+                {
+                    id: 'PANTRY_FRIDGE_CHASSIS_APRON',
+                    name: 'Recessed Lower Compressor Chassis & Kickplate (580×510×18 mm, Z=12..30 mm)',
+                    role: 'appliance_front',
+                    material: 'appliance_steel',
+                    colorRgb: [0.11, 0.12, 0.14],
+                    wireColorRgba: WIRE_FRIDGE_DARK,
+                    x0: fx0 + 10, x1: fx1 - 10,
+                    y0: fy0 + 20, y1: 3700,
+                    z0: 12, z1: 30
+                },
+                buildFridgeTubePart({
+                    id: 'PANTRY_FRIDGE_FOOT_LEFT',
+                    name: 'Front-Left (West) Adjustable Leveling Foot (Ø44 mm, Z=0..30 mm)',
+                    role: 'appliance_front',
+                    material: 'appliance_steel',
+                    colorRgb: [0.14, 0.15, 0.17],
+                    numSegs: 16,
+                    spine: [
+                        [6272, 3726, 2, 22],
+                        [6272, 3726, 10, 22],
+                        [6272, 3726, 12, 13],
+                        [6272, 3726, 30, 13]
+                    ],
+                    capStart: true,
+                    ringWireframeIndices: [1]
+                }),
+                buildFridgeTubePart({
+                    id: 'PANTRY_FRIDGE_FOOT_RIGHT',
+                    name: 'Front-Right (East) Adjustable Leveling Foot (Ø44 mm, Z=0..30 mm)',
+                    role: 'appliance_front',
+                    material: 'appliance_steel',
+                    colorRgb: [0.14, 0.15, 0.17],
+                    numSegs: 16,
+                    spine: [
+                        [5758, 3726, 2, 22],
+                        [5758, 3726, 10, 22],
+                        [5758, 3726, 12, 13],
+                        [5758, 3726, 30, 13]
+                    ],
+                    capStart: true,
+                    ringWireframeIndices: [1]
+                }),
+                {
+                    id: 'PANTRY_FRIDGE_LOWER_HINGE',
+                    name: 'Lower Door Hinge Bracket & Pivot Pin (58×62×16 mm, Z=16..32 mm)',
+                    role: 'appliance_front',
+                    material: 'appliance_steel',
+                    colorRgb: [0.18, 0.20, 0.23],
+                    wireColorRgba: WIRE_FRIDGE_DARK,
+                    x0: 6255, x1: 6313,
+                    y0: 3700, y1: 3762,
+                    z0: 16, z1: 32
+                }
+            );
+
+            // 2. Main Insulated Cabinet Body (Z = 30..1,838 mm) + Stepped Top-Front Electronics Housing (Z = 1,838..1,886 mm) + Top Hinge Cover
+            skeletonParts.push(
+                {
+                    id: 'PANTRY_FRIDGE_CABINET_BODY',
+                    name: 'Matte Dark-Charcoal Steel Insulated Cabinet Body (596×518×1808 mm, Z=30..1838 mm)',
+                    role: 'appliance_front',
+                    material: 'appliance_steel',
+                    colorRgb: COLOR_FRIDGE_CASING,
+                    wireColorRgba: WIRE_FRIDGE_DARK,
+                    x0: fx0 + 2, x1: fx1 - 2,
+                    y0: fy0 + 12, y1: 3700,
+                    z0: 30, z1: 1838
+                },
+                {
+                    id: 'PANTRY_FRIDGE_TOP_HOUSING',
+                    name: 'Stepped Top-Front Electronics & Hinge Housing (596×230×48 mm, Z=1838..1886 mm)',
+                    role: 'appliance_front',
+                    material: 'appliance_steel',
+                    colorRgb: [0.16, 0.18, 0.21],
+                    wireColorRgba: WIRE_FRIDGE_DARK,
+                    x0: fx0 + 2, x1: fx1 - 2,
+                    y0: 3470, y1: 3700,
+                    z0: 1838, z1: 1886
+                },
+                {
+                    id: 'PANTRY_FRIDGE_UPPER_HINGE_CAP',
+                    name: 'Molded Top Door Hinge Cover Cap (98×104×14 mm, Z=1886..1900 mm)',
+                    role: 'appliance_front',
+                    material: 'appliance_steel',
+                    colorRgb: [0.20, 0.22, 0.26],
+                    wireColorRgba: WIRE_FRIDGE_DARK,
+                    x0: 6215, x1: 6313,
+                    y0: 3660, y1: 3764,
+                    z0: 1886, z1: 1900
+                }
+            );
+
+            // 3. Recessed Magnetic Accordion Door Gasket Seal (Y = 3,700..3,714 mm)
+            skeletonParts.push({
+                id: 'PANTRY_FRIDGE_DOOR_GASKET',
+                name: 'Recessed Magnetic Accordion Door Gasket Seal (584×14×1854 mm, Y=3700..3714 mm)',
+                role: 'appliance_front',
+                material: 'appliance_steel',
+                colorRgb: COLOR_FRIDGE_GASKET,
+                wireColorRgba: [0.18, 0.20, 0.23, 0.90],
+                x0: fx0 + 8, x1: fx1 - 8,
+                y0: 3700, y1: 3714,
+                z0: 36, z1: 1890
+            });
+
+            // 4. Thick 56 mm Sculpted Brushed-Graphite Steel Door (Y = 3,714..3,770 mm, Z = 32..1,898 mm)
+            //    Built with chamfered perimeter bevel facets (Y = 3,762..3,770 mm) and brushed metallic highlight lines
+            const dx0 = fx0, dx1 = fx1;           // 5,715..6,315 mm
+            const dxIn0 = fx0 + 8, dxIn1 = fx1 - 8; // 5,723..6,307 mm
+            const dyBack = 3714, dyBevel = 3762, dyFront = 3770;
+            const dz0 = 32, dz1 = 1898;
+            const dzIn0 = 40, dzIn1 = 1890;
+
+            skeletonParts.push({
+                id: 'PANTRY_FRIDGE_DOOR_SLAB',
+                name: 'Thick Chamfered Brushed-Graphite Steel Door Panel (600×56×1866 mm, Y=3714..3770, Z=32..1898 mm)',
+                role: 'appliance_front',
+                material: 'stainless_steel',
+                colorRgb: COLOR_FRIDGE_DOOR_FACE,
+                wireColorRgba: [0.38, 0.43, 0.49, 0.94],
+                x0: dx0, x1: dx1,
+                y0: dyBack, y1: dyFront,
+                z0: dz0, z1: dz1,
+                faces3D: [
+                    // Main brushed-graphite front door face (South +Y)
+                    {
+                        side: 'front_main',
+                        normal: [0, 1, 0],
+                        loop3D: [[dxIn0, dyFront, dzIn0], [dxIn1, dyFront, dzIn0], [dxIn1, dyFront, dzIn1], [dxIn0, dyFront, dzIn1]]
+                    },
+                    // 4 Chamfered perimeter bevel facets around the front door face
+                    {
+                        side: 'bevel_west',
+                        noWireframe: true,
+                        normal: [0.707, 0.707, 0],
+                        loop3D: [[dxIn1, dyFront, dzIn0], [dx1, dyBevel, dz0], [dx1, dyBevel, dz1], [dxIn1, dyFront, dzIn1]]
+                    },
+                    {
+                        side: 'bevel_east',
+                        noWireframe: true,
+                        normal: [-0.707, 0.707, 0],
+                        loop3D: [[dx0, dyBevel, dz0], [dxIn0, dyFront, dzIn0], [dxIn0, dyFront, dzIn1], [dx0, dyBevel, dz1]]
+                    },
+                    {
+                        side: 'bevel_top',
+                        noWireframe: true,
+                        normal: [0, 0.707, 0.707],
+                        loop3D: [[dxIn0, dyFront, dzIn1], [dxIn1, dyFront, dzIn1], [dx1, dyBevel, dz1], [dx0, dyBevel, dz1]]
+                    },
+                    {
+                        side: 'bevel_bottom',
+                        noWireframe: true,
+                        normal: [0, 0.707, -0.707],
+                        loop3D: [[dx0, dyBevel, dz0], [dx1, dyBevel, dz0], [dxIn1, dyFront, dzIn0], [dxIn0, dyFront, dzIn0]]
+                    },
+                    // Side & Top/Bottom returns of the 56mm thick insulated door
+                    {
+                        side: 'west_return',
+                        normal: [1, 0, 0],
+                        loop3D: [[dx1, dyBevel, dz0], [dx1, dyBack, dz0], [dx1, dyBack, dz1], [dx1, dyBevel, dz1]]
+                    },
+                    {
+                        side: 'east_return',
+                        normal: [-1, 0, 0],
+                        loop3D: [[dx0, dyBack, dz0], [dx0, dyBevel, dz0], [dx0, dyBevel, dz1], [dx0, dyBack, dz1]]
+                    },
+                    {
+                        side: 'top_return',
+                        normal: [0, 0, 1],
+                        loop3D: [[dx0, dyBevel, dz1], [dx1, dyBevel, dz1], [dx1, dyBack, dz1], [dx0, dyBack, dz1]]
+                    },
+                    {
+                        side: 'bottom_return',
+                        normal: [0, 0, -1],
+                        loop3D: [[dx0, dyBack, dz0], [dx1, dyBack, dz0], [dx1, dyBevel, dz0], [dx0, dyBevel, dz0]]
+                    },
+                    {
+                        side: 'rear_liner',
+                        noWireframe: true,
+                        normal: [0, -1, 0],
+                        loop3D: [[dx1, dyBack, dz0], [dx0, dyBack, dz0], [dx0, dyBack, dz1], [dx1, dyBack, dz1]]
+                    }
+                ],
+                wireframeLines3D: [
+                    // Outer chamfer boundary
+                    [[dx0, dyBevel, dz0], [dx1, dyBevel, dz0], [dx1, dyBevel, dz1], [dx0, dyBevel, dz1], [dx0, dyBevel, dz0]],
+                    // Inner front bevel crease
+                    [[dxIn0, dyFront + 0.2, dzIn0], [dxIn1, dyFront + 0.2, dzIn0], [dxIn1, dyFront + 0.2, dzIn1], [dxIn0, dyFront + 0.2, dzIn1], [dxIn0, dyFront + 0.2, dzIn0]]
+                ]
+            });
+
+            // 5. Raised Brushed Silver-Chrome "SAMSUNG" Emblem Plate & Vector Lettering (X = 5,967..6,063, Z = 1,742..1,758 mm)
+            //    Note: When looking at the North Wall from the South (+Y looking toward -Y), LEFT is +X (West) and RIGHT is -X (East).
+            const ly = 3772.3;
+            const lz0 = 1745, lzM = 1750, lz1 = 1755;
+            const samsungStrokes = [
+                // S (X = 6053 -> 6045)
+                [[6045, ly, lz1], [6053, ly, lz1], [6053, ly, lzM], [6045, ly, lzM], [6045, ly, lz0], [6053, ly, lz0]],
+                // A (X = 6041 -> 6033)
+                [[6041, ly, lz0], [6037, ly, lz1], [6033, ly, lz0]],
+                [[6039.5, ly, lzM - 1], [6034.5, ly, lzM - 1]],
+                // M (X = 6029 -> 6019)
+                [[6029, ly, lz0], [6029, ly, lz1], [6024, ly, lzM - 1], [6019, ly, lz1], [6019, ly, lz0]],
+                // S (X = 6015 -> 6007)
+                [[6007, ly, lz1], [6015, ly, lz1], [6015, ly, lzM], [6007, ly, lzM], [6007, ly, lz0], [6015, ly, lz0]],
+                // U (X = 6003 -> 5995)
+                [[6003, ly, lz1], [6003, ly, lz0], [5995, ly, lz0], [5995, ly, lz1]],
+                // N (X = 5991 -> 5983)
+                [[5991, ly, lz0], [5991, ly, lz1], [5983, ly, lz0], [5983, ly, lz1]],
+                // G (X = 5979 -> 5971)
+                [[5971, ly, lz1], [5979, ly, lz1], [5979, ly, lz0], [5971, ly, lz0], [5971, ly, lzM], [5975, ly, lzM]]
+            ];
+
+            skeletonParts.push({
+                id: 'PANTRY_FRIDGE_SAMSUNG_BADGE',
+                name: 'Raised Brushed Silver SAMSUNG Brand Emblem (96×2.2×16 mm, Z=1742..1758 mm)',
+                role: 'sink_faucet',
+                material: 'chrome',
+                colorRgb: COLOR_FRIDGE_BADGE,
+                wireColorRgba: [0.88, 0.92, 0.96, 0.98],
+                x0: 5967, x1: 6063,
+                y0: 3770, y1: 3772.2,
+                z0: 1742, z1: 1758,
+                wireframeLines3D: samsungStrokes
+            });
+
+            // 6. Recessed Black Glass Digital Control & Temperature Display Panel (X = 5,973..6,057, Z = 1,490..1,665 mm)
+            //    Inspired directly by close-up Photo 3 (media_1794776865523.png):
+            //    - Beveled dark surround frame (84 × 175 mm)
+            //    - Glossy pitch-black glass face (72 × 163 mm)
+            //    - Glowing white 7-segment "-19 °C" LED readout + Wi-Fi & eco leaf icons + "< O >" touch controls
+            skeletonParts.push(
+                {
+                    id: 'PANTRY_FRIDGE_DISPLAY_BEZEL',
+                    name: 'Recessed Digital Control Panel Beveled Surround Bezel (84×3.5×175 mm, Z=1490..1665 mm)',
+                    role: 'appliance_front',
+                    material: 'appliance_steel',
+                    colorRgb: COLOR_FRIDGE_BEZEL,
+                    wireColorRgba: [0.42, 0.47, 0.54, 0.96],
+                    x0: 5973, x1: 6057,
+                    y0: 3768.5, y1: 3771.5,
+                    z0: 1490, z1: 1665,
+                    wireframeLines3D: [
+                        [[5973, 3771.6, 1490], [6057, 3771.6, 1490], [6057, 3771.6, 1665], [5973, 3771.6, 1665], [5973, 3771.6, 1490]],
+                        [[5979, 3771.8, 1496], [6051, 3771.8, 1496], [6051, 3771.8, 1659], [5979, 3771.8, 1659], [5979, 3771.8, 1496]]
+                    ]
+                },
+                {
+                    id: 'PANTRY_FRIDGE_DISPLAY_GLASS',
+                    name: 'Glossy Black Glass Digital Temperature Display Window (72×1.2×163 mm, Z=1496..1659 mm)',
+                    role: 'appliance_window',
+                    material: 'appliance_glass',
+                    isReflectiveGlass: true,
+                    colorRgb: COLOR_FRIDGE_GLASS,
+                    wireColorRgba: [0.28, 0.34, 0.42, 0.94],
+                    x0: 5979, x1: 6051,
+                    y0: 3771.2, y1: 3772.2,
+                    z0: 1496, z1: 1659
+                }
+            );
+
+            // Build 3D bright white LED micro-plaques + vector strokes for "-19 °C", status icons, and "< O >" touch buttons
+            const ledY = 3772.4;
+            const ledFaces = [];
+            function addLedRect(xA, xB, zA, zB) {
+                const xMinL = Math.min(xA, xB), xMaxL = Math.max(xA, xB);
+                ledFaces.push({
+                    side: 'south',
+                    noWireframe: true,
+                    normal: [0, 1, 0],
+                    loop3D: [[xMinL, ledY, zA], [xMaxL, ledY, zA], [xMaxL, ledY, zB], [xMinL, ledY, zB]]
+                });
+            }
+
+            // Minus sign "-" (on left side: X = 6042..6035, Z = 1612..1615)
+            addLedRect(6035, 6042, 1612, 1615);
+            // Digit "1" (vertical right-hand bar at X = 6027..6030, Z = 1598..1629)
+            addLedRect(6027, 6030, 1598, 1629);
+            // Digit "9" (X = 6010..6022, Z = 1598..1629: top, mid, bottom, upper-left, full-right)
+            addLedRect(6010, 6022, 1626, 1629); // top bar
+            addLedRect(6010, 6022, 1612, 1615); // middle bar
+            addLedRect(6010, 6022, 1598, 1601); // bottom bar
+            addLedRect(6019, 6022, 1613, 1629); // upper-left bar (+X)
+            addLedRect(6010, 6013, 1598, 1629); // full-right bar (-X)
+            // Degree symbol "°" (X = 6001..6006, Z = 1622..1628)
+            addLedRect(6001, 6006, 1626, 1628);
+            addLedRect(6001, 6006, 1622, 1624);
+            addLedRect(6004, 6006, 1622, 1628);
+            addLedRect(6001, 6003, 1622, 1628);
+            // Letter "C" (X = 5989..5998, Z = 1614..1628)
+            addLedRect(5989, 5998, 1626, 1628); // top of C
+            addLedRect(5989, 5998, 1614, 1616); // bottom of C
+            addLedRect(5996, 5998, 1614, 1628); // left vertical of C (+X)
+
+            // Center touch button circle "O" (X = 6012..6018, Z = 1515..1523)
+            addLedRect(6012, 6018, 1521.5, 1523);
+            addLedRect(6012, 6018, 1515, 1516.5);
+            addLedRect(6016.5, 6018, 1515, 1523);
+            addLedRect(6012, 6013.5, 1515, 1523);
+
+            const ledWireLines = [
+                // "-19 °C" crisp vector segments
+                [[6042, ledY + 0.1, 1613.5], [6035, ledY + 0.1, 1613.5]],
+                [[6028.5, ledY + 0.1, 1598], [6028.5, ledY + 0.1, 1629]],
+                [[6011.5, ledY + 0.1, 1599.5], [6020.5, ledY + 0.1, 1599.5]],
+                [[6011.5, ledY + 0.1, 1599.5], [6011.5, ledY + 0.1, 1627.5], [6020.5, ledY + 0.1, 1627.5], [6020.5, ledY + 0.1, 1613.5], [6011.5, ledY + 0.1, 1613.5]],
+                [[6001.5, ledY + 0.1, 1623], [6005.5, ledY + 0.1, 1623], [6005.5, ledY + 0.1, 1627], [6001.5, ledY + 0.1, 1627], [6001.5, ledY + 0.1, 1623]],
+                [[5989.5, ledY + 0.1, 1627], [5997, ledY + 0.1, 1627], [5997, ledY + 0.1, 1615], [5989.5, ledY + 0.1, 1615]],
+                // Middle row status icons: Wi-Fi waves (left, X=6028..6036) & Eco Leaf / Snowflake (right, X=5994..6002)
+                [[6036, ledY + 0.1, 1568], [6032, ledY + 0.1, 1572], [6028, ledY + 0.1, 1568]],
+                [[6034.5, ledY + 0.1, 1565], [6032, ledY + 0.1, 1567.5], [6029.5, ledY + 0.1, 1565]],
+                [[5998, ledY + 0.1, 1562], [6002, ledY + 0.1, 1567], [5998, ledY + 0.1, 1572], [5994, ledY + 0.1, 1567], [5998, ledY + 0.1, 1562]],
+                // Indicator dots row (Z = 1546)
+                [[6033, ledY + 0.1, 1546], [6031, ledY + 0.1, 1546]],
+                [[6016, ledY + 0.1, 1546], [6014, ledY + 0.1, 1546]],
+                [[5999, ledY + 0.1, 1546], [5997, ledY + 0.1, 1546]],
+                // Bottom touch controls: "<" (left, X=6030..6035), "O" (center, X=6012..6018), ">" (right, X=5995..6000)
+                [[6030, ledY + 0.1, 1523], [6035, ledY + 0.1, 1519], [6030, ledY + 0.1, 1515]],
+                [[6012.5, ledY + 0.1, 1515.5], [6017.5, ledY + 0.1, 1515.5], [6017.5, ledY + 0.1, 1522.5], [6012.5, ledY + 0.1, 1522.5], [6012.5, ledY + 0.1, 1515.5]],
+                [[6000, ledY + 0.1, 1523], [5995, ledY + 0.1, 1519], [6000, ledY + 0.1, 1515]]
+            ];
+
+            skeletonParts.push({
+                id: 'PANTRY_FRIDGE_DISPLAY_LED_READOUT',
+                name: 'White LED "-19 °C" Digital Readout, Status Icons & "< O >" Touch Controls (Z=1515..1629 mm)',
+                role: 'appliance_led',
+                material: 'led_white',
+                colorRgb: COLOR_FRIDGE_LED,
+                wireColorRgba: WIRE_FRIDGE_LED,
+                x0: 5988, x1: 6043,
+                y0: 3772.2, y1: 3772.6,
+                z0: 1514, z1: 1630,
+                faces3D: ledFaces,
+                wireframeLines3D: ledWireLines
+            });
+
+            // 7. Full-Height Vertical Tubular Bar Handle on Right (East, -X) Side of Door (X = 5,772, Y = 3,770..3,818, Z = 760..1,560 mm)
+            const hx = 5772;
+            const hyBar = 3806;
+            skeletonParts.push(
+                buildFridgeTubePart({
+                    id: 'PANTRY_FRIDGE_HANDLE_BAR',
+                    name: 'Vertical Brushed-Gunmetal Tubular Bar Handle (Ø22×800 mm, X=5772, Y=3795..3817, Z=760..1560 mm)',
+                    role: 'sink_faucet',
+                    material: 'stainless_steel',
+                    colorRgb: COLOR_FRIDGE_HANDLE_BAR,
+                    wireColorRgba: [0.46, 0.51, 0.58, 0.95],
+                    numSegs: 24,
+                    spine: [
+                        [hx, hyBar, 760, 2.0],
+                        [hx, hyBar, 763, 10.5],
+                        [hx, hyBar, 778, 11.0],
+                        [hx, hyBar, 1542, 11.0],
+                        [hx, hyBar, 1557, 10.5],
+                        [hx, hyBar, 1560, 2.0]
+                    ],
+                    capStart: true,
+                    capEnd: true,
+                    ringWireframeIndices: [1, 4]
+                }),
+                buildFridgeTubePart({
+                    id: 'PANTRY_FRIDGE_HANDLE_MOUNT_TOP',
+                    name: 'Upper Horizontal Cylindrical Handle Standoff Bracket (Ø17×34 mm at Z=1495 mm)',
+                    role: 'sink_faucet',
+                    material: 'stainless_steel',
+                    colorRgb: COLOR_FRIDGE_HANDLE_MOUNT,
+                    wireColorRgba: [0.50, 0.55, 0.62, 0.95],
+                    numSegs: 18,
+                    spine: [
+                        [hx, 3770, 1495, 9.5],
+                        [hx, 3773, 1495, 8.2],
+                        [hx, 3800, 1495, 8.2]
+                    ],
+                    ringWireframeIndices: [0]
+                }),
+                buildFridgeTubePart({
+                    id: 'PANTRY_FRIDGE_HANDLE_MOUNT_BOTTOM',
+                    name: 'Lower Horizontal Cylindrical Handle Standoff Bracket (Ø17×34 mm at Z=825 mm)',
+                    role: 'sink_faucet',
+                    material: 'stainless_steel',
+                    colorRgb: COLOR_FRIDGE_HANDLE_MOUNT,
+                    wireColorRgba: [0.50, 0.55, 0.62, 0.95],
+                    numSegs: 18,
+                    spine: [
+                        [hx, 3770, 825, 9.5],
+                        [hx, 3773, 825, 8.2],
+                        [hx, 3800, 825, 8.2]
+                    ],
+                    ringWireframeIndices: [0]
+                })
+            );
+
+            return {
+                id: 'PANTRY_FRIDGE',
+                aliasIds: ['CAB_PANTRY_FRIDGE', 'ZAMRAZARKA'],
+                name: 'PANTRY_FRIDGE — Samsung Freestanding Brushed Graphite Upright Refrigerator/Freezer (600×600×1900mm Zamrażarka)',
+                shortName: 'Samsung Upright Freezer (600×600×1900mm)',
+                category: 'tall_appliance',
+                subtype: 'freestanding_fridge_freezer',
+                floor: 'ground',
+                room: '0.14 Spiżarnia',
+                hostWallId: 'EW_NORTH_RECESSED',
+                viewId: 'pantry_north_wall',
+                x1: fx0,
+                x2: fx1,
+                y1: fy0,
+                y2: fy1,
+                zBottom: fz0,
+                zTop: fz1,
+                widthMm: 600,
+                depthMm: 600,
+                carcassDepthMm: 600,
+                frontThicknessMm: 0,
+                plinthHeightMm: 30,
+                plinthRecessMm: 10,
+                bodyHeightMm: 1870,
+                heightMm: 1900,
+                boardThicknessMm: 20,
+                normal: [0, 1, 0],
+                specs: '600 × 600 × 1,900 mm (X = 5,715..6,315 mm, Y = 3,170..3,770 mm, Z = 0..1,900 mm) Samsung brushed-graphite steel upright freezer/refrigerator • Stepped top housing + magnetic door gasket + 56 mm chamfered brushed-steel door + raised silver SAMSUNG emblem + recessed black glass digital display (-19 °C LED readout, Wi-Fi/leaf icons, < O > touch controls) + Ø 22 × 800 mm vertical tubular bar handle + adjustable leveling feet',
+                description: 'Freestanding 600 × 600 × 1,900 mm Samsung brushed-graphite upright refrigerator/freezer (Zamrażarka) positioned in the North-West corner of 0.14 Spiżarnia against EW_NORTH_RECESSED (Y = 3,170 mm) and GW_13_EAST (X = 6,315 mm). Modeled with a dark charcoal cabinet body, stepped top-front electronics housing, recessed magnetic door gasket, 56 mm chamfered brushed-graphite steel door, raised silver SAMSUNG badge, recessed black glass digital control panel displaying -19 °C in white 7-segment LED digits, and a full-height vertical tubular bar handle on the right side.',
+                skeleton: skeletonParts,
+                fronts: []
+            };
+        })(),
+
+        // =====================================================================
+        // 27–33. PANTRY EAST WALL (GW_14) LOWER & UPPER OPEN SHELVING CABINETS
+        //        Based on pantry.html specifications:
+        //        - 4 Lower Base Units (CAB_PANTRY_E1..E4): 4 × 500 mm wide (Y = 3,170..5,170 mm),
+        //          450 mm (45 cm) deep (X = 4,455..4,905 mm), Z = 0..960 mm (100 mm plinth +
+        //          20 mm bottom shelf + 400 mm space + 20 mm middle shelf + 400 mm space + 20 mm top shelf),
+        //          leaving a 40 mm gap before the 900 mm basement stairwell at Y = 5,210..6,110 mm.
+        //        - 1st Upper Cabinet (CAB_PANTRY_E_UP1 — Left/North): 700 mm wide (Y = 3,170..3,870 mm),
+        //          450 mm (45 cm) deep (X = 4,455..4,905 mm), Z = 960..2,800 mm (1,840 mm tall) with
+        //          three 20 mm shelves spaced at 400 / 400 / 400 / 580 mm (Z = 1,360, 1,780, 2,200 mm).
+        //        - 2nd Upper Cabinet (CAB_PANTRY_E_UP2 — Middle): 600 mm wide (Y = 3,870..4,470 mm),
+        //          300 mm (30 cm) deep (X = 4,455..4,755 mm), Z = 960..2,800 mm (1,840 mm tall) with
+        //          four 20 mm shelves spaced at 340 / 350 / 350 / 350 / 370 mm (Z = 1,300, 1,670, 2,040, 2,410 mm).
+        //        - 3rd Upper Cabinet (CAB_PANTRY_E_UP3 — Right/South): 700 mm wide (Y = 4,470..5,170 mm),
+        //          300 mm (30 cm) deep (X = 4,455..4,755 mm), Z = 960..2,800 mm (1,840 mm tall) with
+        //          four 20 mm shelves spaced at 340 / 350 / 350 / 350 / 370 mm (Z = 1,300, 1,670, 2,040, 2,410 mm).
+        //        - All Pantry cabinets have `fronts: []` ("No fronts for now").
+        // =====================================================================
+        ...(function buildPantryEastWallCabinets() {
+            const X_PANTRY_EAST = 4455; // GW_14_UPPER_WEST interior face in 0.14 Spiżarnia
+            const PANTRY_BOARD_MM = 20; // 20 mm (2 cm) shelf & carcass board thickness per pantry.html
+
+            function makePantryLowerCabinet(id, index, y0, y1) {
+                const depthMm = 450; // 45 cm depth per pantry.html legend
+                const x0 = X_PANTRY_EAST;
+                const x1 = x0 + depthMm; // 4,905 mm
+                const xPlinthFront = x1 - 40; // 40 mm recessed toe-kick (4,865 mm)
+                const w = y1 - y0; // 500 mm
+
+                const skeleton = [
+                    {
+                        id: `${id}_PLINTH`,
+                        name: `Recessed Plinth / Toe-Kick (410×${w}×100 mm Cokół, Z=0..100 mm)`,
+                        role: 'plinth',
+                        material: 'dark_plinth',
+                        colorRgb: COLOR_PLINTH,
+                        x0: x0, x1: xPlinthFront,
+                        y0: y0, y1: y1,
+                        z0: 0, z1: 100
+                    },
+                    {
+                        id: `${id}_NORTH_PANEL`,
+                        name: `Left/North Side Carcass Panel (450×20×860 mm, Z=100..960 mm)`,
+                        role: 'carcass_panel',
+                        material: 'carcass_melamine',
+                        colorRgb: COLOR_CARCASS_SIDE,
+                        x0: x0, x1: x1,
+                        y0: y0, y1: y0 + PANTRY_BOARD_MM,
+                        z0: 100, z1: 960
+                    },
+                    {
+                        id: `${id}_SOUTH_PANEL`,
+                        name: `Right/South Side Carcass Panel (450×20×860 mm, Z=100..960 mm)`,
+                        role: 'carcass_panel',
+                        material: 'carcass_melamine',
+                        colorRgb: COLOR_CARCASS_SIDE,
+                        x0: x0, x1: x1,
+                        y0: y1 - PANTRY_BOARD_MM, y1: y1,
+                        z0: 100, z1: 960
+                    },
+                    {
+                        id: `${id}_BACK_PANEL`,
+                        name: `Rear Carcass Backing Panel (20×${w - 2 * PANTRY_BOARD_MM}×860 mm, Z=100..960 mm)`,
+                        role: 'carcass_panel',
+                        material: 'carcass_melamine',
+                        colorRgb: COLOR_CARCASS_BACK,
+                        x0: x0, x1: x0 + PANTRY_BOARD_MM,
+                        y0: y0 + PANTRY_BOARD_MM, y1: y1 - PANTRY_BOARD_MM,
+                        z0: 100, z1: 960
+                    },
+                    {
+                        id: `${id}_BOTTOM_SHELF`,
+                        name: `Bottom 2cm Shelf (430×${w - 2 * PANTRY_BOARD_MM}×20 mm, Z=100..120 mm)`,
+                        role: 'carcass_panel',
+                        material: 'carcass_melamine',
+                        colorRgb: COLOR_CARCASS_SHELF,
+                        x0: x0 + PANTRY_BOARD_MM, x1: x1,
+                        y0: y0 + PANTRY_BOARD_MM, y1: y1 - PANTRY_BOARD_MM,
+                        z0: 100, z1: 120
+                    },
+                    {
+                        id: `${id}_MIDDLE_SHELF`,
+                        name: `Middle 2cm Shelf after 400mm Lower Space (430×${w - 2 * PANTRY_BOARD_MM}×20 mm, Z=520..540 mm)`,
+                        role: 'carcass_panel',
+                        material: 'carcass_melamine',
+                        colorRgb: COLOR_CARCASS_SHELF,
+                        x0: x0 + PANTRY_BOARD_MM, x1: x1,
+                        y0: y0 + PANTRY_BOARD_MM, y1: y1 - PANTRY_BOARD_MM,
+                        z0: 520, z1: 540
+                    },
+                    {
+                        id: `${id}_TOP_SHELF`,
+                        name: `Top 2cm Shelf/Panel after 400mm Upper Space (430×${w - 2 * PANTRY_BOARD_MM}×20 mm, Z=940..960 mm)`,
+                        role: 'carcass_panel',
+                        material: 'carcass_melamine',
+                        colorRgb: COLOR_CARCASS_SHELF,
+                        x0: x0 + PANTRY_BOARD_MM, x1: x1,
+                        y0: y0 + PANTRY_BOARD_MM, y1: y1 - PANTRY_BOARD_MM,
+                        z0: 940, z1: 960
+                    }
+                ];
+
+                return {
+                    id: id,
+                    name: `${id} — Pantry Lower Open Cabinet #${index} (500×450×960mm Regał Dolny)`,
+                    shortName: `Pantry Lower Cabinet #${index} (500×450mm)`,
+                    category: 'base_cabinet',
+                    subtype: 'pantry_open_base_cabinet',
+                    floor: 'ground',
+                    room: '0.14 Spiżarnia',
+                    hostWallId: 'GW_14',
+                    viewId: 'pantry_east_wall',
+                    x1: x0,
+                    x2: x1,
+                    y1: y0,
+                    y2: y1,
+                    zBottom: 0,
+                    zTop: 960,
+                    widthMm: w,
+                    depthMm: depthMm,
+                    carcassDepthMm: depthMm,
+                    frontThicknessMm: 0,
+                    plinthHeightMm: 100,
+                    plinthRecessMm: 40,
+                    bodyHeightMm: 860,
+                    heightMm: 960,
+                    boardThicknessMm: PANTRY_BOARD_MM,
+                    normal: [1, 0, 0],
+                    specs: `500 × 450 × 960 mm (X = ${x0}..${x1} mm, Y = ${y0}..${y1} mm, Z = 0..960 mm) • 100 mm plinth + 20 mm bottom shelf (Z=100..120) + 400 mm space + 20 mm middle shelf (Z=520..540) + 400 mm space + 20 mm top panel (Z=940..960) • Open carcass (no fronts)`,
+                    description: `Pantry East Wall (GW_14) lower open storage unit #${index} (500 mm wide × 450 mm deep × 960 mm high) with 100 mm dark plinth and two 400 mm clear vertical storage tiers separated by 20 mm shelves. No fronts for now.`,
+                    skeleton: skeleton,
+                    fronts: []
+                };
+            }
+
+            function makePantryUpperCabinet(id, index, y0, y1, depthMm, shelfBottomZList, spacingDesc) {
+                const x0 = X_PANTRY_EAST;
+                const x1 = x0 + depthMm;
+                const w = y1 - y0;
+                const zBot = 960, zTop = 2800;
+
+                const skeleton = [
+                    {
+                        id: `${id}_NORTH_PANEL`,
+                        name: `Left/North Side Carcass Panel (${depthMm}×20×1840 mm, Z=960..2800 mm)`,
+                        role: 'carcass_panel',
+                        material: 'carcass_melamine',
+                        colorRgb: COLOR_CARCASS_SIDE,
+                        x0: x0, x1: x1,
+                        y0: y0, y1: y0 + PANTRY_BOARD_MM,
+                        z0: zBot, z1: zTop
+                    },
+                    {
+                        id: `${id}_SOUTH_PANEL`,
+                        name: `Right/South Side Carcass Panel (${depthMm}×20×1840 mm, Z=960..2800 mm)`,
+                        role: 'carcass_panel',
+                        material: 'carcass_melamine',
+                        colorRgb: COLOR_CARCASS_SIDE,
+                        x0: x0, x1: x1,
+                        y0: y1 - PANTRY_BOARD_MM, y1: y1,
+                        z0: zBot, z1: zTop
+                    },
+                    {
+                        id: `${id}_BACK_PANEL`,
+                        name: `Rear Carcass Backing Panel (20×${w - 2 * PANTRY_BOARD_MM}×1840 mm, Z=960..2800 mm)`,
+                        role: 'carcass_panel',
+                        material: 'carcass_melamine',
+                        colorRgb: COLOR_CARCASS_BACK,
+                        x0: x0, x1: x0 + PANTRY_BOARD_MM,
+                        y0: y0 + PANTRY_BOARD_MM, y1: y1 - PANTRY_BOARD_MM,
+                        z0: zBot, z1: zTop
+                    }
+                ];
+
+                shelfBottomZList.forEach((sz0, idx) => {
+                    skeleton.push({
+                        id: `${id}_SHELF_${idx + 1}`,
+                        name: `Internal 2cm Shelf #${idx + 1} (${depthMm - PANTRY_BOARD_MM}×${w - 2 * PANTRY_BOARD_MM}×20 mm, Z=${sz0}..${sz0 + PANTRY_BOARD_MM} mm)`,
+                        role: 'carcass_panel',
+                        material: 'carcass_melamine',
+                        colorRgb: COLOR_CARCASS_SHELF,
+                        x0: x0 + PANTRY_BOARD_MM, x1: x1,
+                        y0: y0 + PANTRY_BOARD_MM, y1: y1 - PANTRY_BOARD_MM,
+                        z0: sz0, z1: sz0 + PANTRY_BOARD_MM
+                    });
+                });
+
+                skeleton.push({
+                    id: `${id}_TOP_PANEL`,
+                    name: `Top Carcass Panel (${depthMm - PANTRY_BOARD_MM}×${w - 2 * PANTRY_BOARD_MM}×20 mm, Z=2780..2800 mm)`,
+                    role: 'carcass_panel',
+                    material: 'carcass_melamine',
+                    colorRgb: COLOR_CARCASS_SHELF,
+                    x0: x0 + PANTRY_BOARD_MM, x1: x1,
+                    y0: y0 + PANTRY_BOARD_MM, y1: y1 - PANTRY_BOARD_MM,
+                    z0: zTop - PANTRY_BOARD_MM, z1: zTop
+                });
+
+                return {
+                    id: id,
+                    name: `${id} — Pantry Upper Open Cabinet #${index} (${w}×${depthMm}×1840mm Szafka Górna)`,
+                    shortName: `Pantry Upper Cabinet #${index} (${w}×${depthMm}mm)`,
+                    category: 'wall_cabinet',
+                    subtype: 'pantry_open_upper_cabinet',
+                    floor: 'ground',
+                    room: '0.14 Spiżarnia',
+                    hostWallId: 'GW_14',
+                    viewId: 'pantry_east_wall',
+                    x1: x0,
+                    x2: x1,
+                    y1: y0,
+                    y2: y1,
+                    zBottom: zBot,
+                    zTop: zTop,
+                    widthMm: w,
+                    depthMm: depthMm,
+                    carcassDepthMm: depthMm,
+                    frontThicknessMm: 0,
+                    plinthHeightMm: 0,
+                    plinthRecessMm: 0,
+                    bodyHeightMm: 1840,
+                    heightMm: 1840,
+                    boardThicknessMm: PANTRY_BOARD_MM,
+                    normal: [1, 0, 0],
+                    specs: `${w} × ${depthMm} × 1,840 mm (X = ${x0}..${x1} mm, Y = ${y0}..${y1} mm, Z = 960..2,800 mm) • ${spacingDesc} • Open carcass (no fronts)`,
+                    description: `Pantry East Wall (GW_14) upper open shelving cabinet #${index} (${w} mm wide × ${depthMm} mm deep × 1,840 mm high, Z = 960..2,800 mm) with 20 mm shelves (${spacingDesc}). No fronts for now.`,
+                    skeleton: skeleton,
+                    fronts: []
+                };
+            }
+
+            return [
+                // 4 Lower Open Base Cabinets (4 × 500 mm = 2,000 mm, 450 mm deep, Z = 0..960 mm)
+                makePantryLowerCabinet('CAB_PANTRY_E1', 1, 3170, 3670),
+                makePantryLowerCabinet('CAB_PANTRY_E2', 2, 3670, 4170),
+                makePantryLowerCabinet('CAB_PANTRY_E3', 3, 4170, 4670),
+                makePantryLowerCabinet('CAB_PANTRY_E4', 4, 4670, 5170),
+
+                // 3 Upper Open Shelving Cabinets (700 + 600 + 700 = 2,000 mm, Z = 960..2,800 mm):
+                // Left/North unit is 450 mm deep with 400/400/400/580 mm clear spaces;
+                // Middle & Right/South units are 300 mm deep with 340/350/350/350/370 mm clear spaces.
+                makePantryUpperCabinet(
+                    'CAB_PANTRY_E_UP1',
+                    1,
+                    3170,
+                    3870,
+                    450,
+                    [1360, 1780, 2200],
+                    '3 × 20 mm shelves at Z = 1,360, 1,780, 2,200 mm (clear spaces: 400 + 400 + 400 + 580 mm)'
+                ),
+                makePantryUpperCabinet(
+                    'CAB_PANTRY_E_UP2',
+                    2,
+                    3870,
+                    4470,
+                    300,
+                    [1300, 1670, 2040, 2410],
+                    '4 × 20 mm shelves at Z = 1,300, 1,670, 2,040, 2,410 mm (clear spaces: 340 + 350 + 350 + 350 + 370 mm)'
+                ),
+                makePantryUpperCabinet(
+                    'CAB_PANTRY_E_UP3',
+                    3,
+                    4470,
+                    5170,
+                    300,
+                    [1300, 1670, 2040, 2410],
+                    '4 × 20 mm shelves at Z = 1,300, 1,670, 2,040, 2,410 mm (clear spaces: 340 + 350 + 350 + 350 + 370 mm)'
+                )
+            ];
+        })()
     ];
 
     return {
         _role: 'DEFAULT_SEED_VALUES',
         entityType: 'furniture',
-        version: '1.3.0-brep',
+        version: '1.4.0-brep',
         metadata: {
             isDefaultSeed: true,
             representation: '3D B-Rep Furniture & Cabinets with separate Skeleton and Fronts parts',
