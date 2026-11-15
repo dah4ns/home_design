@@ -206,8 +206,8 @@
             sumX += Number(s.x) || 0;
             sumY += Number(s.z) || 0;
         });
-        const cx = round1(sumX / cluster.length);
-        const cy = round1(sumY / cluster.length);
+        let cx = round1(sumX / cluster.length);
+        let cy = round1(sumY / cluster.length);
         const heightMm = isFloorSocket ? 0 : (Number.isFinite(Number(primary.heightMm)) ? Number(primary.heightMm) : 300);
         const cz = round1(zFloor + heightMm);
 
@@ -244,6 +244,34 @@
                 N = [0, -1, 0];
                 U = [1, 0, 0];
             }
+
+            // Ensure wall-mounted sockets sit on the 2 cm plaster surface if mounted on a plastered wall side
+            const ws = (typeof self !== 'undefined' && self.WallService) ? self.WallService : (typeof global !== 'undefined' && global.WallService ? global.WallService : null);
+            if (ws && typeof ws.getWalls === 'function') {
+                const floorWalls = ws.getWalls({ floor });
+                for (let wi = 0; wi < floorWalls.length; wi++) {
+                    const w = floorWalls[wi];
+                    const sides = [w.sideA, w.sideB];
+                    for (let si = 0; si < sides.length; si++) {
+                        const side = sides[si];
+                        if (!side || !(side.plasterThicknessMm > 0) || !side.plasterP1 || !side.plasterP2 || !side.normal) continue;
+                        if (Math.abs(side.normal[0] - N[0]) > 0.1 || Math.abs(side.normal[1] - N[1]) > 0.1) continue;
+                        if (w.axis === 'vertical') {
+                            const minY = Math.min(side.p1[1], side.p2[1]) - 25;
+                            const maxY = Math.max(side.p1[1], side.p2[1]) + 25;
+                            if (cy >= minY && cy <= maxY && (Math.abs(cx - side.p1[0]) <= 30 || Math.abs(cx - side.plasterP1[0]) <= 15)) {
+                                cx = round1(side.plasterP1[0]);
+                            }
+                        } else if (w.axis === 'horizontal') {
+                            const minX = Math.min(side.p1[0], side.p2[0]) - 25;
+                            const maxX = Math.max(side.p1[0], side.p2[0]) + 25;
+                            if (cx >= minX && cx <= maxX && (Math.abs(cy - side.p1[1]) <= 30 || Math.abs(cy - side.plasterP1[1]) <= 15)) {
+                                cy = round1(side.plasterP1[1]);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         function pt3D(u, v, d) {
@@ -263,8 +291,8 @@
         const halfH = frameH / 2;
 
         // Keep back plane 1.5 mm proud of wall/floor surface (or 5 mm glass backsplash on GW_3 / EW_NORTH_RECESSED) to prevent Z-fighting
-        const onKitchenWestBacksplash = (!isFloorSocket && rot === 90 && Math.abs(cx - 11915) <= 25 && cy >= 3170 && cy <= 6170 && cz >= 900 && cz <= 1500);
-        const onKitchenNorthBacksplash = (!isFloorSocket && rot === 180 && Math.abs(cy - 3170) <= 25 && cx >= 8315 && cx <= 11915 && cz >= 900 && cz <= 1500);
+        const onKitchenWestBacksplash = (!isFloorSocket && rot === 90 && (Math.abs(cx - 11895) <= 25 || Math.abs(cx - 11915) <= 25) && cy >= 3170 && cy <= 6170 && cz >= 900 && cz <= 1500);
+        const onKitchenNorthBacksplash = (!isFloorSocket && rot === 180 && (Math.abs(cy - 3190) <= 25 || Math.abs(cy - 3170) <= 25) && cx >= 8315 && cx <= 11915 && cz >= 900 && cz <= 1500);
         const glassOff = (onKitchenWestBacksplash || onKitchenNorthBacksplash) ? 5.0 : 0.0;
         const dWall = 1.5 + glassOff;
         const dFrameFront = 10.5 + glassOff;

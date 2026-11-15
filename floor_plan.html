@@ -1017,7 +1017,7 @@
                     id: 'GW_3', name: 'GW_3 (Kotłownia & WC / Kuchnia & Jadalnia)',
                     axis: 'z', x1: 11915, z1: 3170, x2: 12095, z2: 8360,
                     rooms: '0.03 Kotłownia & 0.06 WC ↔ 0.13 Kuchnia',
-                    specs: '180 × 5,190 mm (18 cm structural wall) • Axis 4 wall from Z=3,170 mm to GW_7 South face (Z=8,360 mm)',
+                    specs: '180 × 5,190 mm (18 cm structural wall + 2×2 cm interior plaster) • Axis 4 wall from Z=3,170 mm to GW_7 South face (Z=8,360 mm)',
                     doors: []
                 },
                 {
@@ -1118,8 +1118,8 @@
                 {
                     id: 'GW_13', name: 'GW_13 (Kuchnia / Spiżarnia West Wall)',
                     axis: 'z', x1: 6315, z1: 3170, x2: 6495, z2: 6110,
-                    rooms: '0.13 Kuchnia (542 cm) ↔ 0.14 Spiżarnia (186/211 cm)',
-                    specs: '180 × 2,940 mm (18 cm structural wall) • 5,420 mm (542 cm) East of Axis 4 wall GW_3; 70 cm top pier + 90×210 cm door + 134 cm bottom pier',
+                    rooms: '0.13 Kuchnia (538 cm clear / 542 cm structural) ↔ 0.14 Spiżarnia (186/211 cm)',
+                    specs: '180 × 2,940 mm (18 cm structural wall + 2×2 cm interior plaster) • 5,380 mm (538 cm) clear / 5,420 mm (542 cm) structural East of Axis 4 wall GW_3; 70 cm top pier + 90×210 cm door + 134 cm bottom pier',
                     doors: [
                         { start: 3870, end: 4770, swingDir: -1, hingeStart: true }
                     ]
@@ -1253,7 +1253,7 @@
                 { code: '0.17', name: 'SAUNA', area: '2.45 m²', dims: '143 × 171 cm', x: 16990, z: 14275 },
                 { code: '0.16', name: 'KOMUNIKACJA', area: '4.50 m²', dims: '116 × 373 cm', x: 15655, z: 13200 },
                 { code: '0.10', name: 'SIŁOWNIA', area: '28.88 m²', dims: '525 × 550 cm', x: 17700, z: 18000 },
-                { code: '0.13', name: 'KUCHNIA', area: '16.57 m²', dims: '542 × 294 cm', x: 9310, z: 4660 },
+                { code: '0.13', name: 'KUCHNIA', area: '16.57 m²', dims: '538 × 294 cm', x: 9310, z: 4660 },
                 { code: '0.14', name: 'SPIŻARNIA', area: '5.30 m²', dims: '186/211 × 294 cm', x: 5350, z: 4550 },
                 { code: '0.15', name: 'GABINET', area: '12.24 m²', dims: '424/399 × 294 cm', x: 2200, z: 4660 },
                 { code: '0.12', name: 'JADALNIA', area: '24.30 m²', dims: '470 × 497 cm', x: 9310, z: 8700 },
@@ -1617,9 +1617,20 @@
             loaded.forEach(obj => {
                 if (!obj || obj.type === 'socket_floor' || !obj.snappedToWall) return;
                 const snap = snapToFloorWalls(obj.floor, obj.x, obj.z, 85);
-                if (snap && snap.snappedToWall && obj.rotation !== snap.rot) {
-                    obj.rotation = snap.rot;
-                    healedAny = true;
+                if (snap && snap.snappedToWall) {
+                    if (obj.rotation !== snap.rot) {
+                        obj.rotation = snap.rot;
+                        healedAny = true;
+                    }
+                    // Ensure wall-mounted sockets sit on the plaster surface (not the structural wall behind the plaster)
+                    const isHoriz = (snap.rot === 0 || snap.rot === 180);
+                    if (isHoriz && Math.abs(obj.z - snap.z) > 0.5 && Math.abs(obj.z - snap.z) <= 35) {
+                        obj.z = snap.z;
+                        healedAny = true;
+                    } else if (!isHoriz && Math.abs(obj.x - snap.x) > 0.5 && Math.abs(obj.x - snap.x) <= 35) {
+                        obj.x = snap.x;
+                        healedAny = true;
+                    }
                 }
             });
             planState.placedObjects = loaded;
@@ -1642,17 +1653,70 @@
             SocketStore.saveAll(planState.placedObjects);
         }
 
-        // Snap a world coordinate (x, z) to nearest inner exterior wall or 120 mm internal wall face if within thresholdMm
+        // Snap a world coordinate (x, z) to nearest plastered interior wall face (or structural wall face if unplastered) within thresholdMm
         function snapToFloorWalls(floor, x, z, thresholdMm = 500) {
-            const innerPoly = (floor === 'ground') ? GROUND_INNER_POLY : FIRST_INNER_POLY;
             let bestDist = thresholdMm;
             let snapped = {
                 x: Math.round(x / 50) * 50,
                 z: Math.round(z / 50) * 50,
                 rot: 0,
-                snappedToWall: false
+                snappedToWall: false,
+                mountedOnPlaster: false
             };
 
+            // Primary source of truth: 3D B-Rep wall sides from WallService (uses plasterP1 / plasterP2 when plasterThicknessMm > 0)
+            if (typeof WallService !== 'undefined' && typeof WallService.getWalls === 'function') {
+                const bRepWalls = WallService.getWalls({ floor });
+                bRepWalls.forEach(bw => {
+                    const candidateSides = (bw.category === 'exterior')
+                        ? ((Array.isArray(bw.sides) && bw.sides.length > 0)
+                            ? bw.sides.filter(s => s && s.role === 'interior')
+                            : (bw.sideB ? [bw.sideB] : []))
+                        : (Array.isArray(bw.sides) && bw.sides.length > 0 ? bw.sides : [bw.sideA, bw.sideB].filter(Boolean));
+                    candidateSides.forEach(side => {
+                        if (!side || !side.p1 || !side.p2 || !side.normal) return;
+                        const p1 = side.plasterP1 || side.p1;
+                        const p2 = side.plasterP2 || side.p2;
+                        const hasPlaster = (Number(side.plasterThicknessMm) || 0) > 0;
+                        const sx1 = p1[0], sz1 = p1[1];
+                        const sx2 = p2[0], sz2 = p2[1];
+                        const sdx = sx2 - sx1, sdz = sz2 - sz1;
+                        const sLenSq = sdx * sdx + sdz * sdz;
+                        if (sLenSq < 100) return;
+                        const segLen = Math.sqrt(sLenSq);
+                        const marginT = Math.min(0.25, 35 / segLen);
+                        let t = ((x - sx1) * sdx + (z - sz1) * sdz) / sLenSq;
+                        t = Math.max(marginT, Math.min(1 - marginT, t));
+                        const px = sx1 + t * sdx;
+                        const pz = sz1 + t * sdz;
+                        const d = Math.hypot(x - px, z - pz);
+                        if (d < bestDist) {
+                            bestDist = d;
+                            const nx = side.normal[0], nz = side.normal[1];
+                            let sRot = 0;
+                            const isVertFace = Math.abs(nx) >= Math.abs(nz);
+                            if (isVertFace) {
+                                sRot = (nx < 0) ? 90 : 270;
+                            } else {
+                                sRot = (nz < 0) ? 0 : 180;
+                            }
+                            snapped = {
+                                // Preserve exact plaster/wall surface coordinate on the fixed axis; round 10 mm along the wall
+                                x: isVertFace ? Math.round(px) : (Math.round(px / 10) * 10),
+                                z: isVertFace ? (Math.round(pz / 10) * 10) : Math.round(pz),
+                                rot: sRot,
+                                snappedToWall: true,
+                                mountedOnPlaster: hasPlaster,
+                                wallId: bw.id,
+                                sideId: side.id
+                            };
+                        }
+                    });
+                });
+                return snapped;
+            }
+
+            const innerPoly = (floor === 'ground') ? GROUND_INNER_POLY : FIRST_INNER_POLY;
             for (let i = 0; i < innerPoly.length; i++) {
                 const [x1, z1] = innerPoly[i];
                 const [x2, z2] = innerPoly[(i + 1) % innerPoly.length];
@@ -1669,30 +1733,23 @@
                 const dist = Math.hypot(x - projX, z - projZ);
                 if (dist < bestDist) {
                     bestDist = dist;
-                    // Clockwise polygon in (X=West, Z=South):
-                    // dx < 0: South wall -> faces North (-Z, 0°)
-                    // dx > 0: North wall -> faces South (+Z, 180°)
-                    // dz > 0: West wall  -> faces East  (-X, 90°)
-                    // dz < 0: East wall  -> faces West  (+X, 270°)
                     let wallRot = 0;
-                    if (Math.abs(dx) >= Math.abs(dz)) {
+                    const isHorizSeg = Math.abs(dx) >= Math.abs(dz);
+                    if (isHorizSeg) {
                         wallRot = (dx < 0) ? 0 : 180;
                     } else {
                         wallRot = (dz > 0) ? 90 : 270;
                     }
                     snapped = {
-                        x: Math.round(projX / 10) * 10,
-                        z: Math.round(projZ / 10) * 10,
+                        x: isHorizSeg ? (Math.round(projX / 10) * 10) : Math.round(projX),
+                        z: isHorizSeg ? Math.round(projZ) : (Math.round(projZ / 10) * 10),
                         rot: wallRot,
-                        snappedToWall: true
+                        snappedToWall: true,
+                        mountedOnPlaster: false
                     };
                 }
             }
 
-            // Also snap to both faces of 120 mm internal partition walls on this floor
-            // Note: X increases from East (0) to West (20,705).
-            // Therefore on a vertical wall [w.x1, w.x2], w.x1 is the East face (pointing East -X -> 90°)
-            // and w.x2 is the West face (pointing West +X -> 270°).
             const internalList = INTERNAL_WALLS[floor] || [];
             internalList.forEach(w => {
                 if (w.axis === 'z') {
@@ -1700,69 +1757,27 @@
                     const dEast = Math.hypot(x - w.x1, z - clampedZ);
                     if (dEast < bestDist) {
                         bestDist = dEast;
-                        snapped = { x: w.x1, z: Math.round(clampedZ / 10) * 10, rot: 90, snappedToWall: true };
+                        snapped = { x: w.x1, z: Math.round(clampedZ / 10) * 10, rot: 90, snappedToWall: true, mountedOnPlaster: false };
                     }
                     const dWest = Math.hypot(x - w.x2, z - clampedZ);
                     if (dWest < bestDist) {
                         bestDist = dWest;
-                        snapped = { x: w.x2, z: Math.round(clampedZ / 10) * 10, rot: 270, snappedToWall: true };
+                        snapped = { x: w.x2, z: Math.round(clampedZ / 10) * 10, rot: 270, snappedToWall: true, mountedOnPlaster: false };
                     }
                 } else {
-                    // Horizontal internal wall: North face at w.z1 (faces North -> 0°), South face at w.z2 (faces South -> 180°)
                     const clampedX = Math.max(w.x1 + 35, Math.min(w.x2 - 35, x));
                     const dNorth = Math.hypot(x - clampedX, z - w.z1);
                     if (dNorth < bestDist) {
                         bestDist = dNorth;
-                        snapped = { x: Math.round(clampedX / 10) * 10, z: w.z1, rot: 0, snappedToWall: true };
+                        snapped = { x: Math.round(clampedX / 10) * 10, z: w.z1, rot: 0, snappedToWall: true, mountedOnPlaster: false };
                     }
                     const dSouth = Math.hypot(x - clampedX, z - w.z2);
                     if (dSouth < bestDist) {
                         bestDist = dSouth;
-                        snapped = { x: Math.round(clampedX / 10) * 10, z: w.z2, rot: 180, snappedToWall: true };
+                        snapped = { x: Math.round(clampedX / 10) * 10, z: w.z2, rot: 180, snappedToWall: true, mountedOnPlaster: false };
                     }
                 }
             });
-
-            // Also snap to 3D B-Rep wall sides from WallService (covers stepped walls like GW_14 and upper floor interior faces)
-            if (typeof WallService !== 'undefined' && typeof WallService.getWalls === 'function') {
-                const bRepWalls = WallService.getWalls({ floor });
-                bRepWalls.forEach(bw => {
-                    const candidateSides = (bw.category === 'exterior')
-                        ? (bw.sideB ? [bw.sideB] : [])
-                        : (Array.isArray(bw.sides) && bw.sides.length > 0 ? bw.sides : [bw.sideA, bw.sideB].filter(Boolean));
-                    candidateSides.forEach(side => {
-                        if (!side || !side.p1 || !side.p2 || !side.normal) return;
-                        const sx1 = side.p1[0], sz1 = side.p1[1];
-                        const sx2 = side.p2[0], sz2 = side.p2[1];
-                        const sdx = sx2 - sx1, sdz = sz2 - sz1;
-                        const sLenSq = sdx * sdx + sdz * sdz;
-                        if (sLenSq < 100) return;
-                        const segLen = Math.sqrt(sLenSq);
-                        const marginT = Math.min(0.25, 35 / segLen);
-                        let t = ((x - sx1) * sdx + (z - sz1) * sdz) / sLenSq;
-                        t = Math.max(marginT, Math.min(1 - marginT, t));
-                        const px = sx1 + t * sdx;
-                        const pz = sz1 + t * sdz;
-                        const d = Math.hypot(x - px, z - pz);
-                        if (d < bestDist) {
-                            bestDist = d;
-                            const nx = side.normal[0], nz = side.normal[1];
-                            let sRot = 0;
-                            if (Math.abs(nx) >= Math.abs(nz)) {
-                                sRot = (nx < 0) ? 90 : 270;
-                            } else {
-                                sRot = (nz < 0) ? 0 : 180;
-                            }
-                            snapped = {
-                                x: Math.round(px / 10) * 10,
-                                z: Math.round(pz / 10) * 10,
-                                rot: sRot,
-                                snappedToWall: true
-                            };
-                        }
-                    });
-                });
-            }
 
             return snapped;
         }
@@ -1829,11 +1844,9 @@
             return bestIdx;
         }
 
-        // Find all wall corners along the snapped wall face that bound the room wall span containing (x0, z0)
+        // Find all wall corners (using the plaster face wherever a wall has plaster) along the snapped wall face that bound the room wall span containing (x0, z0)
         function getWallSpanCornersForSocket(floor, x0, z0, rot) {
             const normRot = (((Math.round((Number(rot) || 0) / 90) * 90) % 360) + 360) % 360;
-            const innerPoly = (floor === 'ground') ? GROUND_INNER_POLY : FIRST_INNER_POLY;
-            const internalList = INTERNAL_WALLS[floor] || [];
             const coords = [];
 
             const addCoord = (val) => {
@@ -1845,10 +1858,120 @@
                 coords.push(rv);
             };
 
-            if (normRot === 0 || normRot === 180) {
-                // Horizontal wall face at Z = z0; room inward normal is nz = -1 (North, rot=0) or +1 (South, rot=180)
-                const nz = (normRot === 0) ? -1 : 1;
+            if (typeof WallService !== 'undefined' && typeof WallService.getWalls === 'function') {
+                const bRepWalls = WallService.getWalls({ floor });
+                const allSides = [];
+                const horizPlasterBands = [];
+                const vertPlasterBands = [];
 
+                bRepWalls.forEach(bw => {
+                    const sides = (bw.category === 'exterior')
+                        ? ((Array.isArray(bw.sides) && bw.sides.length > 0)
+                            ? bw.sides.filter(s => s && s.role === 'interior')
+                            : [bw.sideB].filter(Boolean))
+                        : (Array.isArray(bw.sides) && bw.sides.length > 0 ? bw.sides : [bw.sideA, bw.sideB].filter(Boolean));
+                    sides.forEach(side => {
+                        if (!side || !side.p1 || !side.p2) return;
+                        const sp1 = side.plasterP1 || side.p1;
+                        const sp2 = side.plasterP2 || side.p2;
+                        const pThick = Number(side.plasterThicknessMm) || 0;
+                        allSides.push({ wall: bw, side, sp1, sp2, rawP1: side.p1, rawP2: side.p2, pThick });
+
+                        if (pThick > 0) {
+                            const isHoriz = Math.abs(side.normal[1]) >= Math.abs(side.normal[0]);
+                            if (isHoriz) {
+                                horizPlasterBands.push({
+                                    xMin: Math.min(sp1[0], sp2[0]),
+                                    xMax: Math.max(sp1[0], sp2[0]),
+                                    zMin: Math.min(side.p1[1], sp1[1]),
+                                    zMax: Math.max(side.p1[1], sp1[1]),
+                                    plastZ: sp1[1]
+                                });
+                            } else {
+                                vertPlasterBands.push({
+                                    zMin: Math.min(sp1[1], sp2[1]),
+                                    zMax: Math.max(sp1[1], sp2[1]),
+                                    xMin: Math.min(side.p1[0], sp1[0]),
+                                    xMax: Math.max(side.p1[0], sp1[0]),
+                                    plastX: sp1[0]
+                                });
+                            }
+                        }
+                    });
+                });
+
+                const adjustXForVertPlaster = (xVal, zRef) => {
+                    for (let i = 0; i < vertPlasterBands.length; i++) {
+                        const b = vertPlasterBands[i];
+                        if (zRef >= b.zMin - 25 && zRef <= b.zMax + 25 && xVal >= b.xMin - 2 && xVal <= b.xMax + 2) {
+                            return b.plastX;
+                        }
+                    }
+                    return xVal;
+                };
+
+                const adjustZForHorizPlaster = (zVal, xRef) => {
+                    for (let i = 0; i < horizPlasterBands.length; i++) {
+                        const b = horizPlasterBands[i];
+                        if (xRef >= b.xMin - 25 && xRef <= b.xMax + 25 && zVal >= b.zMin - 2 && zVal <= b.zMax + 2) {
+                            return b.plastZ;
+                        }
+                    }
+                    return zVal;
+                };
+
+                if (normRot === 0 || normRot === 180) {
+                    const nz = (normRot === 0) ? -1 : 1;
+                    allSides.forEach(({ sp1, sp2 }) => {
+                        const sx1 = sp1[0], sz1 = sp1[1];
+                        const sx2 = sp2[0], sz2 = sp2[1];
+                        if (Math.abs(sz1 - z0) <= 25 && Math.abs(sz2 - z0) <= 25) {
+                            if (x0 >= Math.min(sx1, sx2) - 60 && x0 <= Math.max(sx1, sx2) + 60) {
+                                addCoord(adjustXForVertPlaster(sx1, z0));
+                                addCoord(adjustXForVertPlaster(sx2, z0));
+                            }
+                        } else if (Math.abs(sx1 - sx2) <= 22) {
+                            const minZ = Math.min(sz1, sz2), maxZ = Math.max(sz1, sz2);
+                            const touchesAndExtends = (nz > 0)
+                                ? (minZ <= z0 + 25 && maxZ > z0 + 50)
+                                : (maxZ >= z0 - 25 && minZ < z0 - 50);
+                            if (touchesAndExtends) {
+                                addCoord(sx1);
+                            }
+                        }
+                    });
+                    coords.sort((a, b) => a - b);
+                    return { axis: 'x', fixedCoord: z0, normalX: 0, normalZ: nz, cornerCoords: coords };
+                } else {
+                    const nx = (normRot === 90) ? -1 : 1;
+                    allSides.forEach(({ sp1, sp2 }) => {
+                        const sx1 = sp1[0], sz1 = sp1[1];
+                        const sx2 = sp2[0], sz2 = sp2[1];
+                        if (Math.abs(sx1 - x0) <= 25 && Math.abs(sx2 - x0) <= 25) {
+                            if (z0 >= Math.min(sz1, sz2) - 60 && z0 <= Math.max(sz1, sz2) + 60) {
+                                addCoord(adjustZForHorizPlaster(sz1, x0));
+                                addCoord(adjustZForHorizPlaster(sz2, x0));
+                            }
+                        } else if (Math.abs(sz1 - sz2) <= 22) {
+                            const minX = Math.min(sx1, sx2), maxX = Math.max(sx1, sx2);
+                            const touchesAndExtends = (nx > 0)
+                                ? (minX <= x0 + 25 && maxX > x0 + 50)
+                                : (maxX >= x0 - 25 && minX < x0 - 50);
+                            if (touchesAndExtends) {
+                                addCoord(sz1);
+                            }
+                        }
+                    });
+                    coords.sort((a, b) => a - b);
+                    return { axis: 'z', fixedCoord: x0, normalX: nx, normalZ: 0, cornerCoords: coords };
+                }
+            }
+
+            // Fallback when WallService is unavailable
+            const innerPoly = (floor === 'ground') ? GROUND_INNER_POLY : FIRST_INNER_POLY;
+            const internalList = INTERNAL_WALLS[floor] || [];
+            if (normRot === 0 || normRot === 180) {
+                const nz = (normRot === 0) ? -1 : 1;
                 for (let i = 0; i < innerPoly.length; i++) {
                     const [x1, z1] = innerPoly[i];
                     const [x2, z2] = innerPoly[(i + 1) % innerPoly.length];
@@ -1865,7 +1988,6 @@
                         }
                     }
                 }
-
                 internalList.forEach(w => {
                     if (w.axis === 'x') {
                         const faceMatch = (normRot === 0 && Math.abs(w.z1 - z0) <= 22) || (normRot === 180 && Math.abs(w.z2 - z0) <= 22);
@@ -1878,50 +2000,15 @@
                             ? (w.z1 <= z0 + 25 && w.z2 > z0 + 50)
                             : (w.z2 >= z0 - 25 && w.z1 < z0 - 50);
                         if (touchesAndExtends) {
-                            if (Array.isArray(w.solidPolygons2D) && w.solidPolygons2D[0]) {
-                                w.solidPolygons2D[0].forEach(([vx, vz]) => {
-                                    if (Math.abs(vz - z0) <= 25) addCoord(vx);
-                                });
-                            } else {
-                                addCoord(w.x1);
-                                addCoord(w.x2);
-                            }
+                            addCoord(w.x1);
+                            addCoord(w.x2);
                         }
                     }
                 });
-
-                if (typeof WallService !== 'undefined' && typeof WallService.getWalls === 'function') {
-                    const bRepWalls = WallService.getWalls({ floor });
-                    bRepWalls.forEach(bw => {
-                        const sides = Array.isArray(bw.sides) && bw.sides.length > 0
-                            ? bw.sides
-                            : [bw.sideA, bw.sideB].filter(Boolean);
-                        sides.forEach(side => {
-                            if (!side || !side.p1 || !side.p2) return;
-                            const sx1 = side.p1[0], sz1 = side.p1[1];
-                            const sx2 = side.p2[0], sz2 = side.p2[1];
-                            if (Math.abs(sz1 - z0) <= 22 && Math.abs(sz2 - z0) <= 22) {
-                                if (x0 >= Math.min(sx1, sx2) - 60 && x0 <= Math.max(sx1, sx2) + 60) {
-                                    addCoord(sx1);
-                                    addCoord(sx2);
-                                }
-                            } else if (Math.abs(sx1 - sx2) <= 22) {
-                                const minZ = Math.min(sz1, sz2), maxZ = Math.max(sz1, sz2);
-                                const touchesAndExtends = (nz > 0)
-                                    ? (minZ <= z0 + 25 && maxZ > z0 + 50)
-                                    : (maxZ >= z0 - 25 && minZ < z0 - 50);
-                                if (touchesAndExtends) addCoord(sx1);
-                            }
-                        });
-                    });
-                }
-
                 coords.sort((a, b) => a - b);
                 return { axis: 'x', fixedCoord: z0, normalX: 0, normalZ: nz, cornerCoords: coords };
             } else {
-                // Vertical wall face at X = x0; room inward normal is nx = -1 (East, rot=90) or +1 (West, rot=270)
                 const nx = (normRot === 90) ? -1 : 1;
-
                 for (let i = 0; i < innerPoly.length; i++) {
                     const [x1, z1] = innerPoly[i];
                     const [x2, z2] = innerPoly[(i + 1) % innerPoly.length];
@@ -1938,25 +2025,12 @@
                         }
                     }
                 }
-
                 internalList.forEach(w => {
                     if (w.axis === 'z') {
-                        if (Array.isArray(w.solidPolygons2D) && w.solidPolygons2D[0]) {
-                            const poly = w.solidPolygons2D[0];
-                            for (let i = 0; i < poly.length; i++) {
-                                const [px1, pz1] = poly[i];
-                                const [px2, pz2] = poly[(i + 1) % poly.length];
-                                if (Math.abs(px1 - x0) <= 22 && Math.abs(px2 - x0) <= 22 && z0 >= Math.min(pz1, pz2) - 60 && z0 <= Math.max(pz1, pz2) + 60) {
-                                    addCoord(pz1);
-                                    addCoord(pz2);
-                                }
-                            }
-                        } else {
-                            const faceMatch = (normRot === 90 && Math.abs(w.x1 - x0) <= 22) || (normRot === 270 && Math.abs(w.x2 - x0) <= 22);
-                            if (faceMatch && z0 >= w.z1 - 60 && z0 <= w.z2 + 60) {
-                                addCoord(w.z1);
-                                addCoord(w.z2);
-                            }
+                        const faceMatch = (normRot === 90 && Math.abs(w.x1 - x0) <= 22) || (normRot === 270 && Math.abs(w.x2 - x0) <= 22);
+                        if (faceMatch && z0 >= w.z1 - 60 && z0 <= w.z2 + 60) {
+                            addCoord(w.z1);
+                            addCoord(w.z2);
                         }
                     } else {
                         const touchesAndExtends = (nx > 0)
@@ -1968,33 +2042,6 @@
                         }
                     }
                 });
-
-                if (typeof WallService !== 'undefined' && typeof WallService.getWalls === 'function') {
-                    const bRepWalls = WallService.getWalls({ floor });
-                    bRepWalls.forEach(bw => {
-                        const sides = Array.isArray(bw.sides) && bw.sides.length > 0
-                            ? bw.sides
-                            : [bw.sideA, bw.sideB].filter(Boolean);
-                        sides.forEach(side => {
-                            if (!side || !side.p1 || !side.p2) return;
-                            const sx1 = side.p1[0], sz1 = side.p1[1];
-                            const sx2 = side.p2[0], sz2 = side.p2[1];
-                            if (Math.abs(sx1 - x0) <= 22 && Math.abs(sx2 - x0) <= 22) {
-                                if (z0 >= Math.min(sz1, sz2) - 60 && z0 <= Math.max(sz1, sz2) + 60) {
-                                    addCoord(sz1);
-                                    addCoord(sz2);
-                                }
-                            } else if (Math.abs(sz1 - sz2) <= 22) {
-                                const minX = Math.min(sx1, sx2), maxX = Math.max(sx1, sx2);
-                                const touchesAndExtends = (nx > 0)
-                                    ? (minX <= x0 + 25 && maxX > x0 + 50)
-                                    : (maxX >= x0 - 25 && minX < x0 - 50);
-                                if (touchesAndExtends) addCoord(sz1);
-                            }
-                        });
-                    });
-                }
-
                 coords.sort((a, b) => a - b);
                 return { axis: 'z', fixedCoord: x0, normalX: nx, normalZ: 0, cornerCoords: coords };
             }
@@ -2093,45 +2140,101 @@
             }
         }
 
-        // Collect all architectural corners (inner/outer wall vertices, internal partition corners, doorway jambs, window corners)
+        // Collect all architectural corners (preferring 2 cm plaster corners over buried structural wall corners wherever plaster is applied)
         function getFloorCorners(floor) {
             const rawCorners = [];
-            const addCorner = (x, z, label) => {
+            const plasterCorners = [];
+            const plasteredWallIds = new Set();
+
+            const addCorner = (x, z, label, isPlaster = false, skipIfNearPlaster = false) => {
                 if (!Number.isFinite(x) || !Number.isFinite(z)) return;
                 const rx = Math.round(x);
                 const rz = Math.round(z);
+                if (skipIfNearPlaster) {
+                    for (let i = 0; i < plasterCorners.length; i++) {
+                        if (Math.hypot(plasterCorners[i].x - rx, plasterCorners[i].z - rz) <= 35) {
+                            return;
+                        }
+                    }
+                }
                 for (let i = 0; i < rawCorners.length; i++) {
                     if (Math.hypot(rawCorners[i].x - rx, rawCorners[i].z - rz) <= 4) {
                         return;
                     }
                 }
-                rawCorners.push({ x: rx, z: rz, label });
+                const pt = { x: rx, z: rz, label };
+                rawCorners.push(pt);
+                if (isPlaster) plasterCorners.push(pt);
             };
 
+            // 1. Register all 2 cm plaster corners & plastered doorway jambs first from WallService floor slice
+            const horizPlasterAt = [];
+            const vertPlasterAt = [];
+            if (typeof WallService !== 'undefined' && typeof WallService.getFloorPlanSlice === 'function') {
+                const slice = WallService.getFloorPlanSlice(floor, 1200);
+                const allSlicedWalls = (slice.exteriorWalls || []).concat(slice.internalWalls || []);
+                allSlicedWalls.forEach(w => {
+                    const segs = Array.isArray(w.plasterSegments2D) ? w.plasterSegments2D : [];
+                    if (segs.length > 0) plasteredWallIds.add(w.id);
+                    segs.forEach(seg => {
+                        if (Array.isArray(seg.plasterLine) && seg.plasterLine.length === 2) {
+                            const [[px1, pz1], [px2, pz2]] = seg.plasterLine;
+                            addCorner(px1, pz1, `${w.id} Plaster Corner`, true, false);
+                            addCorner(px2, pz2, `${w.id} Plaster Corner`, true, false);
+                        }
+                    });
+                    (w.sides || []).forEach(side => {
+                        const pThick = Number(side && side.plasterThicknessMm) || 0;
+                        if (pThick > 0 && side.p1 && side.p2) {
+                            const sp1 = side.plasterP1 || side.p1;
+                            const sp2 = side.plasterP2 || side.p2;
+                            if (Math.abs(side.normal[1]) >= Math.abs(side.normal[0])) {
+                                horizPlasterAt.push({
+                                    xMin: Math.min(sp1[0], sp2[0]),
+                                    xMax: Math.max(sp1[0], sp2[0]),
+                                    rawZ: side.p1[1],
+                                    plastZ: sp1[1]
+                                });
+                            } else {
+                                vertPlasterAt.push({
+                                    zMin: Math.min(sp1[1], sp2[1]),
+                                    zMax: Math.max(sp1[1], sp2[1]),
+                                    rawX: side.p1[0],
+                                    plastX: sp1[0]
+                                });
+                            }
+                        }
+                    });
+                });
+            }
+
+            // 2. Inner & Outer shell polygon vertices (skipping inner structural corners that have been superseded by a plaster corner)
             const innerPoly = (floor === 'ground') ? GROUND_INNER_POLY : FIRST_INNER_POLY;
-            innerPoly.forEach(([x, z]) => addCorner(x, z, 'Inner Wall Corner'));
+            innerPoly.forEach(([x, z]) => addCorner(x, z, 'Inner Wall Corner', false, true));
 
             const outerPoly = (floor === 'ground') ? GROUND_OUTER_POLY : FIRST_OUTER_POLY;
-            outerPoly.forEach(([x, z]) => addCorner(x, z, 'Outer Facade Corner'));
+            outerPoly.forEach(([x, z]) => addCorner(x, z, 'Outer Facade Corner', false, false));
 
+            // 3. Internal walls (for plastered walls, their plaster corners & door jambs were already added in Step 1)
             const internalList = INTERNAL_WALLS[floor] || [];
             internalList.forEach(w => {
-                addCorner(w.x1, w.z1, `${w.id} Corner`);
-                addCorner(w.x2, w.z1, `${w.id} Corner`);
-                addCorner(w.x2, w.z2, `${w.id} Corner`);
-                addCorner(w.x1, w.z2, `${w.id} Corner`);
+                if (plasteredWallIds.has(w.id)) return;
+                addCorner(w.x1, w.z1, `${w.id} Corner`, false, true);
+                addCorner(w.x2, w.z1, `${w.id} Corner`, false, true);
+                addCorner(w.x2, w.z2, `${w.id} Corner`, false, true);
+                addCorner(w.x1, w.z2, `${w.id} Corner`, false, true);
                 const doors = Array.isArray(w.doors) ? w.doors : [];
                 doors.forEach(d => {
                     if (w.axis === 'z' || w.axis === 'y') {
-                        addCorner(w.x1, d.start, `${w.id} Door Jamb`);
-                        addCorner(w.x2, d.start, `${w.id} Door Jamb`);
-                        addCorner(w.x1, d.end, `${w.id} Door Jamb`);
-                        addCorner(w.x2, d.end, `${w.id} Door Jamb`);
+                        addCorner(w.x1, d.start, `${w.id} Door Jamb`, false, true);
+                        addCorner(w.x2, d.start, `${w.id} Door Jamb`, false, true);
+                        addCorner(w.x1, d.end, `${w.id} Door Jamb`, false, true);
+                        addCorner(w.x2, d.end, `${w.id} Door Jamb`, false, true);
                     } else {
-                        addCorner(d.start, w.z1, `${w.id} Door Jamb`);
-                        addCorner(d.start, w.z2, `${w.id} Door Jamb`);
-                        addCorner(d.end, w.z1, `${w.id} Door Jamb`);
-                        addCorner(d.end, w.z2, `${w.id} Door Jamb`);
+                        addCorner(d.start, w.z1, `${w.id} Door Jamb`, false, true);
+                        addCorner(d.start, w.z2, `${w.id} Door Jamb`, false, true);
+                        addCorner(d.end, w.z1, `${w.id} Door Jamb`, false, true);
+                        addCorner(d.end, w.z2, `${w.id} Door Jamb`, false, true);
                     }
                 });
             });
@@ -2143,27 +2246,47 @@
                         ? bw.sides
                         : [bw.sideA, bw.sideB].filter(Boolean);
                     sides.forEach(side => {
-                        if (side && side.p1) addCorner(side.p1[0], side.p1[1], `${bw.id} Corner`);
-                        if (side && side.p2) addCorner(side.p2[0], side.p2[1], `${bw.id} Corner`);
+                        if (!side) return;
+                        if ((Number(side.plasterThicknessMm) || 0) > 0) return;
+                        const isExtFace = (bw.category === 'exterior' && side.role === 'exterior');
+                        if (side.p1) addCorner(side.p1[0], side.p1[1], `${bw.id} Corner`, false, !isExtFace);
+                        if (side.p2) addCorner(side.p2[0], side.p2[1], `${bw.id} Corner`, false, !isExtFace);
                     });
                 });
             }
 
+            // 4. Window & Door Opening Jambs (use plastered inner wall plane if the host exterior wall has interior plaster)
             PLAN_OPENINGS.filter(op => op.floor === floor).forEach(op => {
                 if (op.axis === 'x') {
                     const zOuter = op.fixedZ;
-                    const zInner = op.fixedZ + op.inwardSign * WALL_THICKNESS;
-                    addCorner(op.start, zInner, `${op.name} Inner Jamb`);
-                    addCorner(op.end, zInner, `${op.name} Inner Jamb`);
-                    addCorner(op.start, zOuter, `${op.name} Outer Jamb`);
-                    addCorner(op.end, zOuter, `${op.name} Outer Jamb`);
+                    let zInner = op.fixedZ + op.inwardSign * WALL_THICKNESS;
+                    const midX = (op.start + op.end) / 2;
+                    for (let i = 0; i < horizPlasterAt.length; i++) {
+                        const hp = horizPlasterAt[i];
+                        if (Math.abs(hp.rawZ - zInner) <= 5 && midX >= hp.xMin && midX <= hp.xMax) {
+                            zInner = hp.plastZ;
+                            break;
+                        }
+                    }
+                    addCorner(op.start, zInner, `${op.name} Inner Jamb`, false, false);
+                    addCorner(op.end, zInner, `${op.name} Inner Jamb`, false, false);
+                    addCorner(op.start, zOuter, `${op.name} Outer Jamb`, false, false);
+                    addCorner(op.end, zOuter, `${op.name} Outer Jamb`, false, false);
                 } else {
                     const xOuter = op.fixedX;
-                    const xInner = op.fixedX + op.inwardSign * WALL_THICKNESS;
-                    addCorner(xInner, op.start, `${op.name} Inner Jamb`);
-                    addCorner(xInner, op.end, `${op.name} Inner Jamb`);
-                    addCorner(xOuter, op.start, `${op.name} Outer Jamb`);
-                    addCorner(xOuter, op.end, `${op.name} Outer Jamb`);
+                    let xInner = op.fixedX + op.inwardSign * WALL_THICKNESS;
+                    const midZ = (op.start + op.end) / 2;
+                    for (let i = 0; i < vertPlasterAt.length; i++) {
+                        const vp = vertPlasterAt[i];
+                        if (Math.abs(vp.rawX - xInner) <= 5 && midZ >= vp.zMin && midZ <= vp.zMax) {
+                            xInner = vp.plastX;
+                            break;
+                        }
+                    }
+                    addCorner(xInner, op.start, `${op.name} Inner Jamb`, false, false);
+                    addCorner(xInner, op.end, `${op.name} Inner Jamb`, false, false);
+                    addCorner(xOuter, op.start, `${op.name} Outer Jamb`, false, false);
+                    addCorner(xOuter, op.end, `${op.name} Outer Jamb`, false, false);
                 }
             });
 
@@ -3663,6 +3786,7 @@
                             'pointer-events': 'none'
                         }));
                     }
+                    renderWallPlasterHighlight2D(floor, w, shellG, isSelected);
                 });
             } else {
                 // Fallback outer/inner polygons if WallService is unavailable
@@ -3963,14 +4087,34 @@
                 if (w1.axis === 'y' || w1.axis === 'z') {
                     const mid1 = (w1.x1 + w1.x2) / 2;
                     const mid2 = (w2.x1 + w2.x2) / 2;
-                    const xStart = (mid1 >= mid2) ? w1.x1 : w1.x2;
-                    const xEnd = (mid1 >= mid2) ? w2.x2 : w2.x1;
+                    const w1IsWest = (mid1 >= mid2);
+                    const structStart = w1IsWest ? w1.x1 : w1.x2;
+                    const structEnd = w1IsWest ? w2.x2 : w2.x1;
+                    const plastStart = w1IsWest
+                        ? (w1.plasteredX1 !== undefined ? w1.plasteredX1 : w1.x1)
+                        : (w1.plasteredX2 !== undefined ? w1.plasteredX2 : w1.x2);
+                    const plastEnd = w1IsWest
+                        ? (w2.plasteredX2 !== undefined ? w2.plasteredX2 : w2.x2)
+                        : (w2.plasteredX1 !== undefined ? w2.plasteredX1 : w2.x1);
+                    const bothFacingSidesPlastered = (Math.abs(plastStart - structStart) > 0.5) && (Math.abs(plastEnd - structEnd) > 0.5);
+                    const xStart = bothFacingSidesPlastered ? plastStart : structStart;
+                    const xEnd = bothFacingSidesPlastered ? plastEnd : structEnd;
                     drawWallSpanDim(group, xStart, crossCoord, xEnd, crossCoord, labelSide, color, customLabel);
                 } else {
                     const mid1 = (w1.z1 + w1.z2) / 2;
                     const mid2 = (w2.z1 + w2.z2) / 2;
-                    const zStart = (mid1 <= mid2) ? w1.z2 : w1.z1;
-                    const zEnd = (mid1 <= mid2) ? w2.z1 : w2.z2;
+                    const w1IsNorth = (mid1 <= mid2);
+                    const structStart = w1IsNorth ? w1.z2 : w1.z1;
+                    const structEnd = w1IsNorth ? w2.z1 : w2.z2;
+                    const plastStart = w1IsNorth
+                        ? (w1.plasteredZ2 !== undefined ? w1.plasteredZ2 : w1.z2)
+                        : (w1.plasteredZ1 !== undefined ? w1.plasteredZ1 : w1.z1);
+                    const plastEnd = w1IsNorth
+                        ? (w2.plasteredZ1 !== undefined ? w2.plasteredZ1 : w2.z1)
+                        : (w2.plasteredZ2 !== undefined ? w2.plasteredZ2 : w2.z2);
+                    const bothFacingSidesPlastered = (Math.abs(plastStart - structStart) > 0.5) && (Math.abs(plastEnd - structEnd) > 0.5);
+                    const zStart = bothFacingSidesPlastered ? plastStart : structStart;
+                    const zEnd = bothFacingSidesPlastered ? plastEnd : structEnd;
                     drawWallSpanDim(group, crossCoord, zStart, crossCoord, zEnd, labelSide, color, customLabel);
                 }
             }
@@ -3984,7 +4128,7 @@
                 wallSpan('GW_1', 'EW_GARAGE_EAST', 520, 1);
                 wallThick('EW_GARAGE_EAST', 520, 1);
 
-                // 2) Kotłownia (200 cm), Kuchnia (542 cm), Spiżarnia (upper 186 cm) & Gabinet (upper 424 cm) bay (Z = 3650 mm)
+                // 2) Kotłownia (200 cm), Kuchnia (538 cm clear with 2×2 cm plaster / 542 cm structural), Spiżarnia (upper 186 cm) & Gabinet (upper 424 cm) bay (Z = 3650 mm)
                 wallSpan('GW_1', 'GW_3', 3650, 1);
                 wallThick('GW_3', 3650, 1);
                 wallSpan('GW_3', 'GW_13', 3650, 1);
@@ -4511,6 +4655,9 @@
                     group.appendChild(wallRect);
                 }
 
+                // Highlight 2 cm (20 mm) interior plaster layer in front of the main structural wall
+                renderWallPlasterHighlight2D(floor, w, group, isSelected);
+
                 // Render interior doorway threshold markers where the 3D outerLoop doorway notch is sliced at y = 1,200 mm
                 const doorList = Array.isArray(w.cutOpeningsAtSlice)
                     ? w.cutOpeningsAtSlice
@@ -4577,6 +4724,54 @@
                 }, `${rm.dims} • ${rm.area}`));
                 group.appendChild(rg);
             });
+        }
+
+        function renderWallPlasterHighlight2D(floor, w, group, isSelected) {
+            const segments = Array.isArray(w.plasterSegments2D) ? w.plasterSegments2D : [];
+            if (segments.length === 0) return;
+
+            const plasterGroup = svgEl('g', {
+                'data-plaster-wall-id': w.id,
+                style: 'cursor: pointer;'
+            });
+
+            segments.forEach(seg => {
+                if (Array.isArray(seg.polygon2D) && seg.polygon2D.length >= 3) {
+                    const bandPoly = svgEl('polygon', {
+                        points: polyToPointsAttr(seg.polygon2D),
+                        fill: isSelected ? 'rgba(45, 212, 191, 0.30)' : 'rgba(45, 212, 191, 0.16)',
+                        stroke: 'none'
+                    });
+                    bandPoly.addEventListener('click', (e) => {
+                        if (planState.activeTool !== 'select') return;
+                        e.stopPropagation();
+                        selectInternalWall(floor, w.id);
+                    });
+                    plasterGroup.appendChild(bandPoly);
+                }
+
+                if (Array.isArray(seg.plasterLine) && seg.plasterLine.length === 2) {
+                    const [[px1, pz1], [px2, pz2]] = seg.plasterLine;
+                    const thinLine = svgEl('line', {
+                        x1: toSvgX(px1),
+                        y1: toSvgZ(pz1),
+                        x2: toSvgX(px2),
+                        y2: toSvgZ(pz2),
+                        stroke: isSelected ? '#5eead4' : '#2dd4bf',
+                        'stroke-width': isSelected ? 5 : 3.5,
+                        'stroke-linecap': 'butt',
+                        opacity: 0.95
+                    });
+                    thinLine.addEventListener('click', (e) => {
+                        if (planState.activeTool !== 'select') return;
+                        e.stopPropagation();
+                        selectInternalWall(floor, w.id);
+                    });
+                    plasterGroup.appendChild(thinLine);
+                }
+            });
+
+            group.appendChild(plasterGroup);
         }
 
         function renderAllPlans() {
@@ -4710,10 +4905,16 @@
 
                 const zBot = w.zBottom !== undefined ? w.zBottom : (w.yBottom || 0);
                 const zTop = w.zTop !== undefined ? w.zTop : (w.yTop || 2800);
+                const plasterA = (w.sideA && Number(w.sideA.plasterThicknessMm) > 0) ? `${w.sideA.id}: +${w.sideA.plasterThicknessMm} mm` : null;
+                const plasterB = (w.sideB && Number(w.sideB.plasterThicknessMm) > 0) ? `${w.sideB.id}: +${w.sideB.plasterThicknessMm} mm` : null;
+                const plasterSummary = (plasterA || plasterB)
+                    ? `${[plasterA, plasterB].filter(Boolean).join(' | ')} (Total = ${(w.plasteredThickness || thickMm)} mm)`
+                    : '0 mm (Unplastered structural dimensions)';
                 const rows = [
                     ['Wall ID & Role', `${w.id} (${isExterior ? 'Exterior Mitered B-Rep' : 'Interior Partition B-Rep'})`],
                     ['3D Height (Z)', `${zBot.toLocaleString()}..${zTop.toLocaleString()} mm (H = ${(w.heightMm || 2800).toLocaleString()} mm)`],
                     ['Wall Thickness', `${thickMm} mm (${(thickMm / 10).toFixed(0)} cm)`],
+                    ['Interior Plaster (2 cm)', plasterSummary],
                     ['Side A (p1 → p2, n)', sideADesc],
                     ['Side B (p1 → p2, n)', sideBDesc],
                     ['3D outerLoop (x,y,z)', outerLoopDesc],

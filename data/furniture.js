@@ -477,13 +477,13 @@
 
     /**
      * Build the single continuous L-shaped 30 mm (3 cm) stone countertop (Z = 870..900 mm)
-     * spanning all North Wall base cabinets (N1..N5, X = 8,315..11,915 mm, Y = 3,170..3,770 mm)
+     * spanning all North Wall base cabinets (N1..N5, X = 8,335..11,915 mm, Y = 3,170..3,770 mm)
      * and all West Wall base cabinets (W1..W5, X = 11,315..11,915 mm, Y = 3,170..6,170 mm),
      * with a wide 820 × 400 mm sink cutout opening over CAB_KITCHEN_N2 (X = 10,155..10,975 mm, Y = 3,290..3,690 mm).
      */
     function buildKitchenCountertopPart() {
         const z0 = 870, z1 = 900;
-        const xEast = 8315, xWest = 11915, xCornerInner = 11315;
+        const xEast = 8335, xWest = 11915, xCornerInner = 11315;
         const yNorth = 3170, yCornerInner = 3770, ySouth = 6170;
         // Wide 90cm-cabinet sink cutout over CAB_KITCHEN_N2 (X = 10,115..11,015 mm)
         const sx0 = 10155, sx1 = 10975; // 820 mm wide opening
@@ -1854,27 +1854,27 @@
         },
 
         // =====================================================================
-        // 4. CAB_KITCHEN_N4 (alias CAB_KITCHEN_1): 600 mm Base 2-Drawer Cabinet (Right of Zmywarka)
-        //    Local X = 2,400..3,000 mm from GW_3 -> X = 8,915..9,515 mm
+        // 4. CAB_KITCHEN_N4 (alias CAB_KITCHEN_1): 590 mm (59 cm) Base 2-Drawer Cabinet (Right of Zmywarka)
+        //    Local X = 2,400..2,990 mm from GW_3 -> X = 8,925..9,515 mm
         // =====================================================================
         {
             id: 'CAB_KITCHEN_N4',
             aliasIds: ['CAB_KITCHEN_1'],
-            name: 'CAB_KITCHEN_N4 — Base 2-Drawer Cabinet 600mm (Right of Zmywarka)',
-            shortName: 'Base 2-Drawer 600mm (Right of Zmywarka)',
+            name: 'CAB_KITCHEN_N4 — Base 2-Drawer Cabinet 590mm (Right of Zmywarka)',
+            shortName: 'Base 2-Drawer 590mm (Right of Zmywarka)',
             category: 'cabinet',
             subtype: 'base_cabinet_2_drawers',
             floor: 'ground',
             room: '0.13 Kuchnia',
             hostWallId: 'EW_NORTH_RECESSED',
             viewId: 'kitchen_north_wall',
-            x1: 8915,
+            x1: 8925,
             x2: 9515,
             y1: Y_WALL,
             y2: Y_FRONT_FACE,
             zBottom: 0,
             zTop: 870,
-            widthMm: 600,
+            widthMm: 590,
             depthMm: 600,
             carcassDepthMm: 580,
             frontThicknessMm: 20,
@@ -1885,33 +1885,33 @@
             heightMm: 870,
             boardThicknessMm: BOARD_MM,
             normal: [0, 1, 0],
-            specs: '600 × 600 × 870 mm (150 mm plinth + 720 mm 2-drawer carcass; topped by unified 30 mm KITCHEN_COUNTERTOP; 2 × 330 mm wood fronts + 2 × 30 mm handle rails)',
-            description: '600 mm 2-drawer base cabinet on the Kitchen North Wall immediately to the right of Zmywarka (under Window O1), topped by the unified L-shaped stone countertop (KITCHEN_COUNTERTOP).',
-            skeleton: buildBaseSkeleton('CAB_KITCHEN_N4', 8915, 9515, true),
-            fronts: buildTwoDrawerFronts('CAB_KITCHEN_N4', 8915, 9515)
+            specs: '590 × 600 × 870 mm (59 cm width; 150 mm plinth + 720 mm 2-drawer carcass; topped by unified 30 mm KITCHEN_COUNTERTOP; 2 × 330 mm wood fronts + 2 × 30 mm handle rails)',
+            description: '590 mm (59 cm) 2-drawer base cabinet on the Kitchen North Wall immediately to the right of Zmywarka (under Window O1), reduced from 60 cm to 59 cm for 2 cm plaster clearance, topped by the unified L-shaped stone countertop (KITCHEN_COUNTERTOP).',
+            skeleton: buildBaseSkeleton('CAB_KITCHEN_N4', 8925, 9515, true),
+            fronts: buildTwoDrawerFronts('CAB_KITCHEN_N4', 8925, 9515)
         },
 
         // =====================================================================
-        // 5. CAB_KITCHEN_N5: 600 mm Base 2-Drawer Cabinet (Left of Lodówka)
-        //    Local X = 3,000..3,600 mm from GW_3 -> X = 8,315..8,915 mm
+        // 5. CAB_KITCHEN_N5: 590 mm (59 cm) Base 2-Drawer Cabinet (Left of Lodówka)
+        //    Local X = 2,990..3,580 mm from GW_3 -> X = 8,335..8,925 mm
         // =====================================================================
         {
             id: 'CAB_KITCHEN_N5',
-            name: 'CAB_KITCHEN_N5 — Base 2-Drawer Cabinet 600mm (Left of Lodówka)',
-            shortName: 'Base 2-Drawer 600mm (Left of Lodówka)',
+            name: 'CAB_KITCHEN_N5 — Base 2-Drawer Cabinet 590mm (Left of Lodówka)',
+            shortName: 'Base 2-Drawer 590mm (Left of Lodówka)',
             category: 'cabinet',
             subtype: 'base_cabinet_2_drawers',
             floor: 'ground',
             room: '0.13 Kuchnia',
             hostWallId: 'EW_NORTH_RECESSED',
             viewId: 'kitchen_north_wall',
-            x1: 8315,
-            x2: 8915,
+            x1: 8335,
+            x2: 8925,
             y1: Y_WALL,
             y2: Y_FRONT_FACE,
             zBottom: 0,
             zTop: 870,
-            widthMm: 600,
+            widthMm: 590,
             depthMm: 600,
             carcassDepthMm: 580,
             frontThicknessMm: 20,
@@ -1922,15 +1922,15 @@
             heightMm: 870,
             boardThicknessMm: BOARD_MM,
             normal: [0, 1, 0],
-            specs: '600 × 600 × 870 mm (150 mm plinth + 720 mm 2-drawer carcass; topped by unified 30 mm KITCHEN_COUNTERTOP; 2 × 330 mm wood fronts + 2 × 30 mm handle rails)',
-            description: '600 mm 2-drawer base cabinet on the Kitchen North Wall immediately to the left of the tall fridge cabinet (Lodówka), topped by the unified L-shaped stone countertop (KITCHEN_COUNTERTOP).',
-            skeleton: buildBaseSkeleton('CAB_KITCHEN_N5', 8315, 8915, true),
-            fronts: buildTwoDrawerFronts('CAB_KITCHEN_N5', 8315, 8915)
+            specs: '590 × 600 × 870 mm (59 cm width; 150 mm plinth + 720 mm 2-drawer carcass; topped by unified 30 mm KITCHEN_COUNTERTOP; 2 × 330 mm wood fronts + 2 × 30 mm handle rails)',
+            description: '590 mm (59 cm) 2-drawer base cabinet on the Kitchen North Wall immediately to the left of the tall fridge cabinet (Lodówka), reduced from 60 cm to 59 cm for 2 cm plaster clearance, topped by the unified L-shaped stone countertop (KITCHEN_COUNTERTOP).',
+            skeleton: buildBaseSkeleton('CAB_KITCHEN_N5', 8335, 8925, true),
+            fronts: buildTwoDrawerFronts('CAB_KITCHEN_N5', 8335, 8925)
         },
 
         // =====================================================================
         // 6. CAB_KITCHEN_N6: 600 mm Tall Fridge Cabinet (Lodówka, Z = 0..2,700 mm)
-        //    Local X = 3,600..4,200 mm from GW_3 -> X = 7,715..8,315 mm
+        //    Local X = 3,580..4,180 mm from GW_3 -> X = 7,735..8,335 mm
         // =====================================================================
         {
             id: 'CAB_KITCHEN_N6',
@@ -1942,8 +1942,8 @@
             room: '0.13 Kuchnia',
             hostWallId: 'EW_NORTH_RECESSED',
             viewId: 'kitchen_north_wall',
-            x1: 7715,
-            x2: 8315,
+            x1: 7735,
+            x2: 8335,
             y1: Y_WALL,
             y2: Y_FRONT_FACE,
             zBottom: 0,
@@ -1960,7 +1960,7 @@
             normal: [0, 1, 0],
             specs: '600 × 600 × 2,700 mm (150 mm plinth + 1,950 mm fridge door Z=150..2,100 mm + 600 mm top storage door Z=2,100..2,700 mm)',
             description: 'Full-height 2,700 mm built-in refrigerator tower (Lodówka) on the Kitchen North Wall with a 1,950 mm lower wood door (with vertical handle bar) and a 600 mm top storage cabinet door.',
-            skeleton: buildTallSkeleton('CAB_KITCHEN_N6', 7715, 8315, [2100]),
+            skeleton: buildTallSkeleton('CAB_KITCHEN_N6', 7735, 8335, [2100]),
             fronts: [
                 {
                     id: 'CAB_KITCHEN_N6_FRONT_FRIDGE',
@@ -1968,7 +1968,7 @@
                     role: 'door_front',
                     material: 'wood_tone',
                     colorRgb: COLOR_WOOD_FRONT,
-                    x0: 7717, x1: 8313,
+                    x0: 7737, x1: 8333,
                     y0: Y_CARCASS_FRONT, y1: Y_FRONT_FACE,
                     z0: 152, z1: 2098
                 },
@@ -1978,7 +1978,7 @@
                     role: 'handle_bar',
                     material: 'dark_handle',
                     colorRgb: COLOR_DARK_HANDLE,
-                    x0: 8285, x1: 8295,
+                    x0: 8305, x1: 8315,
                     y0: Y_FRONT_FACE, y1: Y_FRONT_FACE + 12,
                     z0: 700, z1: 900
                 },
@@ -1988,7 +1988,7 @@
                     role: 'door_front',
                     material: 'wood_tone',
                     colorRgb: COLOR_WOOD_FRONT,
-                    x0: 7717, x1: 8313,
+                    x0: 7737, x1: 8333,
                     y0: Y_CARCASS_FRONT, y1: Y_FRONT_FACE,
                     z0: 2102, z1: 2698
                 }
@@ -1997,7 +1997,7 @@
 
         // =====================================================================
         // 7. CAB_KITCHEN_N7: 600 mm Tall Oven & Microwave Tower (Piekarnik & Mikrofala)
-        //    Local X = 4,200..4,800 mm from GW_3 -> X = 7,115..7,715 mm
+        //    Local X = 4,180..4,780 mm from GW_3 -> X = 7,135..7,735 mm
         // =====================================================================
         {
             id: 'CAB_KITCHEN_N7',
@@ -2009,8 +2009,8 @@
             room: '0.13 Kuchnia',
             hostWallId: 'EW_NORTH_RECESSED',
             viewId: 'kitchen_north_wall',
-            x1: 7115,
-            x2: 7715,
+            x1: 7135,
+            x2: 7735,
             y1: Y_WALL,
             y2: Y_FRONT_FACE,
             zBottom: 0,
@@ -2027,7 +2027,7 @@
             normal: [0, 1, 0],
             specs: '600 × 600 × 2,700 mm (150 mm plinth + 450 mm lower door + 600 mm Piekarnik front + 450 mm Mikrofala front + 450 mm upper-mid door + 600 mm top door)',
             description: 'Full-height 2,700 mm appliance tower on the Kitchen North Wall housing the built-in Oven (Piekarnik, Z=600..1,200 mm) and Microwave (Mikrofala, Z=1,200..1,650 mm). Both the wood doors and the Oven/Microwave appliance fascias belong to the removable Fronts group, while the 5-bay carcass and shelves form the Skeleton.',
-            skeleton: buildTallSkeleton('CAB_KITCHEN_N7', 7115, 7715, [600, 1200, 1650, 2100]),
+            skeleton: buildTallSkeleton('CAB_KITCHEN_N7', 7135, 7735, [600, 1200, 1650, 2100]),
             fronts: [
                 {
                     id: 'CAB_KITCHEN_N7_FRONT_BOTTOM',
@@ -2035,7 +2035,7 @@
                     role: 'door_front',
                     material: 'wood_tone',
                     colorRgb: COLOR_WOOD_FRONT,
-                    x0: 7117, x1: 7713,
+                    x0: 7137, x1: 7733,
                     y0: Y_CARCASS_FRONT, y1: Y_FRONT_FACE,
                     z0: 152, z1: 598
                 },
@@ -2045,7 +2045,7 @@
                     role: 'appliance_front',
                     material: 'appliance_black_glass',
                     colorRgb: COLOR_APPLIANCE_BODY,
-                    x0: 7117, x1: 7713,
+                    x0: 7137, x1: 7733,
                     y0: Y_CARCASS_FRONT, y1: Y_FRONT_FACE,
                     z0: 602, z1: 1198
                 },
@@ -2055,7 +2055,7 @@
                     role: 'appliance_window',
                     material: 'appliance_window_glass',
                     colorRgb: COLOR_APPLIANCE_GLASS,
-                    x0: 7165, x1: 7665,
+                    x0: 7185, x1: 7685,
                     y0: Y_FRONT_FACE - 2, y1: Y_FRONT_FACE + 4,
                     z0: 750, z1: 1150
                 },
@@ -2065,7 +2065,7 @@
                     role: 'appliance_front',
                     material: 'appliance_black_glass',
                     colorRgb: COLOR_APPLIANCE_BODY,
-                    x0: 7117, x1: 7713,
+                    x0: 7137, x1: 7733,
                     y0: Y_CARCASS_FRONT, y1: Y_FRONT_FACE,
                     z0: 1202, z1: 1648
                 },
@@ -2075,7 +2075,7 @@
                     role: 'appliance_window',
                     material: 'appliance_window_glass',
                     colorRgb: COLOR_APPLIANCE_GLASS,
-                    x0: 7165, x1: 7665,
+                    x0: 7185, x1: 7685,
                     y0: Y_FRONT_FACE - 2, y1: Y_FRONT_FACE + 4,
                     z0: 1350, z1: 1600
                 },
@@ -2085,7 +2085,7 @@
                     role: 'door_front',
                     material: 'wood_tone',
                     colorRgb: COLOR_WOOD_FRONT,
-                    x0: 7117, x1: 7713,
+                    x0: 7137, x1: 7733,
                     y0: Y_CARCASS_FRONT, y1: Y_FRONT_FACE,
                     z0: 1652, z1: 2098
                 },
@@ -2095,7 +2095,7 @@
                     role: 'door_front',
                     material: 'wood_tone',
                     colorRgb: COLOR_WOOD_FRONT,
-                    x0: 7117, x1: 7713,
+                    x0: 7137, x1: 7733,
                     y0: Y_CARCASS_FRONT, y1: Y_FRONT_FACE,
                     z0: 2102, z1: 2698
                 }
@@ -2104,7 +2104,7 @@
 
         // =====================================================================
         // 8. CAB_KITCHEN_N8: 600 mm Tall Pantry Cabinet (Right End of North Wall)
-        //    Local X = 4,800..5,400 mm from GW_3 -> X = 6,515..7,115 mm
+        //    Local X = 4,780..5,380 mm from GW_3 -> X = 6,535..7,135 mm
         // =====================================================================
         {
             id: 'CAB_KITCHEN_N8',
@@ -2116,8 +2116,8 @@
             room: '0.13 Kuchnia',
             hostWallId: 'EW_NORTH_RECESSED',
             viewId: 'kitchen_north_wall',
-            x1: 6515,
-            x2: 7115,
+            x1: 6535,
+            x2: 7135,
             y1: Y_WALL,
             y2: Y_FRONT_FACE,
             zBottom: 0,
@@ -2134,7 +2134,7 @@
             normal: [0, 1, 0],
             specs: '600 × 600 × 2,700 mm (150 mm plinth + 1,950 mm lower pantry door Z=150..2,100 mm + 600 mm top storage door Z=2,100..2,700 mm)',
             description: 'Full-height 2,700 mm tall pantry storage cabinet at the eastern end of the Kitchen North Wall (adjacent to Spiżarnia wall GW_13), featuring a 1,950 mm lower wood door (with vertical handle bar) and a 600 mm top cabinet door.',
-            skeleton: buildTallSkeleton('CAB_KITCHEN_N8', 6515, 7115, [2100]),
+            skeleton: buildTallSkeleton('CAB_KITCHEN_N8', 6535, 7135, [2100]),
             fronts: [
                 {
                     id: 'CAB_KITCHEN_N8_FRONT_MAIN',
@@ -2142,7 +2142,7 @@
                     role: 'door_front',
                     material: 'wood_tone',
                     colorRgb: COLOR_WOOD_FRONT,
-                    x0: 6517, x1: 7113,
+                    x0: 6537, x1: 7133,
                     y0: Y_CARCASS_FRONT, y1: Y_FRONT_FACE,
                     z0: 152, z1: 2098
                 },
@@ -2152,7 +2152,7 @@
                     role: 'handle_bar',
                     material: 'dark_handle',
                     colorRgb: COLOR_DARK_HANDLE,
-                    x0: 7085, x1: 7095,
+                    x0: 7105, x1: 7115,
                     y0: Y_FRONT_FACE, y1: Y_FRONT_FACE + 12,
                     z0: 700, z1: 900
                 },
@@ -2162,7 +2162,7 @@
                     role: 'door_front',
                     material: 'wood_tone',
                     colorRgb: COLOR_WOOD_FRONT,
-                    x0: 6517, x1: 7113,
+                    x0: 6537, x1: 7133,
                     y0: Y_CARCASS_FRONT, y1: Y_FRONT_FACE,
                     z0: 2102, z1: 2698
                 }
@@ -2717,7 +2717,7 @@
 
         // =====================================================================
         // 23. KITCHEN_COUNTERTOP: Single Unified L-Shaped 30 mm Stone Countertop
-        //     Spans all North Wall base cabinets (CAB_KITCHEN_N1..N5, X = 8,315..11,915 mm)
+        //     Spans all North Wall base cabinets (CAB_KITCHEN_N1..N5, X = 8,335..11,915 mm)
         //     and all West Wall base cabinets (CAB_KITCHEN_W1..W5, Y = 3,170..6,170 mm)
         //     at Z = 870..900 mm, with an 820 × 400 mm sink cutout over CAB_KITCHEN_N2.
         // =====================================================================
@@ -2731,13 +2731,13 @@
             room: '0.13 Kuchnia',
             hostWallId: 'EW_NORTH_RECESSED',
             viewId: 'kitchen_north_wall',
-            x1: 8315,
+            x1: 8335,
             x2: 11915,
             y1: 3170,
             y2: 6170,
             zBottom: 870,
             zTop: 900,
-            widthMm: 3600,
+            widthMm: 3580,
             depthMm: 3000,
             carcassDepthMm: 600,
             frontThicknessMm: 0,
@@ -2749,14 +2749,14 @@
             boardThicknessMm: 30,
             normal: [0, 0, 1],
             footprint2D: [
-                [8315, 3170],
+                [8335, 3170],
                 [11915, 3170],
                 [11915, 6170],
                 [11315, 6170],
                 [11315, 3770],
-                [8315, 3770]
+                [8335, 3770]
             ],
-            specs: 'L-shaped 30 mm stone slab (Z = 870..900 mm): North wing 3,600 × 600 mm (X = 8,315..11,915 mm, Y = 3,170..3,770 mm) + West wing 600 × 3,000 mm (X = 11,315..11,915 mm, Y = 3,170..6,170 mm), with 820 × 400 mm undermount sink cutout over CAB_KITCHEN_N2 (X = 10,155..10,975 mm, Y = 3,290..3,690 mm)',
+            specs: 'L-shaped 30 mm stone slab (Z = 870..900 mm): North wing 3,580 × 600 mm (X = 8,335..11,915 mm, Y = 3,170..3,770 mm) + West wing 600 × 3,000 mm (X = 11,315..11,915 mm, Y = 3,170..6,170 mm), with 820 × 400 mm undermount sink cutout over CAB_KITCHEN_N2 (X = 10,155..10,975 mm, Y = 3,290..3,690 mm)',
             description: 'Single continuous L-shaped 30 mm kitchen stone countertop (Blat, Z = 870..900 mm) spanning all 10 base cabinets across the Kitchen North Wall (CAB_KITCHEN_N1..N5) and Kitchen West Wall (CAB_KITCHEN_W1..W5), featuring a precision 820 × 400 mm rectangular cutout opening over CAB_KITCHEN_N2 for the 90 cm undermount kitchen sink (KITCHEN_SINK_N2).',
             skeleton: [
                 buildKitchenCountertopPart()
@@ -2815,11 +2815,11 @@
         // =====================================================================
         // 23c. KITCHEN_SPLASHBACK_GLASS_NORTH: U-Shaped 5 mm Tempered Glass Backsplash Panel
         //      Mounted on Kitchen Back/North Wall (EW_NORTH_RECESSED, Y = 3,170..3,175 mm)
-        //      spanning X = 8,315..11,910 mm above Countertop (Z = 900 mm) up to Z = 1,500 mm
+        //      spanning X = 8,335..11,910 mm above Countertop (Z = 900 mm) up to Z = 1,500 mm
         //      with a precision U-shaped cutout under Window O1 (X = 8,480..10,580 mm, Z = 900..1,100 mm).
         // =====================================================================
         (function buildKitchenNorthSplashbackItem() {
-            const x0 = 8315;
+            const x0 = 8335;
             const x1 = 8480;
             const x2 = 10580;
             const x3 = 11910;
@@ -2879,7 +2879,7 @@
 
             return {
                 id: 'KITCHEN_SPLASHBACK_GLASS_NORTH',
-                name: 'KITCHEN_SPLASHBACK_GLASS_NORTH — Kitchen Back Wall U-Shaped 5mm Tempered Glass Backsplash Panel (3595×5×600/200mm around Window O1)',
+                name: 'KITCHEN_SPLASHBACK_GLASS_NORTH — Kitchen Back Wall U-Shaped 5mm Tempered Glass Backsplash Panel (3575×5×600/200mm around Window O1)',
                 shortName: '5mm Glass Backsplash U-Panel (Back Wall around O1)',
                 category: 'backsplash',
                 subtype: 'glass_backsplash_5mm',
@@ -2903,12 +2903,12 @@
                 heightMm: 600,
                 boardThicknessMm: 5,
                 normal: [0, 1, 0],
-                specs: '3,595 × 5 × 600 mm U-shaped tempered Lacobel glass panel (X = 8,315..11,910 mm, Y = 3,170..3,175 mm, Z = 900..1,500 mm with 2,100 × 400 mm window cutout at X = 8,480..10,580 mm, Z = 1,100..1,500 mm under Window O1). Configurable material: White Glass / Black Glass.',
-                description: 'U-shaped 5 mm tempered glass backsplash panel mounted on the Kitchen Back (North) Wall (EW_NORTH_RECESSED) from the West Wall corner (X = 11,910 mm) to the Tall Fridge Cabinet (X = 8,315 mm), rising 600 mm (Z = 900..1,500 mm) on both sides of Window O1 and 200 mm (Z = 900..1,100 mm) beneath the Window O1 sill.',
+                specs: '3,575 × 5 × 600 mm U-shaped tempered Lacobel glass panel (X = 8,335..11,910 mm, Y = 3,170..3,175 mm, Z = 900..1,500 mm with 2,100 × 400 mm window cutout at X = 8,480..10,580 mm, Z = 1,100..1,500 mm under Window O1). Configurable material: White Glass / Black Glass.',
+                description: 'U-shaped 5 mm tempered glass backsplash panel mounted on the Kitchen Back (North) Wall (EW_NORTH_RECESSED) from the West Wall corner (X = 11,910 mm) to the Tall Fridge Cabinet (X = 8,335 mm), rising 600 mm (Z = 900..1,500 mm) on both sides of Window O1 and 200 mm (Z = 900..1,100 mm) beneath the Window O1 sill.',
                 skeleton: [
                     {
                         id: 'KITCHEN_SPLASHBACK_GLASS_NORTH_PANE',
-                        name: 'U-Shaped 5mm Tempered Glass Backsplash Pane around Window O1 (3595×5×600/200 mm, Z=900..1500 mm)',
+                        name: 'U-Shaped 5mm Tempered Glass Backsplash Pane around Window O1 (3575×5×600/200 mm, Z=900..1500 mm)',
                         role: 'backsplash_glass',
                         material: 'white_glass',
                         colorRgb: [0.95, 0.98, 1.00],

@@ -433,6 +433,13 @@
                 }
             }
 
+            const plasterThicknessMm = Math.max(0, Number(s.plasterThicknessMm) || 0);
+            const plasterOffsetX = Math.round(plasterThicknessMm * metrics.normal[0] * 100) / 100;
+            const plasterOffsetY = Math.round(plasterThicknessMm * metrics.normal[1] * 100) / 100;
+            const plasterP1 = [metrics.p1[0] + plasterOffsetX, metrics.p1[1] + plasterOffsetY];
+            const plasterP2 = [metrics.p2[0] + plasterOffsetX, metrics.p2[1] + plasterOffsetY];
+            const plasterOuterLoop3D = outerLoop3D.map(pt => [pt[0] + plasterOffsetX, pt[1] + plasterOffsetY, pt[2]]);
+
             return {
                 id: s.id || `${rawWall.id}_SIDE_${idx}`,
                 wallId: rawWall.id,
@@ -442,6 +449,10 @@
                 role: s.role || 'interior',
                 material: s.material || 'plaster_white',
                 materialLabel: s.materialLabel || s.material || 'Plaster',
+                plasterThicknessMm,
+                plasterP1,
+                plasterP2,
+                plasterOuterLoop3D,
                 p1: metrics.p1,
                 p2: metrics.p2,
                 lengthMm: metrics.lengthMm,
@@ -500,6 +511,15 @@
                 return Object.assign({}, h, { loop: shiftedLoop, loop3D: shiftedLoop });
             });
             targetSide.holes3D = targetSide.holes;
+            if (targetSide.plasterP1 && targetSide.plasterP2) {
+                targetSide.plasterP1 = [targetSide.plasterP1[0] + shiftX, targetSide.plasterP1[1] + shiftY];
+                targetSide.plasterP2 = [targetSide.plasterP2[0] + shiftX, targetSide.plasterP2[1] + shiftY];
+                targetSide.plasterOuterLoop3D = targetSide.outerLoop3D.map(pt => [
+                    pt[0] + Math.round((targetSide.plasterThicknessMm || 0) * targetSide.normal[0] * 100) / 100,
+                    pt[1] + Math.round((targetSide.plasterThicknessMm || 0) * targetSide.normal[1] * 100) / 100,
+                    pt[2]
+                ]);
+            }
         }
 
         const footprint2D = isMultiSegmentRing
@@ -518,6 +538,24 @@
         const rawAxis = rawWall.axis === 'z' ? 'y' : rawWall.axis;
         const axis = rawAxis || ((maxX - minX >= maxY - minY) ? 'x' : 'y');
 
+        // Compute plastered exterior/interior face bounds along the wall's cross-axis
+        let eastPlasterMm = 0, westPlasterMm = 0, northPlasterMm = 0, southPlasterMm = 0;
+        compiledSides.forEach(s => {
+            const pMm = Number(s.plasterThicknessMm) || 0;
+            if (pMm <= 0) return;
+            if (s.normal[0] < -0.5) eastPlasterMm = Math.max(eastPlasterMm, pMm);
+            if (s.normal[0] > 0.5) westPlasterMm = Math.max(westPlasterMm, pMm);
+            if (s.normal[1] < -0.5) northPlasterMm = Math.max(northPlasterMm, pMm);
+            if (s.normal[1] > 0.5) southPlasterMm = Math.max(southPlasterMm, pMm);
+        });
+        const plasteredX1 = minX - eastPlasterMm;
+        const plasteredX2 = maxX + westPlasterMm;
+        const plasteredY1 = minY - northPlasterMm;
+        const plasteredY2 = maxY + southPlasterMm;
+        const totalPlasterThicknessMm = (axis === 'y')
+            ? (eastPlasterMm + westPlasterMm)
+            : (northPlasterMm + southPlasterMm);
+
         return {
             id: rawWall.id,
             name: rawWall.name,
@@ -530,7 +568,15 @@
             y2: maxY,
             z1: minY, // backward-compatible alias for 2D floor plan consumers
             z2: maxY, // backward-compatible alias for 2D floor plan consumers
+            plasteredX1,
+            plasteredX2,
+            plasteredY1,
+            plasteredY2,
+            plasteredZ1: plasteredY1,
+            plasteredZ2: plasteredY2,
+            totalPlasterThicknessMm,
             thickness: targetThicknessMm,
+            plasteredThickness: targetThicknessMm + totalPlasterThicknessMm,
             geometricThicknessMm: geomThicknessMm,
             zBottom,
             zTop,
@@ -677,13 +723,142 @@
          * (windows) with the horizontal plane Z = zSlice, producing:
          * - solidPolygons2D: exact 2D [x, y] polygons of the solid wall segments at Z = zSlice
          * - cutOpeningsAtSlice: exact doorway/window gaps cut out of the wall at Z = zSlice
+         * - plasterSegments2D: exact 2D plaster line & band segments for sides with plasterThicknessMm > 0
          */
         getFloorPlanSlice: function (floor, cutHeightMm = 1200) {
             const floorDatumZ = (floor === 'first') ? 3430 : 0;
             const zSlice = floorDatumZ + cutHeightMm;
+            const rawExterior = this.getWalls({ floor, category: 'exterior' });
+            const rawInternal = this.getWalls({ floor, category: 'internal' });
+            const allFloorWalls = rawExterior.concat(rawInternal);
+
+            function subtractIntervalList(intervals, cutStart, cutEnd) {
+                const c0 = Math.min(cutStart, cutEnd);
+                const c1 = Math.max(cutStart, cutEnd);
+                if (c1 - c0 <= 0.5) return intervals;
+                const next = [];
+                intervals.forEach(([a, b]) => {
+                    if (c1 <= a + 0.5 || c0 >= b - 0.5) {
+                        next.push([a, b]);
+                    } else {
+                        if (c0 > a + 0.5) next.push([a, c0]);
+                        if (c1 < b - 0.5) next.push([c1, b]);
+                    }
+                });
+                return next;
+            }
+
+            function computePlasterSegmentsForWall(w) {
+                const segments = [];
+                if (!Array.isArray(w.sides)) return segments;
+
+                w.sides.forEach(side => {
+                    const pThick = Number(side.plasterThicknessMm) || 0;
+                    if (pThick <= 0) return;
+
+                    const isHoriz = Math.abs(side.normal[1]) >= Math.abs(side.normal[0]);
+                    const sideAxis = isHoriz ? 'x' : 'y';
+                    const sideScan = sliceFace3DAtElevation(side.outerLoop3D, [], sideAxis, zSlice);
+                    let intervals = sideScan.solidIntervals.slice();
+
+                    // Trim plaster intervals against perpendicular walls that abut this wall face
+                    const baseCoord = isHoriz ? side.p1[1] : side.p1[0];
+                    const offsetCoord = baseCoord + (isHoriz ? side.normal[1] : side.normal[0]) * pThick;
+                    const bandMin = Math.min(baseCoord, offsetCoord);
+                    const bandMax = Math.max(baseCoord, offsetCoord);
+
+                    allFloorWalls.forEach(other => {
+                        if (other.id === w.id) return;
+                        const otherHoriz = (other.axis === 'x');
+                        if (otherHoriz === isHoriz) return;
+
+                        if (isHoriz) {
+                            // Horizontal plastered face (e.g., EW_NORTH_RECESSED_INT at Y=3170..3190):
+                            // check if vertical wall `other` strictly overlaps Y = [bandMin, bandMax]
+                            if (other.y1 < bandMax - 0.5 && other.y2 > bandMin + 0.5) {
+                                let cutStart = (other.plasteredX1 !== undefined) ? other.plasteredX1 : other.x1;
+                                let cutEnd = (other.plasteredX2 !== undefined) ? other.plasteredX2 : other.x2;
+                                if (other.sideA && other.sideB) {
+                                    const ptA = (Math.abs(other.sideA.p1[1] - baseCoord) <= Math.abs(other.sideA.p2[1] - baseCoord))
+                                        ? (other.sideA.plasterP1 || other.sideA.p1)
+                                        : (other.sideA.plasterP2 || other.sideA.p2);
+                                    const ptB = (Math.abs(other.sideB.p1[1] - baseCoord) <= Math.abs(other.sideB.p2[1] - baseCoord))
+                                        ? (other.sideB.plasterP1 || other.sideB.p1)
+                                        : (other.sideB.plasterP2 || other.sideB.p2);
+                                    cutStart = Math.min(ptA[0], ptB[0]);
+                                    cutEnd = Math.max(ptA[0], ptB[0]);
+                                }
+                                intervals = subtractIntervalList(intervals, cutStart, cutEnd);
+                            }
+                        } else {
+                            // Vertical plastered face (e.g., GW_3 at X=11915 or 12095, GW_13 at X=6315 or 6495):
+                            // check if horizontal wall `other` overlaps X = [bandMin, bandMax]
+                            let ox1 = (other.plasteredX1 !== undefined) ? other.plasteredX1 : other.x1;
+                            let ox2 = (other.plasteredX2 !== undefined) ? other.plasteredX2 : other.x2;
+                            let oy1 = (other.plasteredY1 !== undefined) ? other.plasteredY1 : other.y1;
+                            let oy2 = (other.plasteredY2 !== undefined) ? other.plasteredY2 : other.y2;
+                            if (other.category === 'exterior') {
+                                // Use the interior plastered face of the exterior wall if it has plaster
+                                const intSide = (other.sides || []).find(s => s.role === 'interior');
+                                if (intSide) {
+                                    ox1 = Math.min(intSide.p1[0], intSide.p2[0]);
+                                    ox2 = Math.max(intSide.p1[0], intSide.p2[0]);
+                                    const intY = intSide.p1[1];
+                                    const intPlaster = Number(intSide.plasterThicknessMm) || 0;
+                                    oy1 = Math.min(intY, intY + intSide.normal[1] * intPlaster);
+                                    oy2 = Math.max(intY, intY + intSide.normal[1] * intPlaster);
+                                }
+                            }
+                            if (ox1 < bandMax - 0.5 && ox2 > bandMin + 0.5) {
+                                intervals = subtractIntervalList(intervals, oy1, oy2);
+                            }
+                        }
+                    });
+
+                    intervals.forEach(([cStart, cEnd]) => {
+                        if (cEnd - cStart <= 1) return;
+                        if (isHoriz) {
+                            segments.push({
+                                wallId: w.id,
+                                sideId: side.id,
+                                axis: 'x',
+                                normal: side.normal,
+                                thicknessMm: pThick,
+                                wallLine: [[cStart, baseCoord], [cEnd, baseCoord]],
+                                plasterLine: [[cStart, offsetCoord], [cEnd, offsetCoord]],
+                                polygon2D: [
+                                    [cStart, baseCoord],
+                                    [cEnd, baseCoord],
+                                    [cEnd, offsetCoord],
+                                    [cStart, offsetCoord]
+                                ]
+                            });
+                        } else {
+                            segments.push({
+                                wallId: w.id,
+                                sideId: side.id,
+                                axis: 'y',
+                                normal: side.normal,
+                                thicknessMm: pThick,
+                                wallLine: [[baseCoord, cStart], [baseCoord, cEnd]],
+                                plasterLine: [[offsetCoord, cStart], [offsetCoord, cEnd]],
+                                polygon2D: [
+                                    [baseCoord, cStart],
+                                    [offsetCoord, cStart],
+                                    [offsetCoord, cEnd],
+                                    [baseCoord, cEnd]
+                                ]
+                            });
+                        }
+                    });
+                });
+
+                return segments;
+            }
 
             function sliceWall(w) {
                 const slicedOpenings = w.openings.filter(op => op.active && op.zMin <= zSlice && op.zMax >= zSlice);
+                const plasterSegments2D = computePlasterSegmentsForWall(w);
                 if (Array.isArray(w.solidPolygons2D) && w.solidPolygons2D.length > 0) {
                     const inSlice = (zSlice >= w.zBottom && zSlice <= w.zTop);
                     return Object.assign({}, w, {
@@ -692,7 +867,8 @@
                         slicedOpenings,
                         solidIntervalsAtSlice: inSlice ? [[w.y1, w.y2]] : [],
                         cutOpeningsAtSlice: [],
-                        solidPolygons2D: inSlice ? w.solidPolygons2D : []
+                        solidPolygons2D: inSlice ? w.solidPolygons2D : [],
+                        plasterSegments2D: inSlice ? plasterSegments2D : []
                     });
                 }
 
@@ -714,12 +890,13 @@
                     slicedOpenings,
                     solidIntervalsAtSlice: scan.solidIntervals,
                     cutOpeningsAtSlice: scan.cutOpenings,
-                    solidPolygons2D
+                    solidPolygons2D,
+                    plasterSegments2D
                 });
             }
 
-            const exteriorWalls = this.getWalls({ floor, category: 'exterior' }).map(sliceWall);
-            const internalWalls = this.getWalls({ floor, category: 'internal' }).map(sliceWall);
+            const exteriorWalls = rawExterior.map(sliceWall);
+            const internalWalls = rawInternal.map(sliceWall);
 
             const outerPolygon2D = exteriorWalls.map(w => w.sideA.p1);
             const innerPolygon2D = exteriorWalls.map(w => w.sideB.p2);
@@ -2715,8 +2892,8 @@
                         try {
                             const winO1 = WindowStore.get('O1');
                             if (winO1 && Number.isFinite(Number(winO1.x)) && Number.isFinite(Number(winO1.width))) {
-                                const x0 = 8315;
-                                const x3 = 11910;
+                                const x0 = Number(raw.x1) || 8335;
+                                const x3 = Number(raw.x2) || 11910;
                                 const x1 = Math.max(x0 + 40, Math.min(x3 - 100, Number(winO1.x)));
                                 const x2 = Math.max(x1 + 100, Math.min(x3 - 40, Number(winO1.x) + Number(winO1.width)));
                                 const y0 = 3170;
