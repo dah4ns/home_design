@@ -784,6 +784,7 @@
         { id: 'gf_dining', label: '0.12 Jadalnia', x: 8650, y: 8900, footZ: 0, yaw: -0.58, pitch: -0.04 },
         { id: 'gf_kitchen', label: '0.13 Kuchnia', x: 7100, y: 5050, footZ: 0, yaw: -0.22, pitch: -0.12 },
         { id: 'gf_pantry', label: '0.14 Spiżarnia (Stairs)', x: 5905, y: 3850, footZ: 0, yaw: 1.57, pitch: -0.35 },
+        { id: 'gf_laundry', label: '0.08 Pralnia (Laundry)', x: 18340, y: 12950, footZ: 0, yaw: -1.57, pitch: -0.05 },
         { id: 'bf_basement', label: '-1 Piwnica (Basement)', x: 2600, y: 4600, footZ: -2470, yaw: 0.25, pitch: 0.05 },
         { id: 'gf_study', label: '0.15 Gabinet (NE)', x: 2100, y: 4600, footZ: 0, yaw: -1.25, pitch: 0.0 },
         { id: 'gf_gym', label: '0.10 Siłownia (Gym)', x: 17600, y: 18200, footZ: 0, yaw: -2.25, pitch: 0.0 },
@@ -2371,10 +2372,12 @@
           var x = pt[0], y = pt[1], z = pt[2];
           if (!isRoomFurniture) {
             if (y <= 3171.5) y = 3171.5;
-            if (x >= 11913.5) x = 11913.5;
+            if (x >= 11913.5 && x <= 11920) x = 11913.5;
             if (x >= 6505 && x <= 6516.5 && y <= 6300) x = 6516.5;
             if (x >= 6313.5 && x <= 6320 && y <= 6110) x = 6313.5;
             if (x >= 4450 && x <= 4456.5 && y <= 5210) x = 4456.5;
+            if (y >= 11398 && y <= 11401.5 && x >= 16350) y = 11401.5;
+            if (x >= 16353.5 && x <= 16356.5 && y >= 11400 && y <= 13300) x = 16356.5;
           }
           if (z <= 1.5) z = 1.5;
           if (isFront && furnNormal && !isRoomFurniture) {
