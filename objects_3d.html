@@ -927,7 +927,8 @@
                     <div class="preset-grid">
                         <button type="button" class="ctrl-btn" id="preset-sockets-only" style="grid-column: span 2; border-color: rgba(56,189,248,0.55); color: #7dd3fc;">⚡ Electrical Sockets &amp; Multi-Gang Frames</button>
                         <button type="button" class="ctrl-btn" id="preset-sofa-living" style="grid-column: span 2; border-color: rgba(16,185,129,0.45); color: #6ee7b7;">🛋️ Living Room Corner Sofa (SOFA_LIVING_1)</button>
-                        <button type="button" class="ctrl-btn" id="preset-cab-pantry" style="grid-column: span 2; border-color: rgba(245,158,11,0.55); color: #fcd34d;">🥫 Pantry Room (0.14 Spiżarnia — Fridge + Shelves)</button>
+                        <button type="button" class="ctrl-btn" id="preset-cab-pantry" style="grid-column: span 2; border-color: rgba(245,158,11,0.55); color: #fcd34d;">🥫 Pantry Room (0.14 Spiżarnia — Full Designer Suite)</button>
+                        <button type="button" class="ctrl-btn" id="preset-cab-pantry-housekeeping" style="grid-column: span 2; border-color: rgba(20,184,166,0.55); color: #5eead4;">🧹 Pantry Housekeeping, Ladder, Mop &amp; Vacuum Dock</button>
                         <button type="button" class="ctrl-btn" id="preset-cab-pantry-fridge" style="grid-column: span 2; border-color: rgba(148,163,184,0.55); color: #e2e8f0;">❄️ Pantry Samsung Refrigerator (PANTRY_FRIDGE)</button>
                         <button type="button" class="ctrl-btn" id="preset-cab-only" style="grid-column: span 2;">🗄️ All Furniture Only (Kitchen + Pantry + Living)</button>
                         <button type="button" class="ctrl-btn" id="preset-cab-kitchen" style="grid-column: span 2;">🍳 All Kitchen + Island + Walls &amp; Window O1</button>
@@ -2955,8 +2956,8 @@
                         filter: fn => fn.hostWallId === 'GW_3' && fn.id.indexOf('CAB_DINING_ROOM_') === 0
                     },
                     {
-                        title: '🥫 Pantry Room (0.14 Spiżarnia — PANTRY_FRIDGE, CAB_PANTRY_E1..E4, CAB_PANTRY_E_UP1..UP3)',
-                        filter: fn => fn.room === '0.14 Spiżarnia' || fn.id === 'PANTRY_FRIDGE' || fn.id.indexOf('CAB_PANTRY_') === 0
+                        title: '🥫 Pantry Room — Designer Suite (0.14 Spiżarnia — Fridge, Bridge N_UP1..3, Housekeeping & Vacuum Dock, Corner Bucket, Crate Towers E1..3, Worktop, Upper E_UP1..4)',
+                        filter: fn => fn.room === '0.14 Spiżarnia' || fn.id === 'PANTRY_FRIDGE' || fn.id.indexOf('CAB_PANTRY_') === 0 || fn.id.indexOf('PANTRY_') === 0
                     }
                 ];
 
@@ -3452,7 +3453,7 @@
             const pantryBtn = document.getElementById('preset-cab-pantry');
             if (pantryBtn) {
                 pantryBtn.addEventListener('click', () => {
-                    const pantryIds = allFurniture.filter(fn => fn.room === '0.14 Spiżarnia' || fn.id === 'PANTRY_FRIDGE' || fn.id.indexOf('CAB_PANTRY_') === 0).map(fn => fn.id);
+                    const pantryIds = allFurniture.filter(fn => fn.room === '0.14 Spiżarnia' || fn.id === 'PANTRY_FRIDGE' || fn.id.indexOf('CAB_PANTRY_') === 0 || fn.id.indexOf('PANTRY_') === 0).map(fn => fn.id);
                     appState.selectedIds = new Set(pantryIds.concat(['EW_NORTH_RECESSED', 'GW_13', 'GW_14', 'FLOOR_LOWER', 'STAIRS_BASEMENT']));
                     appState.yaw = 135 * Math.PI / 180;
                     appState.pitch = 24 * Math.PI / 180;
@@ -3460,10 +3461,31 @@
                     focusSelectedFurniture();
                 });
             }
+            const pantryHkBtn = document.getElementById('preset-cab-pantry-housekeeping');
+            if (pantryHkBtn) {
+                pantryHkBtn.addEventListener('click', () => {
+                    appState.selectedIds = new Set([
+                        'CAB_PANTRY_HOUSEKEEPING',
+                        'CAB_PANTRY_CORNER_BUCKET',
+                        'CAB_PANTRY_N_UP1',
+                        'CAB_PANTRY_N_UP2',
+                        'CAB_PANTRY_N_UP3',
+                        'EW_NORTH_RECESSED',
+                        'GW_14',
+                        'FLOOR_LOWER'
+                    ]);
+                    appState.yaw = 104 * Math.PI / 180;
+                    appState.pitch = 16 * Math.PI / 180;
+                    renderDropdownAndInspector();
+                    focusSelectedFurniture();
+                    appState.distance = 2.25;
+                    renderScene();
+                });
+            }
             const pantryFridgeBtn = document.getElementById('preset-cab-pantry-fridge');
             if (pantryFridgeBtn) {
                 pantryFridgeBtn.addEventListener('click', () => {
-                    appState.selectedIds = new Set(['PANTRY_FRIDGE', 'EW_NORTH_RECESSED', 'GW_13', 'FLOOR_LOWER']);
+                    appState.selectedIds = new Set(['PANTRY_FRIDGE', 'CAB_PANTRY_N_UP1', 'EW_NORTH_RECESSED', 'GW_13', 'FLOOR_LOWER']);
                     appState.yaw = 108 * Math.PI / 180;
                     appState.pitch = 16 * Math.PI / 180;
                     renderDropdownAndInspector();

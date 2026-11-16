@@ -3621,7 +3621,7 @@
               } else if (furn.id === 'KITCHEN_SINK_N2') {
                 mmCtx.fillStyle = 'rgba(148, 163, 184, 0.75)';
                 mmCtx.strokeStyle = 'rgba(226, 232, 240, 0.9)';
-              } else if (furn.id === 'KITCHEN_COUNTERTOP') {
+              } else if (furn.id === 'KITCHEN_COUNTERTOP' || furn.id === 'PANTRY_COUNTERTOP') {
                 mmCtx.fillStyle = 'rgba(241, 245, 249, 0.25)';
                 mmCtx.strokeStyle = 'rgba(226, 232, 240, 0.55)';
               } else if (furn.id === 'KITCHEN_ISLAND') {
@@ -3630,6 +3630,9 @@
               } else if (furn.id === 'PANTRY_FRIDGE') {
                 mmCtx.fillStyle = 'rgba(71, 85, 105, 0.78)';
                 mmCtx.strokeStyle = 'rgba(203, 213, 225, 0.92)';
+              } else if (furn.id === 'CAB_PANTRY_HOUSEKEEPING' || furn.id === 'CAB_PANTRY_CORNER_BUCKET') {
+                mmCtx.fillStyle = 'rgba(20, 184, 166, 0.34)';
+                mmCtx.strokeStyle = 'rgba(94, 234, 212, 0.80)';
               } else {
                 mmCtx.fillStyle = 'rgba(217, 119, 6, 0.36)';
                 mmCtx.strokeStyle = 'rgba(251, 191, 36, 0.68)';

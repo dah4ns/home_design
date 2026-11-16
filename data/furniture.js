@@ -3828,113 +3828,1176 @@
         })(),
 
         // =====================================================================
-        // 27–33. PANTRY EAST WALL (GW_14) LOWER & UPPER OPEN SHELVING CABINETS
-        //        Based on pantry.html specifications:
-        //        - 4 Lower Base Units (CAB_PANTRY_E1..E4): 4 × 500 mm wide (Y = 3,170..5,170 mm),
-        //          450 mm (45 cm) deep (X = 4,455..4,905 mm), Z = 0..960 mm (100 mm plinth +
-        //          20 mm bottom shelf + 400 mm space + 20 mm middle shelf + 400 mm space + 20 mm top shelf),
-        //          leaving a 40 mm gap before the 900 mm basement stairwell at Y = 5,210..6,110 mm.
-        //        - 1st Upper Cabinet (CAB_PANTRY_E_UP1 — Left/North): 700 mm wide (Y = 3,170..3,870 mm),
-        //          450 mm (45 cm) deep (X = 4,455..4,905 mm), Z = 960..2,800 mm (1,840 mm tall) with
-        //          three 20 mm shelves spaced at 400 / 400 / 400 / 580 mm (Z = 1,360, 1,780, 2,200 mm).
-        //        - 2nd Upper Cabinet (CAB_PANTRY_E_UP2 — Middle): 600 mm wide (Y = 3,870..4,470 mm),
-        //          300 mm (30 cm) deep (X = 4,455..4,755 mm), Z = 960..2,800 mm (1,840 mm tall) with
-        //          four 20 mm shelves spaced at 340 / 350 / 350 / 350 / 370 mm (Z = 1,300, 1,670, 2,040, 2,410 mm).
-        //        - 3rd Upper Cabinet (CAB_PANTRY_E_UP3 — Right/South): 700 mm wide (Y = 4,470..5,170 mm),
-        //          300 mm (30 cm) deep (X = 4,455..4,755 mm), Z = 960..2,800 mm (1,840 mm tall) with
-        //          four 20 mm shelves spaced at 340 / 350 / 350 / 350 / 370 mm (Z = 1,300, 1,670, 2,040, 2,410 mm).
-        //        - All Pantry cabinets have `fronts: []` ("No fronts for now").
+        // 27–38. PANTRY (0.14 SPIŻARNIA) INTERIOR DESIGNER PLAN — FULL 3D B-REP SUITE
+        //        Matches the approved Interior Designer Proposal in pantry.html:
+        //        - North Wall (EW_NORTH_RECESSED, Y = 3,170 mm):
+        //          • PANTRY_FRIDGE (600×600×1,900 mm at X = 5,715..6,315 mm, Z = 0..1,900 mm) + 50 mm air gap
+        //          • CAB_PANTRY_N_UP1: 600×600×850 mm Overhead Bridge Cabinet above Freezer (Z = 1,950..2,800 mm)
+        //            with aligned shelves at Z = 2,240 & 2,520 mm + 20 mm Full-Height Warm-Oak Portal Cheek Panel
+        //            (X = 5,695..5,715 mm, Z = 0..2,800 mm)
+        //          • CAB_PANTRY_HOUSEKEEPING: 805 mm Wide (X = 4,905..5,695 mm clear bay) × 450 mm Deep × 1,950 mm High
+        //            Housekeeping & Cordless Vacuum Charging Closet with:
+        //            - Waterproof dark floor runner mat (Z = 0..20 mm, extending into the NE corner bucket pocket)
+        //            - Warm-oak acoustic slatwall/pegboard back panel + top detergent shelf (Z = 1,665..1,950 mm)
+        //            - Left 200 mm Slot housing a 3D Tall 4-Step Folding Aluminum & Oak Ladder (H = 1,500 mm)
+        //            - Right 605 mm Bay housing a 3D Wall-Mounted Cordless Stick Vacuum on a 230V Charging Dock,
+        //              2 pegboard accessory nozzles, and a 3D Wall-Mounted Flat Microfiber Mop & Broom
+        //          • CAB_PANTRY_N_UP2 & CAB_PANTRY_N_UP3: 2 × 470 mm (nominal 475+480 mm) Overhead Bridge Cabinets
+        //            above the Housekeeping Closet (X = 4,755..5,695 mm, Y = 3,170..3,620 mm, Z = 1,950..2,800 mm)
+        //            with shelves aligned at Z = 2,240 and Z = 2,520 mm
+        //        - East Wall (GW_14, X = 4,455 mm, Y = 3,170..5,210 mm):
+        //          • CAB_PANTRY_CORNER_BUCKET: Side-Access 450×450×900 mm Corner Bucket Garage (Y = 3,170..3,670 mm)
+        //            closed to the room on the West (eliminating L-corner drawer collisions) and open on its North-West
+        //            side into the Housekeeping Closet, housing a 3D Full-Size Mop Bucket with Side-Press Wringer
+        //          • CAB_PANTRY_E1..E3: 3 × 500 mm Lower Base Cabinets (Y = 3,670..5,170 mm, D = 450 mm, Z = 0..900 mm),
+        //            each fitted with 3 tiers of ventilated pull-out slatted warm-oak crate drawers
+        //          • PANTRY_COUNTERTOP: Continuous 2,000 × 450 × 30 mm Quartz Stone Worktop Slab (Z = 900..930 mm)
+        //            + 3000K recessed under-cabinet LED task strip (Z = 1,375..1,380 mm)
+        //          • CAB_PANTRY_E_UP1..UP4: 4 × 500 mm Upper Open Shelving Columns (Y = 3,170..5,170 mm, D = 300 mm,
+        //            Z = 1,380..2,800 mm) with 5 aligned shelf tiers (Z = 1,380, 1,665, 1,950, 2,240, 2,520, 2,800 mm)
+        //          • PANTRY_STAIR_POST: Full-Height 40 × 450 × 2,800 mm Structural Warm-Oak Stair Guard Post
+        //            (Y = 5,170..5,210 mm, Z = 0..2,800 mm) before the 900 mm Basement Stairwell
         // =====================================================================
-        ...(function buildPantryEastWallCabinets() {
+        ...(function buildPantryDesignerPlanObjects() {
             const X_PANTRY_EAST = 4455; // GW_14_UPPER_WEST interior face in 0.14 Spiżarnia
-            const PANTRY_BOARD_MM = 20; // 20 mm (2 cm) shelf & carcass board thickness per pantry.html
+            const Y_PANTRY_NORTH = 3170; // EW_NORTH_RECESSED interior South face in 0.14 Spiżarnia
+            const PANTRY_BOARD_MM = 20;  // 20 mm (2 cm) shelf & carcass board thickness
 
-            function makePantryLowerCabinet(id, index, y0, y1) {
-                const depthMm = 450; // 45 cm depth per pantry.html legend
-                const x0 = X_PANTRY_EAST;
-                const x1 = x0 + depthMm; // 4,905 mm
-                const xPlinthFront = x1 - 40; // 40 mm recessed toe-kick (4,865 mm)
-                const w = y1 - y0; // 500 mm
+            const COLOR_OAK_WARM = [0.68, 0.52, 0.36];        // Warm architectural oak veneer (crates, cheek, slatwall)
+            const COLOR_OAK_SLAT_DARK = [0.46, 0.34, 0.23];   // Deep oak shadow groove / slat reveal
+            const COLOR_MATTE_ANTHRACITE = [0.16, 0.18, 0.21];// Waterproof floor mat, socket frame, dark hardware
+            const COLOR_ALU_ANODIZED = [0.78, 0.81, 0.85];    // Brushed aluminum ladder rails & mop pole
+            const COLOR_VACUUM_COBALT = [0.24, 0.29, 0.48];   // Metallic cobalt-indigo cyclone & wand accent
+            const COLOR_VACUUM_BODY = [0.22, 0.24, 0.28];     // Satin gunmetal vacuum body & cleaner head
+            const COLOR_VACUUM_BIN = [0.58, 0.64, 0.72];      // Smoked clear polycarbonate cyclone dust bin
+            const COLOR_VACUUM_ACCENT = [0.86, 0.24, 0.22];   // Dyson/Bespoke red trigger & quick-release catches
+            const COLOR_TEAL_CLEAN = [0.16, 0.58, 0.64];      // Turquoise-teal mop bucket, microfiber pad & spray bottle
+            const COLOR_WRINGER_GREY = [0.32, 0.36, 0.40];    // Molded grey wringer sieve basket & broom bristles
+            const COLOR_LED_WARM = [1.00, 0.95, 0.82];        // 3000K warm LED under-cabinet strip
+            const COLOR_LED_GREEN = [0.20, 0.92, 0.55];       // Vacuum battery charging indicator LED
+
+            // Smooth 3D tubular B-Rep builder for ladder safety bow, vacuum wand/cyclones, mop/broom poles & bucket bail
+            function buildPantryTubePart(opts) {
+                const spine = opts.spine || [];
+                const numSegs = opts.numSegs || 18;
+                const faces3D = [];
+                const wireframeLines3D = opts.wireframeLines3D ? opts.wireframeLines3D.slice() : [];
+                let minX = Infinity, maxX = -Infinity;
+                let minY = Infinity, maxY = -Infinity;
+                let minZ = Infinity, maxZ = -Infinity;
+
+                const tangents = [];
+                for (let i = 0; i < spine.length; i++) {
+                    let iPrev = i;
+                    while (iPrev > 0 && Math.hypot(spine[i][0] - spine[iPrev][0], spine[i][1] - spine[iPrev][1], spine[i][2] - spine[iPrev][2]) < 0.05) iPrev--;
+                    let iNext = i;
+                    while (iNext < spine.length - 1 && Math.hypot(spine[iNext][0] - spine[i][0], spine[iNext][1] - spine[i][1], spine[iNext][2] - spine[i][2]) < 0.05) iNext++;
+                    let tx = spine[iNext][0] - spine[iPrev][0];
+                    let ty = spine[iNext][1] - spine[iPrev][1];
+                    let tz = spine[iNext][2] - spine[iPrev][2];
+                    const len = Math.hypot(tx, ty, tz) || 1;
+                    tangents.push([tx / len, ty / len, tz / len]);
+                }
+
+                const rings = [];
+                for (let i = 0; i < spine.length; i++) {
+                    const [px, py, pz, r] = spine[i];
+                    const T = tangents[i];
+                    const ref = (Math.abs(T[0]) < 0.85) ? [1, 0, 0] : [0, 1, 0];
+                    let vx = T[1] * ref[2] - T[2] * ref[1];
+                    let vy = T[2] * ref[0] - T[0] * ref[2];
+                    let vz = T[0] * ref[1] - T[1] * ref[0];
+                    const vLen = Math.hypot(vx, vy, vz) || 1;
+                    vx /= vLen; vy /= vLen; vz /= vLen;
+                    let ux = vy * T[2] - vz * T[1];
+                    let uy = vz * T[0] - vx * T[2];
+                    let uz = vx * T[1] - vy * T[0];
+                    const uLen = Math.hypot(ux, uy, uz) || 1;
+                    ux /= uLen; uy /= uLen; uz /= uLen;
+
+                    const ringPts = [];
+                    const ringNormals = [];
+                    for (let k = 0; k < numSegs; k++) {
+                        const ang = (k / numSegs) * Math.PI * 2;
+                        const ca = Math.cos(ang), sa = Math.sin(ang);
+                        const nx = ca * ux + sa * vx;
+                        const ny = ca * uy + sa * vy;
+                        const nz = ca * uz + sa * vz;
+                        const vx3 = Math.round((px + r * nx) * 100) / 100;
+                        const vy3 = Math.round((py + r * ny) * 100) / 100;
+                        const vz3 = Math.round((pz + r * nz) * 100) / 100;
+                        ringPts.push([vx3, vy3, vz3]);
+                        ringNormals.push([nx, ny, nz]);
+                        if (vx3 < minX) minX = vx3;
+                        if (vx3 > maxX) maxX = vx3;
+                        if (vy3 < minY) minY = vy3;
+                        if (vy3 > maxY) maxY = maxY < vy3 ? vy3 : maxY;
+                        if (vz3 < minZ) minZ = vz3;
+                        if (vz3 > maxZ) maxZ = vz3;
+                    }
+                    rings.push({ pts: ringPts, normals: ringNormals, T, r });
+                }
+
+                for (let i = 0; i + 1 < rings.length; i++) {
+                    const rA = rings[i], rB = rings[i + 1];
+                    const distCenters = Math.hypot(
+                        spine[i + 1][0] - spine[i][0],
+                        spine[i + 1][1] - spine[i][1],
+                        spine[i + 1][2] - spine[i][2]
+                    );
+                    const dr = rB.r - rA.r;
+                    if (distCenters < 0.02 && Math.abs(dr) < 0.02) continue;
+                    const hyp = Math.hypot(distCenters, dr) || 1;
+                    const wRad = distCenters / hyp;
+                    const wTan = -dr / hyp;
+                    for (let k = 0; k < numSegs; k++) {
+                        const kNext = (k + 1) % numSegs;
+                        const p00 = rA.pts[k], p10 = rA.pts[kNext], p11 = rB.pts[kNext], p01 = rB.pts[k];
+                        const n00 = [rA.normals[k][0] * wRad + rA.T[0] * wTan, rA.normals[k][1] * wRad + rA.T[1] * wTan, rA.normals[k][2] * wRad + rA.T[2] * wTan];
+                        const n10 = [rA.normals[kNext][0] * wRad + rA.T[0] * wTan, rA.normals[kNext][1] * wRad + rA.T[1] * wTan, rA.normals[kNext][2] * wRad + rA.T[2] * wTan];
+                        const n11 = [rB.normals[kNext][0] * wRad + rB.T[0] * wTan, rB.normals[kNext][1] * wRad + rB.T[1] * wTan, rB.normals[kNext][2] * wRad + rB.T[2] * wTan];
+                        const n01 = [rB.normals[k][0] * wRad + rB.T[0] * wTan, rB.normals[k][1] * wRad + rB.T[1] * wTan, rB.normals[k][2] * wRad + rB.T[2] * wTan];
+                        const avgNx = (n00[0] + n10[0] + n11[0] + n01[0]) / 4;
+                        const avgNy = (n00[1] + n10[1] + n11[1] + n01[1]) / 4;
+                        const avgNz = (n00[2] + n10[2] + n11[2] + n01[2]) / 4;
+                        const avgLen = Math.hypot(avgNx, avgNy, avgNz) || 1;
+                        faces3D.push({
+                            side: 'curved',
+                            noWireframe: true,
+                            normal: [avgNx / avgLen, avgNy / avgLen, avgNz / avgLen],
+                            vertexNormals3D: [n00, n10, n11, n01],
+                            loop3D: [p00, p10, p11, p01]
+                        });
+                    }
+                }
+
+                if (opts.capStart && rings.length > 0 && rings[0].r > 0.2) {
+                    const T0 = rings[0].T;
+                    faces3D.push({ side: 'cap_start', noWireframe: true, normal: [-T0[0], -T0[1], -T0[2]], loop3D: rings[0].pts.slice().reverse() });
+                }
+                if (opts.capEnd && rings.length > 0 && rings[rings.length - 1].r > 0.2) {
+                    const TN = rings[rings.length - 1].T;
+                    faces3D.push({ side: 'cap_end', noWireframe: true, normal: [TN[0], TN[1], TN[2]], loop3D: rings[rings.length - 1].pts.slice() });
+                }
+                (opts.ringWireframeIndices || []).forEach(idx => {
+                    if (rings[idx]) wireframeLines3D.push(rings[idx].pts.concat([rings[idx].pts[0]]));
+                });
+
+                return {
+                    id: opts.id,
+                    name: opts.name,
+                    role: opts.role || 'appliance_front',
+                    material: opts.material || 'stainless_steel',
+                    colorRgb: opts.colorRgb || COLOR_ALU_ANODIZED,
+                    wireColorRgba: opts.wireColorRgba || [0.35, 0.40, 0.46, 0.90],
+                    x0: Math.floor(minX), x1: Math.ceil(maxX),
+                    y0: Math.floor(minY), y1: Math.ceil(maxY),
+                    z0: Math.floor(minZ), z1: Math.ceil(maxZ),
+                    faces3D,
+                    wireframeLines3D
+                };
+            }
+
+            // -----------------------------------------------------------------
+            // 27. CAB_PANTRY_N_UP1: Overhead Bridge Cabinet above Freezer (600×600×850 mm, Z = 1,950..2,800 mm)
+            //     + Full-Height 20 mm Warm-Oak Portal Cheek Panel (X = 5,695..5,715 mm, Z = 0..2,800 mm)
+            // -----------------------------------------------------------------
+            function buildPantryNorthFreezerBridge() {
+                const x0 = 5715, x1 = 6315;
+                const y0 = Y_PANTRY_NORTH, y1 = Y_PANTRY_NORTH + 600; // 3,170..3,770 mm
+                const z0 = 1950, z1 = 2800;
+                const b = PANTRY_BOARD_MM;
 
                 const skeleton = [
+                    // Full-Height 20 mm Warm-Oak Portal Cheek Panel on East side of Freezer (X = 5,695..5,715 mm, Z = 0..2,800 mm)
                     {
-                        id: `${id}_PLINTH`,
-                        name: `Recessed Plinth / Toe-Kick (410×${w}×100 mm Cokół, Z=0..100 mm)`,
+                        id: 'CAB_PANTRY_N_UP1_PORTAL_CHEEK_LOWER',
+                        name: 'Full-Height 20mm Warm-Oak Freezer Portal Cheek Panel (20×600×2800 mm, X=5695..5715, Z=0..2800 mm)',
+                        role: 'carcass_panel',
+                        material: 'wood_oak',
+                        colorRgb: COLOR_OAK_WARM,
+                        x0: 5695, x1: 5715,
+                        y0: y0, y1: y1,
+                        z0: 0, z1: 2800
+                    },
+                    // Recessed 50 mm Ventilation Shadow Baffle above Freezer (Z = 1,900..1,950 mm)
+                    {
+                        id: 'CAB_PANTRY_N_UP1_VENT_BAFFLE',
+                        name: 'Recessed 50mm Freezer Heat-Dissipation Ventilation Grille Baffle (600×40×50 mm, Z=1900..1950 mm)',
                         role: 'plinth',
                         material: 'dark_plinth',
-                        colorRgb: COLOR_PLINTH,
-                        x0: x0, x1: xPlinthFront,
+                        colorRgb: COLOR_MATTE_ANTHRACITE,
+                        x0: x0, x1: x1,
+                        y0: y1 - 65, y1: y1 - 25,
+                        z0: 1900, z1: 1950,
+                        wireframeLines3D: [
+                            [[x0 + 25, y1 - 24.5, 1916], [x1 - 25, y1 - 24.5, 1916]],
+                            [[x0 + 25, y1 - 24.5, 1934], [x1 - 25, y1 - 24.5, 1934]]
+                        ]
+                    },
+                    // Bridge Cabinet West Panel (X = 6,295..6,315, Z = 1,950..2,800)
+                    {
+                        id: 'CAB_PANTRY_N_UP1_WEST_PANEL',
+                        name: 'Bridge Cabinet West Side Panel (20×600×850 mm, Z=1950..2800 mm)',
+                        role: 'carcass_panel',
+                        material: 'carcass_melamine',
+                        colorRgb: COLOR_CARCASS_SIDE,
+                        x0: x1 - b, x1: x1,
                         y0: y0, y1: y1,
-                        z0: 0, z1: 100
+                        z0: z0, z1: z1
                     },
+                    // Bridge Cabinet Back Panel (Y = 3,170..3,190, Z = 1,950..2,800)
                     {
-                        id: `${id}_NORTH_PANEL`,
-                        name: `Left/North Side Carcass Panel (450×20×860 mm, Z=100..960 mm)`,
-                        role: 'carcass_panel',
-                        material: 'carcass_melamine',
-                        colorRgb: COLOR_CARCASS_SIDE,
-                        x0: x0, x1: x1,
-                        y0: y0, y1: y0 + PANTRY_BOARD_MM,
-                        z0: 100, z1: 960
-                    },
-                    {
-                        id: `${id}_SOUTH_PANEL`,
-                        name: `Right/South Side Carcass Panel (450×20×860 mm, Z=100..960 mm)`,
-                        role: 'carcass_panel',
-                        material: 'carcass_melamine',
-                        colorRgb: COLOR_CARCASS_SIDE,
-                        x0: x0, x1: x1,
-                        y0: y1 - PANTRY_BOARD_MM, y1: y1,
-                        z0: 100, z1: 960
-                    },
-                    {
-                        id: `${id}_BACK_PANEL`,
-                        name: `Rear Carcass Backing Panel (20×${w - 2 * PANTRY_BOARD_MM}×860 mm, Z=100..960 mm)`,
+                        id: 'CAB_PANTRY_N_UP1_BACK_PANEL',
+                        name: 'Bridge Cabinet Rear Backing Panel (580×20×850 mm, Z=1950..2800 mm)',
                         role: 'carcass_panel',
                         material: 'carcass_melamine',
                         colorRgb: COLOR_CARCASS_BACK,
-                        x0: x0, x1: x0 + PANTRY_BOARD_MM,
-                        y0: y0 + PANTRY_BOARD_MM, y1: y1 - PANTRY_BOARD_MM,
-                        z0: 100, z1: 960
+                        x0: x0, x1: x1 - b,
+                        y0: y0, y1: y0 + b,
+                        z0: z0, z1: z1
                     },
+                    // Bottom Shelf at Z = 1,950..1,970 mm (aligned with N_UP2, N_UP3 & East Shelf #3!)
                     {
-                        id: `${id}_BOTTOM_SHELF`,
-                        name: `Bottom 2cm Shelf (430×${w - 2 * PANTRY_BOARD_MM}×20 mm, Z=100..120 mm)`,
+                        id: 'CAB_PANTRY_N_UP1_BOTTOM_PANEL',
+                        name: 'Bridge Cabinet Bottom Shelf — Aligned at Z=1950..1970 mm (580×580×20 mm)',
+                        role: 'carcass_panel',
+                        material: 'carcass_melamine',
+                        colorRgb: COLOR_OAK_WARM,
+                        x0: x0, x1: x1 - b,
+                        y0: y0 + b, y1: y1,
+                        z0: 1950, z1: 1970
+                    },
+                    // Middle Shelf #1 at Z = 2,240..2,260 mm (aligned across entire Pantry!)
+                    {
+                        id: 'CAB_PANTRY_N_UP1_SHELF_1',
+                        name: 'Bridge Cabinet Shelf #1 — Aligned at Z=2240..2260 mm (580×580×20 mm)',
                         role: 'carcass_panel',
                         material: 'carcass_melamine',
                         colorRgb: COLOR_CARCASS_SHELF,
-                        x0: x0 + PANTRY_BOARD_MM, x1: x1,
-                        y0: y0 + PANTRY_BOARD_MM, y1: y1 - PANTRY_BOARD_MM,
-                        z0: 100, z1: 120
+                        x0: x0, x1: x1 - b,
+                        y0: y0 + b, y1: y1,
+                        z0: 2240, z1: 2260
                     },
+                    // Upper Shelf #2 at Z = 2,520..2,540 mm (aligned across entire Pantry!)
                     {
-                        id: `${id}_MIDDLE_SHELF`,
-                        name: `Middle 2cm Shelf after 400mm Lower Space (430×${w - 2 * PANTRY_BOARD_MM}×20 mm, Z=520..540 mm)`,
+                        id: 'CAB_PANTRY_N_UP1_SHELF_2',
+                        name: 'Bridge Cabinet Shelf #2 — Aligned at Z=2520..2540 mm (580×580×20 mm)',
                         role: 'carcass_panel',
                         material: 'carcass_melamine',
                         colorRgb: COLOR_CARCASS_SHELF,
-                        x0: x0 + PANTRY_BOARD_MM, x1: x1,
-                        y0: y0 + PANTRY_BOARD_MM, y1: y1 - PANTRY_BOARD_MM,
-                        z0: 520, z1: 540
+                        x0: x0, x1: x1 - b,
+                        y0: y0 + b, y1: y1,
+                        z0: 2520, z1: 2540
                     },
+                    // Top Ceiling Panel at Z = 2,780..2,800 mm
                     {
-                        id: `${id}_TOP_SHELF`,
-                        name: `Top 2cm Shelf/Panel after 400mm Upper Space (430×${w - 2 * PANTRY_BOARD_MM}×20 mm, Z=940..960 mm)`,
+                        id: 'CAB_PANTRY_N_UP1_TOP_PANEL',
+                        name: 'Bridge Cabinet Top Panel — Flush with Ceiling at Z=2780..2800 mm (580×580×20 mm)',
                         role: 'carcass_panel',
                         material: 'carcass_melamine',
                         colorRgb: COLOR_CARCASS_SHELF,
-                        x0: x0 + PANTRY_BOARD_MM, x1: x1,
-                        y0: y0 + PANTRY_BOARD_MM, y1: y1 - PANTRY_BOARD_MM,
-                        z0: 940, z1: 960
+                        x0: x0, x1: x1 - b,
+                        y0: y0 + b, y1: y1,
+                        z0: 2780, z1: 2800
                     }
                 ];
 
                 return {
+                    id: 'CAB_PANTRY_N_UP1',
+                    name: 'CAB_PANTRY_N_UP1 — Freezer Overhead Bridge Cabinet & 20mm Full-Height Oak Portal Cheek (620×600×2800mm)',
+                    shortName: 'Freezer Bridge Cabinet & Oak Portal (600×600mm)',
+                    category: 'wall_cabinet',
+                    subtype: 'pantry_bridge_cabinet',
+                    floor: 'ground',
+                    room: '0.14 Spiżarnia',
+                    hostWallId: 'EW_NORTH_RECESSED',
+                    viewId: 'pantry_north_wall',
+                    x1: 5695,
+                    x2: 6315,
+                    y1: y0,
+                    y2: y1,
+                    zBottom: 0,
+                    zTop: 2800,
+                    widthMm: 620,
+                    depthMm: 600,
+                    carcassDepthMm: 600,
+                    frontThicknessMm: 0,
+                    plinthHeightMm: 0,
+                    plinthRecessMm: 0,
+                    bodyHeightMm: 850,
+                    heightMm: 2800,
+                    boardThicknessMm: b,
+                    normal: [0, 1, 0],
+                    specs: '600 × 600 × 850 mm Bridge Cabinet (Z = 1,950..2,800 mm above 50 mm ventilation gap) + 20 mm full-height warm-oak portal cheek panel (X = 5,695..5,715 mm, Z = 0..2,800 mm) • 2 internal shelves aligned with East & North upper runs at Z = 2,240 and Z = 2,520 mm',
+                    description: 'Deep 600 × 600 × 850 mm overhead bridge cabinet above the Samsung Upright Freezer (Z = 1,950..2,800 mm, leaving a 50 mm ventilation shadow gap at Z = 1,900..1,950 mm), paired with a full-height 20 mm warm-oak portal cheek panel (X = 5,695..5,715 mm, Z = 0..2,800 mm). Internal shelves at Z = 2,240 mm and Z = 2,520 mm align horizontally with CAB_PANTRY_N_UP2..UP3 and CAB_PANTRY_E_UP1..UP4.',
+                    skeleton: skeleton,
+                    fronts: []
+                };
+            }
+
+            // -----------------------------------------------------------------
+            // 28. CAB_PANTRY_HOUSEKEEPING: 805 mm Wide (X = 4,905..5,695 mm clear bay) × 450 mm Deep × 1,950 mm High
+            //     Housekeeping, 4-Step Folding Ladder, Mop & Cordless Vacuum Charging Dock
+            // -----------------------------------------------------------------
+            function buildPantryHousekeepingCloset() {
+                const x0 = 4905, x1 = 5695; // 790 mm clear plastered span (805 mm nominal to unplastered wall)
+                const y0 = Y_PANTRY_NORTH, y1 = Y_PANTRY_NORTH + 450; // 3,170..3,620 mm (450 mm depth)
+                const xDiv0 = 5480, xDiv1 = 5498; // 18 mm vertical divider: Left 197 mm Ladder Slot (5498..5695), Right 575 mm Vacuum/Mop Dock (4905..5480)
+                const skeleton = [];
+
+                // 1. Continuous Waterproof Dark Anthracite Floor Runner Tray (Z = 0..20 mm)
+                //    Extends from X = 5,695 mm all the way into the NE Side-Access Corner Bucket Pocket (X = 4,475 mm)!
+                skeleton.push({
+                    id: 'PANTRY_HK_FLOOR_MAT',
+                    name: 'Waterproof Ribbed Dark-Anthracite Rubber Floor Runner Tray (1220×450×20 mm, X=4475..5695, Z=0..20 mm)',
+                    role: 'plinth',
+                    material: 'dark_plinth',
+                    colorRgb: COLOR_MATTE_ANTHRACITE,
+                    x0: 4475, x1: x1,
+                    y0: y0, y1: y1,
+                    z0: 0, z1: 20,
+                    wireframeLines3D: [
+                        [[4500, y1 - 1, 10], [5670, y1 - 1, 10]]
+                    ]
+                });
+
+                // 2. Acoustic Warm-Oak Slatwall & Pegboard Back Panel (X = 4,755..5,695, Y = 3,170..3,188, Z = 20..1,665 mm)
+                //    Extends East to X = 4,755 mm (meeting the 300 mm deep East upper shelving cleanly with zero gap)
+                const slatLines = [];
+                for (let sx = 4795; sx <= 5650; sx += 45) {
+                    slatLines.push([[sx, y0 + 18.3, 25], [sx, y0 + 18.3, 1660]]);
+                }
+                skeleton.push({
+                    id: 'PANTRY_HK_SLATWALL_BACK',
+                    name: 'Warm-Oak Acoustic Slatwall & Pegboard Tool Wall Backing (940×18×1645 mm, X=4755..5695, Z=20..1665 mm)',
+                    role: 'carcass_panel',
+                    material: 'wood_oak',
+                    colorRgb: COLOR_OAK_WARM,
+                    wireColorRgba: [0.42, 0.30, 0.19, 0.85],
+                    x0: 4755, x1: x1,
+                    y0: y0, y1: y0 + 18,
+                    z0: 20, z1: 1665,
+                    wireframeLines3D: slatLines
+                });
+
+                // 3. Vertical Partition Dividing Left 200mm Ladder Slot from Right 605mm Vacuum & Mop Wall Dock
+                skeleton.push({
+                    id: 'PANTRY_HK_VERTICAL_DIVIDER',
+                    name: 'Vertical Ladder-Slot Partition Panel (18×400×1645 mm, X=5480..5498, Z=20..1665 mm)',
+                    role: 'carcass_panel',
+                    material: 'carcass_melamine',
+                    colorRgb: COLOR_CARCASS_SIDE,
+                    x0: xDiv0, x1: xDiv1,
+                    y0: y0 + 18, y1: y1 - 32,
+                    z0: 20, z1: 1665
+                });
+
+                // 4. Top Detergent & Cleaning Supply Shelf at Z = 1,665..1,685 mm (aligned with East Wall Shelf #2!)
+                //    Extends to X = 4,755 mm to join the East Wall L-corner shelf seamlessly, and uses CAB_PANTRY_N_UP2..UP3's
+                //    Z = 1,950..1,970 mm bottom panel as its single flush ceiling (no double-stacked ceiling board or step!)
+                skeleton.push(
+                    {
+                        id: 'PANTRY_HK_DETERGENT_SHELF',
+                        name: 'Upper Detergent & Cleaning Caddy Shelf — Aligned at Z=1665..1685 mm (940×432×20 mm, X=4755..5695 mm)',
+                        role: 'carcass_panel',
+                        material: 'carcass_melamine',
+                        colorRgb: COLOR_OAK_WARM,
+                        x0: 4755, x1: x1,
+                        y0: y0 + 18, y1: y1,
+                        z0: 1665, z1: 1685
+                    },
+                    {
+                        id: 'PANTRY_HK_TOP_BACK',
+                        name: 'Upper Detergent Compartment Rear Backing Panel (940×18×265 mm, X=4755..5695, Z=1685..1950 mm)',
+                        role: 'carcass_panel',
+                        material: 'carcass_melamine',
+                        colorRgb: COLOR_CARCASS_BACK,
+                        x0: 4755, x1: x1,
+                        y0: y0, y1: y0 + 18,
+                        z0: 1685, z1: 1950
+                    },
+                    // 3D Eco-Detergent Bottle & Cleaning Caddy on the Z=1685 mm Shelf
+                    {
+                        id: 'PANTRY_HK_DETERGENT_CADDY_BOX',
+                        name: 'Cleaning Supply Organizer Tray & Microfiber Sponges (240×210×115 mm on Z=1685 mm Shelf)',
+                        role: 'appliance_front',
+                        material: 'carcass_melamine',
+                        colorRgb: [0.88, 0.89, 0.91],
+                        x0: 5020, x1: 5260,
+                        y0: 3280, y1: 3490,
+                        z0: 1685, z1: 1800
+                    },
+                    {
+                        id: 'PANTRY_HK_DETERGENT_JUG',
+                        name: 'Eco Laundry & Floor Detergent Jug (130×110×205 mm on Z=1685 mm Shelf)',
+                        role: 'appliance_front',
+                        material: 'appliance_steel',
+                        colorRgb: COLOR_TEAL_CLEAN,
+                        x0: 5340, x1: 5470,
+                        y0: 3300, y1: 3410,
+                        z0: 1685, z1: 1890
+                    }
+                );
+
+                // =============================================================
+                // 5. 3D TALL 4-STEP FOLDING ALUMINUM & WARM-OAK HOUSEHOLD LADDER
+                //    Tucked vertically inside the Left 200 mm Slot (X = 5,540..5,655, Y = 3,230..3,560, Z = 20..1,520 mm)
+                // =============================================================
+                const lx0 = 5545, lx1 = 5650; // 105 mm folded profile width inside 197 mm slot
+                const lyFront0 = 3455, lyFront1 = 3495; // Front main stile rail
+                const lyBack0 = 3250, lyBack1 = 3285;   // Rear support leg rail
+                skeleton.push(
+                    // Non-slip dark rubber ladder feet (Z = 20..42 mm)
+                    {
+                        id: 'PANTRY_LADDER_FEET_FRONT',
+                        name: 'Folding Ladder Non-Slip Rubber Front Feet (105×44×22 mm, Z=20..42 mm)',
+                        role: 'plinth',
+                        material: 'dark_plinth',
+                        colorRgb: COLOR_MATTE_ANTHRACITE,
+                        x0: lx0 - 2, x1: lx1 + 2,
+                        y0: lyFront0 - 2, y1: lyFront1 + 2,
+                        z0: 20, z1: 42
+                    },
+                    {
+                        id: 'PANTRY_LADDER_FEET_REAR',
+                        name: 'Folding Ladder Non-Slip Rubber Rear Feet (105×39×22 mm, Z=20..42 mm)',
+                        role: 'plinth',
+                        material: 'dark_plinth',
+                        colorRgb: COLOR_MATTE_ANTHRACITE,
+                        x0: lx0 - 2, x1: lx1 + 2,
+                        y0: lyBack0 - 2, y1: lyBack1 + 2,
+                        z0: 20, z1: 42
+                    },
+                    // Anodized Aluminum Side Stiles (Left X=5545..5563 & Right X=5632..5650, Front & Rear legs, Z=42..1080 mm)
+                    {
+                        id: 'PANTRY_LADDER_STILE_FRONT_WEST',
+                        name: 'Folding Ladder Anodized Aluminum Front-Left Stile (18×40×1040 mm, Z=42..1082 mm)',
+                        role: 'sink_faucet',
+                        material: 'stainless_steel',
+                        colorRgb: COLOR_ALU_ANODIZED,
+                        x0: lx1 - 18, x1: lx1,
+                        y0: lyFront0, y1: lyFront1,
+                        z0: 42, z1: 1082
+                    },
+                    {
+                        id: 'PANTRY_LADDER_STILE_FRONT_EAST',
+                        name: 'Folding Ladder Anodized Aluminum Front-Right Stile (18×40×1040 mm, Z=42..1082 mm)',
+                        role: 'sink_faucet',
+                        material: 'stainless_steel',
+                        colorRgb: COLOR_ALU_ANODIZED,
+                        x0: lx0, x1: lx0 + 18,
+                        y0: lyFront0, y1: lyFront1,
+                        z0: 42, z1: 1082
+                    },
+                    {
+                        id: 'PANTRY_LADDER_STILE_REAR_WEST',
+                        name: 'Folding Ladder Anodized Aluminum Rear-Left Leg Stile (16×35×1010 mm, Z=42..1052 mm)',
+                        role: 'sink_faucet',
+                        material: 'stainless_steel',
+                        colorRgb: COLOR_ALU_ANODIZED,
+                        x0: lx1 - 16, x1: lx1,
+                        y0: lyBack0, y1: lyBack1,
+                        z0: 42, z1: 1052
+                    },
+                    {
+                        id: 'PANTRY_LADDER_STILE_REAR_EAST',
+                        name: 'Folding Ladder Anodized Aluminum Rear-Right Leg Stile (16×35×1010 mm, Z=42..1052 mm)',
+                        role: 'sink_faucet',
+                        material: 'stainless_steel',
+                        colorRgb: COLOR_ALU_ANODIZED,
+                        x0: lx0, x1: lx0 + 16,
+                        y0: lyBack0, y1: lyBack1,
+                        z0: 42, z1: 1052
+                    }
+                );
+
+                // 4 Folded Warm-Oak Anti-Slip Treads/Steps at Z = 260, 500, 740, and 980 mm (Top Platform)
+                [
+                    { idx: 1, zA: 260, zB: 282, yA: 3320, yB: 3485, label: 'Step #1' },
+                    { idx: 2, zA: 500, zB: 522, yA: 3310, yB: 3485, label: 'Step #2' },
+                    { idx: 3, zA: 740, zB: 762, yA: 3300, yB: 3485, label: 'Step #3' },
+                    { idx: 4, zA: 980, zB: 1008, yA: 3270, yB: 3490, label: 'Top Standing Platform (#4)' }
+                ].forEach(st => {
+                    skeleton.push({
+                        id: `PANTRY_LADDER_STEP_${st.idx}`,
+                        name: `Folding Ladder Ribbed Warm-Oak ${st.label} (85×${st.yB - st.yA}×${st.zB - st.zA} mm, Z=${st.zA}..${st.zB} mm)`,
+                        role: 'carcass_panel',
+                        material: 'wood_oak',
+                        colorRgb: COLOR_OAK_WARM,
+                        x0: lx0 + 10, x1: lx1 - 10,
+                        y0: st.yA, y1: st.yB,
+                        z0: st.zA, z1: st.zB
+                    });
+                });
+
+                // Tall Curved Tubular Aluminum Safety Bow Handle (rising from Z=1050 to Z=1520 mm!)
+                const bowX = Math.round((lx0 + lx1) / 2); // X = 5,598 mm
+                skeleton.push(
+                    buildPantryTubePart({
+                        id: 'PANTRY_LADDER_SAFETY_BOW',
+                        name: 'Folding Ladder Tall Curved Tubular Safety Bow Handle (Ø24 mm, H=1520 mm, Z=1050..1520 mm)',
+                        role: 'sink_faucet',
+                        material: 'stainless_steel',
+                        colorRgb: COLOR_ALU_ANODIZED,
+                        numSegs: 16,
+                        spine: [
+                            [bowX, 3475, 1050, 12],
+                            [bowX, 3475, 1440, 12],
+                            [bowX, 3455, 1485, 12],
+                            [bowX, 3415, 1506, 13],
+                            [bowX, 3330, 1506, 13],
+                            [bowX, 3290, 1485, 12],
+                            [bowX, 3270, 1440, 12],
+                            [bowX, 3270, 1040, 12]
+                        ],
+                        capStart: true,
+                        capEnd: true,
+                        ringWireframeIndices: [1, 3, 4, 6]
+                    }),
+                    // Soft Black Foam Top Grip on the Safety Bow (Z = 1,490..1,522 mm)
+                    {
+                        id: 'PANTRY_LADDER_BOW_FOAM_GRIP',
+                        name: 'Folding Ladder Ergonomic Soft-Foam Top Hand Grip (32×110×32 mm, Z=1490..1522 mm)',
+                        role: 'plinth',
+                        material: 'dark_plinth',
+                        colorRgb: COLOR_MATTE_ANTHRACITE,
+                        x0: bowX - 16, x1: bowX + 16,
+                        y0: 3320, y1: 3425,
+                        z0: 1490, z1: 1522
+                    }
+                );
+
+                // =============================================================
+                // 6. 3D WALL-MOUNTED CORDLESS STICK VACUUM CLEANER ON 230V CHARGING DOCK
+                //    Mounted on the Right Slatwall Bay (X = 5,180..5,425, Y = 3,188..3,415, Z = 265..1,425 mm)
+                // =============================================================
+                const vx = 5295; // Vacuum centerline X = 5,295 mm
+                skeleton.push(
+                    // Dedicated 230V Wall Socket (IP44) at X = 5,365..5,425, Y = 3,188..3,202, Z = 1,320..1,380 mm
+                    {
+                        id: 'PANTRY_VACUUM_230V_SOCKET',
+                        name: 'Dedicated 230V Vacuum Charger Wall Socket (60×14×60 mm at Z=1320..1380 mm)',
+                        role: 'appliance_front',
+                        material: 'appliance_steel',
+                        colorRgb: COLOR_MATTE_ANTHRACITE,
+                        x0: 5365, x1: 5425,
+                        y0: y0 + 18, y1: y0 + 32,
+                        z0: 1320, z1: 1380,
+                        wireframeLines3D: [
+                            // Cord from 230V socket to charging dock
+                            [[5365, y0 + 24, 1350], [5330, y0 + 24, 1350], [5330, y0 + 24, 1290]]
+                        ]
+                    },
+                    // Wall-Mounted Charging Dock Bracket (X = 5,260..5,330, Y = 3,188..3,255, Z = 1,150..1,400 mm)
+                    {
+                        id: 'PANTRY_VACUUM_CHARGING_DOCK',
+                        name: 'Wall-Mounted Cordless Vacuum Charging Dock Cradle (70×67×250 mm, Z=1150..1400 mm)',
+                        role: 'appliance_front',
+                        material: 'appliance_steel',
+                        colorRgb: COLOR_MATTE_ANTHRACITE,
+                        x0: vx - 35, x1: vx + 35,
+                        y0: y0 + 18, y1: y0 + 85,
+                        z0: 1150, z1: 1400
+                    },
+                    // Click-In Lithium-Ion Battery Pack + Glowing Green LED Charge Indicator (Z = 1,165..1,215 mm)
+                    {
+                        id: 'PANTRY_VACUUM_BATTERY_PACK',
+                        name: 'Click-In Lithium-Ion Battery Pack (64×85×50 mm, Z=1165..1215 mm)',
+                        role: 'appliance_front',
+                        material: 'appliance_steel',
+                        colorRgb: COLOR_VACUUM_BODY,
+                        x0: vx - 32, x1: vx + 32,
+                        y0: y0 + 55, y1: y0 + 140,
+                        z0: 1165, z1: 1215
+                    },
+                    {
+                        id: 'PANTRY_VACUUM_BATTERY_LED',
+                        name: 'Glowing Green Battery Charge Status LED Bar (36×4×8 mm, Z=1185..1193 mm)',
+                        role: 'appliance_led',
+                        material: 'led_white',
+                        colorRgb: COLOR_LED_GREEN,
+                        wireColorRgba: [0.20, 0.95, 0.55, 0.98],
+                        x0: vx - 18, x1: vx + 18,
+                        y0: y0 + 138, y1: y0 + 142,
+                        z0: 1185, z1: 1193
+                    },
+                    // Ergonomic Pistol Grip & Red Trigger (Z = 1,215..1,335 mm)
+                    {
+                        id: 'PANTRY_VACUUM_PISTOL_GRIP',
+                        name: 'Vacuum Ergonomic Pistol Handle Grip (34×42×120 mm, Z=1215..1335 mm)',
+                        role: 'appliance_front',
+                        material: 'appliance_steel',
+                        colorRgb: COLOR_VACUUM_BODY,
+                        x0: vx - 17, x1: vx + 17,
+                        y0: y0 + 62, y1: y0 + 104,
+                        z0: 1215, z1: 1335
+                    },
+                    {
+                        id: 'PANTRY_VACUUM_RED_TRIGGER',
+                        name: 'Vacuum Crimson Power Trigger Switch (14×18×32 mm, Z=1275..1307 mm)',
+                        role: 'appliance_front',
+                        material: 'appliance_steel',
+                        colorRgb: COLOR_VACUUM_ACCENT,
+                        x0: vx - 7, x1: vx + 7,
+                        y0: y0 + 104, y1: y0 + 122,
+                        z0: 1275, z1: 1307
+                    },
+                    // Cylindrical Smoked-Clear Polycarbonate Cyclone Dust Bin (Ø90 mm, Z = 1,135..1,290 mm)
+                    buildPantryTubePart({
+                        id: 'PANTRY_VACUUM_DUST_BIN',
+                        name: 'Smoked Polycarbonate Cyclone Dust Bin Chamber (Ø90×155 mm, Z=1135..1290 mm)',
+                        role: 'appliance_window',
+                        material: 'appliance_glass',
+                        colorRgb: COLOR_VACUUM_BIN,
+                        numSegs: 20,
+                        spine: [
+                            [vx, y0 + 165, 1135, 44],
+                            [vx, y0 + 165, 1290, 44]
+                        ],
+                        capStart: true,
+                        capEnd: true,
+                        ringWireframeIndices: [0, 1]
+                    }),
+                    // Metallic Cobalt Multi-Cyclone & Digital Motorhead Crown (Ø94 mm, Z = 1,290..1,425 mm)
+                    buildPantryTubePart({
+                        id: 'PANTRY_VACUUM_CYCLONE_HEAD',
+                        name: 'Metallic Cobalt Multi-Cyclone & HEPA Filter Motorhead (Ø94×135 mm, Z=1290..1425 mm)',
+                        role: 'appliance_front',
+                        material: 'stainless_steel',
+                        colorRgb: COLOR_VACUUM_COBALT,
+                        numSegs: 20,
+                        spine: [
+                            [vx, y0 + 165, 1290, 46],
+                            [vx, y0 + 165, 1365, 48],
+                            [vx, y0 + 165, 1415, 42],
+                            [vx, y0 + 165, 1425, 34]
+                        ],
+                        capStart: true,
+                        capEnd: true,
+                        ringWireframeIndices: [0, 1, 2]
+                    }),
+                    // Long Anodized Metallic Cobalt Extension Wand Tube (Ø34 mm, Z = 320..1,135 mm)
+                    buildPantryTubePart({
+                        id: 'PANTRY_VACUUM_EXTENSION_WAND',
+                        name: 'Anodized Metallic Cobalt Vacuum Extension Wand Tube (Ø34×815 mm, Z=320..1135 mm)',
+                        role: 'sink_faucet',
+                        material: 'stainless_steel',
+                        colorRgb: COLOR_VACUUM_COBALT,
+                        numSegs: 18,
+                        spine: [
+                            [vx, y0 + 115, 320, 17],
+                            [vx, y0 + 115, 1135, 17]
+                        ],
+                        capStart: true,
+                        capEnd: true,
+                        ringWireframeIndices: [0, 1]
+                    }),
+                    // Crimson Quick-Release Wand Collars (Top Z=1110..1135 & Bottom Z=320..345 mm)
+                    buildPantryTubePart({
+                        id: 'PANTRY_VACUUM_COLLAR_TOP',
+                        name: 'Upper Quick-Release Wand Catch Collar (Ø40×25 mm, Z=1110..1135 mm)',
+                        role: 'appliance_front',
+                        material: 'appliance_steel',
+                        colorRgb: COLOR_VACUUM_ACCENT,
+                        numSegs: 16,
+                        spine: [
+                            [vx, y0 + 115, 1110, 20],
+                            [vx, y0 + 115, 1135, 20]
+                        ],
+                        capStart: true,
+                        capEnd: true
+                    }),
+                    buildPantryTubePart({
+                        id: 'PANTRY_VACUUM_COLLAR_BOTTOM',
+                        name: 'Lower Quick-Release Wand Catch Collar (Ø40×25 mm, Z=320..345 mm)',
+                        role: 'appliance_front',
+                        material: 'appliance_steel',
+                        colorRgb: COLOR_VACUUM_ACCENT,
+                        numSegs: 16,
+                        spine: [
+                            [vx, y0 + 115, 320, 20],
+                            [vx, y0 + 115, 345, 20]
+                        ],
+                        capStart: true,
+                        capEnd: true
+                    }),
+                    // Motorized Multi-Surface Floor Cleaner Head Housing (230 × 140 × 55 mm, Z = 265..320 mm)
+                    {
+                        id: 'PANTRY_VACUUM_FLOOR_HEAD',
+                        name: 'Motorized Multi-Surface Floor Roller Cleaner Head (230×140×55 mm, Z=265..320 mm)',
+                        role: 'appliance_front',
+                        material: 'appliance_steel',
+                        colorRgb: COLOR_VACUUM_BODY,
+                        x0: vx - 115, x1: vx + 115,
+                        y0: y0 + 55, y1: y0 + 195,
+                        z0: 265, z1: 320
+                    },
+                    // Fluffy Soft Roller Brush Bar inside Floor Cleaner Head (Ø42 × 210 mm along X)
+                    buildPantryTubePart({
+                        id: 'PANTRY_VACUUM_ROLLER_BRUSH',
+                        name: 'Soft Carbon-Fiber Fluffy Roller Brush Bar (Ø42×210 mm, Z=262..304 mm)',
+                        role: 'appliance_front',
+                        material: 'appliance_steel',
+                        colorRgb: COLOR_VACUUM_ACCENT,
+                        numSegs: 16,
+                        spine: [
+                            [vx - 105, y0 + 165, 283, 21],
+                            [vx + 105, y0 + 165, 283, 21]
+                        ],
+                        capStart: true,
+                        capEnd: true,
+                        ringWireframeIndices: [0, 1]
+                    }),
+                    // Pegboard Accessory Nozzles (Crevice Tool & Dusting Brush at X = 5,095..5,165, Z = 890..1,170 mm)
+                    {
+                        id: 'PANTRY_VACUUM_NOZZLE_HOLDER',
+                        name: 'Slatwall Accessory Nozzle Clip Rail (85×36×28 mm, Z=1140..1168 mm)',
+                        role: 'plinth',
+                        material: 'dark_plinth',
+                        colorRgb: COLOR_MATTE_ANTHRACITE,
+                        x0: 5085, x1: 5170,
+                        y0: y0 + 18, y1: y0 + 54,
+                        z0: 1140, z1: 1168
+                    },
+                    buildPantryTubePart({
+                        id: 'PANTRY_VACUUM_CREVICE_NOZZLE',
+                        name: 'Wall-Clipped Long Crevice Nozzle Attachment (Ø28×260 mm, Z=890..1150 mm)',
+                        role: 'appliance_front',
+                        material: 'appliance_steel',
+                        colorRgb: COLOR_VACUUM_BODY,
+                        numSegs: 14,
+                        spine: [
+                            [5145, y0 + 42, 890, 7],
+                            [5145, y0 + 42, 1090, 14],
+                            [5145, y0 + 42, 1150, 16]
+                        ],
+                        capStart: true,
+                        capEnd: true
+                    }),
+                    buildPantryTubePart({
+                        id: 'PANTRY_VACUUM_BRUSH_NOZZLE',
+                        name: 'Wall-Clipped Combination Dusting Brush Nozzle (Ø36×175 mm, Z=985..1160 mm)',
+                        role: 'appliance_front',
+                        material: 'appliance_steel',
+                        colorRgb: COLOR_VACUUM_COBALT,
+                        numSegs: 14,
+                        spine: [
+                            [5105, y0 + 45, 985, 20],
+                            [5105, y0 + 45, 1045, 18],
+                            [5105, y0 + 45, 1160, 16]
+                        ],
+                        capStart: true,
+                        capEnd: true
+                    })
+                );
+
+                // =============================================================
+                // 7. 3D WALL-MOUNTED FLAT MICROFIBER MOP & LONG-HANDLED BROOM
+                //    Clipped to the Slatwall on the Right Side of the Bay (X = 4,920..5,070, Z = 110..1,420 mm)
+                // =============================================================
+                const mx = 5020; // Flat Mop pole X = 5,020 mm
+                const bx = 4950; // Broom pole X = 4,950 mm
+                skeleton.push(
+                    // Wall Spring-Clip Tool Holder Rail (X = 4,920..5,060, Y = 3,188..3,228, Z = 1,140..1,180 mm)
+                    {
+                        id: 'PANTRY_MOP_WALL_CLIP_RAIL',
+                        name: 'Wall-Mounted Spring-Grip Mop & Broom Holder Rail (140×40×40 mm, Z=1140..1180 mm)',
+                        role: 'plinth',
+                        material: 'dark_plinth',
+                        colorRgb: COLOR_MATTE_ANTHRACITE,
+                        x0: 4920, x1: 5060,
+                        y0: y0 + 18, y1: y0 + 58,
+                        z0: 1140, z1: 1180
+                    },
+                    // Flat Microfiber Spray Mop Pole (Ø22 mm brushed aluminum, Z = 140..1,420 mm)
+                    buildPantryTubePart({
+                        id: 'PANTRY_MOP_HANDLE_POLE',
+                        name: 'Flat Spray Mop Telescopic Brushed-Aluminum Handle (Ø22×1280 mm, Z=140..1420 mm)',
+                        role: 'sink_faucet',
+                        material: 'stainless_steel',
+                        colorRgb: COLOR_ALU_ANODIZED,
+                        numSegs: 14,
+                        spine: [
+                            [mx, y0 + 55, 140, 11],
+                            [mx, y0 + 55, 1300, 11],
+                            [mx, y0 + 55, 1420, 13]
+                        ],
+                        capStart: true,
+                        capEnd: true
+                    }),
+                    // Spray Mop Refillable Water Reservoir Bottle (Z = 380..550 mm)
+                    buildPantryTubePart({
+                        id: 'PANTRY_MOP_WATER_RESERVOIR',
+                        name: 'Spray Mop Translucent Teal Water Reservoir Bottle (Ø56×170 mm, Z=380..550 mm)',
+                        role: 'appliance_front',
+                        material: 'appliance_steel',
+                        colorRgb: COLOR_TEAL_CLEAN,
+                        numSegs: 14,
+                        spine: [
+                            [mx, y0 + 78, 380, 16],
+                            [mx, y0 + 78, 410, 28],
+                            [mx, y0 + 78, 530, 28],
+                            [mx, y0 + 78, 550, 14]
+                        ],
+                        capStart: true,
+                        capEnd: true
+                    }),
+                    // Flat Swivel Microfiber Mop Head & Pad (110 × 320 × 26 mm oriented along Y, Z = 114..140 mm)
+                    {
+                        id: 'PANTRY_MOP_FLAT_PAD',
+                        name: 'Flat Swivel Turquoise Microfiber Mop Head & Pad (90×280×26 mm, Z=114..140 mm)',
+                        role: 'appliance_front',
+                        material: 'appliance_steel',
+                        colorRgb: COLOR_TEAL_CLEAN,
+                        x0: mx - 45, x1: mx + 45,
+                        y0: y0 + 30, y1: y0 + 310,
+                        z0: 114, z1: 140
+                    },
+                    // Long-Handled Sweeping Broom Pole (Ø22 mm warm oak/ash wood, Z = 185..1,380 mm)
+                    buildPantryTubePart({
+                        id: 'PANTRY_BROOM_WOOD_POLE',
+                        name: 'Long-Handled Sweeping Broom Wooden Pole (Ø22×1195 mm, Z=185..1380 mm)',
+                        role: 'carcass_panel',
+                        material: 'wood_oak',
+                        colorRgb: COLOR_OAK_WARM,
+                        numSegs: 14,
+                        spine: [
+                            [bx, y0 + 55, 185, 11],
+                            [bx, y0 + 55, 1380, 11]
+                        ],
+                        capStart: true,
+                        capEnd: true
+                    }),
+                    // Sweeping Broom Head & Bristle Block (70 × 240 × 75 mm, Z = 110..185 mm)
+                    {
+                        id: 'PANTRY_BROOM_BRISTLE_HEAD',
+                        name: 'Soft-Bristle Sweeping Broom Head (64×230×75 mm, Z=110..185 mm)',
+                        role: 'appliance_front',
+                        material: 'dark_plinth',
+                        colorRgb: COLOR_WRINGER_GREY,
+                        x0: bx - 32, x1: bx + 32,
+                        y0: y0 + 35, y1: y0 + 265,
+                        z0: 110, z1: 185
+                    }
+                );
+
+                return {
+                    id: 'CAB_PANTRY_HOUSEKEEPING',
+                    name: 'CAB_PANTRY_HOUSEKEEPING — 805mm Housekeeping, 4-Step Folding Ladder, Mop & Cordless Vacuum Charging Closet (805×450×1950mm)',
+                    shortName: 'Housekeeping, Ladder, Mop & Vacuum Closet (805×450mm)',
+                    category: 'tall_cabinet',
+                    subtype: 'pantry_housekeeping_closet',
+                    floor: 'ground',
+                    room: '0.14 Spiżarnia',
+                    hostWallId: 'EW_NORTH_RECESSED',
+                    viewId: 'pantry_north_wall',
+                    x1: x0,
+                    x2: x1,
+                    y1: y0,
+                    y2: y1,
+                    zBottom: 0,
+                    zTop: 1950,
+                    widthMm: x1 - x0,
+                    depthMm: 450,
+                    carcassDepthMm: 450,
+                    frontThicknessMm: 0,
+                    plinthHeightMm: 20,
+                    plinthRecessMm: 0,
+                    bodyHeightMm: 1930,
+                    heightMm: 1950,
+                    boardThicknessMm: PANTRY_BOARD_MM,
+                    normal: [0, 1, 0],
+                    specs: '805 mm nominal width (X = 4,905..5,695 mm clear bay + 450 mm corner bucket extension to X = 4,455 mm) × 450 mm deep (Y = 3,170..3,620 mm) × 1,950 mm high • Left 200 mm slot with 3D 4-step folding aluminum/oak ladder (H = 1,500 mm) • Right 605 mm warm-oak slatwall dock with 3D cordless stick vacuum on 230V charger, 2 accessory nozzles, flat microfiber spray mop & broom • Top detergent shelf at Z = 1,665..1,950 mm',
+                    description: 'Dedicated 805 mm wide × 1,930 mm clear-height Housekeeping & Cordless Vacuum Charging Closet on the Pantry North Wall (EW_NORTH_RECESSED). Features a waterproof dark anthracite floor runner mat extending into the NE corner pocket, an acoustic warm-oak slatwall/pegboard back panel, an upper detergent shelf aligned at Z = 1,665 mm, a 200 mm left slot holding a tall 4-step folding ladder with safety bow, and a 605 mm right wall dock holding a cordless stick vacuum cleaner on a 230V charging cradle plus a wall-clipped flat microfiber mop and sweeping broom.',
+                    skeleton: skeleton,
+                    fronts: []
+                };
+            }
+
+            // -----------------------------------------------------------------
+            // 29–30. CAB_PANTRY_N_UP2 & CAB_PANTRY_N_UP3: Overhead Bridge Cabinets above Housekeeping Closet
+            //        (X = 4,755..5,695 mm, Y = 3,170..3,620 mm, Z = 1,950..2,800 mm)
+            //        With internal shelves aligned at Z = 2,240 and Z = 2,520 mm!
+            //        Note: CAB_PANTRY_N_UP3 (index === 3) is open on its East side (X = 4,755 mm) into CAB_PANTRY_E_UP1
+            //        so the shelves wrap continuously around the North-East L-corner without covering the corner shelves!
+            // -----------------------------------------------------------------
+            function makePantryNorthOverheadCabinet(id, index, x0, x1, nominalWidthMm) {
+                const y0 = Y_PANTRY_NORTH, y1 = Y_PANTRY_NORTH + 450; // 3,170..3,620 mm
+                const z0 = 1950, z1 = 2800;
+                const b = PANTRY_BOARD_MM;
+                const w = x1 - x0;
+                const isCornerRight = (index === 3); // Open East side at X = 4,755 mm to form continuous L-corner shelves!
+                const xEastInner = isCornerRight ? x0 : (x0 + b);
+
+                const skeleton = [
+                    {
+                        id: `${id}_WEST_PANEL`,
+                        name: `Left/West Side Carcass Panel (20×450×850 mm, Z=1950..2800 mm)`,
+                        role: 'carcass_panel',
+                        material: 'carcass_melamine',
+                        colorRgb: COLOR_CARCASS_SIDE,
+                        x0: x1 - b, x1: x1,
+                        y0: y0, y1: y1,
+                        z0: z0, z1: z1
+                    }
+                ];
+
+                if (!isCornerRight) {
+                    skeleton.push({
+                        id: `${id}_EAST_PANEL`,
+                        name: `Right/East Side Carcass Panel (20×450×850 mm, Z=1950..2800 mm)`,
+                        role: 'carcass_panel',
+                        material: 'carcass_melamine',
+                        colorRgb: COLOR_CARCASS_SIDE,
+                        x0: x0, x1: x0 + b,
+                        y0: y0, y1: y1,
+                        z0: z0, z1: z1
+                    });
+                }
+
+                skeleton.push(
+                    {
+                        id: `${id}_BACK_PANEL`,
+                        name: `Rear Carcass Backing Panel (${x1 - b - xEastInner}×20×850 mm, Z=1950..2800 mm)`,
+                        role: 'carcass_panel',
+                        material: 'carcass_melamine',
+                        colorRgb: COLOR_CARCASS_BACK,
+                        x0: xEastInner, x1: x1 - b,
+                        y0: y0, y1: y0 + b,
+                        z0: z0, z1: z1
+                    },
+                    {
+                        id: `${id}_BOTTOM_PANEL`,
+                        name: `Bottom Shelf — Aligned at Z=1950..1970 mm (${x1 - b - xEastInner}×430×20 mm)`,
+                        role: 'carcass_panel',
+                        material: 'carcass_melamine',
+                        colorRgb: COLOR_OAK_WARM,
+                        x0: xEastInner, x1: x1 - b,
+                        y0: y0 + b, y1: y1,
+                        z0: 1950, z1: 1970
+                    },
+                    {
+                        id: `${id}_SHELF_1`,
+                        name: `Internal Shelf #1 — Aligned at Z=2240..2260 mm (${x1 - b - xEastInner}×430×20 mm)`,
+                        role: 'carcass_panel',
+                        material: 'carcass_melamine',
+                        colorRgb: COLOR_CARCASS_SHELF,
+                        x0: xEastInner, x1: x1 - b,
+                        y0: y0 + b, y1: y1,
+                        z0: 2240, z1: 2260
+                    },
+                    {
+                        id: `${id}_SHELF_2`,
+                        name: `Internal Shelf #2 — Aligned at Z=2520..2540 mm (${x1 - b - xEastInner}×430×20 mm)`,
+                        role: 'carcass_panel',
+                        material: 'carcass_melamine',
+                        colorRgb: COLOR_CARCASS_SHELF,
+                        x0: xEastInner, x1: x1 - b,
+                        y0: y0 + b, y1: y1,
+                        z0: 2520, z1: 2540
+                    },
+                    {
+                        id: `${id}_TOP_PANEL`,
+                        name: `Top Ceiling Panel — Aligned at Z=2780..2800 mm (${x1 - b - xEastInner}×430×20 mm)`,
+                        role: 'carcass_panel',
+                        material: 'carcass_melamine',
+                        colorRgb: COLOR_CARCASS_SHELF,
+                        x0: xEastInner, x1: x1 - b,
+                        y0: y0 + b, y1: y1,
+                        z0: 2780, z1: 2800
+                    }
+                );
+
+                return {
                     id: id,
-                    name: `${id} — Pantry Lower Open Cabinet #${index} (500×450×960mm Regał Dolny)`,
-                    shortName: `Pantry Lower Cabinet #${index} (500×450mm)`,
+                    name: `${id} — Housekeeping Overhead Bridge Cabinet #${index} (${nominalWidthMm}×450×850mm, Z=1950..2800mm)`,
+                    shortName: `Pantry North Overhead #${index} (${nominalWidthMm}×450mm)`,
+                    category: 'wall_cabinet',
+                    subtype: 'pantry_bridge_cabinet',
+                    floor: 'ground',
+                    room: '0.14 Spiżarnia',
+                    hostWallId: 'EW_NORTH_RECESSED',
+                    viewId: 'pantry_north_wall',
+                    x1: x0,
+                    x2: x1,
+                    y1: y0,
+                    y2: y1,
+                    zBottom: z0,
+                    zTop: z1,
+                    widthMm: w,
+                    depthMm: 450,
+                    carcassDepthMm: 450,
+                    frontThicknessMm: 0,
+                    plinthHeightMm: 0,
+                    plinthRecessMm: 0,
+                    bodyHeightMm: 850,
+                    heightMm: 850,
+                    boardThicknessMm: b,
+                    normal: [0, 1, 0],
+                    specs: `${nominalWidthMm} × 450 × 850 mm (X = ${x0}..${x1} mm, Y = ${y0}..${y1} mm, Z = 1,950..2,800 mm) • Shelves aligned at Z = 1,950, 2,240, 2,520, 2,800 mm with Freezer Bridge & East Wall Upper Shelving`,
+                    description: `Overhead cabinet #${index} above the Housekeeping & Vacuum Closet on the Pantry North Wall (Z = 1,950..2,800 mm), featuring horizontal shelves at Z = 2,240 mm and Z = 2,520 mm that align continuously with both the Freezer Bridge Cabinet (CAB_PANTRY_N_UP1) on the left and the East Wall Upper Shelving (CAB_PANTRY_E_UP1..UP4) on the right.`,
+                    skeleton: skeleton,
+                    fronts: []
+                };
+            }
+
+            // -----------------------------------------------------------------
+            // 31. CAB_PANTRY_CORNER_BUCKET: North-East Side-Access 450×450×900 mm Corner Bucket Garage
+            //     + 50 mm Corner Filler + 3D Full-Size Mop Bucket with Side-Press Wringer
+            //     (X = 4,455..4,905 mm, Y = 3,170..3,670 mm, Z = 0..900 mm)
+            // -----------------------------------------------------------------
+            function buildPantryCornerBucketGarage() {
+                const x0 = X_PANTRY_EAST, x1 = X_PANTRY_EAST + 450; // 4,455..4,905 mm
+                const y0 = Y_PANTRY_NORTH, yPocketEnd = Y_PANTRY_NORTH + 450, y1 = Y_PANTRY_NORTH + 500; // 3,170..3,620 pocket + 3,620..3,670 filler
+                const b = PANTRY_BOARD_MM;
+
+                const skeleton = [
+                    // East Wall Rear Panel (X = 4,455..4,475, Y = 3,170..3,670, Z = 20..900 mm)
+                    {
+                        id: 'CAB_PANTRY_CORNER_EAST_BACK',
+                        name: 'Corner Bucket Garage East Wall Backing Panel (20×500×880 mm, Z=20..900 mm)',
+                        role: 'carcass_panel',
+                        material: 'carcass_melamine',
+                        colorRgb: COLOR_CARCASS_BACK,
+                        x0: x0, x1: x0 + b,
+                        y0: y0, y1: y1,
+                        z0: 20, z1: 900
+                    },
+                    // North Wall Rear Panel inside Corner Pocket (X = 4,475..4,885, Y = 3,170..3,190, Z = 20..900 mm)
+                    {
+                        id: 'CAB_PANTRY_CORNER_NORTH_BACK',
+                        name: 'Corner Bucket Garage North Wall Backing Panel (410×20×880 mm, Z=20..900 mm)',
+                        role: 'carcass_panel',
+                        material: 'wood_oak',
+                        colorRgb: COLOR_OAK_WARM,
+                        x0: x0 + b, x1: x1 - b,
+                        y0: y0, y1: y0 + b,
+                        z0: 20, z1: 900
+                    },
+                    // Closed Warm-Oak Front Panel facing West into the Room (X = 4,885..4,905, Y = 3,620..3,670 filler + 3,520..3,620 corner post)
+                    // Note: Y = 3,190..3,580 mm is WIDE OPEN on the West (X = 4,885..4,905) so the Mop Bucket slides in sideways from the Housekeeping Closet!
+                    {
+                        id: 'CAB_PANTRY_CORNER_SOUTH_DIVIDER',
+                        name: 'Corner Bucket Garage South Partition & 50mm Anti-Collision Filler (450×50×800 mm, Y=3620..3670, Z=100..900 mm)',
+                        role: 'carcass_panel',
+                        material: 'wood_oak',
+                        colorRgb: COLOR_OAK_WARM,
+                        x0: x0, x1: x1,
+                        y0: yPocketEnd, y1: y1,
+                        z0: 100, z1: 900
+                    },
+                    {
+                        id: 'CAB_PANTRY_CORNER_PLINTH_FILLER',
+                        name: 'Corner Bucket Garage South Plinth Return (410×50×100 mm, Y=3620..3670, Z=0..100 mm)',
+                        role: 'plinth',
+                        material: 'dark_plinth',
+                        colorRgb: COLOR_PLINTH,
+                        x0: x0, x1: x1 - 40,
+                        y0: yPocketEnd, y1: y1,
+                        z0: 0, z1: 100
+                    },
+                    // Top Support Frame under the NE Corner of the Quartz Countertop (Z = 880..900 mm)
+                    {
+                        id: 'CAB_PANTRY_CORNER_TOP_PANEL',
+                        name: 'Corner Bucket Garage Top Worktop Support Panel (430×480×20 mm, Z=880..900 mm)',
+                        role: 'carcass_panel',
+                        material: 'carcass_melamine',
+                        colorRgb: COLOR_CARCASS_SHELF,
+                        x0: x0 + b, x1: x1,
+                        y0: y0 + b, y1: y1,
+                        z0: 880, z1: 900
+                    },
+
+                    // =========================================================
+                    // 3D FULL-SIZE RECTANGULAR MOP BUCKET WITH SIDE-PRESS WRINGER
+                    // Tucked inside the 450×450×880 mm Side-Access Corner Pocket (X = 4,535..4,845, Y = 3,240..3,540, Z = 20..445 mm)
+                    // =========================================================
+                    // 4 Swivel Caster Wheels (Z = 20..58 mm)
+                    {
+                        id: 'PANTRY_BUCKET_CASTERS',
+                        name: 'Mop Bucket 4 Swivel Caster Base Frame (280×260×38 mm, Z=20..58 mm)',
+                        role: 'plinth',
+                        material: 'dark_plinth',
+                        colorRgb: COLOR_MATTE_ANTHRACITE,
+                        x0: 4550, x1: 4830,
+                        y0: 3260, y1: 3520,
+                        z0: 20, z1: 58
+                    },
+                    // Molded Turquoise-Teal Polypropylene Mop Bucket Body (300 × 280 × 275 mm, Z = 58..333 mm)
+                    {
+                        id: 'PANTRY_BUCKET_BODY',
+                        name: 'Full-Size Rectangular Turquoise Mop Bucket Body (300×280×275 mm, Z=58..333 mm)',
+                        role: 'appliance_front',
+                        material: 'appliance_steel',
+                        colorRgb: COLOR_TEAL_CLEAN,
+                        x0: 4540, x1: 4840,
+                        y0: 3250, y1: 3530,
+                        z0: 58, z1: 333
+                    },
+                    // Flared Top Pouring Rim of Mop Bucket (320 × 300 × 22 mm, Z = 325..347 mm)
+                    {
+                        id: 'PANTRY_BUCKET_RIM',
+                        name: 'Mop Bucket Reinforced Top Pouring Spout Rim (320×300×22 mm, Z=325..347 mm)',
+                        role: 'appliance_front',
+                        material: 'appliance_steel',
+                        colorRgb: COLOR_TEAL_CLEAN,
+                        x0: 4530, x1: 4850,
+                        y0: 3240, y1: 3540,
+                        z0: 325, z1: 347
+                    },
+                    // Detachable Charcoal-Grey Side-Press Wringer Sieve Basket (175 × 270 × 125 mm, Z = 285..410 mm)
+                    {
+                        id: 'PANTRY_BUCKET_WRINGER_BASKET',
+                        name: 'Detachable Mop Wringer Perforated Sieve Basket (175×270×125 mm, Z=285..410 mm)',
+                        role: 'appliance_front',
+                        material: 'appliance_steel',
+                        colorRgb: COLOR_WRINGER_GREY,
+                        x0: 4540, x1: 4715,
+                        y0: 3255, y1: 3525,
+                        z0: 285, z1: 410
+                    },
+                    // Wringer Press Lever Arm (Z = 365..450 mm)
+                    buildPantryTubePart({
+                        id: 'PANTRY_BUCKET_WRINGER_LEVER',
+                        name: 'Mop Wringer Side-Press Torsion Handle Lever (Ø18 mm, Z=365..450 mm)',
+                        role: 'sink_faucet',
+                        material: 'appliance_steel',
+                        colorRgb: COLOR_MATTE_ANTHRACITE,
+                        numSegs: 12,
+                        spine: [
+                            [4625, 3390, 365, 9],
+                            [4685, 3390, 445, 10]
+                        ],
+                        capStart: true,
+                        capEnd: true
+                    }),
+                    // Curved Chrome Wire Carry Bail Handle (arching over Y = 3,245..3,535 mm)
+                    buildPantryTubePart({
+                        id: 'PANTRY_BUCKET_WIRE_BAIL',
+                        name: 'Mop Bucket Curved Stainless-Steel Carry Bail Handle (Ø10 mm, Z=290..385 mm)',
+                        role: 'sink_faucet',
+                        material: 'stainless_steel',
+                        colorRgb: COLOR_ALU_ANODIZED,
+                        numSegs: 12,
+                        spine: [
+                            [4740, 3245, 335, 5],
+                            [4795, 3285, 378, 5],
+                            [4815, 3390, 390, 5],
+                            [4795, 3495, 378, 5],
+                            [4740, 3535, 335, 5]
+                        ],
+                        capStart: true,
+                        capEnd: true
+                    })
+                ];
+
+                return {
+                    id: 'CAB_PANTRY_CORNER_BUCKET',
+                    name: 'CAB_PANTRY_CORNER_BUCKET — Side-Access 450×450×900mm Corner Bucket Garage & 3D Mop Bucket with Wringer',
+                    shortName: 'Side-Access Corner Bucket Garage (450×500mm)',
                     category: 'base_cabinet',
-                    subtype: 'pantry_open_base_cabinet',
+                    subtype: 'pantry_corner_bucket_garage',
                     floor: 'ground',
                     room: '0.14 Spiżarnia',
                     hostWallId: 'GW_14',
@@ -3944,91 +5007,402 @@
                     y1: y0,
                     y2: y1,
                     zBottom: 0,
-                    zTop: 960,
-                    widthMm: w,
-                    depthMm: depthMm,
-                    carcassDepthMm: depthMm,
+                    zTop: 900,
+                    widthMm: 500,
+                    depthMm: 450,
+                    carcassDepthMm: 450,
                     frontThicknessMm: 0,
                     plinthHeightMm: 100,
                     plinthRecessMm: 40,
-                    bodyHeightMm: 860,
-                    heightMm: 960,
-                    boardThicknessMm: PANTRY_BOARD_MM,
+                    bodyHeightMm: 800,
+                    heightMm: 900,
+                    boardThicknessMm: b,
                     normal: [1, 0, 0],
-                    specs: `500 × 450 × 960 mm (X = ${x0}..${x1} mm, Y = ${y0}..${y1} mm, Z = 0..960 mm) • 100 mm plinth + 20 mm bottom shelf (Z=100..120) + 400 mm space + 20 mm middle shelf (Z=520..540) + 400 mm space + 20 mm top panel (Z=940..960) • Open carcass (no fronts)`,
-                    description: `Pantry East Wall (GW_14) lower open storage unit #${index} (500 mm wide × 450 mm deep × 960 mm high) with 100 mm dark plinth and two 400 mm clear vertical storage tiers separated by 20 mm shelves. No fronts for now.`,
+                    specs: '450 × 450 × 880 mm Side-Access Corner Pocket (X = 4,455..4,905 mm, Y = 3,170..3,620 mm, Z = 20..900 mm) + 50 mm South anti-collision filler (Y = 3,620..3,670 mm) • Open on the North-West side into the Housekeeping Closet • Houses a 3D full-size turquoise mop bucket on casters with detachable side-press wringer',
+                    description: 'Ingenious side-access 450 × 450 × 880 mm corner base cavity underneath the North-East corner of the East Quartz Countertop (Y = 3,170..3,670 mm). Closed toward the East-wall drawer run with a 50 mm warm-oak filler (eliminating L-corner drawer collisions) and wide open on its West side into the Housekeeping Closet so a full-size mop bucket with wringer rolls effortlessly in and out on the continuous waterproof floor mat.',
                     skeleton: skeleton,
                     fronts: []
                 };
             }
 
-            function makePantryUpperCabinet(id, index, y0, y1, depthMm, shelfBottomZList, spacingDesc) {
+            // -----------------------------------------------------------------
+            // 32–34. CAB_PANTRY_E1, CAB_PANTRY_E2, CAB_PANTRY_E3:
+            //        3 × 500 mm Lower Base Cabinets with 3 Tiers of Pull-Out Slatted Warm-Oak Crate Drawers
+            //        (X = 4,455..4,905 mm, Y = 3,670..5,170 mm, Z = 0..900 mm; topped by PANTRY_COUNTERTOP at Z = 900..930 mm)
+            // -----------------------------------------------------------------
+            function makePantryCrateBaseCabinet(id, index, y0, y1) {
+                const depthMm = 450;
                 const x0 = X_PANTRY_EAST;
-                const x1 = x0 + depthMm;
-                const w = y1 - y0;
-                const zBot = 960, zTop = 2800;
+                const x1 = x0 + depthMm; // 4,905 mm
+                const xPlinthFront = x1 - 40; // 4,865 mm
+                const w = y1 - y0; // 500 mm
+                const b = PANTRY_BOARD_MM; // 20 mm
 
                 const skeleton = [
                     {
+                        id: `${id}_PLINTH`,
+                        name: `Recessed Dark Plinth / Toe-Kick (410×${w}×100 mm Cokół, Z=0..100 mm)`,
+                        role: 'plinth',
+                        material: 'dark_plinth',
+                        colorRgb: COLOR_PLINTH,
+                        x0: x0, x1: xPlinthFront,
+                        y0: y0, y1: y1,
+                        z0: 0, z1: 100
+                    },
+                    {
                         id: `${id}_NORTH_PANEL`,
-                        name: `Left/North Side Carcass Panel (${depthMm}×20×1840 mm, Z=960..2800 mm)`,
+                        name: `Left/North Side Carcass Panel (450×20×800 mm, Z=100..900 mm)`,
                         role: 'carcass_panel',
                         material: 'carcass_melamine',
                         colorRgb: COLOR_CARCASS_SIDE,
-                        x0: x0, x1: x1,
-                        y0: y0, y1: y0 + PANTRY_BOARD_MM,
-                        z0: zBot, z1: zTop
+                        x0: x0, x1: x1 - b,
+                        y0: y0, y1: y0 + b,
+                        z0: 100, z1: 900
                     },
                     {
                         id: `${id}_SOUTH_PANEL`,
-                        name: `Right/South Side Carcass Panel (${depthMm}×20×1840 mm, Z=960..2800 mm)`,
+                        name: `Right/South Side Carcass Panel (450×20×800 mm, Z=100..900 mm)`,
                         role: 'carcass_panel',
                         material: 'carcass_melamine',
                         colorRgb: COLOR_CARCASS_SIDE,
-                        x0: x0, x1: x1,
-                        y0: y1 - PANTRY_BOARD_MM, y1: y1,
-                        z0: zBot, z1: zTop
+                        x0: x0, x1: x1 - b,
+                        y0: y1 - b, y1: y1,
+                        z0: 100, z1: 900
                     },
                     {
                         id: `${id}_BACK_PANEL`,
-                        name: `Rear Carcass Backing Panel (20×${w - 2 * PANTRY_BOARD_MM}×1840 mm, Z=960..2800 mm)`,
+                        name: `Rear Carcass Backing Panel (20×${w - 2 * b}×800 mm, Z=100..900 mm)`,
                         role: 'carcass_panel',
                         material: 'carcass_melamine',
                         colorRgb: COLOR_CARCASS_BACK,
-                        x0: x0, x1: x0 + PANTRY_BOARD_MM,
-                        y0: y0 + PANTRY_BOARD_MM, y1: y1 - PANTRY_BOARD_MM,
-                        z0: zBot, z1: zTop
-                    }
-                ];
-
-                shelfBottomZList.forEach((sz0, idx) => {
-                    skeleton.push({
-                        id: `${id}_SHELF_${idx + 1}`,
-                        name: `Internal 2cm Shelf #${idx + 1} (${depthMm - PANTRY_BOARD_MM}×${w - 2 * PANTRY_BOARD_MM}×20 mm, Z=${sz0}..${sz0 + PANTRY_BOARD_MM} mm)`,
+                        x0: x0, x1: x0 + b,
+                        y0: y0 + b, y1: y1 - b,
+                        z0: 100, z1: 900
+                    },
+                    {
+                        id: `${id}_BOTTOM_PANEL`,
+                        name: `Bottom Carcass Panel (410×${w - 2 * b}×20 mm, Z=100..120 mm)`,
                         role: 'carcass_panel',
                         material: 'carcass_melamine',
                         colorRgb: COLOR_CARCASS_SHELF,
-                        x0: x0 + PANTRY_BOARD_MM, x1: x1,
-                        y0: y0 + PANTRY_BOARD_MM, y1: y1 - PANTRY_BOARD_MM,
-                        z0: sz0, z1: sz0 + PANTRY_BOARD_MM
-                    });
-                });
+                        x0: x0 + b, x1: x1 - b,
+                        y0: y0 + b, y1: y1 - b,
+                        z0: 100, z1: 120
+                    },
+                    {
+                        id: `${id}_TOP_PANEL`,
+                        name: `Top Worktop Support Panel (410×${w - 2 * b}×20 mm, Z=880..900 mm)`,
+                        role: 'carcass_panel',
+                        material: 'carcass_melamine',
+                        colorRgb: COLOR_CARCASS_SHELF,
+                        x0: x0 + b, x1: x1 - b,
+                        y0: y0 + b, y1: y1 - b,
+                        z0: 880, z1: 900
+                    }
+                ];
 
-                skeleton.push({
-                    id: `${id}_TOP_PANEL`,
-                    name: `Top Carcass Panel (${depthMm - PANTRY_BOARD_MM}×${w - 2 * PANTRY_BOARD_MM}×20 mm, Z=2780..2800 mm)`,
-                    role: 'carcass_panel',
-                    material: 'carcass_melamine',
-                    colorRgb: COLOR_CARCASS_SHELF,
-                    x0: x0 + PANTRY_BOARD_MM, x1: x1,
-                    y0: y0 + PANTRY_BOARD_MM, y1: y1 - PANTRY_BOARD_MM,
-                    z0: zTop - PANTRY_BOARD_MM, z1: zTop
+                // Build 3 Tiers of Ventilated Pull-Out Slatted Warm-Oak Crate Drawers:
+                // Tier 1 (Bottom): Z = 130..355 mm (225 mm high)
+                // Tier 2 (Middle): Z = 390..615 mm (225 mm high)
+                // Tier 3 (Top):    Z = 650..865 mm (215 mm high)
+                const crateTiers = [
+                    { idx: 1, zA: 130, zB: 355, label: 'Lower Deep Root-Vegetable & Bottle Crate' },
+                    { idx: 2, zA: 390, zB: 615, label: 'Middle Ventilated Produce & Dry-Goods Crate' },
+                    { idx: 3, zA: 650, zB: 865, label: 'Upper Bread, Onion & Snack Slatted Crate' }
+                ];
+
+                crateTiers.forEach(cr => {
+                    const cy0 = y0 + b + 8, cy1 = y1 - b - 8; // 444 mm wide inner drawer box
+                    const cx0 = x0 + b + 12, cx1 = x1 - b;    // 398 mm deep inner drawer tray
+                    // Drawer tray bottom & side walls
+                    skeleton.push(
+                        {
+                            id: `${id}_CRATE_${cr.idx}_TRAY_BOTTOM`,
+                            name: `${cr.label} #${cr.idx} — Pull-Out Tray Floor (${cx1 - cx0}×${cy1 - cy0}×14 mm, Z=${cr.zA}..${cr.zA + 14} mm)`,
+                            role: 'carcass_panel',
+                            material: 'wood_oak',
+                            colorRgb: COLOR_CARCASS_SHELF,
+                            x0: cx0, x1: cx1,
+                            y0: cy0, y1: cy1,
+                            z0: cr.zA, z1: cr.zA + 14
+                        },
+                        {
+                            id: `${id}_CRATE_${cr.idx}_SIDE_NORTH`,
+                            name: `${cr.label} #${cr.idx} — North Drawer Runner Side (${cx1 - cx0}×16×140 mm)`,
+                            role: 'carcass_panel',
+                            material: 'wood_oak',
+                            colorRgb: COLOR_OAK_WARM,
+                            x0: cx0, x1: cx1,
+                            y0: cy0, y1: cy0 + 16,
+                            z0: cr.zA + 14, z1: cr.zA + 154
+                        },
+                        {
+                            id: `${id}_CRATE_${cr.idx}_SIDE_SOUTH`,
+                            name: `${cr.label} #${cr.idx} — South Drawer Runner Side (${cx1 - cx0}×16×140 mm)`,
+                            role: 'carcass_panel',
+                            material: 'wood_oak',
+                            colorRgb: COLOR_OAK_WARM,
+                            x0: cx0, x1: cx1,
+                            y0: cy1 - 16, y1: cy1,
+                            z0: cr.zA + 14, z1: cr.zA + 154
+                        },
+                        // Dark Shadow Backing Behind the Slatted Front Bars (creates realistic ventilation gap depth!)
+                        {
+                            id: `${id}_CRATE_${cr.idx}_SHADOW_BACKING`,
+                            name: `${cr.label} #${cr.idx} — Recessed Ventilation Shadow Backing (8×${w - 16}×${cr.zB - cr.zA - 12} mm)`,
+                            role: 'plinth',
+                            material: 'dark_plinth',
+                            colorRgb: COLOR_OAK_SLAT_DARK,
+                            x0: x1 - b - 4, x1: x1 - b + 4,
+                            y0: y0 + 8, y1: y1 - 8,
+                            z0: cr.zA + 6, z1: cr.zB - 6
+                        }
+                    );
+
+                    // 3 Horizontal Solid Warm-Oak Slats across the West Front (X = 4,885..4,905 mm) with 16 mm air gaps between slats!
+                    const slatH = 56;
+                    const slatGap = 18;
+                    for (let s = 0; s < 3; s++) {
+                        const sz0 = cr.zA + s * (slatH + slatGap);
+                        const sz1 = Math.min(cr.zB, sz0 + slatH);
+                        skeleton.push({
+                            id: `${id}_CRATE_${cr.idx}_SLAT_${s + 1}`,
+                            name: `${cr.label} #${cr.idx} — Warm-Oak Ventilated Front Slat #${s + 1} (20×${w - 6}×${sz1 - sz0} mm, Z=${sz0}..${sz1} mm)`,
+                            role: 'drawer_front',
+                            material: 'wood_oak',
+                            colorRgb: COLOR_OAK_WARM,
+                            x0: x1 - b, x1: x1,
+                            y0: y0 + 3, y1: y1 - 3,
+                            z0: sz0, z1: sz1
+                        });
+                    }
+
+                    // Recessed Integrated Finger-Pull Grip Cutout at the top center of the crate front
+                    const yMid = Math.round((y0 + y1) / 2);
+                    skeleton.push({
+                        id: `${id}_CRATE_${cr.idx}_PULL_GRIP`,
+                        name: `${cr.label} #${cr.idx} — Integrated Finger-Pull Cutout (6×120×18 mm)`,
+                        role: 'handle_rail',
+                        material: 'dark_plinth',
+                        colorRgb: COLOR_MATTE_ANTHRACITE,
+                        x0: x1 - 4, x1: x1 + 1,
+                        y0: yMid - 60, y1: yMid + 60,
+                        z0: cr.zB - 22, z1: cr.zB - 4
+                    });
                 });
 
                 return {
                     id: id,
-                    name: `${id} — Pantry Upper Open Cabinet #${index} (${w}×${depthMm}×1840mm Szafka Górna)`,
-                    shortName: `Pantry Upper Cabinet #${index} (${w}×${depthMm}mm)`,
+                    name: `${id} — Pantry Lower 3-Tier Pull-Out Slatted Oak Crate Cabinet #${index} (500×450×900mm Szuflady Skrzynkowe)`,
+                    shortName: `Pantry Slatted Crate Tower #${index} (500×450mm)`,
+                    category: 'base_cabinet',
+                    subtype: 'pantry_crate_drawer_cabinet',
+                    floor: 'ground',
+                    room: '0.14 Spiżarnia',
+                    hostWallId: 'GW_14',
+                    viewId: 'pantry_east_wall',
+                    x1: x0,
+                    x2: x1,
+                    y1: y0,
+                    y2: y1,
+                    zBottom: 0,
+                    zTop: 900,
+                    widthMm: w,
+                    depthMm: depthMm,
+                    carcassDepthMm: depthMm - b,
+                    frontThicknessMm: b,
+                    plinthHeightMm: 100,
+                    plinthRecessMm: 40,
+                    bodyHeightMm: 800,
+                    heightMm: 900,
+                    boardThicknessMm: b,
+                    normal: [1, 0, 0],
+                    specs: `500 × 450 × 900 mm (X = ${x0}..${x1} mm, Y = ${y0}..${y1} mm, Z = 0..900 mm; topped by 30 mm PANTRY_COUNTERTOP at Z = 900..930 mm) • 100 mm dark plinth + 3 tiers of full-extension ventilated warm-oak slatted crate drawers (Z = 130..355, 390..615, 650..865 mm)`,
+                    description: `Pantry East Wall (GW_14) lower storage tower #${index} (500 mm wide × 450 mm deep × 900 mm high, topped by the 30 mm quartz worktop at Z = 900..930 mm). Fitted with 3 tiers of full-extension pull-out slatted warm-oak crate drawers with 18 mm ventilation slots and integrated finger-pull grips for root vegetables, fruit, bread, and bulk bottles.`,
+                    skeleton: skeleton,
+                    fronts: []
+                };
+            }
+
+            // -----------------------------------------------------------------
+            // 35. PANTRY_COUNTERTOP: Continuous 2,000 × 450 × 30 mm Quartz Stone Worktop Slab
+            //     (X = 4,455..4,905 mm, Y = 3,170..5,170 mm, Z = 900..930 mm)
+            //     + Warm 3000K Under-Cabinet LED Strip (Z = 1,375..1,380 mm) + Dual 230V Counter Socket
+            // -----------------------------------------------------------------
+            function buildPantryCountertopObject() {
+                const x0 = X_PANTRY_EAST, x1 = X_PANTRY_EAST + 450; // 4,455..4,905 mm
+                const y0 = Y_PANTRY_NORTH, y1 = Y_PANTRY_NORTH + 2000; // 3,170..5,170 mm
+
+                const skeleton = [
+                    {
+                        id: 'PANTRY_COUNTERTOP_SLAB',
+                        name: 'Continuous 30mm Satin Quartz Stone Countertop Slab (450×2000×30 mm Blat Kwarcowy, Z=900..930 mm)',
+                        role: 'worktop',
+                        material: 'stone_worktop',
+                        colorRgb: COLOR_WORKTOP,
+                        x0: x0, x1: x1,
+                        y0: y0, y1: y1,
+                        z0: 900, z1: 930
+                    },
+                    {
+                        id: 'PANTRY_COUNTERTOP_LED_STRIP',
+                        name: 'Recessed 3000K Warm-White Under-Shelf LED Task Light Bar (16×1960×5 mm at Z=1375..1380 mm)',
+                        role: 'appliance_led',
+                        material: 'led_white',
+                        colorRgb: COLOR_LED_WARM,
+                        wireColorRgba: [1.00, 0.94, 0.76, 0.96],
+                        x0: x0 + 255, x1: x0 + 271,
+                        y0: y0 + 20, y1: y1 - 20,
+                        z0: 1375, z1: 1380
+                    },
+                    {
+                        id: 'PANTRY_COUNTERTOP_APPLIANCE_SOCKET',
+                        name: 'Dual 230V Countertop Appliance Power Outlet (8×142×72 mm on East Wall at Z=1080..1152 mm)',
+                        role: 'appliance_front',
+                        material: 'appliance_steel',
+                        colorRgb: COLOR_MATTE_ANTHRACITE,
+                        x0: x0, x1: x0 + 8,
+                        y0: y0 + 210, y1: y0 + 352,
+                        z0: 1080, z1: 1152
+                    }
+                ];
+
+                return {
+                    id: 'PANTRY_COUNTERTOP',
+                    name: 'PANTRY_COUNTERTOP — 2,000 × 450 × 30 mm Quartz Prep & Appliance Countertop + 3000K LED Strip (Z=900..930mm)',
+                    shortName: 'Pantry Quartz Countertop (2000×450×30mm)',
+                    category: 'countertop',
+                    subtype: 'stone_worktop',
+                    floor: 'ground',
+                    room: '0.14 Spiżarnia',
+                    hostWallId: 'GW_14',
+                    viewId: 'pantry_east_wall',
+                    x1: x0,
+                    x2: x1,
+                    y1: y0,
+                    y2: y1,
+                    zBottom: 900,
+                    zTop: 1380,
+                    widthMm: 2000,
+                    depthMm: 450,
+                    carcassDepthMm: 450,
+                    frontThicknessMm: 0,
+                    plinthHeightMm: 0,
+                    plinthRecessMm: 0,
+                    bodyHeightMm: 30,
+                    heightMm: 30,
+                    boardThicknessMm: 30,
+                    normal: [1, 0, 0],
+                    specs: '2,000 × 450 × 30 mm Satin Quartz Worktop Slab (X = 4,455..4,905 mm, Y = 3,170..5,170 mm, Z = 900..930 mm) • 450 mm clear backsplash height (Z = 930..1,380 mm) with 450×450 mm NE Corner Appliance Niche + dual 230V socket + 3000K recessed LED task light strip',
+                    description: 'Continuous 2,000 × 450 × 30 mm light quartz stone worktop slab spanning the Pantry East Wall (GW_14) at Z = 900..930 mm above CAB_PANTRY_CORNER_BUCKET and CAB_PANTRY_E1..E3. Provides a 450 mm high illuminated prep & small-appliance zone (Z = 930..1,380 mm) complete with a 3000K under-shelf LED strip and a dual 230V appliance socket in the North-East corner niche.',
+                    skeleton: skeleton,
+                    fronts: []
+                };
+            }
+
+            // -----------------------------------------------------------------
+            // 36–39. CAB_PANTRY_E_UP1..UP4: 4 × 500 mm Upper Open Shelving Columns
+            //        (X = 4,455..4,755 mm, Y = 3,170..5,170 mm, Z = 1,380..2,800 mm)
+            //        With 5 aligned shelf tiers at Z = 1,380, 1,665, 1,950, 2,240, 2,520, and 2,780..2,800 mm!
+            // -----------------------------------------------------------------
+            function makePantryEastUpperColumn(id, index, y0, y1) {
+                const depthMm = 300; // 30 cm ergonomic single-row jar depth
+                const x0 = X_PANTRY_EAST;
+                const x1 = x0 + depthMm; // 4,755 mm
+                const w = y1 - y0; // 500 mm
+                const zBot = 1380, zTop = 2800;
+                const zCornerOpen = 1665; // Above Z=1,665 mm, North shelves (Y=3,170..3,620 mm) meet East shelves (X=4,455..4,755 mm) in an Open L-Corner
+                const b = PANTRY_BOARD_MM;
+                const isCornerCol1 = (index === 1); // Y = 3,170..3,670 mm
+                const isCornerCol2 = (index === 2); // Y = 3,670..4,170 mm
+
+                const skeleton = [];
+
+                // Left/North Side Carcass Panel:
+                // - For Col #2 (Y = 3,670 mm), terminate at Z = 1,665 mm so it does not create a wall 50 mm South of the Y = 3,620 mm North cabinet front!
+                skeleton.push({
+                    id: `${id}_NORTH_PANEL`,
+                    name: isCornerCol2
+                        ? `Lower Left/North Divider Panel (300×20×285 mm, Z=1380..1665 mm below Open L-Corner)`
+                        : `Left/North Side Carcass Panel (300×20×1420 mm, Z=1380..2800 mm)`,
+                    role: 'carcass_panel',
+                    material: 'carcass_melamine',
+                    colorRgb: COLOR_CARCASS_SIDE,
+                    x0: x0, x1: x1,
+                    y0: y0, y1: y0 + b,
+                    z0: zBot, z1: isCornerCol2 ? zCornerOpen : zTop
+                });
+
+                // Right/South Side Carcass Panel:
+                // - For Col #1 (Y = 3,650..3,670 mm), terminate at Z = 1,665 mm so Z = 1,665..2,800 mm forms an unobstructed Open L-Corner with Col #2 and CAB_PANTRY_N_UP3!
+                skeleton.push({
+                    id: `${id}_SOUTH_PANEL`,
+                    name: isCornerCol1
+                        ? `Lower Right/South Divider Panel (300×20×285 mm, Z=1380..1665 mm below Open L-Corner)`
+                        : `Right/South Side Carcass Panel (300×20×1420 mm, Z=1380..2800 mm)`,
+                    role: 'carcass_panel',
+                    material: 'carcass_melamine',
+                    colorRgb: COLOR_CARCASS_SIDE,
+                    x0: x0, x1: x1,
+                    y0: y1 - b, y1: y1,
+                    z0: zBot, z1: isCornerCol1 ? zCornerOpen : zTop
+                });
+
+                // Rear Carcass Backing Panel (flush against East Wall X = 4,455..4,475 mm)
+                skeleton.push({
+                    id: `${id}_BACK_PANEL`,
+                    name: `Rear Carcass Backing Panel (20×${w - 2 * b}×1420 mm, Z=1380..2800 mm)`,
+                    role: 'carcass_panel',
+                    material: 'carcass_melamine',
+                    colorRgb: COLOR_CARCASS_BACK,
+                    x0: x0, x1: x0 + b,
+                    y0: isCornerCol2 ? y0 : y0 + b,
+                    y1: isCornerCol1 ? y1 : y1 - b,
+                    z0: zBot, z1: zTop
+                });
+
+                // Aligned 20 mm shelves at Z = 1,380, 1,665, 1,950, 2,240, 2,520 mm + Top Panel at Z = 2,780..2,800 mm
+                const alignedShelves = [
+                    { z0: 1380, label: 'Bottom Shelf #1 (450mm above Worktop)' },
+                    { z0: 1665, label: 'Shelf #2 (Continuous Open L-Corner with Housekeeping Detergent Shelf)' },
+                    { z0: 1950, label: 'Shelf #3 (Continuous Open L-Corner with North Overhead Bridge Base)' },
+                    { z0: 2240, label: 'Shelf #4 (Continuous Open L-Corner with North Overhead Shelf #1)' },
+                    { z0: 2520, label: 'Shelf #5 (Continuous Open L-Corner with North Overhead Shelf #2)' }
+                ];
+
+                alignedShelves.forEach((sh, idx) => {
+                    const isOpenLCornerTier = (sh.z0 >= zCornerOpen);
+                    const shelfY0 = (isCornerCol2 && isOpenLCornerTier) ? y0 : (y0 + b);
+                    const shelfY1 = (isCornerCol1 && isOpenLCornerTier) ? y1 : (y1 - b);
+                    skeleton.push({
+                        id: `${id}_SHELF_${idx + 1}`,
+                        name: `${sh.label} — Z=${sh.z0}..${sh.z0 + b} mm (280×${shelfY1 - shelfY0}×20 mm)`,
+                        role: 'carcass_panel',
+                        material: 'carcass_melamine',
+                        colorRgb: (idx === 0 || idx === 2) ? COLOR_OAK_WARM : COLOR_CARCASS_SHELF,
+                        x0: x0 + b, x1: x1,
+                        y0: shelfY0, y1: shelfY1,
+                        z0: sh.z0, z1: sh.z0 + b
+                    });
+                });
+
+                const topY0 = isCornerCol2 ? y0 : (y0 + b);
+                const topY1 = isCornerCol1 ? y1 : (y1 - b);
+                skeleton.push({
+                    id: `${id}_TOP_PANEL`,
+                    name: `Top Ceiling Panel — Z=2780..2800 mm (280×${topY1 - topY0}×20 mm)`,
+                    role: 'carcass_panel',
+                    material: 'carcass_melamine',
+                    colorRgb: COLOR_CARCASS_SHELF,
+                    x0: x0 + b, x1: x1,
+                    y0: topY0, y1: topY1,
+                    z0: zTop - b, z1: zTop
+                });
+
+                return {
+                    id: id,
+                    name: `${id} — Pantry Upper Open Shelving Column #${index} (500×300×1420mm, Z=1380..2800mm)`,
+                    shortName: `Pantry Upper Shelving #${index} (500×300mm)`,
                     category: 'wall_cabinet',
                     subtype: 'pantry_open_upper_cabinet',
                     floor: 'ground',
@@ -4047,54 +5421,92 @@
                     frontThicknessMm: 0,
                     plinthHeightMm: 0,
                     plinthRecessMm: 0,
-                    bodyHeightMm: 1840,
-                    heightMm: 1840,
-                    boardThicknessMm: PANTRY_BOARD_MM,
+                    bodyHeightMm: 1420,
+                    heightMm: 1420,
+                    boardThicknessMm: b,
                     normal: [1, 0, 0],
-                    specs: `${w} × ${depthMm} × 1,840 mm (X = ${x0}..${x1} mm, Y = ${y0}..${y1} mm, Z = 960..2,800 mm) • ${spacingDesc} • Open carcass (no fronts)`,
-                    description: `Pantry East Wall (GW_14) upper open shelving cabinet #${index} (${w} mm wide × ${depthMm} mm deep × 1,840 mm high, Z = 960..2,800 mm) with 20 mm shelves (${spacingDesc}). No fronts for now.`,
+                    specs: `500 × 300 × 1,420 mm (X = ${x0}..${x1} mm, Y = ${y0}..${y1} mm, Z = 1,380..2,800 mm) • 5 aligned shelf tiers at Z = 1,380, 1,665, 1,950, 2,240, 2,520, 2,800 mm (Open L-Corner above Z = 1,665 mm)`,
+                    description: `Pantry East Wall (GW_14) 500 mm wide × 300 mm deep upper open shelving column #${index} (Z = 1,380..2,800 mm), vertically aligned with the 500 mm lower cabinets below and horizontally aligned across all 5 shelf elevations (Z = 1,380, 1,665, 1,950, 2,240, 2,520 mm) in an unobstructed Open L-Corner with the North Wall cabinetry.`,
                     skeleton: skeleton,
                     fronts: []
                 };
             }
 
-            return [
-                // 4 Lower Open Base Cabinets (4 × 500 mm = 2,000 mm, 450 mm deep, Z = 0..960 mm)
-                makePantryLowerCabinet('CAB_PANTRY_E1', 1, 3170, 3670),
-                makePantryLowerCabinet('CAB_PANTRY_E2', 2, 3670, 4170),
-                makePantryLowerCabinet('CAB_PANTRY_E3', 3, 4170, 4670),
-                makePantryLowerCabinet('CAB_PANTRY_E4', 4, 4670, 5170),
+            // -----------------------------------------------------------------
+            // 40. PANTRY_STAIR_POST: Full-Height 40 × 450 × 2,800 mm Structural Warm-Oak
+            //     Stairwell End-Post & Guard Panel (X = 4,455..4,905 mm, Y = 5,170..5,210 mm, Z = 0..2,800 mm)
+            // -----------------------------------------------------------------
+            function buildPantryStairGuardPost() {
+                const x0 = X_PANTRY_EAST, x1 = X_PANTRY_EAST + 450; // 4,455..4,905 mm
+                const y0 = 5170, y1 = 5210; // 40 mm post immediately North of STAIRS_BASEMENT (Y = 5,210..6,110 mm)
 
-                // 3 Upper Open Shelving Cabinets (700 + 600 + 700 = 2,000 mm, Z = 960..2,800 mm):
-                // Left/North unit is 450 mm deep with 400/400/400/580 mm clear spaces;
-                // Middle & Right/South units are 300 mm deep with 340/350/350/350/370 mm clear spaces.
-                makePantryUpperCabinet(
-                    'CAB_PANTRY_E_UP1',
-                    1,
-                    3170,
-                    3870,
-                    450,
-                    [1360, 1780, 2200],
-                    '3 × 20 mm shelves at Z = 1,360, 1,780, 2,200 mm (clear spaces: 400 + 400 + 400 + 580 mm)'
-                ),
-                makePantryUpperCabinet(
-                    'CAB_PANTRY_E_UP2',
-                    2,
-                    3870,
-                    4470,
-                    300,
-                    [1300, 1670, 2040, 2410],
-                    '4 × 20 mm shelves at Z = 1,300, 1,670, 2,040, 2,410 mm (clear spaces: 340 + 350 + 350 + 350 + 370 mm)'
-                ),
-                makePantryUpperCabinet(
-                    'CAB_PANTRY_E_UP3',
-                    3,
-                    4470,
-                    5170,
-                    300,
-                    [1300, 1670, 2040, 2410],
-                    '4 × 20 mm shelves at Z = 1,300, 1,670, 2,040, 2,410 mm (clear spaces: 340 + 350 + 350 + 350 + 370 mm)'
-                )
+                return {
+                    id: 'PANTRY_STAIR_POST',
+                    name: 'PANTRY_STAIR_POST — Full-Height 40mm Structural Warm-Oak Stairwell End-Post & Guard Panel (450×40×2800mm)',
+                    shortName: 'Pantry Oak Stair Guard Post (40×450×2800mm)',
+                    category: 'tall_cabinet',
+                    subtype: 'pantry_stair_guard_post',
+                    floor: 'ground',
+                    room: '0.14 Spiżarnia',
+                    hostWallId: 'GW_14',
+                    viewId: 'pantry_east_wall',
+                    x1: x0,
+                    x2: x1,
+                    y1: y0,
+                    y2: y1,
+                    zBottom: 0,
+                    zTop: 2800,
+                    widthMm: 40,
+                    depthMm: 450,
+                    carcassDepthMm: 450,
+                    frontThicknessMm: 0,
+                    plinthHeightMm: 0,
+                    plinthRecessMm: 0,
+                    bodyHeightMm: 2800,
+                    heightMm: 2800,
+                    boardThicknessMm: 40,
+                    normal: [1, 0, 0],
+                    specs: '450 × 40 × 2,800 mm (X = 4,455..4,905 mm, Y = 5,170..5,210 mm, Z = 0..2,800 mm) • Full-height solid warm-oak structural end-panel & stairwell safety guard before the 900 mm Basement Stairs (Y = 5,210..6,110 mm)',
+                    description: 'Full-height 40 mm thick × 450 mm deep structural warm-oak end panel and stairwell safety guard post at Y = 5,170..5,210 mm (Z = 0..2,800 mm), cleanly terminating the 2,000 mm East Wall countertop and upper shelving run right before the 900 mm basement stairwell drop.',
+                    skeleton: [
+                        {
+                            id: 'PANTRY_STAIR_POST_PANEL',
+                            name: 'Full-Height 40mm Structural Warm-Oak Stair Guard Panel (450×40×2800 mm, Y=5170..5210, Z=0..2800 mm)',
+                            role: 'carcass_panel',
+                            material: 'wood_oak',
+                            colorRgb: COLOR_OAK_WARM,
+                            x0: x0, x1: x1,
+                            y0: y0, y1: y1,
+                            z0: 0, z1: 2800
+                        }
+                    ],
+                    fronts: []
+                };
+            }
+
+            return [
+                // North Wall Overhead Bridge above Freezer + 20mm Full-Height Oak Portal Cheek Panel
+                buildPantryNorthFreezerBridge(),
+                // North Wall 805mm Housekeeping, Folding Ladder, Mop & Cordless Vacuum Charging Dock
+                buildPantryHousekeepingCloset(),
+                // North Wall 2 × Overhead Bridge Cabinets above Housekeeping Closet (aligned shelves at Z = 2,240 & 2,520 mm)
+                makePantryNorthOverheadCabinet('CAB_PANTRY_N_UP2', 2, 5225, 5695, 475),
+                makePantryNorthOverheadCabinet('CAB_PANTRY_N_UP3', 3, 4755, 5225, 480),
+                // East Wall Side-Access 450×450×900mm Corner Bucket Garage + 3D Mop Bucket with Wringer
+                buildPantryCornerBucketGarage(),
+                // East Wall 3 × 500mm Lower Base Cabinets with 3 Tiers of Pull-Out Slatted Oak Crate Drawers
+                makePantryCrateBaseCabinet('CAB_PANTRY_E1', 1, 3670, 4170),
+                makePantryCrateBaseCabinet('CAB_PANTRY_E2', 2, 4170, 4670),
+                makePantryCrateBaseCabinet('CAB_PANTRY_E3', 3, 4670, 5170),
+                // East Wall Continuous 2,000 × 450 × 30 mm Quartz Stone Countertop + 3000K LED Strip
+                buildPantryCountertopObject(),
+                // East Wall 4 × 500mm Upper Open Shelving Columns (Z = 1,380..2,800 mm, aligned shelves)
+                makePantryEastUpperColumn('CAB_PANTRY_E_UP1', 1, 3170, 3670),
+                makePantryEastUpperColumn('CAB_PANTRY_E_UP2', 2, 3670, 4170),
+                makePantryEastUpperColumn('CAB_PANTRY_E_UP3', 3, 4170, 4670),
+                makePantryEastUpperColumn('CAB_PANTRY_E_UP4', 4, 4670, 5170),
+                // East Wall Full-Height 40mm Warm-Oak Stairwell End-Post & Guard Panel (Y = 5,170..5,210 mm)
+                buildPantryStairGuardPost()
             ];
         })()
     ];
