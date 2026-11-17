@@ -1160,7 +1160,7 @@
                     const allFurn = WallService.getFurniture3D();
                     allFurn.forEach(fn => {
                         if (fn.isRoomFurniture) return;
-                        if ((fn.zBottom || 0) > 1000) return;
+                        if ((fn.zBottom || 0) > 1000 || fn.id === 'LAUNDRY_HANGING_NICHE' || fn.id === 'CAB_LAUNDRY_DRYER') return;
                         if (!Array.isArray(fn.footprint2D) || fn.footprint2D.length < 3) return;
                         const pts = fn.footprint2D.map(p => `${toSvgX(p[0])},${p[1]}`).join(' ');
                         fixedGroup.appendChild(createSvgEl('polygon', {

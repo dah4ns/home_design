@@ -1217,29 +1217,39 @@
             function isOccludedByFrontFaces(cand, frontFaces) {
                 const blockers = frontFaces.filter(f =>
                     f.depthMm < cand.depthMm - 1 &&
-                    f.zBottom <= cand.zBottom + 1 &&
-                    f.zTop >= cand.zTop - 1 &&
-                    f.xMaxMm > cand.xMinMm &&
-                    f.xMinMm < cand.xMaxMm
+                    f.zBottom < cand.zTop - 1 &&
+                    f.zTop > cand.zBottom + 1 &&
+                    f.xMaxMm > cand.xMinMm + 1 &&
+                    f.xMinMm < cand.xMaxMm - 1
                 );
                 if (blockers.length === 0) return false;
 
-                const intervals = blockers
-                    .map(f => [Math.max(cand.xMinMm, f.xMinMm), Math.min(cand.xMaxMm, f.xMaxMm)])
-                    .sort((a, b) => a[0] - b[0]);
-
-                let coveredUntil = cand.xMinMm;
-                for (let i = 0; i < intervals.length; i++) {
-                    const [start, end] = intervals[i];
-                    if (start > coveredUntil + 1) {
-                        return false;
+                const xPts = new Set([cand.xMinMm, cand.xMaxMm]);
+                blockers.forEach(f => {
+                    if (f.xMinMm > cand.xMinMm && f.xMinMm < cand.xMaxMm) xPts.add(f.xMinMm);
+                    if (f.xMaxMm > cand.xMinMm && f.xMaxMm < cand.xMaxMm) xPts.add(f.xMaxMm);
+                });
+                const xs = Array.from(xPts).sort((a, b) => a - b);
+                for (let i = 0; i + 1 < xs.length; i++) {
+                    const x0 = xs[i];
+                    const x1 = xs[i + 1];
+                    if (x1 - x0 <= 1) continue;
+                    const xMid = 0.5 * (x0 + x1);
+                    const zIntervals = blockers
+                        .filter(f => f.xMinMm <= xMid && f.xMaxMm >= xMid)
+                        .map(f => [Math.max(cand.zBottom, f.zBottom), Math.min(cand.zTop, f.zTop)])
+                        .filter(iv => iv[1] > iv[0])
+                        .sort((a, b) => a[0] - b[0]);
+                    if (zIntervals.length === 0) return false;
+                    let zCovered = cand.zBottom;
+                    for (let j = 0; j < zIntervals.length; j++) {
+                        const [zStart, zEnd] = zIntervals[j];
+                        if (zStart > zCovered + 1) return false;
+                        zCovered = Math.max(zCovered, zEnd);
                     }
-                    coveredUntil = Math.max(coveredUntil, end);
-                    if (coveredUntil >= cand.xMaxMm - 1) {
-                        return true;
-                    }
+                    if (zCovered < cand.zTop - 1) return false;
                 }
-                return coveredUntil >= cand.xMaxMm - 1;
+                return true;
             }
 
             const visibleFaces = [];
@@ -1263,13 +1273,15 @@
         computeFacadeWallSpecs: function (viewId) {
             const faces = this.getVisibleFacesForView(viewId);
             const lowerFaces = faces.filter(f => f.floor === 'ground');
+            const bandFaces = faces.filter(f => f.floor === 'band');
             const upperFaces = faces.filter(f => f.floor === 'first');
 
             const lowerLengthMm = lowerFaces.reduce((sum, f) => sum + f.lengthMm, 0);
             const upperSolidSpanMm = upperFaces.reduce((sum, f) => sum + f.lengthMm, 0);
 
+            const bandBottomMm = bandFaces.length ? Math.min(...bandFaces.map(f => f.zBottom)) : Infinity;
             const lowerBottomMm = lowerFaces.length ? Math.min(...lowerFaces.map(f => f.zBottom)) : 0;
-            const lowerTopMm = lowerFaces.length ? Math.max(...lowerFaces.map(f => f.zTop)) : 2800;
+            const lowerTopMm = lowerFaces.length ? Math.min(bandBottomMm, Math.max(...lowerFaces.map(f => f.zTop))) : 2800;
             const upperBottomMm = upperFaces.length ? Math.min(...upperFaces.map(f => f.zBottom)) : 3430;
             const upperTopMm = upperFaces.length ? Math.max(...upperFaces.map(f => f.zTop)) : 6130;
 

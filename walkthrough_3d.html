@@ -1630,8 +1630,9 @@
             Math.hypot(p1[0] - sideA.p2[0], p1[1] - sideA.p2[1]) < 2
           );
 
-          // Skip buried vertical end caps on interior partition walls where they T-junction or L-corner against another wall face
-          if (!isExteriorWall && isWallEndCap) {
+          // Skip buried vertical end caps on interior partition walls where they T-junction or L-corner against another wall face,
+          // and skip vertical step caps on exterior alcove return walls where they step up behind WALL_BAND (X = 20,325 mm)
+          if ((!isExteriorWall && isWallEndCap) || (isExteriorWall && isOuterLoop && isVerticalEdge && !isWallEndCap)) {
             var zMid = 0.5 * (p1[2] + p2[2]);
             if (isBuriedEndCap(p1, q1, zMid)) return;
           }
@@ -3608,7 +3609,7 @@
           furnitureItems3D.forEach(function (furn) {
             var furnFloorIdx = (furn.floor === 'first') ? 1 : 0;
             if (furnFloorIdx !== minimapFloor) return;
-            if (!furn.isRoomFurniture && (furn.zBottom || 0) > 1000) return; // Skip upper wall cabinets so base footprints are clear
+            if (!furn.isRoomFurniture && ((furn.zBottom || 0) > 1000 || furn.id === 'LAUNDRY_HANGING_NICHE' || furn.id === 'CAB_LAUNDRY_DRYER')) return; // Skip upper wall cabinets & elevated laundry niche/dryer so base footprints are clear
             var fp = furn.footprint2D;
             if (Array.isArray(fp) && fp.length >= 3) {
               mmCtx.beginPath();
@@ -3633,9 +3634,12 @@
               } else if (furn.id === 'PANTRY_FRIDGE') {
                 mmCtx.fillStyle = 'rgba(71, 85, 105, 0.78)';
                 mmCtx.strokeStyle = 'rgba(203, 213, 225, 0.92)';
-              } else if (furn.id === 'CAB_PANTRY_HOUSEKEEPING' || furn.id === 'CAB_PANTRY_CORNER_BUCKET') {
+              } else if (furn.id === 'CAB_PANTRY_HOUSEKEEPING' || furn.id === 'CAB_PANTRY_CORNER_BUCKET' || furn.id === 'CAB_LAUNDRY_LEFT_DRYING_BAY') {
                 mmCtx.fillStyle = 'rgba(20, 184, 166, 0.34)';
                 mmCtx.strokeStyle = 'rgba(94, 234, 212, 0.80)';
+              } else if (furn.id === 'CAB_LAUNDRY_WASHER') {
+                mmCtx.fillStyle = 'rgba(226, 232, 240, 0.62)';
+                mmCtx.strokeStyle = 'rgba(248, 250, 252, 0.90)';
               } else {
                 mmCtx.fillStyle = 'rgba(217, 119, 6, 0.36)';
                 mmCtx.strokeStyle = 'rgba(251, 191, 36, 0.68)';
@@ -3644,6 +3648,12 @@
               mmCtx.fill();
               mmCtx.stroke();
 
+              if (furn.id === 'CAB_LAUNDRY_SINK') {
+                var ls0 = worldToMinimap(17215, 11530);
+                var ls1 = worldToMinimap(17695, 11910);
+                mmCtx.fillStyle = 'rgba(148, 163, 184, 0.82)';
+                mmCtx.fillRect(ls0[0], ls0[1], ls1[0] - ls0[0], ls1[1] - ls0[1]);
+              }
               if (furn.id === 'KITCHEN_ISLAND') {
                 var hob0 = worldToMinimap(8465, 5470);
                 var hob1 = worldToMinimap(9365, 5990);

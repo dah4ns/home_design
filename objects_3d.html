@@ -930,7 +930,8 @@
                         <button type="button" class="ctrl-btn" id="preset-cab-pantry" style="grid-column: span 2; border-color: rgba(245,158,11,0.55); color: #fcd34d;">🥫 Pantry Room (0.14 Spiżarnia — Full Designer Suite)</button>
                         <button type="button" class="ctrl-btn" id="preset-cab-pantry-housekeeping" style="grid-column: span 2; border-color: rgba(20,184,166,0.55); color: #5eead4;">🧹 Pantry Housekeeping, Ladder, Mop &amp; Vacuum Dock</button>
                         <button type="button" class="ctrl-btn" id="preset-cab-pantry-fridge" style="grid-column: span 2; border-color: rgba(148,163,184,0.55); color: #e2e8f0;">❄️ Pantry Samsung Refrigerator (PANTRY_FRIDGE)</button>
-                        <button type="button" class="ctrl-btn" id="preset-cab-laundry" style="grid-column: span 2; border-color: rgba(16,185,129,0.55); color: #6ee7b7;">🧺 Laundry Room (0.08 Pralnia — Pralka, Suszarka, Sink &amp; Cabinets)</button>
+                        <button type="button" class="ctrl-btn" id="preset-cab-laundry" style="grid-column: span 2; border-color: rgba(16,185,129,0.55); color: #6ee7b7;">🧺 Laundry Room (0.08 Pralnia — Full Drying-Focused Suite)</button>
+                        <button type="button" class="ctrl-btn" id="preset-cab-laundry-drying" style="grid-column: span 2; border-color: rgba(56,189,248,0.45); color: #7dd3fc;">🌬️ Laundry Drying Bay (4× Półki Ażurowe, Drip-Dry &amp; Cargo Racks)</button>
                         <button type="button" class="ctrl-btn" id="preset-cab-only" style="grid-column: span 2;">🗄️ All Furniture Only (Kitchen + Pantry + Laundry + Living)</button>
                         <button type="button" class="ctrl-btn" id="preset-cab-kitchen" style="grid-column: span 2;">🍳 All Kitchen + Island + Walls &amp; Window O1</button>
                         <button type="button" class="ctrl-btn" id="preset-cab-island-only" style="grid-column: span 2;">🏝️ Kitchen Island Only (KITCHEN_ISLAND)</button>
@@ -2961,7 +2962,7 @@
                         filter: fn => fn.room === '0.14 Spiżarnia' || fn.id === 'PANTRY_FRIDGE' || fn.id.indexOf('CAB_PANTRY_') === 0 || fn.id.indexOf('PANTRY_') === 0
                     },
                     {
-                        title: '🧺 Laundry Room — North Wall Elevation (0.08 Pralnia — Tall 450, Pralka, Suszarka, Base 800, Closet Rod, Sink 600, Right 800×1600, Top 1..3)',
+                        title: '🧺 Laundry Room — Drying-Focused Suite (0.08 Pralnia — Left Drying Bay + 4× Półki Ażurowe, Tall 450, Pralka + Basket Shelf, Suszarka, Hampers 800, 1400mm Drip-Dry & Sweater Mesh, Sink 480, Right 2×200 Cargo Racks, Top 1..4)',
                         filter: fn => fn.room === '0.08 Pralnia' || fn.id.indexOf('CAB_LAUNDRY_') === 0 || fn.id.indexOf('LAUNDRY_') === 0
                     }
                 ];
@@ -3508,6 +3509,26 @@
                     appState.pitch = 16 * Math.PI / 180;
                     renderDropdownAndInspector();
                     focusSelectedFurniture();
+                });
+            }
+            const laundryDryingBtn = document.getElementById('preset-cab-laundry-drying');
+            if (laundryDryingBtn) {
+                laundryDryingBtn.addEventListener('click', () => {
+                    appState.selectedIds = new Set([
+                        'CAB_LAUNDRY_LEFT_DRYING_BAY',
+                        'LAUNDRY_HANGING_NICHE',
+                        'CAB_LAUNDRY_SINK',
+                        'CAB_LAUNDRY_BASE_800',
+                        'CAB_LAUNDRY_RIGHT_1600',
+                        'GW_8',
+                        'FLOOR_LOWER'
+                    ]);
+                    appState.yaw = 86 * Math.PI / 180;
+                    appState.pitch = 15 * Math.PI / 180;
+                    renderDropdownAndInspector();
+                    focusSelectedFurniture();
+                    appState.distance = 3.2;
+                    renderScene();
                 });
             }
             document.getElementById('preset-cab-only').addEventListener('click', () => {

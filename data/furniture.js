@@ -5511,21 +5511,18 @@
         })(),
 
         // =====================================================================
-        // 41–51. GROUND FLOOR LAUNDRY (0.08 Pralnia — North Wall GW_8 / EW_ALCOVE_SOUTH)
+        // 40–51. GROUND FLOOR LAUNDRY — DRYING-FOCUSED DESIGNER SUITE (0.08 Pralnia — North Wall GW_8 / EW_ALCOVE_SOUTH)
         //        Based on /laundry.html (Total Width: 3,970 mm, Height: 2,800 mm)
         //        North Wall Y = 11,400 mm, X = 20,325 mm (Left/West) -> 16,355 mm (Right/East)
-        //        - Left Empty Wall Gap: 670 mm (X = 19,655..20,325 mm)
-        //        - Tall Left Cabinet: 450 × 2,400 mm with 150 mm Plinth (X = 19,205..19,655 mm, Z = 0..2,400 mm)
-        //        - Washing Machine ("Pralka"): 650 × 900 mm (X = 18,555..19,205 mm, Z = 0..900 mm)
-        //        - Tumble Dryer ("Suszarka"): 650 × 900 mm (X = 18,555..19,205 mm, Z = 900..1,800 mm)
-        //        - Leftmost Top Cabinet: 650 × 600 mm with shelf at Z = 2,100 mm (X = 18,555..19,205 mm, Z = 1,800..2,400 mm)
-        //        - Lower Double Cabinet: 800 × 900 mm split 400+400 mm (X = 17,755..18,555 mm, Z = 0..900 mm)
-        //        - Hanging Drying Niche: 800 × 900 mm with Closet Rod at Z = 1,600 mm & Partition (X = 17,755..18,555 mm, Z = 900..1,800 mm)
-        //        - Sink Base Cabinet: 600 × 900 mm with 300 mm Basin & Faucet (X = 17,155..17,755 mm, Z = 0..900 mm)
-        //        - Middle Top Cabinet: 1,100 × 600 mm with shelf at Z = 2,100 mm (X = 17,455..18,555 mm, Z = 1,800..2,400 mm)
-        //        - Rightmost Top Cabinet: 1,100 × 600 mm with shelf at Z = 2,100 mm (X = 16,355..17,455 mm, Z = 1,800..2,400 mm)
-        //        - Right Multi-Split Cabinet: 800 × 1,600 mm split 200+200+400 mm (X = 16,355..17,155 mm, Z = 0..1,600 mm)
-        //        - Right Bridge Cubby Cabinet: 800 × 200 mm (X = 16,355..17,155 mm, Z = 1,600..1,800 mm)
+        //        - Left Open Drying Bay: 670 × 2,400 mm with High Rod, Heated Rack & 4× Półki Ażurowe (X = 19,655..20,325 mm)
+        //        - Tall Left Cabinet: 450 × 2,400 mm with 150 mm Plinth & Z=1,800 mm door split (X = 19,205..19,655 mm)
+        //        - Washing Machine ("Pralka") + 60 mm Pull-Out Basket Shelf: 650 × 920 mm (X = 18,555..19,205 mm, Z = 0..920 mm)
+        //        - Tumble Dryer ("Suszarka"): 650 × 880 mm (X = 18,555..19,205 mm, Z = 920..1,800 mm)
+        //        - Lower Pull-Out Hampers: 800 × 900 mm split 400+400 mm Kosz Cargo I & II (X = 17,755..18,555 mm, Z = 0..900 mm)
+        //        - Open Hanging, Drip-Dry & 2× Sweater Mesh Zone: 1,400 × 900 mm (X = 17,155..18,555 mm, Z = 900..1,800 mm)
+        //        - Sink Base Cabinet: 600 × 900 mm with Wide 480 mm Soaking Basin & Faucet (X = 17,155..17,755 mm, Z = 0..900 mm)
+        //        - Right Drying & Utility Cabinet: 800 × 1,800 mm with 2×200 mm Suszarka Cargo & 400 mm Closet (X = 16,355..17,155 mm)
+        //        - Aligned Top Cabinets 1..4: 650 + 800 + 600 + 800 mm at Z = 1,800..2,400 mm
         // =====================================================================
         ...(function buildLaundryFurniture() {
             const Y_LAUNDRY_NORTH = 11400; // Interior South face of GW_8 & EW_ALCOVE_SOUTH
@@ -5541,6 +5538,7 @@
             const COLOR_STEEL_CHROME = [0.690, 0.745, 0.773];   // #B0BEC5 stainless steel / sink / closet rod
             const COLOR_FAUCET_STEEL = [0.471, 0.565, 0.612];   // #78909C brushed gunmetal/chrome faucet
             const COLOR_PLINTH_DARK = [0.22, 0.20, 0.18];
+            const COLOR_DARK_STEEL = [0.24, 0.25, 0.27];        // Matte dark graphite steel handles & plinth trim
 
             const y0 = Y_LAUNDRY_NORTH;
             const yCarcass1 = y0 + LAUNDRY_CARCASS_DEPTH_MM; // 12,030 mm
@@ -5747,7 +5745,7 @@
             // 3D agitator paddles, smooth 32-segment chrome porthole bezel, concave glass bowl, and control fascia
             function addFrontLoadApplianceParts(skeleton, prefix, labelPrefix, x0, x1, z0, z1, isDryer) {
                 const cx = Math.round((x0 + x1) * 0.5); // 18,880 mm
-                const cz = z0 + 435;                    // Porthole center Z
+                const cz = Math.round((z0 + z1) * 0.5) - 15; // Porthole center Z
                 const yApp0 = y0 + 25;
                 const yApp1 = yCarcass1 - 6;            // 12,024 mm front appliance face
                 const yDrumBack = yApp1 - 240;          // 240 mm deep visible stainless steel drum
@@ -6001,12 +5999,223 @@
             }
 
             // -----------------------------------------------------------------
-            // 41. CAB_LAUNDRY_LEFT_TALL: Leftmost 450 × 2,400 mm Tall Cabinet with 150 mm Plinth
+            // 40. CAB_LAUNDRY_LEFT_DRYING_BAY: Leftmost 670 × 2,400 mm Open Alcove with
+            //     4× Półki Ażurowe (Openwork Drying Shelves) Spaced Every 450 mm (45 cm)
+            //     (d = 0..670 mm from West wall -> X = 19,655..20,325 mm, Z = 0..2,400 mm)
+            //     Vertical rhythm: Plinth 150 mm -> +450 -> Z=600 -> +450 -> Z=1050 -> +450 -> Z=1500 -> +450 -> Z=1950 -> +450 -> Z=2400 mm
+            // -----------------------------------------------------------------
+            function buildLaundryLeftDryingBay() {
+                const x0 = 19655, x1 = 20325; // 670 mm wide
+                const zPlinth = 150, zTop = 2400;
+
+                const skeleton = [
+                    // 1. 150 mm Ventilated Plinth Base (Z = 0..150 mm)
+                    {
+                        id: 'CAB_LAUNDRY_LEFT_DRYING_PLINTH',
+                        name: 'Recessed 150mm Ventilated Plinth Base (670×590×150 mm, Z=0..150 mm)',
+                        role: 'plinth',
+                        material: 'plinth_dark',
+                        colorRgb: COLOR_PLINTH_DARK,
+                        x0: x0, x1: x1,
+                        y0: y0, y1: yCarcass1 - 40,
+                        z0: 0, z1: zPlinth
+                    },
+                    {
+                        id: 'CAB_LAUNDRY_LEFT_DRYING_KICKPLATE',
+                        name: 'Front Ventilated Oak Plinth Kickplate (670×20×150 mm, Z=0..150 mm)',
+                        role: 'carcass_panel',
+                        material: 'wood_oak',
+                        colorRgb: COLOR_OAK_WARM,
+                        x0: x0, x1: x1,
+                        y0: yCarcass1 - 20, y1: yCarcass1,
+                        z0: 0, z1: zPlinth
+                    },
+                    // 2. Warm-Oak Open Alcove Carcass Frame (Z = 150..2,400 mm = 2,250 mm = 5 × 450 mm)
+                    {
+                        id: 'CAB_LAUNDRY_LEFT_DRYING_WEST_PANEL',
+                        name: 'Left/West Outer Oak Frame Panel (20×630×2250 mm, Z=150..2400 mm)',
+                        role: 'carcass_panel',
+                        material: 'wood_oak',
+                        colorRgb: COLOR_OAK_WARM,
+                        x0: x1 - b, x1: x1,
+                        y0: y0, y1: yCarcass1,
+                        z0: zPlinth, z1: zTop
+                    },
+                    {
+                        id: 'CAB_LAUNDRY_LEFT_DRYING_EAST_PANEL',
+                        name: 'Right/East Oak Frame Panel (20×630×2250 mm, Z=150..2400 mm)',
+                        role: 'carcass_panel',
+                        material: 'wood_oak',
+                        colorRgb: COLOR_OAK_WARM,
+                        x0: x0, x1: x0 + b,
+                        y0: y0, y1: yCarcass1,
+                        z0: zPlinth, z1: zTop
+                    },
+                    {
+                        id: 'CAB_LAUNDRY_LEFT_DRYING_BACK_PANEL',
+                        name: 'Rear Warm-Oak Backing Panel (630×20×2250 mm, Z=150..2400 mm)',
+                        role: 'carcass_panel',
+                        material: 'wood_oak',
+                        colorRgb: COLOR_OAK_WARM,
+                        x0: x0 + b, x1: x1 - b,
+                        y0: y0, y1: y0 + b,
+                        z0: zPlinth, z1: zTop
+                    },
+                    {
+                        id: 'CAB_LAUNDRY_LEFT_DRYING_BOTTOM',
+                        name: 'Alcove Bottom Deck above Plinth (630×610×20 mm, Z=150..170 mm)',
+                        role: 'carcass_panel',
+                        material: 'wood_oak',
+                        colorRgb: COLOR_OAK_WARM,
+                        x0: x0 + b, x1: x1 - b,
+                        y0: y0 + b, y1: yCarcass1,
+                        z0: zPlinth, z1: zPlinth + b
+                    },
+                    {
+                        id: 'CAB_LAUNDRY_LEFT_DRYING_TOP',
+                        name: 'Alcove Top Soffit Panel (630×610×20 mm, Z=2380..2400 mm)',
+                        role: 'carcass_panel',
+                        material: 'wood_oak',
+                        colorRgb: COLOR_OAK_WARM,
+                        x0: x0 + b, x1: x1 - b,
+                        y0: y0 + b, y1: yCarcass1,
+                        z0: zTop - b, z1: zTop
+                    },
+                    {
+                        id: 'CAB_LAUNDRY_LEFT_DRYING_LED_BAR',
+                        name: 'Recessed Warm 3000K LED Strip in Alcove Soffit (610×18×6 mm, Z=2374..2380 mm)',
+                        role: 'led_strip',
+                        material: 'led_warm',
+                        colorRgb: [0.99, 0.92, 0.62],
+                        x0: x0 + 30, x1: x1 - 30,
+                        y0: y0 + 260, y1: y0 + 278,
+                        z0: zTop - b - 6, z1: zTop - b
+                    }
+                ];
+
+                // 3. ✨ 4 ROWS OF OPENWORK WIRE / MESH DRYING SHELVES (4× PÓŁKI AŻUROWE)
+                //    Spaced with exact 450 mm (45 cm) vertical distance between layers:
+                //    Z = 600 mm, Z = 1,050 mm, Z = 1,500 mm, Z = 1,950 mm
+                //    (150 plinth -> +450 -> 600 -> +450 -> 1050 -> +450 -> 1500 -> +450 -> 1950 -> +450 -> 2400 top)
+                const azuroweHeights = [600, 1050, 1500, 1950];
+                azuroweHeights.forEach((sz, rIdx) => {
+                    const rowNum = rIdx + 1;
+                    // Front, Rear & Side Powder-Coated Brushed Steel Perimeter Rails
+                    skeleton.push(
+                        {
+                            id: `CAB_LAUNDRY_LEFT_AZUROWA_${rowNum}_FRONT_RAIL`,
+                            name: `Półka Ażurowa #${rowNum} Front Openwork Frame Rail (630×18×22 mm at Z=${sz} mm, 45cm spacing)`,
+                            role: 'handle_rail',
+                            material: 'steel_chrome',
+                            colorRgb: [0.68, 0.73, 0.79],
+                            x0: x0 + b, x1: x1 - b,
+                            y0: yCarcass1 - 32, y1: yCarcass1 - 14,
+                            z0: sz, z1: sz + 22
+                        },
+                        {
+                            id: `CAB_LAUNDRY_LEFT_AZUROWA_${rowNum}_REAR_RAIL`,
+                            name: `Półka Ażurowa #${rowNum} Rear Support Rail (630×18×22 mm at Z=${sz} mm)`,
+                            role: 'handle_rail',
+                            material: 'steel_chrome',
+                            colorRgb: [0.68, 0.73, 0.79],
+                            x0: x0 + b, x1: x1 - b,
+                            y0: y0 + b, y1: y0 + b + 18,
+                            z0: sz, z1: sz + 22
+                        },
+                        {
+                            id: `CAB_LAUNDRY_LEFT_AZUROWA_${rowNum}_WEST_BRACKET`,
+                            name: `Półka Ażurowa #${rowNum} Left Side Runner Bracket`,
+                            role: 'handle_rail',
+                            material: 'steel_chrome',
+                            colorRgb: [0.62, 0.67, 0.73],
+                            x0: x1 - b - 14, x1: x1 - b,
+                            y0: y0 + b, y1: yCarcass1 - 14,
+                            z0: sz, z1: sz + 22
+                        },
+                        {
+                            id: `CAB_LAUNDRY_LEFT_AZUROWA_${rowNum}_EAST_BRACKET`,
+                            name: `Półka Ażurowa #${rowNum} Right Side Runner Bracket`,
+                            role: 'handle_rail',
+                            material: 'steel_chrome',
+                            colorRgb: [0.62, 0.67, 0.73],
+                            x0: x0 + b, x1: x0 + b + 14,
+                            y0: y0 + b, y1: yCarcass1 - 14,
+                            z0: sz, z1: sz + 22
+                        }
+                    );
+                    // 10 Openwork Longitudinal Wire Slat Bars (creating the real 3D ażurowa ventilated grid!)
+                    for (let wi = 1; wi <= 10; wi++) {
+                        const wy = y0 + b + 20 + wi * 50;
+                        skeleton.push({
+                            id: `CAB_LAUNDRY_LEFT_AZUROWA_${rowNum}_WIRE_${wi}`,
+                            name: `Półka Ażurowa #${rowNum} Openwork Wire Bar #${wi}`,
+                            role: 'handle_rail',
+                            material: 'steel_chrome',
+                            colorRgb: [0.80, 0.84, 0.88],
+                            x0: x0 + b + 14, x1: x1 - b - 14,
+                            y0: wy - 4, y1: wy + 4,
+                            z0: sz + 8, z1: sz + 18
+                        });
+                    }
+                    // 3 Transverse Cross-Support Wires (front-to-back) for authentic mesh grid look
+                    [x0 + 175, x0 + 335, x0 + 495].forEach((wx, cIdx) => {
+                        skeleton.push({
+                            id: `CAB_LAUNDRY_LEFT_AZUROWA_${rowNum}_CROSS_${cIdx + 1}`,
+                            name: `Półka Ażurowa #${rowNum} Cross Support Wire #${cIdx + 1}`,
+                            role: 'handle_rail',
+                            material: 'steel_chrome',
+                            colorRgb: [0.74, 0.79, 0.84],
+                            x0: wx - 3, x1: wx + 3,
+                            y0: y0 + b + 18, y1: yCarcass1 - 32,
+                            z0: sz + 4, z1: sz + 10
+                        });
+                    });
+                    // Flat-Drying Knitwear / Folded Towel Stack resting on each Półka Ażurowa
+                    skeleton.push({
+                        id: `CAB_LAUNDRY_LEFT_AZUROWA_${rowNum}_LINEN`,
+                        name: `Flat-Drying Knitwear / Folded Linen on Półka Ażurowa #${rowNum}`,
+                        role: 'front_panel',
+                        material: 'front_cashmere',
+                        colorRgb: rIdx % 2 === 0 ? [0.92, 0.90, 0.87] : [0.83, 0.88, 0.93],
+                        x0: x0 + 95 + (rIdx % 2) * 110, x1: x0 + 365 + (rIdx % 2) * 110,
+                        y0: y0 + 140, y1: yCarcass1 - 90,
+                        z0: sz + 18, z1: sz + 54
+                    });
+                });
+
+                return {
+                    id: 'CAB_LAUNDRY_LEFT_DRYING_BAY',
+                    name: 'CAB_LAUNDRY_LEFT_DRYING_BAY — Left 670×2400mm Open Drying Alcove with 4× Półki Ażurowe (45cm Spacing)',
+                    shortName: 'Laundry Left 4× Półki Ażurowe (45cm spacing)',
+                    category: 'tall_cabinet',
+                    subtype: 'laundry_drying_alcove',
+                    floor: 'ground',
+                    room: '0.08 Pralnia',
+                    hostWallId: 'EW_ALCOVE_SOUTH',
+                    viewId: 'laundry_north_wall',
+                    x1: x0, x2: x1,
+                    y1: y0, y2: yCarcass1,
+                    zBottom: 0, zTop: zTop,
+                    widthMm: 670, depthMm: LAUNDRY_CARCASS_DEPTH_MM,
+                    carcassDepthMm: LAUNDRY_CARCASS_DEPTH_MM, frontThicknessMm: 0,
+                    plinthHeightMm: zPlinth, plinthRecessMm: 40,
+                    bodyHeightMm: zTop - zPlinth, heightMm: zTop,
+                    boardThicknessMm: b,
+                    normal: [0, 1, 0],
+                    specs: '670 × 630 × 2,400 mm (X = 19,655..20,325 mm, Y = 11,400..12,030 mm, Z = 0..2,400 mm) • 4 Rows of Breathable Openwork Drying Shelves (4× Półki Ażurowe) with 450 mm (45 cm) vertical spacing at Z = 600, 1,050, 1,500, 1,950 mm • Recessed Soffit LED Bar',
+                    description: 'Leftmost 670 × 2,400 mm open warm-oak drying alcove featuring 4 rows of breathable openwork wire/mesh drying shelves (4× półki ażurowe) spaced 45 cm (450 mm) apart vertically across the entire height (Z = 600, 1,050, 1,500, 1,950 mm; 5 equal 45 cm bays from the 150 mm plinth to the 2,400 mm soffit).',
+                    skeleton: skeleton,
+                    fronts: []
+                };
+            }
+
+            // -----------------------------------------------------------------
+            // 41. CAB_LAUNDRY_LEFT_TALL: 450 × 2,400 mm Tall Linen & Detergent Cabinet with 150 mm Plinth
             //     (d = 670..1,120 mm from West wall -> X = 19,205..19,655 mm, Z = 0..2,400 mm)
             // -----------------------------------------------------------------
             function buildLaundryLeftTallCabinet() {
                 const x0 = 19205, x1 = 19655; // 450 mm wide
-                const zPlinth = 150, zTop = 2400;
+                const zPlinth = 150, zSplit = 1800, zTop = 2400;
                 const skeleton = [
                     // 150 mm Plinth base (Z = 0..150 mm, recessed 40 mm)
                     {
@@ -6019,7 +6228,6 @@
                         y0: y0, y1: yCarcass1 - 40,
                         z0: 0, z1: zPlinth
                     },
-                    // Plinth oak kickplate
                     {
                         id: 'CAB_LAUNDRY_LEFT_TALL_KICKPLATE',
                         name: 'Front Plinth Line Kickplate (450×20×150 mm, Z=0..150 mm)',
@@ -6030,7 +6238,6 @@
                         y0: yCarcass1 - 20, y1: yCarcass1,
                         z0: 0, z1: zPlinth
                     },
-                    // Left (East) & Right (West) Side Panels (Z = 150..2,400 mm)
                     {
                         id: 'CAB_LAUNDRY_LEFT_TALL_WEST_PANEL',
                         name: 'Left/West Outer Carcass Panel (20×630×2250 mm, Z=150..2400 mm)',
@@ -6051,7 +6258,6 @@
                         y0: y0, y1: yCarcass1,
                         z0: zPlinth, z1: zTop
                     },
-                    // Back Panel
                     {
                         id: 'CAB_LAUNDRY_LEFT_TALL_BACK_PANEL',
                         name: 'Rear Backing Panel (410×20×2250 mm, Z=150..2400 mm)',
@@ -6062,7 +6268,6 @@
                         y0: y0, y1: y0 + b,
                         z0: zPlinth, z1: zTop
                     },
-                    // Bottom & Top Carcass Panels
                     {
                         id: 'CAB_LAUNDRY_LEFT_TALL_BOTTOM',
                         name: 'Bottom Carcass Shelf above 150mm Plinth (410×610×20 mm, Z=150..170 mm)',
@@ -6085,11 +6290,11 @@
                     }
                 ];
 
-                // Internal shelves at Z = 900, 1,350, 1,800, 2,100 mm
-                [900, 1350, 1800, 2100].forEach((sz, idx) => {
+                // Internal shelves at Z = 450, 780, 1,120, 1,460, 1,800, 2,100 mm
+                [450, 780, 1120, 1460, 1800, 2100].forEach((sz, idx) => {
                     skeleton.push({
                         id: `CAB_LAUNDRY_LEFT_TALL_SHELF_${idx + 1}`,
-                        name: `Internal Utility Shelf #${idx + 1} (Z=${sz}..${sz + b} mm)`,
+                        name: `Internal Linen & Detergent Shelf #${idx + 1} (Z=${sz}..${sz + b} mm)`,
                         role: 'carcass_panel',
                         material: 'wood_oak',
                         colorRgb: COLOR_OAK_WARM,
@@ -6101,20 +6306,40 @@
 
                 const fronts = [
                     {
-                        id: 'CAB_LAUNDRY_LEFT_TALL_DOOR',
-                        name: 'Tall Utility Cabinet Hinged Door (446×20×2246 mm, Z=152..2398 mm)',
+                        id: 'CAB_LAUNDRY_LEFT_TALL_DOOR_LOWER',
+                        name: 'Tall Cabinet Lower Hinged Door (446×20×1646 mm, Z=152..1798 mm)',
                         role: 'front_panel',
                         material: 'front_cashmere',
                         colorRgb: COLOR_CASHMERE_FRONT,
                         x0: x0 + 2, x1: x1 - 2,
                         y0: yCarcass1, y1: yFront1,
-                        z0: zPlinth + 2, z1: zTop - 2
+                        z0: zPlinth + 2, z1: zSplit - 2
+                    },
+                    {
+                        id: 'CAB_LAUNDRY_LEFT_TALL_HANDLE',
+                        name: 'Tall Cabinet Vertical Dark Bronze Handle (Z=950..1170 mm)',
+                        role: 'handle_rail',
+                        material: 'plinth_dark',
+                        colorRgb: COLOR_PLINTH_DARK,
+                        x0: x0 + 28, x1: x0 + 42,
+                        y0: yFront1, y1: yFront1 + 14,
+                        z0: 950, z1: 1170
+                    },
+                    {
+                        id: 'CAB_LAUNDRY_LEFT_TALL_DOOR_UPPER',
+                        name: 'Tall Cabinet Upper Hinged Door Aligned at Z=1800..2400mm (446×20×596 mm)',
+                        role: 'front_panel',
+                        material: 'front_cashmere',
+                        colorRgb: COLOR_CASHMERE_FRONT,
+                        x0: x0 + 2, x1: x1 - 2,
+                        y0: yCarcass1, y1: yFront1,
+                        z0: zSplit + 2, z1: zTop - 2
                     }
                 ];
 
                 return {
                     id: 'CAB_LAUNDRY_LEFT_TALL',
-                    name: 'CAB_LAUNDRY_LEFT_TALL — Leftmost Tall Laundry Cabinet with 150mm Plinth (450×650×2400mm)',
+                    name: 'CAB_LAUNDRY_LEFT_TALL — Tall Linen & Detergent Cabinet with 150mm Plinth (450×650×2400mm)',
                     shortName: 'Laundry Tall Cabinet (450×2400mm)',
                     category: 'tall_cabinet',
                     subtype: 'laundry_tall_cabinet',
@@ -6131,26 +6356,27 @@
                     bodyHeightMm: zTop - zPlinth, heightMm: zTop,
                     boardThicknessMm: b,
                     normal: [0, 1, 0],
-                    specs: '450 × 650 × 2,400 mm (X = 19,205..19,655 mm, Y = 11,400..12,050 mm, Z = 0..2,400 mm) • 150 mm Plinth (Z = 0..150 mm) • Positioned 670 mm from West Wall',
-                    description: 'Leftmost 450 × 2,400 mm tall laundry cabinet with a 150 mm plinth (Z = 0..150 mm), positioned after the 670 mm left wall clearance on the Laundry North Wall.',
+                    specs: '450 × 650 × 2,400 mm (X = 19,205..19,655 mm, Y = 11,400..12,050 mm, Z = 0..2,400 mm) • 150 mm Plinth • Split at Z = 1,800 mm to align with upper wall cabinets',
+                    description: '450 × 2,400 mm tall linen and detergent cabinet with a 150 mm plinth, 6 internal shelves, and two cashmere doors aligned with the Z = 1,800 mm upper cabinet line.',
                     skeleton: skeleton,
                     fronts: fronts
                 };
             }
 
             // -----------------------------------------------------------------
-            // 42. CAB_LAUNDRY_WASHER: 650 × 900 mm Washing Machine Cabinet ("Pralka")
-            //     (d = 1,120..1,770 mm from West wall -> X = 18,555..19,205 mm, Z = 0..900 mm)
+            // 42. CAB_LAUNDRY_WASHER: 650 × 920 mm Washing Machine Cabinet ("Pralka")
+            //     + Integrated 60 mm Pull-Out Oak Laundry Basket Shelf at Z = 860..920 mm
+            //     (d = 1,120..1,770 mm from West wall -> X = 18,555..19,205 mm, Z = 0..920 mm)
             // -----------------------------------------------------------------
             function buildLaundryWasherCabinet() {
                 const x0 = 18555, x1 = 19205; // 650 mm wide
-                const z0 = 0, z1 = 900;
+                const z0 = 0, zApp1 = 860, z1 = 920;
 
                 const skeleton = [
-                    // Outer 650×900 mm Warm-Oak Carcass Frame
+                    // Outer 650×920 mm Warm-Oak Carcass Frame
                     {
                         id: 'CAB_LAUNDRY_WASHER_WEST_PANEL',
-                        name: 'Washer Housing Left/West Panel (20×630×900 mm, Z=0..900 mm)',
+                        name: 'Washer Housing Left/West Panel (20×630×920 mm, Z=0..920 mm)',
                         role: 'carcass_panel',
                         material: 'wood_oak',
                         colorRgb: COLOR_OAK_WARM,
@@ -6160,7 +6386,7 @@
                     },
                     {
                         id: 'CAB_LAUNDRY_WASHER_EAST_PANEL',
-                        name: 'Washer Housing Right/East Panel (20×630×900 mm, Z=0..900 mm)',
+                        name: 'Washer Housing Right/East Panel (20×630×920 mm, Z=0..920 mm)',
                         role: 'carcass_panel',
                         material: 'wood_oak',
                         colorRgb: COLOR_OAK_WARM,
@@ -6179,23 +6405,54 @@
                         z0: z0, z1: z0 + b
                     },
                     {
-                        id: 'CAB_LAUNDRY_WASHER_TOP_PANEL',
-                        name: 'Washer/Dryer Stacking Deck (610×630×20 mm, Z=880..900 mm)',
+                        id: 'CAB_LAUNDRY_WASHER_MID_DECK',
+                        name: 'Washer Top / Pull-Out Shelf Lower Deck (610×630×16 mm, Z=844..860 mm)',
                         role: 'carcass_panel',
                         material: 'wood_oak',
                         colorRgb: COLOR_OAK_WARM,
                         x0: x0 + b, x1: x1 - b,
                         y0: y0, y1: yCarcass1,
-                        z0: z1 - b, z1: z1
+                        z0: zApp1 - 16, z1: zApp1
+                    },
+                    // ✨ Integrated 60 mm Pull-Out Oak Laundry Basket Shelf ("Wysuwana półka na kosz", Z = 860..920 mm)
+                    {
+                        id: 'CAB_LAUNDRY_PULLOUT_BASKET_SHELF_TRAY',
+                        name: 'Pull-Out Oak Laundry Basket Unloading Shelf (606×635×36 mm, Z=866..902 mm)',
+                        role: 'countertop',
+                        material: 'wood_oak',
+                        colorRgb: [0.84, 0.72, 0.59],
+                        x0: x0 + b + 2, x1: x1 - b - 2,
+                        y0: y0 + 25, y1: yFront1 + 10,
+                        z0: 866, z1: 902
+                    },
+                    {
+                        id: 'CAB_LAUNDRY_PULLOUT_BASKET_SHELF_HANDLE_SLOT',
+                        name: 'Pull-Out Basket Shelf Recessed Hand Grip Slot (210×8×14 mm)',
+                        role: 'handle_rail',
+                        material: 'plinth_dark',
+                        colorRgb: COLOR_PLINTH_DARK,
+                        x0: x0 + 220, x1: x1 - 220,
+                        y0: yFront1 + 6, y1: yFront1 + 14,
+                        z0: 877, z1: 891
+                    },
+                    {
+                        id: 'CAB_LAUNDRY_WASHER_TOP_PANEL',
+                        name: 'Dryer Stacking Deck above Pull-Out Shelf (610×630×18 mm, Z=902..920 mm)',
+                        role: 'carcass_panel',
+                        material: 'wood_oak',
+                        colorRgb: COLOR_OAK_WARM,
+                        x0: x0 + b, x1: x1 - b,
+                        y0: y0, y1: yCarcass1,
+                        z0: 902, z1: z1
                     }
                 ];
 
-                addFrontLoadApplianceParts(skeleton, 'LAUNDRY_WASHER', 'Pralka (Washing Machine)', x0, x1, z0, z1, false);
+                addFrontLoadApplianceParts(skeleton, 'LAUNDRY_WASHER', 'Pralka (Washing Machine)', x0, x1, z0, zApp1, false);
 
                 return {
                     id: 'CAB_LAUNDRY_WASHER',
-                    name: 'CAB_LAUNDRY_WASHER — Washing Machine ("Pralka") & 650×900mm Housing Cabinet',
-                    shortName: 'Pralka / Washer (650×900mm)',
+                    name: 'CAB_LAUNDRY_WASHER — Washing Machine ("Pralka") + Z=900mm Pull-Out Oak Basket Shelf (650×920mm)',
+                    shortName: 'Pralka + Pull-Out Basket Shelf (650×920mm)',
                     category: 'appliance',
                     subtype: 'washing_machine_cabinet',
                     floor: 'ground',
@@ -6203,34 +6460,34 @@
                     hostWallId: 'GW_8',
                     viewId: 'laundry_north_wall',
                     x1: x0, x2: x1,
-                    y1: y0, y2: yFront1,
+                    y1: y0, y2: yFront1 + 10,
                     zBottom: z0, zTop: z1,
                     widthMm: 650, depthMm: LAUNDRY_DEPTH_MM,
                     carcassDepthMm: LAUNDRY_CARCASS_DEPTH_MM, frontThicknessMm: 0,
                     plinthHeightMm: 0, plinthRecessMm: 0,
-                    bodyHeightMm: 900, heightMm: 900,
+                    bodyHeightMm: 920, heightMm: 920,
                     boardThicknessMm: b,
                     normal: [0, 1, 0],
-                    specs: '650 × 650 × 900 mm (X = 18,555..19,205 mm, Y = 11,400..12,050 mm, Z = 0..900 mm) • Built-in Front-Loading Washing Machine ("Pralka") with Ø408 mm Turned-Chrome Bezel, Concave Glass Dome & Stainless Drum',
-                    description: '650 × 900 mm lower appliance housing cabinet containing the front-loading washing machine ("Pralka") with a 32-segment stainless steel inner drum, 3D agitator paddles, concave glass porthole dome, and rotary program dial.',
+                    specs: '650 × 650 × 920 mm (X = 18,555..19,205 mm, Y = 11,400..12,050 mm, Z = 0..920 mm) • Front-Loading Washing Machine ("Pralka") + Integrated 60 mm Pull-Out Oak Laundry Basket Shelf at Z = 860..920 mm',
+                    description: '650 × 920 mm lower appliance housing cabinet containing the front-loading washing machine ("Pralka") and an ergonomic 60 mm pull-out oak laundry basket shelf at Z = 860..920 mm for unloading wet/dry clothes.',
                     skeleton: skeleton,
                     fronts: []
                 };
             }
 
             // -----------------------------------------------------------------
-            // 43. CAB_LAUNDRY_DRYER: 650 × 900 mm Stacked Tumble Dryer Cabinet ("Suszarka")
-            //     (d = 1,120..1,770 mm from West wall -> X = 18,555..19,205 mm, Z = 900..1,800 mm)
+            // 43. CAB_LAUNDRY_DRYER: 650 × 880 mm Stacked Heat-Pump Tumble Dryer Cabinet ("Suszarka")
+            //     (d = 1,120..1,770 mm from West wall -> X = 18,555..19,205 mm, Z = 920..1,800 mm)
             // -----------------------------------------------------------------
             function buildLaundryDryerCabinet() {
                 const x0 = 18555, x1 = 19205; // 650 mm wide
-                const z0 = 900, z1 = 1800;
+                const z0 = 920, z1 = 1800;
 
                 const skeleton = [
-                    // Outer 650×900 mm Warm-Oak Carcass Frame (Z = 900..1,800 mm)
+                    // Outer 650×880 mm Warm-Oak Carcass Frame (Z = 920..1,800 mm)
                     {
                         id: 'CAB_LAUNDRY_DRYER_WEST_PANEL',
-                        name: 'Dryer Housing Left/West Panel (20×630×900 mm, Z=900..1800 mm)',
+                        name: 'Dryer Housing Left/West Panel (20×630×880 mm, Z=920..1800 mm)',
                         role: 'carcass_panel',
                         material: 'wood_oak',
                         colorRgb: COLOR_OAK_WARM,
@@ -6240,7 +6497,7 @@
                     },
                     {
                         id: 'CAB_LAUNDRY_DRYER_EAST_PANEL',
-                        name: 'Dryer Housing Right/East Panel (20×630×900 mm, Z=900..1800 mm)',
+                        name: 'Dryer Housing Right/East Panel (20×630×880 mm, Z=920..1800 mm)',
                         role: 'carcass_panel',
                         material: 'wood_oak',
                         colorRgb: COLOR_OAK_WARM,
@@ -6264,8 +6521,8 @@
 
                 return {
                     id: 'CAB_LAUNDRY_DRYER',
-                    name: 'CAB_LAUNDRY_DRYER — Stacked Tumble Dryer ("Suszarka") & 650×900mm Housing Cabinet',
-                    shortName: 'Suszarka / Dryer (650×900mm)',
+                    name: 'CAB_LAUNDRY_DRYER — Stacked Heat-Pump Tumble Dryer ("Suszarka") & 650×880mm Housing',
+                    shortName: 'Suszarka / Dryer (650×880mm)',
                     category: 'appliance',
                     subtype: 'tumble_dryer_cabinet',
                     floor: 'ground',
@@ -6278,136 +6535,174 @@
                     widthMm: 650, depthMm: LAUNDRY_DEPTH_MM,
                     carcassDepthMm: LAUNDRY_CARCASS_DEPTH_MM, frontThicknessMm: 0,
                     plinthHeightMm: 0, plinthRecessMm: 0,
-                    bodyHeightMm: 900, heightMm: 900,
+                    bodyHeightMm: 880, heightMm: 880,
                     boardThicknessMm: b,
                     normal: [0, 1, 0],
-                    specs: '650 × 650 × 900 mm (X = 18,555..19,205 mm, Y = 11,400..12,050 mm, Z = 900..1,800 mm) • Stacked Heat-Pump Tumble Dryer ("Suszarka") with Ø408 mm Turned-Chrome Bezel, Concave Glass Dome & Stainless Drum',
-                    description: '650 × 900 mm upper appliance housing cabinet stacked directly above the washing machine at Z = 900..1,800 mm, housing the heat-pump tumble dryer ("Suszarka") with stainless steel drum, paddles, concave glass dome, and condenser louver grille.',
+                    specs: '650 × 650 × 880 mm (X = 18,555..19,205 mm, Y = 11,400..12,050 mm, Z = 920..1,800 mm) • Stacked Heat-Pump Tumble Dryer ("Suszarka") above Pull-Out Basket Shelf',
+                    description: '650 × 880 mm upper appliance housing cabinet stacked directly above the pull-out basket shelf at Z = 920..1,800 mm, housing the heat-pump tumble dryer ("Suszarka").',
                     skeleton: skeleton,
                     fronts: []
                 };
             }
 
             // -----------------------------------------------------------------
-            // 44. CAB_LAUNDRY_BASE_800: 800 × 900 mm Lower Cabinet with 400+400 mm Center Split
+            // 44. CAB_LAUNDRY_BASE_800: 800 × 900 mm Lower Cabinet with 2× 400 mm Pull-Out Laundry Hampers
             //     (d = 1,770..2,570 mm from West wall -> X = 17,755..18,555 mm, Z = 0..900 mm)
             // -----------------------------------------------------------------
             function buildLaundryBase800Cabinet() {
                 const x0 = 17755, x1 = 18555; // 800 mm wide
                 const xMid = 18155;          // Center split (400 + 400 mm, x=217 in laundry.html)
-                const z0 = 0, z1 = 900;
+                const z0 = 0, zPlinth = 150, zDeck0 = 870, z1 = 900;
 
                 const skeleton = [
                     {
+                        id: 'CAB_LAUNDRY_BASE_800_PLINTH',
+                        name: 'Recessed Plinth Kickplate (800×590×150 mm, Z=0..150 mm)',
+                        role: 'plinth',
+                        material: 'plinth_dark',
+                        colorRgb: COLOR_DARK_STEEL,
+                        x0: x0, x1: x1,
+                        y0: y0, y1: yCarcass1 - 40,
+                        z0: z0, z1: zPlinth
+                    },
+                    {
                         id: 'CAB_LAUNDRY_BASE_800_WEST_PANEL',
-                        name: 'Left/West Carcass Side Panel (20×630×900 mm, Z=0..900 mm)',
+                        name: 'Left/West Carcass Side Panel (20×630×720 mm, Z=150..870 mm)',
                         role: 'carcass_panel',
                         material: 'wood_oak',
                         colorRgb: COLOR_OAK_WARM,
                         x0: x1 - b, x1: x1,
                         y0: y0, y1: yCarcass1,
-                        z0: z0, z1: z1
+                        z0: zPlinth, z1: zDeck0
                     },
                     {
                         id: 'CAB_LAUNDRY_BASE_800_EAST_PANEL',
-                        name: 'Right/East Carcass Side Panel (20×630×900 mm, Z=0..900 mm)',
+                        name: 'Right/East Carcass Side Panel (20×630×720 mm, Z=150..870 mm)',
                         role: 'carcass_panel',
                         material: 'wood_oak',
                         colorRgb: COLOR_OAK_WARM,
                         x0: x0, x1: x0 + b,
                         y0: y0, y1: yCarcass1,
-                        z0: z0, z1: z1
+                        z0: zPlinth, z1: zDeck0
                     },
                     {
                         id: 'CAB_LAUNDRY_BASE_800_CENTER_SPLIT',
-                        name: 'Center Vertical Divider Panel — 400+400mm Split (20×610×860 mm, X=18145..18165 mm)',
+                        name: 'Center Vertical Divider Panel — 400+400mm Split (20×610×700 mm, X=18145..18165 mm)',
                         role: 'carcass_panel',
                         material: 'wood_oak',
                         colorRgb: COLOR_OAK_WARM,
                         x0: xMid - 10, x1: xMid + 10,
                         y0: y0 + b, y1: yCarcass1,
-                        z0: z0 + b, z1: z1 - b
+                        z0: zPlinth + b, z1: zDeck0
                     },
                     {
                         id: 'CAB_LAUNDRY_BASE_800_BACK_PANEL',
-                        name: 'Rear Backing Panel (760×20×900 mm, Z=0..900 mm)',
+                        name: 'Rear Backing Panel (760×20×720 mm, Z=150..870 mm)',
                         role: 'carcass_panel',
                         material: 'wood_oak',
                         colorRgb: COLOR_OAK_WARM,
                         x0: x0 + b, x1: x1 - b,
                         y0: y0, y1: y0 + b,
-                        z0: z0, z1: z1
+                        z0: zPlinth, z1: zDeck0
                     },
                     {
                         id: 'CAB_LAUNDRY_BASE_800_BOTTOM_PANEL',
-                        name: 'Bottom Carcass Panel (760×610×20 mm, Z=0..20 mm)',
+                        name: 'Bottom Carcass Panel (760×610×20 mm, Z=150..170 mm)',
                         role: 'carcass_panel',
                         material: 'wood_oak',
                         colorRgb: COLOR_OAK_WARM,
                         x0: x0 + b, x1: x1 - b,
                         y0: y0 + b, y1: yCarcass1,
-                        z0: z0, z1: z0 + b
+                        z0: zPlinth, z1: zPlinth + b
                     },
                     {
                         id: 'CAB_LAUNDRY_BASE_800_TOP_PANEL',
-                        name: 'Top Countertop Deck Panel (800×650×20 mm, Z=880..900 mm)',
+                        name: 'Oak Worktop Slab (800×650×30 mm, Z=870..900 mm)',
                         role: 'countertop',
                         material: 'wood_oak',
                         colorRgb: COLOR_OAK_WARM,
                         x0: x0, x1: x1,
                         y0: y0, y1: yFront1,
-                        z0: z1 - b, z1: z1
-                    },
-                    // Mid-height internal shelves inside both 400 mm bays (Z = 440..460 mm)
-                    {
-                        id: 'CAB_LAUNDRY_BASE_800_SHELF_LEFT',
-                        name: 'Left 400mm Bay Internal Shelf (370×590×20 mm, Z=440..460 mm)',
-                        role: 'carcass_panel',
-                        material: 'wood_oak',
-                        colorRgb: COLOR_OAK_WARM,
-                        x0: xMid + 10, x1: x1 - b,
-                        y0: y0 + b, y1: yCarcass1 - 10,
-                        z0: 440, z1: 460
-                    },
-                    {
-                        id: 'CAB_LAUNDRY_BASE_800_SHELF_RIGHT',
-                        name: 'Right 400mm Bay Internal Shelf (370×590×20 mm, Z=440..460 mm)',
-                        role: 'carcass_panel',
-                        material: 'wood_oak',
-                        colorRgb: COLOR_OAK_WARM,
-                        x0: x0 + b, x1: xMid - 10,
-                        y0: y0 + b, y1: yCarcass1 - 10,
-                        z0: 440, z1: 460
+                        z0: zDeck0, z1: z1
                     }
                 ];
+
+                // Two Pull-Out Ventilated Wire Laundry Hamper Baskets ("Kosz Cargo I — Białe" & "Kosz Cargo II — Kolor")
+                [
+                    { tag: 'LEFT_WHITES', label: 'Kosz Cargo I (Białe)', bx0: xMid + 24, bx1: x1 - 34, bagColor: [238, 236, 230] },
+                    { tag: 'RIGHT_COLORS', label: 'Kosz Cargo II (Kolor)', bx0: x0 + 34, bx1: xMid - 24, bagColor: [188, 198, 210] }
+                ].forEach((hamp) => {
+                    skeleton.push(
+                        {
+                            id: `CAB_LAUNDRY_BASE_800_HAMPER_${hamp.tag}_RAIL_TOP`,
+                            name: `${hamp.label} Upper Chrome Pull-Out Frame (Z=720..734 mm)`,
+                            role: 'drawer_box',
+                            material: 'steel_chrome',
+                            colorRgb: [195, 202, 210],
+                            x0: hamp.bx0, x1: hamp.bx1,
+                            y0: y0 + 60, y1: yCarcass1 - 25,
+                            z0: 720, z1: 734
+                        },
+                        {
+                            id: `CAB_LAUNDRY_BASE_800_HAMPER_${hamp.tag}_BAG`,
+                            name: `${hamp.label} Breathable Ventilated Laundry Bin (Z=220..720 mm)`,
+                            role: 'drawer_box',
+                            material: 'front_cashmere',
+                            colorRgb: hamp.bagColor,
+                            x0: hamp.bx0 + 12, x1: hamp.bx1 - 12,
+                            y0: y0 + 75, y1: yCarcass1 - 40,
+                            z0: 220, z1: 720
+                        }
+                    );
+                });
 
                 const fronts = [
                     {
                         id: 'CAB_LAUNDRY_BASE_800_DOOR_LEFT',
-                        name: 'Left 400mm Hinged Door (396×20×876 mm)',
+                        name: 'Left 400mm Pull-Out Hamper Front — Kosz Cargo I Białe (396×20×716 mm)',
                         role: 'front_panel',
                         material: 'front_cashmere',
                         colorRgb: COLOR_CASHMERE_FRONT,
                         x0: xMid + 2, x1: x1 - 2,
                         y0: yCarcass1, y1: yFront1,
-                        z0: 2, z1: z1 - b - 2
+                        z0: zPlinth + 2, z1: zDeck0 - 2
+                    },
+                    {
+                        id: 'CAB_LAUNDRY_BASE_800_HANDLE_LEFT',
+                        name: 'Left 400mm Hamper Top Edge Pull Handle (140 mm)',
+                        role: 'handle_rail',
+                        material: 'steel_dark',
+                        colorRgb: COLOR_DARK_STEEL,
+                        x0: xMid + 130, x1: x1 - 130,
+                        y0: yFront1, y1: yFront1 + 14,
+                        z0: zDeck0 - 32, z1: zDeck0 - 18
                     },
                     {
                         id: 'CAB_LAUNDRY_BASE_800_DOOR_RIGHT',
-                        name: 'Right 400mm Hinged Door (396×20×876 mm)',
+                        name: 'Right 400mm Pull-Out Hamper Front — Kosz Cargo II Kolor (396×20×716 mm)',
                         role: 'front_panel',
                         material: 'front_cashmere',
                         colorRgb: COLOR_CASHMERE_FRONT,
                         x0: x0 + 2, x1: xMid - 2,
                         y0: yCarcass1, y1: yFront1,
-                        z0: 2, z1: z1 - b - 2
+                        z0: zPlinth + 2, z1: zDeck0 - 2
+                    },
+                    {
+                        id: 'CAB_LAUNDRY_BASE_800_HANDLE_RIGHT',
+                        name: 'Right 400mm Hamper Top Edge Pull Handle (140 mm)',
+                        role: 'handle_rail',
+                        material: 'steel_dark',
+                        colorRgb: COLOR_DARK_STEEL,
+                        x0: x0 + 130, x1: xMid - 130,
+                        y0: yFront1, y1: yFront1 + 14,
+                        z0: zDeck0 - 32, z1: zDeck0 - 18
                     }
                 ];
 
                 return {
                     id: 'CAB_LAUNDRY_BASE_800',
-                    name: 'CAB_LAUNDRY_BASE_800 — Lower 800×900mm Double Cabinet (400+400mm Split)',
-                    shortName: 'Laundry Base 800mm (400+400mm)',
+                    name: 'CAB_LAUNDRY_BASE_800 — Lower 800×900mm Pull-Out Laundry Hamper Cabinet (400+400mm Kosz Cargo I & II)',
+                    shortName: 'Laundry Hampers 800mm (400+400mm)',
                     category: 'base_cabinet',
                     subtype: 'laundry_base_cabinet',
                     floor: 'ground',
@@ -6415,125 +6710,120 @@
                     hostWallId: 'GW_8',
                     viewId: 'laundry_north_wall',
                     x1: x0, x2: x1,
-                    y1: y0, y2: yFront1,
+                    y1: y0, y2: yFront1 + 14,
                     zBottom: z0, zTop: z1,
                     widthMm: 800, depthMm: LAUNDRY_DEPTH_MM,
                     carcassDepthMm: LAUNDRY_CARCASS_DEPTH_MM, frontThicknessMm: LAUNDRY_FRONT_MM,
-                    plinthHeightMm: 0, plinthRecessMm: 0,
-                    bodyHeightMm: 900, heightMm: 900,
+                    plinthHeightMm: 150, plinthRecessMm: 40,
+                    bodyHeightMm: 750, heightMm: 900,
                     boardThicknessMm: b,
                     normal: [0, 1, 0],
-                    specs: '800 × 650 × 900 mm (X = 17,755..18,555 mm, Y = 11,400..12,050 mm, Z = 0..900 mm) • Center vertical split (400 + 400 mm at X = 18,155 mm)',
-                    description: '800 × 900 mm lower laundry base cabinet located between the washer/dryer tower and the utility sink cabinet, divided centrally into two 400 mm bays (400 + 400 mm).',
+                    specs: '800 × 650 × 900 mm (X = 17,755..18,555 mm, Y = 11,400..12,050 mm, Z = 0..900 mm) • 2× 400 mm Pull-Out Ventilated Laundry Hampers ("Kosz Cargo I — Białe" & "Kosz Cargo II — Kolor") • 30 mm Oak Countertop',
+                    description: '800 × 900 mm lower laundry base cabinet divided into two 400 mm pull-out ventilated laundry sorting hampers (Whites & Colors) beneath a continuous 30 mm solid oak worktop.',
                     skeleton: skeleton,
                     fronts: fronts
                 };
             }
 
             // -----------------------------------------------------------------
-            // 45. LAUNDRY_HANGING_NICHE: 800 × 900 mm Hanging Drying Zone with Closet Rod (Z=1600mm),
-            //     4 Sculpted 3D Coat Hangers + Garments, & 900 mm Vertical Divider Panel at X = 17,755 mm
+            // 45. LAUNDRY_HANGING_NICHE: 1,400 × 900 mm Open Air-Drying & Over-Sink Drip-Dry Zone
+            //     (d = 1,770..3,170 mm from West wall -> X = 17,155..18,555 mm, Z = 900..1,800 mm)
+            //     - Full-width 1,360 mm Brushed Chrome Hanging & Drip-Dry Rod at Z = 1,680 mm
+            //     - 6 Sculpted 3D Coat Hangers + 3 Hanging Garments (including Over-Sink Drip-Dry Shirt)
+            //     - 2× Pull-Out Flat Mesh Sweater Drying Racks ("2× wysuwana siatka na swetry na płasko") at Z = 1,040 & 1,140 mm
+            //     - Under-Cabinet Warm LED Strip at Z = 1,792..1,800 mm
             // -----------------------------------------------------------------
             function buildLaundryHangingNiche() {
-                const x0 = 17755, x1 = 18555; // 800 mm wide (d = 1,770..2,570 mm)
+                const x0 = 17155, x1 = 18555; // Full 1,400 mm open span (800 mm dry zone + 600 mm over-sink drip-dry zone)
+                const xSplit = 17755;         // Boundary between 800 mm dry zone and 600 mm sink drip-dry zone
                 const z0 = 900, z1 = 1800;
-                const zRod = 1600;            // y = 100 in laundry.html -> 260-100 = 160 -> Z = 1,600 mm
+                const zRod = 1680;            // Raised hanging rod at Z = 1,680 mm (leaves room for 2 sweater mesh racks below)
                 const yRod = y0 + 325;        // Centered at 325 mm depth (Y = 11,725 mm)
 
                 const skeleton = [
-                    // Vertical Divider Panel above left edge of sink cabinet (X = 17,745..17,765 mm, Z = 900..1,800 mm)
-                    // Matches <line x1="257" y1="170" x2="257" y2="80" stroke="#8E6B47" /> in laundry.html
+                    // Under-Cabinet Recessed Warm LED Strip (spanning full 1,360 mm niche at Z = 1,792..1,800 mm)
                     {
-                        id: 'LAUNDRY_HANGING_NICHE_DIVIDER',
-                        name: 'Vertical Partition Panel between Hanging Zone & Sink Zone (20×630×900 mm, Z=900..1800 mm)',
-                        role: 'carcass_panel',
-                        material: 'wood_oak',
-                        colorRgb: COLOR_OAK_WARM,
-                        x0: x0 - 10, x1: x0 + 10,
-                        y0: y0, y1: yCarcass1,
-                        z0: z0, z1: z1
+                        id: 'LAUNDRY_HANGING_NICHE_LED_BAR',
+                        name: 'Recessed Warm LED Strip under Upper Cabinets (1360×24×8 mm, Z=1792..1800 mm)',
+                        role: 'appliance_TRIM',
+                        material: 'appliance_white',
+                        colorRgb: [255, 243, 214],
+                        x0: x0 + 20, x1: x1 - 20,
+                        y0: y0 + 290, y1: y0 + 314,
+                        z0: z1 - 8, z1: z1
                     }
                 ];
 
-                // 1. Smooth 24-segment Cylindrical Brushed Chrome Closet Rod (Ø28 mm, X = 17,765..18,555 mm)
+                // 1. Full-Width 1,360 mm Smooth 24-segment Cylindrical Brushed Chrome Hanging & Drip-Dry Rod (Ø28 mm, X = 17,175..18,535 mm)
                 const rodSpine = [
-                    { cx: x1, cy: yRod, cz: zRod, r: 14 },
-                    { cx: x0 + 10, cy: yRod, cz: zRod, r: 14 }
+                    { cx: x1 - 20, cy: yRod, cz: zRod, r: 14 },
+                    { cx: x0 + 20, cy: yRod, cz: zRod, r: 14 }
                 ];
                 skeleton.push(buildLaundryTubePart({
                     id: 'LAUNDRY_CLOSET_ROD_CYLINDER',
-                    name: 'Smooth Cylindrical Brushed Chrome Closet Rod (Ø28×790 mm at Z=1600 mm)',
+                    name: 'Full-Width 1360mm Brushed Chrome Hanging & Over-Sink Drip-Dry Rod (Ø28×1360 mm at Z=1680 mm)',
                     role: 'handle_rail',
                     material: 'steel_chrome',
                     colorRgb: [224, 229, 235],
                     spine: rodSpine,
                     segments: 24,
                     upHint: [0, 0, 1],
-                    capStart: false,
-                    capEnd: false,
-                    ringStep: 1
-                }));
-
-                // 2. Turned Chrome End-Socket Flanges (West at X = 18,555 mm, East at X = 17,765 mm)
-                skeleton.push(buildLaundryTubePart({
-                    id: 'LAUNDRY_CLOSET_ROD_MOUNT_WEST',
-                    name: 'Closet Rod West Mounting Socket Rosette (Ø52 mm at X=18555 mm)',
-                    role: 'handle_rail',
-                    material: 'steel_chrome',
-                    colorRgb: [200, 206, 214],
-                    spine: [
-                        { cx: x1, cy: yRod, cz: zRod, r: 26 },
-                        { cx: x1 - 6, cy: yRod, cz: zRod, r: 26 },
-                        { cx: x1 - 10, cy: yRod, cz: zRod, r: 19 },
-                        { cx: x1 - 18, cy: yRod, cz: zRod, r: 18 }
-                    ],
-                    segments: 24,
-                    upHint: [0, 0, 1],
-                    capStart: false,
-                    capEnd: true,
-                    ringStep: 1
-                }));
-                skeleton.push(buildLaundryTubePart({
-                    id: 'LAUNDRY_CLOSET_ROD_MOUNT_EAST',
-                    name: 'Closet Rod East Mounting Socket Rosette (Ø52 mm at X=17765 mm)',
-                    role: 'handle_rail',
-                    material: 'steel_chrome',
-                    colorRgb: [200, 206, 214],
-                    spine: [
-                        { cx: x0 + 10, cy: yRod, cz: zRod, r: 26 },
-                        { cx: x0 + 16, cy: yRod, cz: zRod, r: 26 },
-                        { cx: x0 + 20, cy: yRod, cz: zRod, r: 19 },
-                        { cx: x0 + 28, cy: yRod, cz: zRod, r: 18 }
-                    ],
-                    segments: 24,
-                    upHint: [0, 0, 1],
-                    capStart: false,
+                    capStart: true,
                     capEnd: true,
                     ringStep: 1
                 }));
 
-                // 3. Four Sculpted 3D Coat Hangers + 2 Hung Drying Shirts along the Closet Rod
+                // 2. Three Vertical Ceiling Suspension Struts (at X = 18,520, X = 17,755 center, X = 17,190 mm)
+                [
+                    { id: 'WEST', x: x1 - 35, label: 'Left/West' },
+                    { id: 'CENTER', x: xSplit, label: 'Center' },
+                    { id: 'EAST', x: x0 + 35, label: 'Right/East (Over-Sink)' }
+                ].forEach((br) => {
+                    skeleton.push(buildLaundryTubePart({
+                        id: `LAUNDRY_CLOSET_ROD_BRACKET_${br.id}`,
+                        name: `Hanging Rod ${br.label} Ceiling Suspension Bracket (Z=1680..1800 mm)`,
+                        role: 'handle_rail',
+                        material: 'steel_chrome',
+                        colorRgb: [200, 206, 214],
+                        spine: [
+                            { cx: br.x, cy: yRod, cz: zRod, r: 10 },
+                            { cx: br.x, cy: yRod, cz: z1 - 6, r: 10 },
+                            { cx: br.x, cy: yRod, cz: z1, r: 22 }
+                        ],
+                        segments: 16,
+                        upHint: [0, 1, 0],
+                        capStart: false,
+                        capEnd: true,
+                        ringStep: 1
+                    }));
+                });
+
+                // 3. Six Sculpted 3D Coat Hangers along the 1,360 mm Rod:
+                //    - 4 in the 800 mm Dry Zone (X = 17,755..18,555 mm)
+                //    - 2 in the 600 mm Over-Sink Drip-Dry Zone (X = 17,155..17,755 mm, dripping directly into the sink!)
                 const hangerConfigs = [
-                    { x: 18410, hasGarment: true, garmentColor: [232, 236, 242], garmentName: 'Crisp White Linen Shirt' },
-                    { x: 18240, hasGarment: true, garmentColor: [182, 198, 214], garmentName: 'Chambray Blue Oxford Shirt' },
-                    { x: 18070, hasGarment: false },
-                    { x: 17900, hasGarment: false }
+                    { x: 18420, hasGarment: true, garmentColor: [232, 236, 242], garmentName: 'Crisp White Linen Shirt (Air-Dry)' },
+                    { x: 18250, hasGarment: true, garmentColor: [182, 198, 214], garmentName: 'Chambray Blue Oxford Shirt (Air-Dry)' },
+                    { x: 18080, hasGarment: false },
+                    { x: 17910, hasGarment: false },
+                    { x: 17560, hasGarment: true, garmentColor: [176, 206, 218], garmentName: 'Wet Delicate Blouse (Over-Sink Drip-Dry Zone)' },
+                    { x: 17360, hasGarment: false }
                 ];
 
                 for (let hi = 0; hi < hangerConfigs.length; hi++) {
                     const hc = hangerConfigs[hi];
                     const hx = hc.x;
 
-                    // 3a. Smooth Chrome Wire Hanger Hook wrapping around the Ø28 mm rod
+                    // 3a. Smooth Chrome Wire Hanger Hook wrapping around the Ø28 mm rod at Z = 1,680 mm
                     const hookSpine = [
-                        { cx: hx, cy: yRod, cz: 1532, r: 3.2 },
-                        { cx: hx, cy: yRod, cz: 1562, r: 3.2 },
-                        { cx: hx, cy: yRod - 14, cz: 1580, r: 3.2 },
-                        { cx: hx, cy: yRod - 22, cz: 1600, r: 3.2 },
-                        { cx: hx, cy: yRod - 15, cz: 1620, r: 3.2 },
-                        { cx: hx, cy: yRod, cz: 1626, r: 3.2 },
-                        { cx: hx, cy: yRod + 16, cz: 1618, r: 3.2 },
-                        { cx: hx, cy: yRod + 21, cz: 1602, r: 2.8 }
+                        { cx: hx, cy: yRod, cz: zRod - 68, r: 3.2 },
+                        { cx: hx, cy: yRod, cz: zRod - 38, r: 3.2 },
+                        { cx: hx, cy: yRod - 14, cz: zRod - 20, r: 3.2 },
+                        { cx: hx, cy: yRod - 22, cz: zRod,      r: 3.2 },
+                        { cx: hx, cy: yRod - 15, cz: zRod + 20, r: 3.2 },
+                        { cx: hx, cy: yRod,      cz: zRod + 26, r: 3.2 },
+                        { cx: hx, cy: yRod + 16, cz: zRod + 18, r: 3.2 },
+                        { cx: hx, cy: yRod + 21, cz: zRod + 2,  r: 2.8 }
                     ];
                     skeleton.push(buildLaundryTubePart({
                         id: `LAUNDRY_HANGER_${hi + 1}_HOOK`,
@@ -6550,33 +6840,21 @@
                     }));
 
                     // 3b. Contoured Wooden Hanger Body (Sloped Shoulders along Y = yRod-195 .. yRod+195)
-                    const hw = 7; // Half-thickness in X (14 mm thick tailored wooden hanger)
+                    const hw = 7;
                     const hVerts = [
-                        // Rear shoulder tip (0, 1)
-                        [hx - hw, yRod - 195, 1455], [hx + hw, yRod - 195, 1455],
-                        // Rear shoulder upper slope (2, 3)
-                        [hx - hw, yRod - 185, 1474], [hx + hw, yRod - 185, 1474],
-                        // Center neck apex (4, 5)
-                        [hx - hw, yRod,       1536], [hx + hw, yRod,       1536],
-                        // Front shoulder upper slope (6, 7)
-                        [hx - hw, yRod + 185, 1474], [hx + hw, yRod + 185, 1474],
-                        // Front shoulder tip (8, 9)
-                        [hx - hw, yRod + 195, 1455], [hx + hw, yRod + 195, 1455],
-                        // Front lower inner shoulder (10, 11)
-                        [hx - hw, yRod + 150, 1452], [hx + hw, yRod + 150, 1452],
-                        // Center neck lower arch (12, 13)
-                        [hx - hw, yRod,       1506], [hx + hw, yRod,       1506],
-                        // Rear lower inner shoulder (14, 15)
-                        [hx - hw, yRod - 150, 1452], [hx + hw, yRod - 150, 1452]
+                        [hx - hw, yRod - 195, zRod - 145], [hx + hw, yRod - 195, zRod - 145],
+                        [hx - hw, yRod - 185, zRod - 126], [hx + hw, yRod - 185, zRod - 126],
+                        [hx - hw, yRod,       zRod - 64],  [hx + hw, yRod,       zRod - 64],
+                        [hx - hw, yRod + 185, zRod - 126], [hx + hw, yRod + 185, zRod - 126],
+                        [hx - hw, yRod + 195, zRod - 145], [hx + hw, yRod + 195, zRod - 145],
+                        [hx - hw, yRod + 150, zRod - 148], [hx + hw, yRod + 150, zRod - 148],
+                        [hx - hw, yRod,       zRod - 94],  [hx + hw, yRod,       zRod - 94],
+                        [hx - hw, yRod - 150, zRod - 148], [hx + hw, yRod - 150, zRod - 148]
                     ];
                     const hFaces = [
-                        // East face (hx - hw)
                         [0, 2, 14], [2, 4, 12, 14], [4, 6, 10, 12], [6, 8, 10],
-                        // West face (hx + hw)
                         [1, 15, 3], [3, 15, 13, 5], [5, 13, 11, 7], [7, 11, 9],
-                        // Top sloped bevels
                         [0, 1, 3, 2], [2, 3, 5, 4], [4, 5, 7, 6], [6, 7, 9, 8],
-                        // Bottom inner arch bevels
                         [8, 9, 11, 10], [10, 11, 13, 12], [12, 13, 15, 14], [14, 15, 1, 0]
                     ];
                     const hWire = [
@@ -6592,13 +6870,13 @@
                         colorRgb: COLOR_OAK_WARM,
                         x0: hx - hw, x1: hx + hw,
                         y0: yRod - 195, y1: yRod + 195,
-                        z0: 1452, z1: 1536,
+                        z0: zRod - 148, z1: zRod - 64,
                         vertices3D: hVerts,
                         faces3D: hFaces,
                         wireframeIndices: hWire
                     }));
 
-                    // 3c. Cylindrical Trouser Crossbar (Y = yRod-165 .. yRod+165 at Z = 1,454 mm)
+                    // 3c. Cylindrical Trouser Crossbar
                     skeleton.push(buildLaundryTubePart({
                         id: `LAUNDRY_HANGER_${hi + 1}_BAR`,
                         name: `Coat Hanger #${hi + 1} Trouser Crossbar`,
@@ -6606,8 +6884,8 @@
                         material: 'wood_oak',
                         colorRgb: COLOR_OAK_WARM,
                         spine: [
-                            { cx: hx, cy: yRod - 165, cz: 1454, r: 4.5 },
-                            { cx: hx, cy: yRod + 165, cz: 1454, r: 4.5 }
+                            { cx: hx, cy: yRod - 165, cz: zRod - 146, r: 4.5 },
+                            { cx: hx, cy: yRod + 165, cz: zRod - 146, r: 4.5 }
                         ],
                         segments: 10,
                         upHint: [1, 0, 0],
@@ -6616,39 +6894,26 @@
                         ringStep: 2
                     }));
 
-                    // 3d. Sculpted Hanging Garment / Shirt on Hangers #1 and #2
+                    // 3d. Sculpted Hanging Garment / Shirt
                     if (hc.hasGarment) {
-                        const gw = 20; // 40 mm softly draped garment thickness
+                        const gw = 20;
+                        const zHem = 1175;
                         const gVerts = [
-                            // Collar apex (0, 1)
-                            [hx - gw + 4, yRod,       1524], [hx + gw - 4, yRod,       1524],
-                            // Rear shoulder (2, 3)
-                            [hx - gw,     yRod - 198, 1466], [hx + gw,     yRod - 198, 1466],
-                            // Front shoulder (4, 5)
-                            [hx - gw,     yRod + 198, 1466], [hx + gw,     yRod + 198, 1466],
-                            // Rear sleeve cuff (6, 7)
-                            [hx - gw + 2, yRod - 222, 1180], [hx + gw - 2, yRod - 222, 1180],
-                            // Front sleeve cuff (8, 9)
-                            [hx - gw + 2, yRod + 222, 1180], [hx + gw - 2, yRod + 222, 1180],
-                            // Rear underarm (10, 11)
-                            [hx - gw,     yRod - 165, 1340], [hx + gw,     yRod - 165, 1340],
-                            // Front underarm (12, 13)
-                            [hx - gw,     yRod + 165, 1340], [hx + gw,     yRod + 165, 1340],
-                            // Rear bottom hem (14, 15)
-                            [hx - gw + 3, yRod - 172, 1045], [hx + gw - 3, yRod - 172, 1045],
-                            // Front bottom hem (16, 17)
-                            [hx - gw + 3, yRod + 172, 1045], [hx + gw - 3, yRod + 172, 1045]
+                            [hx - gw + 4, yRod,       zRod - 76],  [hx + gw - 4, yRod,       zRod - 76],
+                            [hx - gw,     yRod - 198, zRod - 134], [hx + gw,     yRod - 198, zRod - 134],
+                            [hx - gw,     yRod + 198, zRod - 134], [hx + gw,     yRod + 198, zRod - 134],
+                            [hx - gw + 2, yRod - 220, zHem + 90],  [hx + gw - 2, yRod - 220, zHem + 90],
+                            [hx - gw + 2, yRod + 220, zHem + 90],  [hx + gw - 2, yRod + 220, zHem + 90],
+                            [hx - gw,     yRod - 165, zRod - 250], [hx + gw,     yRod - 165, zRod - 250],
+                            [hx - gw,     yRod + 165, zRod - 250], [hx + gw,     yRod + 165, zRod - 250],
+                            [hx - gw + 3, yRod - 172, zHem],       [hx + gw - 3, yRod - 172, zHem],
+                            [hx - gw + 3, yRod + 172, zHem],       [hx + gw - 3, yRod + 172, zHem]
                         ];
                         const gFaces = [
-                            // East side of garment
                             [0, 2, 10, 12, 4], [2, 6, 10], [4, 12, 8], [10, 14, 16, 12],
-                            // West side of garment
                             [1, 5, 13, 11, 3], [3, 11, 7], [5, 9, 13], [11, 13, 17, 15],
-                            // Top shoulders & collar
                             [0, 1, 3, 2], [0, 4, 5, 1],
-                            // Outer sleeves & cuffs
                             [2, 3, 7, 6], [6, 7, 11, 10], [4, 8, 9, 5], [8, 12, 13, 9],
-                            // Side seams & bottom hem
                             [10, 11, 15, 14], [12, 16, 17, 13], [14, 15, 17, 16]
                         ];
                         const gWire = [
@@ -6663,8 +6928,8 @@
                             material: 'front_cashmere',
                             colorRgb: hc.garmentColor,
                             x0: hx - gw, x1: hx + gw,
-                            y0: yRod - 222, y1: yRod + 222,
-                            z0: 1045, z1: 1524,
+                            y0: yRod - 220, y1: yRod + 220,
+                            z0: zHem, z1: zRod - 76,
                             vertices3D: gVerts,
                             faces3D: gFaces,
                             wireframeIndices: gWire
@@ -6672,41 +6937,120 @@
                     }
                 }
 
+                // 4. Two Pull-Out Flat Mesh Sweater Drying Racks ("2× wysuwana siatka na swetry na płasko")
+                //    in the 800 mm dry zone (X = 17,775..18,535 mm) at Z = 1,040 mm and Z = 1,140 mm
+                const meshRackZs = [1040, 1140];
+                const mx0 = xSplit + 20, mx1 = x1 - 20; // 760 mm wide pull-out mesh frame
+                const my0 = y0 + 50, my1 = yCarcass1 - 30;
+                meshRackZs.forEach((mz, mIdx) => {
+                    const rNum = mIdx + 1;
+                    // Perimeter anodized aluminum frame
+                    skeleton.push(
+                        {
+                            id: `LAUNDRY_SWEATER_MESH_RACK_${rNum}_FRONT`,
+                            name: `Pull-Out Flat Mesh Sweater Drying Rack #${rNum} Front Bar (Z=${mz}..${mz + 14} mm)`,
+                            role: 'drawer_box',
+                            material: 'steel_chrome',
+                            colorRgb: [196, 204, 212],
+                            x0: mx0, x1: mx1,
+                            y0: my1 - 16, y1: my1,
+                            z0: mz, z1: mz + 14
+                        },
+                        {
+                            id: `LAUNDRY_SWEATER_MESH_RACK_${rNum}_REAR`,
+                            name: `Pull-Out Flat Mesh Sweater Drying Rack #${rNum} Rear Bar (Z=${mz}..${mz + 14} mm)`,
+                            role: 'drawer_box',
+                            material: 'steel_chrome',
+                            colorRgb: [196, 204, 212],
+                            x0: mx0, x1: mx1,
+                            y0: my0, y1: my0 + 16,
+                            z0: mz, z1: mz + 14
+                        },
+                        {
+                            id: `LAUNDRY_SWEATER_MESH_RACK_${rNum}_LEFT`,
+                            name: `Pull-Out Flat Mesh Sweater Drying Rack #${rNum} Left Slide Rail`,
+                            role: 'drawer_box',
+                            material: 'steel_chrome',
+                            colorRgb: [180, 188, 198],
+                            x0: mx1 - 14, x1: mx1,
+                            y0: my0, y1: my1,
+                            z0: mz, z1: mz + 14
+                        },
+                        {
+                            id: `LAUNDRY_SWEATER_MESH_RACK_${rNum}_RIGHT`,
+                            name: `Pull-Out Flat Mesh Sweater Drying Rack #${rNum} Right Slide Rail`,
+                            role: 'drawer_box',
+                            material: 'steel_chrome',
+                            colorRgb: [180, 188, 198],
+                            x0: mx0, x1: mx0 + 14,
+                            y0: my0, y1: my1,
+                            z0: mz, z1: mz + 14
+                        }
+                    );
+                    // Breathable openwork mesh crossbars (9 longitudinal bars)
+                    for (let bi = 1; bi <= 9; bi++) {
+                        const bx = Math.round(mx0 + (bi / 10) * (mx1 - mx0));
+                        skeleton.push({
+                            id: `LAUNDRY_SWEATER_MESH_RACK_${rNum}_WIRE_${bi}`,
+                            name: `Sweater Drying Rack #${rNum} Breathable Mesh Grid Bar #${bi}`,
+                            role: 'shelf_panel',
+                            material: 'steel_chrome',
+                            colorRgb: [210, 216, 224],
+                            x0: bx - 3, x1: bx + 3,
+                            y0: my0 + 16, y1: my1 - 16,
+                            z0: mz + 3, z1: mz + 11
+                        });
+                    }
+                    // Folded/flat-drying cashmere sweater on Upper Mesh Rack #2
+                    if (rNum === 2) {
+                        skeleton.push({
+                            id: 'LAUNDRY_SWEATER_MESH_RACK_2_SWEATER',
+                            name: 'Flat-Drying Cashmere Knit Sweater on Mesh Rack #2',
+                            role: 'front_panel',
+                            material: 'front_cashmere',
+                            colorRgb: [224, 212, 198],
+                            x0: mx0 + 140, x1: mx1 - 140,
+                            y0: my0 + 70, y1: my1 - 70,
+                            z0: mz + 12, z1: mz + 34
+                        });
+                    }
+                });
+
                 return {
                     id: 'LAUNDRY_HANGING_NICHE',
-                    name: 'LAUNDRY_HANGING_NICHE — 800×900mm Hanging Drying Zone with Closet Rod (Z=1600mm), 4 Coat Hangers & Divider',
-                    shortName: 'Laundry Closet Rod & Hangers (800×900mm)',
+                    name: 'LAUNDRY_HANGING_NICHE — 1400×900mm Open Hanging, Over-Sink Drip-Dry & 2× Pull-Out Sweater Mesh Zone',
+                    shortName: 'Hanging & Drip-Dry Niche (1400×900mm)',
                     category: 'wall_cabinet',
                     subtype: 'laundry_hanging_niche',
                     floor: 'ground',
                     room: '0.08 Pralnia',
                     hostWallId: 'GW_8',
                     viewId: 'laundry_north_wall',
-                    x1: x0 - 10, x2: x1,
+                    x1: x0, x2: x1,
                     y1: y0, y2: yCarcass1,
                     zBottom: z0, zTop: z1,
-                    widthMm: 800, depthMm: LAUNDRY_CARCASS_DEPTH_MM,
+                    widthMm: 1400, depthMm: LAUNDRY_CARCASS_DEPTH_MM,
                     carcassDepthMm: LAUNDRY_CARCASS_DEPTH_MM, frontThicknessMm: 0,
                     plinthHeightMm: 0, plinthRecessMm: 0,
                     bodyHeightMm: 900, heightMm: 900,
                     boardThicknessMm: b,
                     normal: [0, 1, 0],
-                    specs: '800 × 630 × 900 mm (X = 17,755..18,555 mm, Y = 11,400..12,030 mm, Z = 900..1,800 mm) • Smooth Ø28 mm Chrome Closet Rod at Z = 1,600 mm • 4 Contoured Wooden Coat Hangers & 2 Hanging Shirts • 900 mm Vertical Partition',
-                    description: 'Open 800 × 900 mm shirt & garment air-drying niche above the 800 mm base cabinet, equipped with a cylindrical chrome closet rod at Z = 1,600 mm, turned mounting sockets, 4 contoured oak coat hangers with chrome hooks, 2 hanging shirts, and a 900 mm vertical partition.',
+                    specs: '1,400 × 630 × 900 mm (X = 17,155..18,555 mm, Y = 11,400..12,030 mm, Z = 900..1,800 mm) • Full-Width 1,360 mm Chrome Hanging & Over-Sink Drip-Dry Rod at Z = 1,680 mm • 6 Coat Hangers + 3 Garments • 2× Pull-Out Flat Mesh Sweater Drying Racks (Z = 1,040 & 1,140 mm) • Under-Cabinet LED Strip',
+                    description: 'Continuous 1,400 × 900 mm open air-drying and over-sink drip-dry zone (partition removed) featuring a full-width 1,360 mm chrome hanging rod at Z = 1,680 mm (allowing wet garments to drip directly into the 480 mm soaking sink), 2 pull-out flat mesh sweater drying racks ("2× wysuwana siatka na swetry na płasko"), and a recessed warm LED strip.',
                     skeleton: skeleton,
                     fronts: []
                 };
             }
 
             // -----------------------------------------------------------------
-            // 46. CAB_LAUNDRY_SINK: 600 × 900 mm Utility Sink Cabinet + Deep 300 mm Stainless Basin & Curved Gooseneck Faucet
+            // 46. CAB_LAUNDRY_SINK: 600 × 900 mm Utility Sink Cabinet + Wide 480 mm Soaking Basin & Gooseneck Faucet
             //     (d = 2,570..3,170 mm from West wall -> X = 17,155..17,755 mm, Z = 0..900 mm + Sink/Faucet to Z=1185mm)
             // -----------------------------------------------------------------
             function buildLaundrySinkCabinet() {
                 const x0 = 17155, x1 = 17755; // 600 mm wide (d = 2,570..3,170 mm)
-                const z0 = 0, z1 = 900;
-                // Sink Basin in laundry.html: x = 272..302 (d = 2,720..3,020 mm -> X = 17,305..17,605 mm, 300 mm wide)
-                const xSink0 = 17305, xSink1 = 17605;
+                const z0 = 0, zPlinth = 150, zDeck0 = 870, z1 = 900;
+                // Wide 480 mm Soaking Sink Basin in laundry.html: x = 263..311 (d = 2,630..3,110 mm -> X = 17,215..17,695 mm, 480 mm wide)
+                const xSink0 = 17215, xSink1 = 17695;
                 const ySink0 = y0 + 130;      // Y = 11,530 mm (leaves 130 mm rear deck for gooseneck faucet)
                 const ySink1 = y0 + 510;      // Y = 11,910 mm (380 mm front-to-back cutout)
                 const xFaucet = 17455;        // Centered at X = 17,455 mm
@@ -6715,94 +7059,105 @@
                 const cyDrain = (ySink0 + ySink1) / 2; // Y = 11,720 mm
 
                 const skeleton = [
-                    // 1. Cabinet Carcass Side, Back & Bottom Panels (stopped below sink sump where needed)
+                    // 0. Recessed 150 mm Plinth Kickplate
+                    {
+                        id: 'CAB_LAUNDRY_SINK_PLINTH',
+                        name: 'Sink Cabinet Recessed Plinth Kickplate (600×590×150 mm, Z=0..150 mm)',
+                        role: 'plinth',
+                        material: 'plinth_dark',
+                        colorRgb: COLOR_DARK_STEEL,
+                        x0: x0, x1: x1,
+                        y0: y0, y1: yCarcass1 - 40,
+                        z0: z0, z1: zPlinth
+                    },
+                    // 1. Cabinet Carcass Side, Back & Bottom Panels
                     {
                         id: 'CAB_LAUNDRY_SINK_WEST_PANEL',
-                        name: 'Sink Cabinet Left/West Side Panel (20×630×880 mm, Z=0..880 mm)',
+                        name: 'Sink Cabinet Left/West Side Panel (20×630×720 mm, Z=150..870 mm)',
                         role: 'carcass_panel',
                         material: 'wood_oak',
                         colorRgb: COLOR_OAK_WARM,
                         x0: x1 - b, x1: x1,
                         y0: y0, y1: yCarcass1,
-                        z0: z0, z1: z1 - b
+                        z0: zPlinth, z1: zDeck0
                     },
                     {
                         id: 'CAB_LAUNDRY_SINK_EAST_PANEL',
-                        name: 'Sink Cabinet Right/East Side Panel (20×630×880 mm, Z=0..880 mm)',
+                        name: 'Sink Cabinet Right/East Side Panel (20×630×720 mm, Z=150..870 mm)',
                         role: 'carcass_panel',
                         material: 'wood_oak',
                         colorRgb: COLOR_OAK_WARM,
                         x0: x0, x1: x0 + b,
                         y0: y0, y1: yCarcass1,
-                        z0: z0, z1: z1 - b
+                        z0: zPlinth, z1: zDeck0
                     },
                     {
                         id: 'CAB_LAUNDRY_SINK_BACK_PANEL',
-                        name: 'Sink Cabinet Rear Panel (560×20×880 mm, Z=0..880 mm)',
+                        name: 'Sink Cabinet Rear Panel (560×20×720 mm, Z=150..870 mm)',
                         role: 'carcass_panel',
                         material: 'wood_oak',
                         colorRgb: COLOR_OAK_WARM,
                         x0: x0 + b, x1: x1 - b,
                         y0: y0, y1: y0 + b,
-                        z0: z0, z1: z1 - b
+                        z0: zPlinth, z1: zDeck0
                     },
                     {
                         id: 'CAB_LAUNDRY_SINK_BOTTOM_PANEL',
-                        name: 'Sink Cabinet Bottom Panel (560×610×20 mm, Z=0..20 mm)',
+                        name: 'Sink Cabinet Bottom Panel (560×610×20 mm, Z=150..170 mm)',
                         role: 'carcass_panel',
                         material: 'wood_oak',
                         colorRgb: COLOR_OAK_WARM,
                         x0: x0 + b, x1: x1 - b,
                         y0: y0 + b, y1: yCarcass1,
-                        z0: z0, z1: z0 + b
+                        z0: zPlinth, z1: zPlinth + b
                     },
 
-                    // 2. Oak Countertop Deck with Real 300 × 380 mm Sink Cutout Opening (Z = 880..900 mm)
+                    // 2. 30 mm Oak Countertop Deck with Real 480 × 380 mm Sink Cutout Opening (Z = 870..900 mm)
                     {
                         id: 'CAB_LAUNDRY_SINK_DECK_WEST',
-                        name: 'Sink Countertop Left Deck Strip (150×650×20 mm)',
+                        name: 'Sink Countertop Left Deck Strip (60×650×30 mm)',
                         role: 'countertop',
                         material: 'wood_oak',
                         colorRgb: COLOR_OAK_WARM,
                         x0: xSink1, x1: x1,
                         y0: y0, y1: yFront1,
-                        z0: z1 - b, z1: z1
+                        z0: zDeck0, z1: z1
                     },
                     {
                         id: 'CAB_LAUNDRY_SINK_DECK_EAST',
-                        name: 'Sink Countertop Right Deck Strip (150×650×20 mm)',
+                        name: 'Sink Countertop Right Deck Strip (60×650×30 mm)',
                         role: 'countertop',
                         material: 'wood_oak',
                         colorRgb: COLOR_OAK_WARM,
                         x0: x0, x1: xSink0,
                         y0: y0, y1: yFront1,
-                        z0: z1 - b, z1: z1
+                        z0: zDeck0, z1: z1
                     },
                     {
                         id: 'CAB_LAUNDRY_SINK_DECK_NORTH',
-                        name: 'Sink Countertop Rear Faucet Deck Strip (300×130×20 mm)',
+                        name: 'Sink Countertop Rear Faucet Deck Strip (480×130×30 mm)',
                         role: 'countertop',
                         material: 'wood_oak',
                         colorRgb: COLOR_OAK_WARM,
                         x0: xSink0, x1: xSink1,
                         y0: y0, y1: ySink0,
-                        z0: z1 - b, z1: z1
+                        z0: zDeck0, z1: z1
                     },
                     {
                         id: 'CAB_LAUNDRY_SINK_DECK_SOUTH',
-                        name: 'Sink Countertop Front Apron Deck Strip (300×140×20 mm)',
+                        name: 'Sink Countertop Front Apron Deck Strip (480×140×30 mm)',
                         role: 'countertop',
                         material: 'wood_oak',
                         colorRgb: COLOR_OAK_WARM,
                         x0: xSink0, x1: xSink1,
                         y0: ySink1, y1: yFront1,
-                        z0: z1 - b, z1: z1
+                        z0: zDeck0, z1: z1
                     }
                 ];
 
-                // 3. Sculpted Above-Counter Beveled Stainless Utility Sink Rim (Z = 900..932 mm)
-                //    Outer footprint: X = 17,295..17,615 (320 mm), Y = 11,520..11,920 (400 mm)
-                //    Inner basin opening: X = 17,315..17,595 (280 mm), Y = 11,540..11,900 (360 mm)
+                // 3. Sculpted Above-Counter Beveled Stainless Utility Soaking Sink Rim (Z = 900..932 mm)
+                //    Outer footprint: X = 17,205..17,705 (500 mm), Y = 11,520..11,920 (400 mm)
+                //    Inner basin opening: X = 17,225..17,685 (460 mm), Y = 11,540..11,900 (360 mm)
                 const rx0 = xSink0 - 10, rx1 = xSink1 + 10;
                 const ry0 = ySink0 - 10, ry1 = ySink1 + 10;
                 const bx0 = xSink0 + 10, bx1 = xSink1 - 10;
@@ -6810,28 +7165,18 @@
                 const zRim0 = 900, zRim1 = 932;
 
                 const rimVerts = [
-                    // Outer bottom perimeter at Z = 900 (0..3)
                     [rx0, ry0, zRim0], [rx1, ry0, zRim0], [rx1, ry1, zRim0], [rx0, ry1, zRim0],
-                    // Outer top beveled perimeter at Z = 932 (4..7)
                     [rx0 + 3, ry0 + 3, zRim1], [rx1 - 3, ry0 + 3, zRim1], [rx1 - 3, ry1 - 3, zRim1], [rx0 + 3, ry1 - 3, zRim1],
-                    // Inner top perimeter at Z = 932 (8..11)
                     [bx0, by0, zRim1], [bx1, by0, zRim1], [bx1, by1, zRim1], [bx0, by1, zRim1],
-                    // Inner basin bottom perimeter at Z = 686 (12..15)
                     [bx0 + 6, by0 + 6, 686], [bx1 - 6, by0 + 6, 686], [bx1 - 6, by1 - 6, 686], [bx0 + 6, by1 - 6, 686],
-                    // Center drain sump perimeter at Z = 678 (16..19)
                     [cxDrain - 28, cyDrain - 28, 678], [cxDrain + 28, cyDrain - 28, 678],
                     [cxDrain + 28, cyDrain + 28, 678], [cxDrain - 28, cyDrain + 28, 678]
                 ];
                 const rimFaces = [
-                    // Outer rim slopes (facing outward)
                     [0, 1, 5, 4], [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7],
-                    // Top brushed stainless rim deck (facing up +Z)
                     [4, 5, 9, 8], [5, 6, 10, 9], [6, 7, 11, 10], [7, 4, 8, 11],
-                    // Inner basin walls (facing inward into the sink cavity!)
                     [8, 9, 13, 12], [9, 10, 14, 13], [10, 11, 15, 14], [11, 8, 12, 15],
-                    // Pitched 4-facet stainless steel basin floor with X-drainage creases (facing up +Z)
                     [12, 13, 17, 16], [13, 14, 18, 17], [14, 15, 19, 18], [15, 12, 16, 19],
-                    // Outer underside of sink sump box (so looking from below is also solid)
                     [0, 4, 12, 15, 3], [1, 2, 14, 13, 5]
                 ];
                 const rimWire = [
@@ -6840,13 +7185,12 @@
                     [8, 9], [9, 10], [10, 11], [11, 8],
                     [12, 13], [13, 14], [14, 15], [15, 12],
                     [8, 12], [9, 13], [10, 14], [11, 15],
-                    // X-drainage creases on basin floor
                     [12, 16], [13, 17], [14, 18], [15, 19],
                     [16, 17], [17, 18], [18, 19], [19, 16]
                 ];
                 skeleton.push(buildIndexedMeshPart({
                     id: 'LAUNDRY_SINK_BASIN_SHELL',
-                    name: 'Sculpted Brushed Stainless Steel Utility Sink Basin & Pitched Sump (320×400×254 mm, Z=678..932 mm)',
+                    name: 'Sculpted Wide 480mm Brushed Stainless Steel Soaking Basin & Pitched Sump (500×400×254 mm, Z=678..932 mm)',
                     role: 'sink_basin',
                     material: 'steel_chrome',
                     colorRgb: [208, 215, 222],
@@ -6878,7 +7222,6 @@
                     ringStep: 1
                 }));
 
-                // Rear Wall Chrome Overflow Escutcheon Slot (at Y = by0 + 1, Z = 865..885 mm)
                 skeleton.push({
                     id: 'LAUNDRY_SINK_OVERFLOW_PLATE',
                     name: 'Sink Rear Wall Chrome Overflow Escutcheon (48×4×20 mm)',
@@ -6891,7 +7234,6 @@
                 });
 
                 // 5. Smooth-Shaded 3D Gooseneck Mixer Faucet (X = 17,455 mm, Y = 11,478 mm, Z = 900..1,185 mm)
-                // 5a. Turned Base Escutcheon & Cylindrical Mixer Body Column (Z = 900..1,055 mm)
                 const faucetBaseSpine = [
                     { cx: xFaucet, cy: yFaucet, cz: 900,  r: 27 },
                     { cx: xFaucet, cy: yFaucet, cz: 908,  r: 27 },
@@ -6913,11 +7255,8 @@
                     ringStep: 1
                 }));
 
-                // 5b. Smooth 18-Step 180° Curved Gooseneck Spout Arch + Aerator Nozzle
-                //     Rises from Z = 1,055 to 1,095 at Y = 11,478, then sweeps a 95 mm radius 180° arch forward
-                //     to Y = 11,668 mm (over the center of the sink bowl), ending with a flared aerator at Z = 1,068 mm.
                 const R_arch = 95;
-                const cyArch = yFaucet + R_arch; // Y = 11,573 mm
+                const cyArch = yFaucet + R_arch;
                 const czArch = 1090;
                 const spoutSpine = [
                     { cx: xFaucet, cy: yFaucet, cz: 1055, r: 12 },
@@ -6925,13 +7264,12 @@
                 ];
                 const archSteps = 16;
                 for (let s = 1; s <= archSteps; s++) {
-                    const theta = Math.PI * (1 - s / archSteps); // PI (rear) -> 0 (front)
+                    const theta = Math.PI * (1 - s / archSteps);
                     const py = cyArch + R_arch * Math.cos(theta);
                     const pz = czArch + R_arch * Math.sin(theta);
                     spoutSpine.push({ cx: xFaucet, cy: py, cz: pz, r: 12 });
                 }
-                // Aerator nozzle drop & lip
-                const yNozzle = cyArch + R_arch; // Y = 11,668 mm
+                const yNozzle = cyArch + R_arch;
                 spoutSpine.push(
                     { cx: xFaucet, cy: yNozzle, cz: 1074, r: 13.5 },
                     { cx: xFaucet, cy: yNozzle, cz: 1066, r: 13.5 },
@@ -6951,7 +7289,6 @@
                     ringStep: 3
                 }));
 
-                // 5c. Side Mixer Valve Cylinder & Pin Lever Handle (protruding East/Right from mixer column at Z = 975 mm)
                 skeleton.push(buildLaundryTubePart({
                     id: 'LAUNDRY_SINK_FAUCET_VALVE_HUB',
                     name: 'Laundry Sink Mixer Side Valve Cartridge Hub',
@@ -6989,19 +7326,29 @@
                 const fronts = [
                     {
                         id: 'CAB_LAUNDRY_SINK_DOOR',
-                        name: 'Sink Base Cabinet Hinged Door (596×20×876 mm)',
+                        name: 'Sink Base Cabinet Hinged Door (596×20×716 mm)',
                         role: 'front_panel',
                         material: 'front_cashmere',
                         colorRgb: COLOR_CASHMERE_FRONT,
                         x0: x0 + 2, x1: x1 - 2,
                         y0: yCarcass1, y1: yFront1,
-                        z0: 2, z1: z1 - b - 2
+                        z0: zPlinth + 2, z1: zDeck0 - 2
+                    },
+                    {
+                        id: 'CAB_LAUNDRY_SINK_HANDLE',
+                        name: 'Sink Base Cabinet Top Edge Pull Handle (160 mm)',
+                        role: 'handle_rail',
+                        material: 'steel_dark',
+                        colorRgb: COLOR_DARK_STEEL,
+                        x0: x0 + 220, x1: x1 - 220,
+                        y0: yFront1, y1: yFront1 + 14,
+                        z0: zDeck0 - 32, z1: zDeck0 - 18
                     }
                 ];
 
                 return {
                     id: 'CAB_LAUNDRY_SINK',
-                    name: 'CAB_LAUNDRY_SINK — 600×900mm Utility Sink Base Cabinet + 300mm Sculpted Stainless Basin & Gooseneck Faucet',
+                    name: 'CAB_LAUNDRY_SINK — 600×900mm Utility Sink Base Cabinet + Wide 480mm Stainless Soaking Basin & Gooseneck Faucet',
                     shortName: 'Laundry Sink Cabinet (600×900mm)',
                     category: 'base_cabinet',
                     subtype: 'laundry_sink_cabinet',
@@ -7010,103 +7357,115 @@
                     hostWallId: 'GW_8',
                     viewId: 'laundry_north_wall',
                     x1: x0, x2: x1,
-                    y1: y0, y2: yFront1,
+                    y1: y0, y2: yFront1 + 14,
                     zBottom: z0, zTop: 1185,
                     widthMm: 600, depthMm: LAUNDRY_DEPTH_MM,
                     carcassDepthMm: LAUNDRY_CARCASS_DEPTH_MM, frontThicknessMm: LAUNDRY_FRONT_MM,
-                    plinthHeightMm: 0, plinthRecessMm: 0,
-                    bodyHeightMm: 900, heightMm: 900,
+                    plinthHeightMm: 150, plinthRecessMm: 40,
+                    bodyHeightMm: 750, heightMm: 900,
                     boardThicknessMm: b,
                     normal: [0, 1, 0],
-                    specs: '600 × 650 × 900 mm (X = 17,155..17,755 mm, Y = 11,400..12,050 mm, Z = 0..900 mm) • Sculpted 300 × 380 × 254 mm Brushed Stainless Basin with Pitched Sump & Strainer • Smooth Curved 180° Gooseneck Mixer Faucet',
-                    description: '600 × 900 mm utility sink base cabinet featuring a real countertop cutout, a deep 254 mm brushed stainless steel soaking basin with pitched X-grooved floor and basket strainer drain, and a smooth-shaded 180° gooseneck mixer faucet with pin lever.',
+                    specs: '600 × 650 × 900 mm (X = 17,155..17,755 mm, Y = 11,400..12,050 mm, Z = 0..900 mm) • Wide 480 × 380 × 254 mm Brushed Stainless Soaking Basin ("Zlew 48cm — strefa ociekania z drążka") • Smooth Curved 180° Gooseneck Mixer Faucet',
+                    description: '600 × 900 mm utility sink base cabinet featuring a widened 480 × 380 × 254 mm brushed stainless steel soaking basin positioned directly beneath the over-sink drip-dry rod, paired with a smooth-shaded 180° gooseneck mixer faucet.',
                     skeleton: skeleton,
                     fronts: fronts
                 };
             }
 
             // -----------------------------------------------------------------
-            // 47. CAB_LAUNDRY_RIGHT_1600: Right-Side 800 × 1,600 mm Multi-Split Cabinet
-            //     (d = 3,170..3,970 mm from West wall -> X = 16,355..17,155 mm, Z = 0..1,600 mm)
-            //     Vertical Splits (Right to Left: 400, 200, 200 mm -> Left to Right: 200, 200, 400 mm)
-            //     Matches x=317..337 (200mm), x=337..357 (200mm), x=357..397 (400mm) in laundry.html!
+            // 47. CAB_LAUNDRY_RIGHT_1600: Right-Side 800 × 1,800 mm Drying & Utility Cabinet
+            //     (d = 3,170..3,970 mm from West wall -> X = 16,355..17,155 mm, Z = 0..1,800 mm)
+            //     - Extended to full Z = 1,800 mm (eliminating the awkward 200 mm bridge cubby)
+            //     - Two 200 mm Pull-Out 5-Tier Vertical Drying Racks ("Suszarka Cargo I & II", 5 levels each = 6.0m line)
+            //     - One 400 mm Tall Ironing & Utility Closet (X = 16,355..16,755 mm)
             // -----------------------------------------------------------------
             function buildLaundryRight1600Cabinet() {
                 const x0 = 16355, x1 = 17155; // 800 mm wide (flush with East Wall GW_9 at X = 16,355 mm)
                 const xSplit1 = 16755;        // 400 mm from Right/East wall (x = 357 in laundry.html)
                 const xSplit2 = 16955;        // 600 mm from Right/East wall (x = 337 in laundry.html)
-                const z0 = 0, z1 = 1600;
+                const z0 = 0, zPlinth = 150, z1 = 1800;
 
                 const skeleton = [
+                    // Recessed 150 mm Ventilated Plinth Kickplate
+                    {
+                        id: 'CAB_LAUNDRY_RIGHT_1600_PLINTH',
+                        name: 'Recessed Ventilated Plinth Kickplate (800×590×150 mm, Z=0..150 mm)',
+                        role: 'plinth',
+                        material: 'plinth_dark',
+                        colorRgb: COLOR_DARK_STEEL,
+                        x0: x0, x1: x1,
+                        y0: y0, y1: yCarcass1 - 40,
+                        z0: z0, z1: zPlinth
+                    },
                     // Left/West Outer Panel (X = 17,135..17,155 mm)
                     {
                         id: 'CAB_LAUNDRY_RIGHT_1600_WEST_PANEL',
-                        name: 'Left/West Outer Carcass Panel (20×630×1600 mm, Z=0..1600 mm)',
+                        name: 'Left/West Outer Carcass Panel (20×630×1650 mm, Z=150..1800 mm)',
                         role: 'carcass_panel',
                         material: 'wood_oak',
                         colorRgb: COLOR_OAK_WARM,
                         x0: x1 - b, x1: x1,
                         y0: y0, y1: yCarcass1,
-                        z0: z0, z1: z1
+                        z0: zPlinth, z1: z1
                     },
                     // Right/East Outer Panel (X = 16,355..16,375 mm)
                     {
                         id: 'CAB_LAUNDRY_RIGHT_1600_EAST_PANEL',
-                        name: 'Right/East Outer Carcass Panel (20×630×1600 mm, Z=0..1600 mm)',
+                        name: 'Right/East Outer Carcass Panel (20×630×1650 mm, Z=150..1800 mm)',
                         role: 'carcass_panel',
                         material: 'wood_oak',
                         colorRgb: COLOR_OAK_WARM,
                         x0: x0, x1: x0 + b,
                         y0: y0, y1: yCarcass1,
-                        z0: z0, z1: z1
+                        z0: zPlinth, z1: z1
                     },
                     // Vertical Split #1 at x = 357 (400 mm from Right -> X = 16,745..16,765 mm)
                     {
                         id: 'CAB_LAUNDRY_RIGHT_1600_SPLIT_357',
-                        name: 'Vertical Split #1 (400mm from Right, X=16745..16765, Z=20..1580 mm)',
+                        name: 'Vertical Split #1 (400mm from Right, X=16745..16765, Z=170..1780 mm)',
                         role: 'carcass_panel',
                         material: 'wood_oak',
                         colorRgb: COLOR_OAK_WARM,
                         x0: xSplit1 - 10, x1: xSplit1 + 10,
                         y0: y0 + b, y1: yCarcass1,
-                        z0: z0 + b, z1: z1 - b
+                        z0: zPlinth + b, z1: z1 - b
                     },
                     // Vertical Split #2 at x = 337 (600 mm from Right -> X = 16,945..16,965 mm)
                     {
                         id: 'CAB_LAUNDRY_RIGHT_1600_SPLIT_337',
-                        name: 'Vertical Split #2 (200+200mm Narrow Bays, X=16945..16965, Z=20..1580 mm)',
+                        name: 'Vertical Split #2 (200+200mm Pull-Out Drying Bays, X=16945..16965, Z=170..1780 mm)',
                         role: 'carcass_panel',
                         material: 'wood_oak',
                         colorRgb: COLOR_OAK_WARM,
                         x0: xSplit2 - 10, x1: xSplit2 + 10,
                         y0: y0 + b, y1: yCarcass1,
-                        z0: z0 + b, z1: z1 - b
+                        z0: zPlinth + b, z1: z1 - b
                     },
                     // Back Panel
                     {
                         id: 'CAB_LAUNDRY_RIGHT_1600_BACK_PANEL',
-                        name: 'Rear Backing Panel (760×20×1600 mm, Z=0..1600 mm)',
+                        name: 'Rear Backing Panel (760×20×1650 mm, Z=150..1800 mm)',
                         role: 'carcass_panel',
                         material: 'wood_oak',
                         colorRgb: COLOR_OAK_WARM,
                         x0: x0 + b, x1: x1 - b,
                         y0: y0, y1: y0 + b,
-                        z0: z0, z1: z1
+                        z0: zPlinth, z1: z1
                     },
                     // Bottom & Top Panels
                     {
                         id: 'CAB_LAUNDRY_RIGHT_1600_BOTTOM_PANEL',
-                        name: 'Bottom Carcass Panel (760×610×20 mm, Z=0..20 mm)',
+                        name: 'Bottom Carcass Panel (760×610×20 mm, Z=150..170 mm)',
                         role: 'carcass_panel',
                         material: 'wood_oak',
                         colorRgb: COLOR_OAK_WARM,
                         x0: x0 + b, x1: x1 - b,
                         y0: y0 + b, y1: yCarcass1,
-                        z0: z0, z1: z0 + b
+                        z0: zPlinth, z1: zPlinth + b
                     },
                     {
                         id: 'CAB_LAUNDRY_RIGHT_1600_TOP_PANEL',
-                        name: 'Top Carcass Panel (760×610×20 mm, Z=1580..1600 mm)',
+                        name: 'Top Carcass Panel (760×610×20 mm, Z=1780..1800 mm)',
                         role: 'carcass_panel',
                         material: 'wood_oak',
                         colorRgb: COLOR_OAK_WARM,
@@ -7116,11 +7475,60 @@
                     }
                 ];
 
-                // Internal shelves inside the 400 mm right bay (X = 16,375..16,745 mm)
-                [400, 800, 1200].forEach((sz, idx) => {
+                // Two 200 mm Pull-Out 5-Tier Telescopic Vertical Drying Racks ("Suszarka Cargo I" & "Suszarka Cargo II")
+                // Each bay has 5 horizontal drying rod tiers at Z = 420, 680, 940, 1200, 1460 mm (2 rods per tier = 6.0 m total drying line)
+                const cargoBays = [
+                    { id: 'CARGO_1', label: 'Suszarka Cargo I (Left 200mm Bay)', bx0: xSplit2 + 12, bx1: x1 - b - 4 },
+                    { id: 'CARGO_2', label: 'Suszarka Cargo II (Middle 200mm Bay)', bx0: xSplit1 + 12, bx1: xSplit2 - 12 }
+                ];
+                const cargoTierZs = [420, 680, 940, 1200, 1460];
+                cargoBays.forEach((bay) => {
+                    const cxMid = Math.round((bay.bx0 + bay.bx1) * 0.5);
+                    // Bottom & Top telescopic slide runners
+                    skeleton.push(
+                        {
+                            id: `CAB_LAUNDRY_RIGHT_${bay.id}_SLIDE_BOTTOM`,
+                            name: `${bay.label} Lower Heavy-Duty Telescopic Runner`,
+                            role: 'drawer_box',
+                            material: 'steel_chrome',
+                            colorRgb: [185, 192, 200],
+                            x0: cxMid - 18, x1: cxMid + 18,
+                            y0: y0 + 50, y1: yCarcass1 - 20,
+                            z0: zPlinth + b, z1: zPlinth + b + 16
+                        },
+                        {
+                            id: `CAB_LAUNDRY_RIGHT_${bay.id}_SLIDE_TOP`,
+                            name: `${bay.label} Upper Heavy-Duty Telescopic Runner`,
+                            role: 'drawer_box',
+                            material: 'steel_chrome',
+                            colorRgb: [185, 192, 200],
+                            x0: cxMid - 18, x1: cxMid + 18,
+                            y0: y0 + 50, y1: yCarcass1 - 20,
+                            z0: z1 - b - 16, z1: z1 - b
+                        }
+                    );
+                    // 5 Tiers of Dual Chrome Drying Rods (running front-to-back along Y)
+                    cargoTierZs.forEach((tz, tIdx) => {
+                        [-32, 32].forEach((dx, rIdx) => {
+                            skeleton.push({
+                                id: `CAB_LAUNDRY_RIGHT_${bay.id}_TIER_${tIdx + 1}_ROD_${rIdx + 1}`,
+                                name: `${bay.label} Tier #${tIdx + 1} Drying Rod #${rIdx + 1} (Z=${tz} mm)`,
+                                role: 'shelf_panel',
+                                material: 'steel_chrome',
+                                colorRgb: [215, 222, 230],
+                                x0: cxMid + dx - 4, x1: cxMid + dx + 4,
+                                y0: y0 + 60, y1: yCarcass1 - 25,
+                                z0: tz - 4, z1: tz + 4
+                            });
+                        });
+                    });
+                });
+
+                // Internal shelves inside the 400 mm right utility/ironing closet (X = 16,375..16,745 mm)
+                [900, 1350].forEach((sz, idx) => {
                     skeleton.push({
                         id: `CAB_LAUNDRY_RIGHT_1600_SHELF_${idx + 1}`,
-                        name: `Right 400mm Bay Internal Shelf #${idx + 1} (Z=${sz}..${sz + b} mm)`,
+                        name: `Right 400mm Utility Closet Shelf #${idx + 1} (Z=${sz}..${sz + b} mm)`,
                         role: 'carcass_panel',
                         material: 'wood_oak',
                         colorRgb: COLOR_OAK_WARM,
@@ -7131,45 +7539,94 @@
                 });
 
                 const fronts = [
-                    // Leftmost 200 mm door (X = 16,955..17,155 mm)
+                    // Leftmost 200 mm Pull-Out Drying Rack Door (X = 16,955..17,155 mm, Z = 152..1,798 mm)
                     {
                         id: 'CAB_LAUNDRY_RIGHT_1600_DOOR_200A',
-                        name: 'Left 200mm Narrow Pull-Out Door (196×20×1596 mm)',
+                        name: 'Left 200mm Pull-Out Vertical Drying Rack Door — Suszarka Cargo I (196×20×1646 mm)',
                         role: 'front_panel',
                         material: 'front_cashmere',
                         colorRgb: COLOR_CASHMERE_FRONT,
                         x0: xSplit2 + 2, x1: x1 - 2,
                         y0: yCarcass1, y1: yFront1,
-                        z0: 2, z1: z1 - 2
+                        z0: zPlinth + 2, z1: z1 - 2
                     },
-                    // Middle 200 mm door (X = 16,755..16,955 mm)
+                    {
+                        id: 'CAB_LAUNDRY_RIGHT_1600_HANDLE_200A',
+                        name: 'Left 200mm Pull-Out Drying Rack Vertical Handle',
+                        role: 'handle_rail',
+                        material: 'steel_dark',
+                        colorRgb: COLOR_DARK_STEEL,
+                        x0: xSplit2 + 92, x1: xSplit2 + 108,
+                        y0: yFront1, y1: yFront1 + 14,
+                        z0: 940, z1: 1120
+                    },
+                    // Middle 200 mm Pull-Out Drying Rack Door (X = 16,755..16,955 mm, Z = 152..1,798 mm)
                     {
                         id: 'CAB_LAUNDRY_RIGHT_1600_DOOR_200B',
-                        name: 'Middle 200mm Narrow Pull-Out Door (196×20×1596 mm)',
+                        name: 'Middle 200mm Pull-Out Vertical Drying Rack Door — Suszarka Cargo II (196×20×1646 mm)',
                         role: 'front_panel',
                         material: 'front_cashmere',
                         colorRgb: COLOR_CASHMERE_FRONT,
                         x0: xSplit1 + 2, x1: xSplit2 - 2,
                         y0: yCarcass1, y1: yFront1,
-                        z0: 2, z1: z1 - 2
+                        z0: zPlinth + 2, z1: z1 - 2
                     },
-                    // Rightmost 400 mm door (X = 16,355..16,755 mm)
+                    {
+                        id: 'CAB_LAUNDRY_RIGHT_1600_HANDLE_200B',
+                        name: 'Middle 200mm Pull-Out Drying Rack Vertical Handle',
+                        role: 'handle_rail',
+                        material: 'steel_dark',
+                        colorRgb: COLOR_DARK_STEEL,
+                        x0: xSplit1 + 92, x1: xSplit1 + 108,
+                        y0: yFront1, y1: yFront1 + 14,
+                        z0: 940, z1: 1120
+                    },
+                    // Rightmost 400 mm Hinged Utility Door (X = 16,355..16,755 mm, Z = 152..1,798 mm)
                     {
                         id: 'CAB_LAUNDRY_RIGHT_1600_DOOR_400',
-                        name: 'Right 400mm Hinged Storage Door (396×20×1596 mm)',
+                        name: 'Right 400mm Hinged Ironing & Utility Closet Door (396×20×1646 mm)',
                         role: 'front_panel',
                         material: 'front_cashmere',
                         colorRgb: COLOR_CASHMERE_FRONT,
                         x0: x0 + 2, x1: xSplit1 - 2,
                         y0: yCarcass1, y1: yFront1,
-                        z0: 2, z1: z1 - 2
+                        z0: zPlinth + 2, z1: z1 - 2
+                    },
+                    {
+                        id: 'CAB_LAUNDRY_RIGHT_1600_HANDLE_400',
+                        name: 'Right 400mm Utility Closet Vertical Handle',
+                        role: 'handle_rail',
+                        material: 'steel_dark',
+                        colorRgb: COLOR_DARK_STEEL,
+                        x0: xSplit1 - 42, x1: xSplit1 - 28,
+                        y0: yFront1, y1: yFront1 + 14,
+                        z0: 940, z1: 1120
                     }
                 ];
 
+                // Upper & lower air-intake/exhaust ventilation louver slots on the two 200 mm pull-out drying rack doors
+                [
+                    { tag: '200A', lx0: xSplit2 + 40, lx1: x1 - 40 },
+                    { tag: '200B', lx0: xSplit1 + 40, lx1: xSplit2 - 40 }
+                ].forEach((dr) => {
+                    [230, 260, 290, 1660, 1690, 1720].forEach((lz, lIdx) => {
+                        fronts.push({
+                            id: `CAB_LAUNDRY_RIGHT_1600_LOUVER_${dr.tag}_${lIdx + 1}`,
+                            name: `Pull-Out Drying Rack ${dr.tag} Door Ventilation Slot #${lIdx + 1} (Z=${lz} mm)`,
+                            role: 'handle_rail',
+                            material: 'steel_dark',
+                            colorRgb: [148, 138, 128],
+                            x0: dr.lx0, x1: dr.lx1,
+                            y0: yFront1 - 2, y1: yFront1 + 2,
+                            z0: lz, z1: lz + 8
+                        });
+                    });
+                });
+
                 return {
                     id: 'CAB_LAUNDRY_RIGHT_1600',
-                    name: 'CAB_LAUNDRY_RIGHT_1600 — Right 800×1600mm Multi-Split Cabinet (200+200+400mm)',
-                    shortName: 'Laundry Right Cabinet (800×1600mm)',
+                    name: 'CAB_LAUNDRY_RIGHT_1600 — Right 800×1800mm Pull-Out Drying Racks (2×200mm Suszarka Cargo) & 400mm Utility Closet',
+                    shortName: 'Laundry Right Drying & Utility (800×1800mm)',
                     category: 'tall_cabinet',
                     subtype: 'laundry_mid_tall_cabinet',
                     floor: 'ground',
@@ -7177,127 +7634,28 @@
                     hostWallId: 'GW_8',
                     viewId: 'laundry_north_wall',
                     x1: x0, x2: x1,
-                    y1: y0, y2: yFront1,
+                    y1: y0, y2: yFront1 + 14,
                     zBottom: z0, zTop: z1,
                     widthMm: 800, depthMm: LAUNDRY_DEPTH_MM,
                     carcassDepthMm: LAUNDRY_CARCASS_DEPTH_MM, frontThicknessMm: LAUNDRY_FRONT_MM,
-                    plinthHeightMm: 0, plinthRecessMm: 0,
-                    bodyHeightMm: 1600, heightMm: 1600,
+                    plinthHeightMm: 150, plinthRecessMm: 40,
+                    bodyHeightMm: 1650, heightMm: 1800,
                     boardThicknessMm: b,
                     normal: [0, 1, 0],
-                    specs: '800 × 650 × 1,600 mm (X = 16,355..17,155 mm, Y = 11,400..12,050 mm, Z = 0..1,600 mm) • Vertical Splits (Right to Left: 400, 200, 200 mm)',
-                    description: 'Rightmost 800 × 1,600 mm laundry cabinet at Z = 0..1,600 mm, divided vertically into two 200 mm narrow utility compartments (ironing board / drying rack) and one 400 mm shelved storage bay.',
+                    specs: '800 × 650 × 1,800 mm (X = 16,355..17,155 mm, Y = 11,400..12,050 mm, Z = 0..1,800 mm) • 2× 200 mm Pull-Out 5-Tier Vertical Drying Racks ("Suszarka Cargo I & II", 6.0 m drying line) • 400 mm Ironing & Utility Closet',
+                    description: 'Rightmost 800 × 1,800 mm cabinet extended cleanly to the Z = 1,800 mm upper-cabinet datum, housing two 200 mm pull-out 5-tier telescopic vertical drying racks ("Suszarka Cargo I & II" with ventilated door louvers) and one 400 mm tall ironing & utility closet.',
                     skeleton: skeleton,
                     fronts: fronts
                 };
             }
 
             // -----------------------------------------------------------------
-            // 48. CAB_LAUNDRY_RIGHT_BRIDGE: 800 × 200 mm Cubby Cabinet on top of 800×1600mm Cabinet
-            //     (d = 3,170..3,970 mm from West wall -> X = 16,355..17,155 mm, Z = 1,600..1,800 mm)
-            // -----------------------------------------------------------------
-            function buildLaundryRightBridgeCabinet() {
-                const x0 = 16355, x1 = 17155; // 800 mm wide
-                const z0 = 1600, z1 = 1800;   // 200 mm high (y = 80..100 in laundry.html)
-
-                const skeleton = [
-                    {
-                        id: 'CAB_LAUNDRY_RIGHT_BRIDGE_WEST_PANEL',
-                        name: 'Left/West Side Panel (20×630×200 mm, Z=1600..1800 mm)',
-                        role: 'carcass_panel',
-                        material: 'wood_oak',
-                        colorRgb: COLOR_OAK_WARM,
-                        x0: x1 - b, x1: x1,
-                        y0: y0, y1: yCarcass1,
-                        z0: z0, z1: z1
-                    },
-                    {
-                        id: 'CAB_LAUNDRY_RIGHT_BRIDGE_EAST_PANEL',
-                        name: 'Right/East Side Panel (20×630×200 mm, Z=1600..1800 mm)',
-                        role: 'carcass_panel',
-                        material: 'wood_oak',
-                        colorRgb: COLOR_OAK_WARM,
-                        x0: x0, x1: x0 + b,
-                        y0: y0, y1: yCarcass1,
-                        z0: z0, z1: z1
-                    },
-                    {
-                        id: 'CAB_LAUNDRY_RIGHT_BRIDGE_BACK_PANEL',
-                        name: 'Rear Backing Panel (760×20×200 mm, Z=1600..1800 mm)',
-                        role: 'carcass_panel',
-                        material: 'wood_oak',
-                        colorRgb: COLOR_OAK_WARM,
-                        x0: x0 + b, x1: x1 - b,
-                        y0: y0, y1: y0 + b,
-                        z0: z0, z1: z1
-                    },
-                    {
-                        id: 'CAB_LAUNDRY_RIGHT_BRIDGE_BOTTOM_PANEL',
-                        name: 'Bottom Panel (760×610×18 mm, Z=1600..1618 mm)',
-                        role: 'carcass_panel',
-                        material: 'wood_oak',
-                        colorRgb: COLOR_OAK_WARM,
-                        x0: x0 + b, x1: x1 - b,
-                        y0: y0 + b, y1: yCarcass1,
-                        z0: z0, z1: z0 + 18
-                    },
-                    {
-                        id: 'CAB_LAUNDRY_RIGHT_BRIDGE_TOP_PANEL',
-                        name: 'Top Panel (760×610×18 mm, Z=1782..1800 mm)',
-                        role: 'carcass_panel',
-                        material: 'wood_oak',
-                        colorRgb: COLOR_OAK_WARM,
-                        x0: x0 + b, x1: x1 - b,
-                        y0: y0 + b, y1: yCarcass1,
-                        z0: z1 - 18, z1: z1
-                    }
-                ];
-
-                const fronts = [
-                    {
-                        id: 'CAB_LAUNDRY_RIGHT_BRIDGE_FLAP',
-                        name: 'Flip-Up Cubby Front Door (796×20×196 mm, Z=1602..1798 mm)',
-                        role: 'front_panel',
-                        material: 'front_cashmere',
-                        colorRgb: COLOR_CASHMERE_FRONT,
-                        x0: x0 + 2, x1: x1 - 2,
-                        y0: yCarcass1, y1: yFront1,
-                        z0: z0 + 2, z1: z1 - 2
-                    }
-                ];
-
-                return {
-                    id: 'CAB_LAUNDRY_RIGHT_BRIDGE',
-                    name: 'CAB_LAUNDRY_RIGHT_BRIDGE — 800×200mm Cubby Cabinet on Top of 800×1600mm Cabinet',
-                    shortName: 'Laundry Bridge Cubby (800×200mm)',
-                    category: 'wall_cabinet',
-                    subtype: 'laundry_bridge_cubby',
-                    floor: 'ground',
-                    room: '0.08 Pralnia',
-                    hostWallId: 'GW_8',
-                    viewId: 'laundry_north_wall',
-                    x1: x0, x2: x1,
-                    y1: y0, y2: yFront1,
-                    zBottom: z0, zTop: z1,
-                    widthMm: 800, depthMm: LAUNDRY_DEPTH_MM,
-                    carcassDepthMm: LAUNDRY_CARCASS_DEPTH_MM, frontThicknessMm: LAUNDRY_FRONT_MM,
-                    plinthHeightMm: 0, plinthRecessMm: 0,
-                    bodyHeightMm: 200, heightMm: 200,
-                    boardThicknessMm: b,
-                    normal: [0, 1, 0],
-                    specs: '800 × 650 × 200 mm (X = 16,355..17,155 mm, Y = 11,400..12,050 mm, Z = 1,600..1,800 mm) • Sits atop the 800×1600 mm cabinet below CAB_LAUNDRY_TOP_3',
-                    description: '800 × 200 mm horizontal cubby cabinet at Z = 1,600..1,800 mm directly on top of CAB_LAUNDRY_RIGHT_1600, bridging up to the Z = 1,800 mm top cabinet line.',
-                    skeleton: skeleton,
-                    fronts: fronts
-                };
-            }
-
-            // -----------------------------------------------------------------
-            // 49–51. CAB_LAUNDRY_TOP_1..3: Top Wall Cabinets at Z = 1,800..2,400 mm
+            // 48–51. CAB_LAUNDRY_TOP_1..4: Top Wall Cabinets at Z = 1,800..2,400 mm (100% Aligned with Base Modules!)
             //        with Horizontal Middle Shelf at Z = 2,100 mm (y = 50 in laundry.html)
-            //        - CAB_LAUNDRY_TOP_1: 650 × 600 mm (X = 18,555..19,205 mm)
-            //        - CAB_LAUNDRY_TOP_2: 1,100 × 600 mm (X = 17,455..18,555 mm)
-            //        - CAB_LAUNDRY_TOP_3: 1,100 × 600 mm (X = 16,355..17,455 mm)
+            //        - CAB_LAUNDRY_TOP_1: 650 × 600 mm (X = 18,555..19,205 mm, above Washer/Dryer Tower)
+            //        - CAB_LAUNDRY_TOP_2: 800 × 600 mm (X = 17,755..18,555 mm, 400+400 doors above Hamper & Sweater Zone)
+            //        - CAB_LAUNDRY_TOP_3: 600 × 600 mm (X = 17,155..17,755 mm, single 600 door above Sink Drip-Dry Zone)
+            //        - CAB_LAUNDRY_TOP_4: 800 × 600 mm (X = 16,355..17,155 mm, 400+400 doors above Right Drying & Utility)
             // -----------------------------------------------------------------
             function makeLaundryTopCabinet(id, index, x0, x1, labelPos) {
                 const w = x1 - x0;
@@ -7423,14 +7781,15 @@
                     bodyHeightMm: 600, heightMm: 600,
                     boardThicknessMm: b,
                     normal: [0, 1, 0],
-                    specs: `${w} × 650 × 600 mm (X = ${x0}..${x1} mm, Y = 11,400..12,050 mm, Z = 1,800..2,400 mm) • Horizontal middle shelf at Z = 2,100 mm`,
-                    description: `${labelPos} top laundry cabinet (${w} × 600 mm) at Z = 1,800..2,400 mm with a central horizontal shelf at Z = 2,100 mm.`,
+                    specs: `${w} × 650 × 600 mm (X = ${x0}..${x1} mm, Y = 11,400..12,050 mm, Z = 1,800..2,400 mm) • Aligned 100% with base cabinet vertical seams • Horizontal middle shelf at Z = 2,100 mm`,
+                    description: `${labelPos} top laundry cabinet (${w} × 600 mm) at Z = 1,800..2,400 mm aligned directly with the vertical module lines below, with a central horizontal shelf at Z = 2,100 mm.`,
                     skeleton: skeleton,
                     fronts: fronts
                 };
             }
 
             return [
+                buildLaundryLeftDryingBay(),
                 buildLaundryLeftTallCabinet(),
                 buildLaundryWasherCabinet(),
                 buildLaundryDryerCabinet(),
@@ -7438,10 +7797,10 @@
                 buildLaundryHangingNiche(),
                 buildLaundrySinkCabinet(),
                 buildLaundryRight1600Cabinet(),
-                buildLaundryRightBridgeCabinet(),
-                makeLaundryTopCabinet('CAB_LAUNDRY_TOP_1', 1, 18555, 19205, 'Leftmost'),
-                makeLaundryTopCabinet('CAB_LAUNDRY_TOP_2', 2, 17455, 18555, 'Middle'),
-                makeLaundryTopCabinet('CAB_LAUNDRY_TOP_3', 3, 16355, 17455, 'Rightmost')
+                makeLaundryTopCabinet('CAB_LAUNDRY_TOP_1', 1, 18555, 19205, 'Washer/Dryer Tower'),
+                makeLaundryTopCabinet('CAB_LAUNDRY_TOP_2', 2, 17755, 18555, 'Hamper & Sweater Zone'),
+                makeLaundryTopCabinet('CAB_LAUNDRY_TOP_3', 3, 17155, 17755, 'Over-Sink Drip-Dry Zone'),
+                makeLaundryTopCabinet('CAB_LAUNDRY_TOP_4', 4, 16355, 17155, 'Right Drying & Utility')
             ];
         })()
     ];

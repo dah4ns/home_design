@@ -293,9 +293,9 @@
                 category: 'exterior',
                 thickness: 380,
                 zBottom: 0,
-                zTop: 2800,
+                zTop: 2960,
                 rooms: 'Covered Entrance Porch ↔ 0.04 Wiatrołap',
-                specs: '1,480 × 380 mm (38 cm) • North reveal of recessed main entrance',
+                specs: '1,480 × 380 mm (38 cm) • North reveal of recessed main entrance; steps up from Z = 2,800 mm under WALL_BAND (X = 20,325..20,705) to Z = 2,960 mm behind the band (X ≤ 20,325)',
                 openings: [],
                 doors: [],
                 sides: [
@@ -311,7 +311,9 @@
                         outerLoop: [
                             [20705, 8560, 0],
                             [19225, 8560, 0],
-                            [19225, 8560, 2800],
+                            [19225, 8560, 2960],
+                            [20325, 8560, 2960],
+                            [20325, 8560, 2800],
                             [20705, 8560, 2800]
                         ],
                         holes: []
@@ -328,8 +330,8 @@
                         outerLoop: [
                             [18845, 8180, 0],
                             [20325, 8180, 0],
-                            [20325, 8180, 2800],
-                            [18845, 8180, 2800]
+                            [20325, 8180, 2960],
+                            [18845, 8180, 2960]
                         ],
                         holes: []
                     }
@@ -342,9 +344,9 @@
                 category: 'exterior',
                 thickness: 380,
                 zBottom: 0,
-                zTop: 2800,
+                zTop: 2960,
                 rooms: 'Covered Entrance Porch (W) ↔ 0.04 Wiatrołap',
-                specs: '2,460 × 380 mm (38 cm) • OuterLoop notches up to Z = 2,250 mm over entrance door Z1 (550 mm lintel above door)',
+                specs: '2,460 × 380 mm (38 cm) • Recessed behind WALL_BAND (zTop = 2,960 mm); outerLoop notches up to Z = 2,250 mm over entrance door Z1 (710 mm lintel above door)',
                 openings: ['Z1'],
                 doors: [],
                 sides: [
@@ -364,8 +366,8 @@
                             [19225, 10620, 2250],
                             [19225, 10620, 0],
                             [19225, 11020, 0],
-                            [19225, 11020, 2800],
-                            [19225, 8560, 2800]
+                            [19225, 11020, 2960],
+                            [19225, 8560, 2960]
                         ],
                         holes: []
                     },
@@ -385,8 +387,8 @@
                             [18845, 8920, 2250],
                             [18845, 8920, 0],
                             [18845, 8180, 0],
-                            [18845, 8180, 2800],
-                            [18845, 11400, 2800]
+                            [18845, 8180, 2960],
+                            [18845, 11400, 2960]
                         ],
                         holes: []
                     }
@@ -399,9 +401,9 @@
                 category: 'exterior',
                 thickness: 380,
                 zBottom: 0,
-                zTop: 2800,
+                zTop: 2960,
                 rooms: 'Covered Entrance Porch ↔ 0.08 Pralnia',
-                specs: '1,480 × 380 mm (38 cm) • South reveal of recessed main entrance',
+                specs: '1,480 × 380 mm (38 cm) • South reveal of recessed main entrance; steps up from Z = 2,800 mm under WALL_BAND (X = 20,325..20,705) to Z = 2,960 mm behind the band (X ≤ 20,325)',
                 openings: [],
                 doors: [],
                 sides: [
@@ -418,7 +420,9 @@
                             [19225, 11020, 0],
                             [20705, 11020, 0],
                             [20705, 11020, 2800],
-                            [19225, 11020, 2800]
+                            [20325, 11020, 2800],
+                            [20325, 11020, 2960],
+                            [19225, 11020, 2960]
                         ],
                         holes: []
                     },
@@ -434,8 +438,8 @@
                         outerLoop: [
                             [20325, 11400, 0],
                             [18845, 11400, 0],
-                            [18845, 11400, 2800],
-                            [20325, 11400, 2800]
+                            [18845, 11400, 2960],
+                            [20325, 11400, 2960]
                         ],
                         holes: []
                     }
