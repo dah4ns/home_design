@@ -576,6 +576,8 @@
                             <option value="moso_bamboo_rhombos">MOSO Bamboo Rhombos (double)</option>
                             <option value="thermory_ash_natural">Thermory Thermo Ash (width: 95 mm, color: natural)</option>
                             <option value="thermory_ash_ebony">Thermory Thermo Ash (width: 95 mm, color: ebony)</option>
+                            <option value="aluprof_earthline_black">Aluprof Earthline — Black (30/30 mm, 23.9 mm)</option>
+                            <option value="aluprof_earthline_light_wood">Aluprof Earthline — Light Wood + Black Back (30/30 mm)</option>
                         </select>
                     </div>
                 </div>
@@ -858,6 +860,26 @@
                 uvScale: { u: 1 / 0.824, v: 1 / 2.80 }, // 824 mm width (8 × 103 mm pitch: 95 mm plank + 8 mm gap) × 2,800 mm full-floor height
                 swatchStyle: 'background: #262422;',
                 legendDesc: 'Thermory Thermo Ash (ebony) — 95 mm plank + 8 mm gap (75.23 m² net)'
+            },
+            aluprof_earthline_black: {
+                id: 'aluprof_earthline_black',
+                label: 'Aluprof Earthline — Black (30/30 mm, 23.9 mm)',
+                isEarthline: true,
+                textureKey: 'aluprofEarthlineBack',
+                barTextureKey: 'aluprofEarthlineBarBlack',
+                uvScale: { u: 1 / 0.60, v: 1 / 2.80 },
+                swatchStyle: 'background: repeating-linear-gradient(90deg, #272c33 0px, #272c33 3px, #0b0d10 3px, #0b0d10 6px);',
+                legendDesc: 'Aluprof Earthline — Black aluminium panels (30 mm bar / 30 mm gap, 23.9 mm depth • 75.23 m² net)'
+            },
+            aluprof_earthline_light_wood: {
+                id: 'aluprof_earthline_light_wood',
+                label: 'Aluprof Earthline — Light Wood + Black Back (30/30 mm)',
+                isEarthline: true,
+                textureKey: 'aluprofEarthlineBack',
+                barTextureKey: 'aluprofEarthlineBarLightWood',
+                uvScale: { u: 1 / 0.60, v: 1 / 2.80 },
+                swatchStyle: 'background: repeating-linear-gradient(90deg, #cfb99d 0px, #cfb99d 3px, #101215 3px, #101215 6px);',
+                legendDesc: 'Aluprof Earthline — Light Wood bars + Black back (30 mm bar / 30 mm gap, 23.9 mm depth • 75.23 m² net)'
             }
         };
 
@@ -1720,6 +1742,102 @@
                 ? window.FACADE_TEXTURES.thermory_thermo_ash
                 : 'textures/thermory_thermo_ash.png';
 
+            // 2d. Aluprof Earthline Aluminium Cladding System (30 mm K441213X vertical bars + 30 mm K441208X black recessed back plates, 23.9 mm total depth)
+            // Matte black recessed back plate (K441208X) seen between every pair of 30 mm protruding vertical bars
+            textures.aluprofEarthlineBack = createCanvasTexture(glCtx, (ctx, w, h) => {
+                const outImg = ctx.createImageData(w, h);
+                const dst = outImg.data;
+                for (let y = 0; y < h; y++) {
+                    const microV = Math.sin(y * 0.14) * 1.0;
+                    for (let x = 0; x < w; x++) {
+                        // Subtle matte powder-coat micro-grain over deep architectural black (#101216)
+                        const microH = Math.sin(x * 0.45 + y * 0.08) * 1.1;
+                        const grain = (((x * 37 + y * 17) & 31) - 15.5) * 0.12;
+                        const idx = (y * w + x) * 4;
+                        dst[idx]     = Math.max(8, Math.min(30, Math.round(15 + microH + microV + grain)));
+                        dst[idx + 1] = Math.max(9, Math.min(32, Math.round(17 + microH + microV + grain)));
+                        dst[idx + 2] = Math.max(11, Math.min(36, Math.round(20 + microH + microV + grain)));
+                        dst[idx + 3] = 255;
+                    }
+                }
+                ctx.putImageData(outImg, 0, 0);
+            }, 256, 256);
+
+            // Aluprof Earthline — Black anodized / matte black aluminium lamella bars (8 vertical bar strips × 64 px)
+            textures.aluprofEarthlineBarBlack = createCanvasTexture(glCtx, (ctx, w, h) => {
+                const outImg = ctx.createImageData(w, h);
+                const dst = outImg.data;
+                const strips = 8;
+                const stripW = w / strips;
+                const baseOffsets = [0, 3, -2, 2, -1, 4, -2, 1];
+
+                for (let y = 0; y < h; y++) {
+                    const yNorm = y / h;
+                    const vertSheen = Math.sin(yNorm * Math.PI * 2.0) * 1.8;
+                    for (let x = 0; x < w; x++) {
+                        const sIdx = Math.min(strips - 1, Math.floor(x / stripW));
+                        const localU = (x - sIdx * stripW) / stripW; // 0..1 across one 30 mm bar face
+                        // Subtle architectural bevel highlight near arrises + fine vertical brushed aluminium streaks
+                        const brush = Math.sin(localU * 38.0 + sIdx * 2.1) * 1.6 + Math.sin(localU * 91.0 + sIdx * 5.3) * 0.9;
+                        let bevel = 0;
+                        if (localU < 0.09) bevel = 9.0 * (1.0 - localU / 0.09);
+                        else if (localU > 0.91) bevel = -5.5 * ((localU - 0.91) / 0.09);
+                        else bevel = Math.sin((localU - 0.09) / 0.82 * Math.PI) * 2.5;
+
+                        const off = baseOffsets[sIdx] + brush + vertSheen + bevel;
+                        const idx = (y * w + x) * 4;
+                        dst[idx]     = Math.max(18, Math.min(68, Math.round(35 + off)));
+                        dst[idx + 1] = Math.max(20, Math.min(72, Math.round(39 + off)));
+                        dst[idx + 2] = Math.max(24, Math.min(78, Math.round(45 + off)));
+                        dst[idx + 3] = 255;
+                    }
+                }
+                ctx.putImageData(outImg, 0, 0);
+            }, 512, 1024);
+
+            // Aluprof Earthline — Light Wood-effect sublimated aluminium lamella bars (8 vertical bar strips × 64 px)
+            // Warm pale Scandinavian oak / natural light larch matching reference render over matte black back plates
+            textures.aluprofEarthlineBarLightWood = createCanvasTexture(glCtx, (ctx, w, h) => {
+                const outImg = ctx.createImageData(w, h);
+                const dst = outImg.data;
+                const strips = 8;
+                const stripW = w / strips;
+                const stripBases = [
+                    [210, 189, 162], [203, 180, 152], [216, 196, 170], [197, 173, 144],
+                    [207, 185, 157], [214, 193, 166], [200, 177, 148], [212, 190, 163]
+                ];
+
+                for (let y = 0; y < h; y++) {
+                    const yNorm = y / h;
+                    for (let x = 0; x < w; x++) {
+                        const sIdx = Math.min(strips - 1, Math.floor(x / stripW));
+                        const localU = (x - sIdx * stripW) / stripW; // 0..1 across one 30 mm bar
+                        const base = stripBases[sIdx];
+                        const phase = sIdx * 1.93 + 0.4;
+
+                        // Straight longitudinal oak grain + gentle pale cathedral figure
+                        const warp = Math.sin(yNorm * 6.283 + phase) * 0.18 + Math.sin(yNorm * 12.566 + phase * 1.7) * 0.08;
+                        const uG = localU + warp;
+                        const fineFibers = Math.sin(uG * 46.0 + phase * 2.3) * 5.2 + Math.sin(uG * 105.0 + yNorm * 4.0) * 2.4;
+                        const cathedral = Math.sin((uG * 9.5 + Math.sin(yNorm * 3.1416 + phase) * 1.2) * 3.1416) * 5.5;
+                        const pore = Math.sin(localU * 140.0 + yNorm * 28.0 + phase) > 0.92 ? -7.0 : 0.0;
+
+                        // Subtle micro-chamfer at bar edges for crisp 30 mm rectangular definition
+                        let edgeShade = 1.0;
+                        if (localU < 0.06) edgeShade = 0.91 + 0.09 * (localU / 0.06);
+                        else if (localU > 0.94) edgeShade = 0.91 + 0.09 * ((1.0 - localU) / 0.06);
+
+                        const delta = fineFibers + cathedral + pore;
+                        const idx = (y * w + x) * 4;
+                        dst[idx]     = Math.max(125, Math.min(238, Math.round((base[0] + delta) * edgeShade)));
+                        dst[idx + 1] = Math.max(105, Math.min(222, Math.round((base[1] + delta * 0.92) * edgeShade)));
+                        dst[idx + 2] = Math.max(82,  Math.min(200, Math.round((base[2] + delta * 0.80) * edgeShade)));
+                        dst[idx + 3] = 255;
+                    }
+                }
+                ctx.putImageData(outImg, 0, 0);
+            }, 512, 1024);
+
             // 3. RAL 7021 (#1f2421) Metal Cassette Fascia / Gzyms Texture (tile repeat: 0.9m width)
             textures.fascia = createCanvasTexture(glCtx, (ctx, w, h) => {
                 const grad = ctx.createLinearGradient(0, 0, 0, h);
@@ -1977,6 +2095,167 @@
         }
 
         /**
+         * Emit 3D protruding Aluprof Earthline vertical lamella bars (K441213X) over a wall face.
+         * Exact CAD profile dimensions: 30 mm bar width, 30 mm black recessed back gap (60 mm pitch),
+         * 20.9 mm outward bar projection over ~3 mm K441208X backing plate (23.9 mm total depth).
+         * Aligned on a global 60 mm world grid so sills, piers, and lintels line up continuously.
+         */
+        function addEarthlineBarsOnFaceMm(barsBuilder, opts) {
+            if (!barsBuilder) return;
+            const {
+                axis,        // 'x' (wall along X at fixed Z) or 'z' (wall along Z at fixed X)
+                cOuter,      // outer backing face coordinate (mm)
+                inwardSign,  // +1 or -1 INTO building; outward protrusion is -inwardSign
+                s1,          // span start along wall axis (mm)
+                s2,          // span end along wall axis (mm)
+                yb,          // bottom elevation (mm)
+                yt,          // top elevation (mm)
+                color,       // RGB vertex tint
+                yOffset      // vertical explode offset (m)
+            } = opts;
+
+            if (s2 - s1 < 2 || yt - yb < 2) return;
+
+            const PITCH_MM = 60;
+            const BAR_W_MM = 30;
+            const PROJ_MM = 20.9; // 23.9 mm total panel depth minus 3.0 mm K441208X backing plate
+            const outSign = -inwardSign;
+
+            const Y1 = yb / 1000 + yOffset;
+            const Y2 = yt / 1000 + yOffset;
+            const floorBaseMm = (yb >= 3400) ? 3430 : 0;
+            // Scale V over 2,800 mm so 2,700 mm upper-floor walls stay strictly within [0..0.964] (no fract(1.0) seam)
+            const vy1 = Math.max(0.001, Math.min(0.995, (yb - floorBaseMm) / 2800));
+            const vy2 = Math.max(0.001, Math.min(0.995, (yt - floorBaseMm) / 2800));
+
+            const C0 = cOuter / 1000;
+            const C1 = (cOuter + outSign * PROJ_MM) / 1000;
+
+            const kStart = Math.floor(s1 / PITCH_MM);
+            const kEnd = Math.ceil(s2 / PITCH_MM);
+
+            for (let k = kStart; k < kEnd; k++) {
+                const rawStart = k * PITCH_MM;
+                const b1 = Math.max(s1, rawStart);
+                const b2 = Math.min(s2, rawStart + BAR_W_MM);
+                if (b2 - b1 < 2) continue;
+
+                const B1 = b1 / 1000;
+                const B2 = b2 / 1000;
+
+                // Map bar k to one of 8 independent vertical texture strips (each 1/8 wide)
+                const stripIdx = ((k % 8) + 8) % 8;
+                const uBase = stripIdx / 8;
+                const pad = 0.003;
+                const spanU = (1 / 8) - pad * 2;
+                const f1 = (b1 - rawStart) / BAR_W_MM;
+                const f2 = (b2 - rawStart) / BAR_W_MM;
+                const u1 = uBase + pad + f1 * spanU;
+                const u2 = uBase + pad + f2 * spanU;
+                const uSide1 = uBase + 0.025;
+                const uSide2 = uBase + 0.095;
+
+                // Subtle deterministic bar-to-bar luminance variation for natural architectural depth
+                const shade = 0.965 + (((k * 19 + 7) & 7) / 7) * 0.065;
+                const col = [color[0] * shade, color[1] * shade, color[2] * shade];
+
+                if (axis === 'x') {
+                    if (outSign > 0) {
+                        // South-facing (+Z outward): Z_back = C0, Z_front = C1 (C1 > C0)
+                        barsBuilder.addQuad(
+                            [B1, Y1, C1], [B2, Y1, C1], [B2, Y2, C1], [B1, Y2, C1],
+                            [0, 0, 1], [u1, vy1], [u2, vy1], [u2, vy2], [u1, vy2], col
+                        );
+                        barsBuilder.addQuad(
+                            [B2, Y1, C1], [B2, Y1, C0], [B2, Y2, C0], [B2, Y2, C1],
+                            [1, 0, 0], [uSide1, vy1], [uSide2, vy1], [uSide2, vy2], [uSide1, vy2], col
+                        );
+                        barsBuilder.addQuad(
+                            [B1, Y1, C0], [B1, Y1, C1], [B1, Y2, C1], [B1, Y2, C0],
+                            [-1, 0, 0], [uSide1, vy1], [uSide2, vy1], [uSide2, vy2], [uSide1, vy2], col
+                        );
+                        barsBuilder.addQuad(
+                            [B1, Y2, C1], [B2, Y2, C1], [B2, Y2, C0], [B1, Y2, C0],
+                            [0, 1, 0], [u1, uSide1], [u2, uSide1], [u2, uSide2], [u1, uSide2], col
+                        );
+                        barsBuilder.addQuad(
+                            [B1, Y1, C0], [B2, Y1, C0], [B2, Y1, C1], [B1, Y1, C1],
+                            [0, -1, 0], [u1, uSide1], [u2, uSide1], [u2, uSide2], [u1, uSide2], col
+                        );
+                    } else {
+                        // North-facing (-Z outward): Z_front = C1, Z_back = C0 (C1 < C0)
+                        barsBuilder.addQuad(
+                            [B2, Y1, C1], [B1, Y1, C1], [B1, Y2, C1], [B2, Y2, C1],
+                            [0, 0, -1], [u2, vy1], [u1, vy1], [u1, vy2], [u2, vy2], col
+                        );
+                        barsBuilder.addQuad(
+                            [B2, Y1, C0], [B2, Y1, C1], [B2, Y2, C1], [B2, Y2, C0],
+                            [1, 0, 0], [uSide1, vy1], [uSide2, vy1], [uSide2, vy2], [uSide1, vy2], col
+                        );
+                        barsBuilder.addQuad(
+                            [B1, Y1, C1], [B1, Y1, C0], [B1, Y2, C0], [B1, Y2, C1],
+                            [-1, 0, 0], [uSide1, vy1], [uSide2, vy1], [uSide2, vy2], [uSide1, vy2], col
+                        );
+                        barsBuilder.addQuad(
+                            [B1, Y2, C0], [B2, Y2, C0], [B2, Y2, C1], [B1, Y2, C1],
+                            [0, 1, 0], [u1, uSide1], [u2, uSide1], [u2, uSide2], [u1, uSide2], col
+                        );
+                        barsBuilder.addQuad(
+                            [B1, Y1, C1], [B2, Y1, C1], [B2, Y1, C0], [B1, Y1, C0],
+                            [0, -1, 0], [u1, uSide1], [u2, uSide1], [u2, uSide2], [u1, uSide2], col
+                        );
+                    }
+                } else {
+                    if (outSign > 0) {
+                        // West-facing (+X outward): X_back = C0, X_front = C1 (C1 > C0)
+                        barsBuilder.addQuad(
+                            [C1, Y1, B2], [C1, Y1, B1], [C1, Y2, B1], [C1, Y2, B2],
+                            [1, 0, 0], [u2, vy1], [u1, vy1], [u1, vy2], [u2, vy2], col
+                        );
+                        barsBuilder.addQuad(
+                            [C0, Y1, B2], [C1, Y1, B2], [C1, Y2, B2], [C0, Y2, B2],
+                            [0, 0, 1], [uSide1, vy1], [uSide2, vy1], [uSide2, vy2], [uSide1, vy2], col
+                        );
+                        barsBuilder.addQuad(
+                            [C1, Y1, B1], [C0, Y1, B1], [C0, Y2, B1], [C1, Y2, B1],
+                            [0, 0, -1], [uSide1, vy1], [uSide2, vy1], [uSide2, vy2], [uSide1, vy2], col
+                        );
+                        barsBuilder.addQuad(
+                            [C0, Y2, B2], [C1, Y2, B2], [C1, Y2, B1], [C0, Y2, B1],
+                            [0, 1, 0], [uSide1, u2], [uSide2, u2], [uSide2, u1], [uSide1, u1], col
+                        );
+                        barsBuilder.addQuad(
+                            [C0, Y1, B1], [C1, Y1, B1], [C1, Y1, B2], [C0, Y1, B2],
+                            [0, -1, 0], [uSide1, u1], [uSide2, u1], [uSide2, u2], [uSide1, u2], col
+                        );
+                    } else {
+                        // East-facing (-X outward): X_front = C1, X_back = C0 (C1 < C0)
+                        barsBuilder.addQuad(
+                            [C1, Y1, B1], [C1, Y1, B2], [C1, Y2, B2], [C1, Y2, B1],
+                            [-1, 0, 0], [u1, vy1], [u2, vy1], [u2, vy2], [u1, vy2], col
+                        );
+                        barsBuilder.addQuad(
+                            [C1, Y1, B2], [C0, Y1, B2], [C0, Y2, B2], [C1, Y2, B2],
+                            [0, 0, 1], [uSide1, vy1], [uSide2, vy1], [uSide2, vy2], [uSide1, vy2], col
+                        );
+                        barsBuilder.addQuad(
+                            [C0, Y1, B1], [C1, Y1, B1], [C1, Y2, B1], [C0, Y2, B1],
+                            [0, 0, -1], [uSide1, vy1], [uSide2, vy1], [uSide2, vy2], [uSide1, vy2], col
+                        );
+                        barsBuilder.addQuad(
+                            [C1, Y2, B2], [C0, Y2, B2], [C0, Y2, B1], [C1, Y2, B1],
+                            [0, 1, 0], [uSide1, u2], [uSide2, u2], [uSide2, u1], [uSide1, u1], col
+                        );
+                        barsBuilder.addQuad(
+                            [C1, Y1, B1], [C0, Y1, B1], [C0, Y1, B2], [C1, Y1, B2],
+                            [0, -1, 0], [uSide1, u1], [uSide2, u1], [uSide2, u2], [uSide1, u2], col
+                        );
+                    }
+                }
+            }
+        }
+
+        /**
          * Build a wall segment with exact cutouts for openings (windows/doors),
          * 200 mm deep recessed window jambs (Ościeża), outer frames, 90 mm inner pillars,
          * and recessed glass panes.
@@ -1998,6 +2277,7 @@
                 jambBuilder, // MeshBuilder for RAL 7021 jambs & frames
                 glassBuilder,// MeshBuilder for glass
                 garageBuilder,// MeshBuilder for sectional garage door
+                earthlineBarsBuilder, // Optional MeshBuilder for 3D Aluprof Earthline lamella bars
                 edges,       // edge accumulator
                 yOffset      // vertical offset in meters (for explode mode)
             } = opts;
@@ -2019,12 +2299,20 @@
                 } else {
                     builder.addBoxMm(cOuter, yb, s1, cInner, yt, s2, col, uvScale, yOffset);
                 }
+                if (earthlineBarsBuilder && builder === wallBuilder) {
+                    addEarthlineBarsOnFaceMm(earthlineBarsBuilder, {
+                        axis, cOuter, inwardSign, s1, s2, yb, yt, color: col, yOffset
+                    });
+                }
             }
 
             let cursor = spanStart;
             sorted.forEach(op => {
-                const opStart = (axis === 'x') ? Math.min(op.x1, op.x2) : Math.min(op.z1, op.z2);
-                const opEnd = (axis === 'x') ? Math.max(op.x1, op.x2) : Math.max(op.z1, op.z2);
+                const rawOpStart = (axis === 'x') ? Math.min(op.x1, op.x2) : Math.min(op.z1, op.z2);
+                const rawOpEnd = (axis === 'x') ? Math.max(op.x1, op.x2) : Math.max(op.z1, op.z2);
+                const opStart = Math.max(spanStart, Math.min(spanEnd, rawOpStart));
+                const opEnd = Math.max(opStart, Math.min(spanEnd, rawOpEnd));
+                if (opEnd - opStart <= 1) return;
 
                 const jambDepth = 200; // 200 mm recession depth from outer facade to window
                 const cJambInner = fixedCoord + inwardSign * jambDepth;
@@ -2054,7 +2342,7 @@
                 }
 
                 // 4. 200 mm Deep Window Jambs (Ościeża) at the ENDS of the window (indicating 200 mm setback from facade)
-                if (!op.cornerJoinStart) {
+                if (!op.cornerJoinStart && opStart - wallCutStart > 0.5) {
                     if (axis === 'x') {
                         activeJambBuilder.addBoxMm(wallCutStart, op.y1, cOuter, opStart, op.y2, cJambInner, activeJambCol, uvScale, yOffset);
                         addEdgeBoxMm(edges, wallCutStart, op.y1, cOuter, opStart, op.y2, cJambInner, [0.06, 0.08, 0.10], yOffset);
@@ -2063,7 +2351,7 @@
                         addEdgeBoxMm(edges, cOuter, op.y1, wallCutStart, cJambInner, op.y2, opStart, [0.06, 0.08, 0.10], yOffset);
                     }
                 }
-                if (!op.cornerJoinEnd) {
+                if (!op.cornerJoinEnd && wallCutEnd - opEnd > 0.5) {
                     if (axis === 'x') {
                         activeJambBuilder.addBoxMm(opEnd, op.y1, cOuter, wallCutEnd, op.y2, cJambInner, activeJambCol, uvScale, yOffset);
                         addEdgeBoxMm(edges, opEnd, op.y1, cOuter, wallCutEnd, op.y2, cJambInner, [0.06, 0.08, 0.10], yOffset);
@@ -2364,8 +2652,12 @@
             // ====================================================================
             // C. UPPER FLOOR (PIĘTRO: Y = 3,430 to 6,130 mm) + MAIN ROOF & CHIMNEY
             // ====================================================================
+            const earthlineBarsBuilder = upperMat.isEarthline ? new MeshBuilder() : null;
             if (showUpper) {
                 const upperOpenings = OPENINGS_3D.filter(o => o.floor === 'first');
+                const terraceTint = upperMat.isEarthline ? [0.88, 0.88, 0.90] : [0.88, 0.86, 0.82];
+                const terraceEastTint = upperMat.isEarthline ? [0.92, 0.92, 0.94] : [0.92, 0.90, 0.86];
+                const columnTint = upperMat.isEarthline ? [0.86, 0.86, 0.88] : [0.82, 0.78, 0.72];
 
                 // 1. North Upper Wall (14a, O15, O11_2, O11_3, O13a: X = 6515..20505, Z = 2790)
                 buildWallWithOpenings({
@@ -2373,11 +2665,15 @@
                     spanStart: 6515, spanEnd: 20505, yBottom: 3430, yTop: 6130, thickness: 200,
                     openings: upperOpenings.filter(o => o.facade === 'North Facade'),
                     wallBuilder: woodBuilder, wallColor: [1, 1, 1], uvScale: woodUv,
-                    jambBuilder, glassBuilder, garageBuilder, edges, yOffset: upperOffsetM
+                    jambBuilder, glassBuilder, garageBuilder, earthlineBarsBuilder, edges, yOffset: upperOffsetM
                 });
                 // North-West Upper Corner (X = 20505..20705, Z = 2790..2990):
                 // Only the bottom 850 mm parapet (3430..4180) is at the outer corner; above 4180 mm, O13a and O13b_1 meet at recessed corner (20505, 2990)!
                 woodBuilder.addBoxMm(20505, 3430, 2790, 20705, 4180, 2990, [1, 1, 1], woodUv, upperOffsetM);
+                if (earthlineBarsBuilder) {
+                    addEarthlineBarsOnFaceMm(earthlineBarsBuilder, { axis: 'x', cOuter: 2790, inwardSign: 1, s1: 20505, s2: 20705, yb: 3430, yt: 4180, color: [1, 1, 1], yOffset: upperOffsetM });
+                    addEarthlineBarsOnFaceMm(earthlineBarsBuilder, { axis: 'z', cOuter: 20705, inwardSign: -1, s1: 2790, s2: 2990, yb: 3430, yt: 4180, color: [1, 1, 1], yOffset: upperOffsetM });
+                }
                 jambBuilder.addBoxMm(20505, 4168, 2790, 20705, 4192, 2990, ralCol, 1.0, upperOffsetM);
                 jambBuilder.addBoxMm(20505, 6114, 2790, 20705, 6134, 2990, ralCol, 1.0, upperOffsetM);
                 addEdgeBoxMm(edges, 6515, 3430, 2790, 20705, 4180, 2790, [0.35, 0.28, 0.20], upperOffsetM);
@@ -2388,11 +2684,15 @@
                     spanStart: 2990, spanEnd: 11380, yBottom: 3430, yTop: 6130, thickness: 200,
                     openings: upperOpenings.filter(o => o.facade === 'West Facade'),
                     wallBuilder: woodBuilder, wallColor: [1, 1, 1], uvScale: woodUv,
-                    jambBuilder, glassBuilder, garageBuilder, edges, yOffset: upperOffsetM
+                    jambBuilder, glassBuilder, garageBuilder, earthlineBarsBuilder, edges, yOffset: upperOffsetM
                 });
                 // South-West Upper Corner (Z = 11380..11580, X = 20505..20705):
                 // Only the bottom 850 mm parapet (3430..4180) is at the outer corner; above 4180 mm, O13b_2 and O13a_2 meet at recessed corner (20505, 11380)!
                 woodBuilder.addBoxMm(20505, 3430, 11380, 20705, 4180, 11580, [1, 1, 1], woodUv, upperOffsetM);
+                if (earthlineBarsBuilder) {
+                    addEarthlineBarsOnFaceMm(earthlineBarsBuilder, { axis: 'z', cOuter: 20705, inwardSign: -1, s1: 11380, s2: 11580, yb: 3430, yt: 4180, color: [1, 1, 1], yOffset: upperOffsetM });
+                    addEarthlineBarsOnFaceMm(earthlineBarsBuilder, { axis: 'x', cOuter: 11580, inwardSign: -1, s1: 20505, s2: 20705, yb: 3430, yt: 4180, color: [1, 1, 1], yOffset: upperOffsetM });
+                }
                 jambBuilder.addBoxMm(20505, 4168, 11380, 20705, 4192, 11580, ralCol, 1.0, upperOffsetM);
                 jambBuilder.addBoxMm(20505, 6114, 11380, 20705, 6134, 11580, ralCol, 1.0, upperOffsetM);
                 addEdgeBoxMm(edges, 20705, 3430, 2790, 20705, 4180, 11580, [0.35, 0.28, 0.20], upperOffsetM);
@@ -2403,7 +2703,7 @@
                     spanStart: -85, spanEnd: 20505, yBottom: 3430, yTop: 6130, thickness: 200,
                     openings: upperOpenings.filter(o => o.facade === 'South Facade'),
                     wallBuilder: woodBuilder, wallColor: [1, 1, 1], uvScale: woodUv,
-                    jambBuilder, glassBuilder, garageBuilder, edges, yOffset: upperOffsetM
+                    jambBuilder, glassBuilder, garageBuilder, earthlineBarsBuilder, edges, yOffset: upperOffsetM
                 });
                 addEdgeBoxMm(edges, 6215, 3430, 11580, 20705, 4180, 11580, [0.35, 0.28, 0.20], upperOffsetM);
 
@@ -2413,7 +2713,7 @@
                     spanStart: 5890, spanEnd: 11380, yBottom: 3430, yTop: 6130, thickness: 200,
                     openings: upperOpenings.filter(o => o.id === 'O9'),
                     wallBuilder: woodBuilder, wallColor: [1, 1, 1], uvScale: woodUv,
-                    jambBuilder, glassBuilder, garageBuilder, edges, yOffset: upperOffsetM
+                    jambBuilder, glassBuilder, garageBuilder, earthlineBarsBuilder, edges, yOffset: upperOffsetM
                 });
                 // 200 × 200 mm bottom sill & top soffit cap at the recessed O10+O9 corner (X = -285..-85, Z = 11380..11580)
                 jambBuilder.addBoxMm(-285, 3418, 11380, -85, 3444, 11580, ralCol, 1.0, upperOffsetM);
@@ -2424,7 +2724,11 @@
                 // Terrace gres floor deck
                 terraceBuilder.addBoxMm(-285, 3430, 2790, 6315, 3460, 5890, [0.92, 0.94, 0.96], 0.6, upperOffsetM);
                 // Recessed North-facing back wall of terrace (X = -285..6315, Z = 5890)
-                woodBuilder.addBoxMm(-285, 3430, 5890, 6315, 6130, 6090, [0.88, 0.86, 0.82], woodUv, upperOffsetM);
+                woodBuilder.addBoxMm(-285, 3430, 5890, 6315, 6130, 6090, terraceTint, woodUv, upperOffsetM);
+                if (earthlineBarsBuilder) {
+                    // Stop 25 mm before X = 6315 concave corner so perpendicular East terrace bars never collide
+                    addEarthlineBarsOnFaceMm(earthlineBarsBuilder, { axis: 'x', cOuter: 5890, inwardSign: 1, s1: -285, s2: 6290, yb: 3430, yt: 6130, color: terraceTint, yOffset: upperOffsetM });
+                }
                 addEdgeBoxMm(edges, -285, 3430, 5890, 6315, 6130, 5890, [0.35, 0.28, 0.20], upperOffsetM);
 
                 // Recessed East-facing wall of terrace with O14b + D1 (X = 6315, Z = 2990..5890; O14b meets 14a at recessed corner X=6515, Z=2990)
@@ -2432,14 +2736,19 @@
                     axis: 'z', fixedCoord: 6315, inwardSign: 1,
                     spanStart: 2990, spanEnd: 5890, yBottom: 3430, yTop: 6130, thickness: 200,
                     openings: upperOpenings.filter(o => o.id === 'O14b'),
-                    wallBuilder: woodBuilder, wallColor: [0.92, 0.90, 0.86], uvScale: woodUv,
-                    jambBuilder, glassBuilder, garageBuilder, edges, yOffset: upperOffsetM
+                    wallBuilder: woodBuilder, wallColor: terraceEastTint, uvScale: woodUv,
+                    jambBuilder, glassBuilder, garageBuilder, earthlineBarsBuilder, edges, yOffset: upperOffsetM
                 });
                 jambBuilder.addBoxMm(6315, 3418, 2790, 6515, 3444, 2990, ralCol, 1.0, upperOffsetM);
                 jambBuilder.addBoxMm(6315, 6114, 2790, 6515, 6134, 2990, ralCol, 1.0, upperOffsetM);
 
                 // North-East Corner Support Column & 220 mm Timber Slat Return (X = -285..0, Z = 2790)
-                woodBuilder.addBoxMm(-285, 3430, 2790, -65, 6130, 2990, [0.82, 0.78, 0.72], woodUv, upperOffsetM);
+                woodBuilder.addBoxMm(-285, 3430, 2790, -65, 6130, 2990, columnTint, woodUv, upperOffsetM);
+                if (earthlineBarsBuilder) {
+                    addEarthlineBarsOnFaceMm(earthlineBarsBuilder, { axis: 'x', cOuter: 2790, inwardSign: 1, s1: -285, s2: -65, yb: 3430, yt: 6130, color: columnTint, yOffset: upperOffsetM });
+                    addEarthlineBarsOnFaceMm(earthlineBarsBuilder, { axis: 'z', cOuter: -285, inwardSign: 1, s1: 2790, s2: 2990, yb: 3430, yt: 6130, color: columnTint, yOffset: upperOffsetM });
+                    addEarthlineBarsOnFaceMm(earthlineBarsBuilder, { axis: 'x', cOuter: 2990, inwardSign: -1, s1: -285, s2: -65, yb: 3430, yt: 6130, color: columnTint, yOffset: upperOffsetM });
+                }
                 jambBuilder.addBoxMm(-65, 3430, 2790, 85, 6130, 2940, ralCol, 1.0, upperOffsetM);
 
                 // Glass Balustrade along North (X = 0..6315, Z = 2790) and East (X = -285, Z = 2790..5890), H = 950 mm
@@ -2467,6 +2776,9 @@
                 terraceBuilder.toBatch(glCtx, textures.terrace, true, 1.0),
                 brickBuilder.toBatch(glCtx, textures[lowerMat.textureKey] || textures.brick, true, 1.0),
                 woodBuilder.toBatch(glCtx, textures[upperMat.textureKey] || textures.wood, true, 1.0),
+                earthlineBarsBuilder
+                    ? earthlineBarsBuilder.toBatch(glCtx, textures[upperMat.barTextureKey], true, 1.0)
+                    : null,
                 fasciaBuilder.toBatch(glCtx, textures.fascia, true, 1.0),
                 garageBuilder.toBatch(glCtx, textures.garage, true, 1.0),
                 jambBuilder.toBatch(glCtx, null, false, 1.0),

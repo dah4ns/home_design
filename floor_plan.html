@@ -5978,7 +5978,11 @@
                     const worldPt = clientToWorldMm(svg, e.clientX, e.clientY);
                     const curCoord = op.axis === 'x' ? worldPt.x : worldPt.z;
                     const deltaMm = Math.round((curCoord - initialCursorCoord) / 50) * 50;
-                    op.start = initialOpStart + deltaMm;
+                    let nextStart = initialOpStart + deltaMm;
+                    if (op.id === 'Z2') {
+                        nextStart = Math.max(90, Math.min(8560 - op.widthMm, nextStart));
+                    }
+                    op.start = nextStart;
                     op.end = op.start + op.widthMm;
                     updateInspectorUI();
                     renderAllPlans();
@@ -6029,7 +6033,9 @@
 
             window.addEventListener('mouseup', () => {
                 if (draggingOpeningState) {
-                    persistOpeningToWindowStore(draggingOpeningState.op);
+                    if (draggingOpeningState.op.start !== draggingOpeningState.initialOpStart) {
+                        persistOpeningToWindowStore(draggingOpeningState.op);
+                    }
                     updateInspectorUI();
                     draggingOpeningState = null;
                 }

@@ -734,10 +734,22 @@
         { id: 'mosoBambooRhombos', name: 'MOSO Bamboo X-treme Rhombos' },
         { id: 'thermoryAshNatural', name: 'Thermory Thermo Ash (Natural)' },
         { id: 'thermoryAshEbony', name: 'Thermory Thermo Ash (Ebony)' },
+        { id: 'aluprofEarthlineBlack', name: 'Aluprof Earthline — Black (30/30 mm, 23.9 mm)' },
+        { id: 'aluprofEarthlineLightWood', name: 'Aluprof Earthline — Light Wood + Black Back (30/30 mm)' },
         { id: 'wood', name: 'Vertical Timber Slats (Walnut)' },
         { id: 'brick', name: 'Feldhaus K686G14 Clinker Brick' },
         { id: 'brickGloomLong', name: 'Gloom Long Brick (490×40 mm)' }
       ];
+
+      function isEarthlineUpperMat(matId) {
+        return matId === 'aluprofEarthlineBlack' || matId === 'aluprofEarthlineLightWood';
+      }
+
+      function getEarthlineBarTexKey(matId) {
+        return matId === 'aluprofEarthlineLightWood'
+          ? 'aluprofEarthlineBarLightWood'
+          : 'aluprofEarthlineBarBlack';
+      }
 
       var activeLowerMatId = 'brickGloomLong';
       var activeUpperMatId = 'mosoBambooRhombos';
@@ -1139,6 +1151,90 @@
         }
       }, 512);
 
+      // Aluprof Earthline — Matte black recessed back plate (K441208X) between vertical 30 mm bars
+      textures.aluprofEarthlineBack = createProceduralTexture(function (ctx, w, h) {
+        var outImg = ctx.createImageData(w, h);
+        var dst = outImg.data;
+        for (var y = 0; y < h; y++) {
+          var microV = Math.sin(y * 0.14) * 1.0;
+          for (var x = 0; x < w; x++) {
+            var microH = Math.sin(x * 0.45 + y * 0.08) * 1.1;
+            var grain = (((x * 37 + y * 17) & 31) - 15.5) * 0.12;
+            var idx = (y * w + x) * 4;
+            dst[idx]     = Math.max(8, Math.min(30, Math.round(15 + microH + microV + grain)));
+            dst[idx + 1] = Math.max(9, Math.min(32, Math.round(17 + microH + microV + grain)));
+            dst[idx + 2] = Math.max(11, Math.min(36, Math.round(20 + microH + microV + grain)));
+            dst[idx + 3] = 255;
+          }
+        }
+        ctx.putImageData(outImg, 0, 0);
+      }, 256);
+
+      // Aluprof Earthline — Black anodized / matte black aluminium lamella bars (8 vertical strips × 64 px)
+      textures.aluprofEarthlineBarBlack = createProceduralTexture(function (ctx, w, h) {
+        var outImg = ctx.createImageData(w, h);
+        var dst = outImg.data;
+        var strips = 8;
+        var stripW = w / strips;
+        var baseOffsets = [0, 3, -2, 2, -1, 4, -2, 1];
+        for (var y = 0; y < h; y++) {
+          var yNorm = y / h;
+          var vertSheen = Math.sin(yNorm * Math.PI * 2.0) * 1.8;
+          for (var x = 0; x < w; x++) {
+            var sIdx = Math.min(strips - 1, Math.floor(x / stripW));
+            var localU = (x - sIdx * stripW) / stripW;
+            var brush = Math.sin(localU * 38.0 + sIdx * 2.1) * 1.6 + Math.sin(localU * 91.0 + sIdx * 5.3) * 0.9;
+            var bevel = 0;
+            if (localU < 0.09) bevel = 9.0 * (1.0 - localU / 0.09);
+            else if (localU > 0.91) bevel = -5.5 * ((localU - 0.91) / 0.09);
+            else bevel = Math.sin((localU - 0.09) / 0.82 * Math.PI) * 2.5;
+            var off = baseOffsets[sIdx] + brush + vertSheen + bevel;
+            var idx = (y * w + x) * 4;
+            dst[idx]     = Math.max(18, Math.min(68, Math.round(35 + off)));
+            dst[idx + 1] = Math.max(20, Math.min(72, Math.round(39 + off)));
+            dst[idx + 2] = Math.max(24, Math.min(78, Math.round(45 + off)));
+            dst[idx + 3] = 255;
+          }
+        }
+        ctx.putImageData(outImg, 0, 0);
+      }, 512);
+
+      // Aluprof Earthline — Light Wood-effect sublimated aluminium lamella bars (8 vertical strips × 64 px)
+      textures.aluprofEarthlineBarLightWood = createProceduralTexture(function (ctx, w, h) {
+        var outImg = ctx.createImageData(w, h);
+        var dst = outImg.data;
+        var strips = 8;
+        var stripW = w / strips;
+        var stripBases = [
+          [210, 189, 162], [203, 180, 152], [216, 196, 170], [197, 173, 144],
+          [207, 185, 157], [214, 193, 166], [200, 177, 148], [212, 190, 163]
+        ];
+        for (var y = 0; y < h; y++) {
+          var yNorm = y / h;
+          for (var x = 0; x < w; x++) {
+            var sIdx = Math.min(strips - 1, Math.floor(x / stripW));
+            var localU = (x - sIdx * stripW) / stripW;
+            var base = stripBases[sIdx];
+            var phase = sIdx * 1.93 + 0.4;
+            var warp = Math.sin(yNorm * 6.283 + phase) * 0.18 + Math.sin(yNorm * 12.566 + phase * 1.7) * 0.08;
+            var uG = localU + warp;
+            var fineFibers = Math.sin(uG * 46.0 + phase * 2.3) * 5.2 + Math.sin(uG * 105.0 + yNorm * 4.0) * 2.4;
+            var cathedral = Math.sin((uG * 9.5 + Math.sin(yNorm * 3.1416 + phase) * 1.2) * 3.1416) * 5.5;
+            var pore = Math.sin(localU * 140.0 + yNorm * 28.0 + phase) > 0.92 ? -7.0 : 0.0;
+            var edgeShade = 1.0;
+            if (localU < 0.06) edgeShade = 0.91 + 0.09 * (localU / 0.06);
+            else if (localU > 0.94) edgeShade = 0.91 + 0.09 * ((1.0 - localU) / 0.06);
+            var delta = fineFibers + cathedral + pore;
+            var idx = (y * w + x) * 4;
+            dst[idx]     = Math.max(125, Math.min(238, Math.round((base[0] + delta) * edgeShade)));
+            dst[idx + 1] = Math.max(105, Math.min(222, Math.round((base[1] + delta * 0.92) * edgeShade)));
+            dst[idx + 2] = Math.max(82,  Math.min(200, Math.round((base[2] + delta * 0.80) * edgeShade)));
+            dst[idx + 3] = 255;
+          }
+        }
+        ctx.putImageData(outImg, 0, 0);
+      }, 512);
+
       // RAL 7021 Dark Metal Fascia
       textures.fascia = createProceduralTexture(function (ctx, w, h) {
         ctx.fillStyle = '#1f2421';
@@ -1290,6 +1386,9 @@
           color: props.color || [1, 1, 1],
           alpha: props.alpha !== undefined ? props.alpha : 1.0,
           texKey: props.texKey || null,
+          isLowerFacade: !!props.isLowerFacade,
+          isUpperFacade: !!props.isUpperFacade,
+          isUpperEarthlineBars: !!props.isUpperEarthlineBars,
           isGlass: !!props.isGlass,
           isInteriorWall: !!props.isInteriorWall,
           isMetallic: !!props.isMetallic,
@@ -1507,6 +1606,146 @@
         }
       }
 
+      // Emit 3D protruding Aluprof Earthline vertical lamella bars (K441213X: 30 mm width, 30 mm gap,
+      // 60 mm repeating pitch, 20.9 mm outward projection over ~3 mm K441208X back plate = 23.9 mm total depth)
+      // strictly clipped to the exact rectilinear wall cells (excluding all window openings and notches).
+      function addEarthlineLamellasOnFace3D(barBuilder, sideObj, concaveTrimEndMm) {
+        if (!barBuilder || !sideObj) return;
+        var outer = sideObj.outerLoop3D || sideObj.outerLoop || sideObj.outer;
+        if (!outer || outer.length < 3) return;
+        var rawHoles = sideObj.holes3D || sideObj.holes || [];
+        var holes = rawHoles.map(function (h) {
+          return Array.isArray(h) ? h : (h.loop3D || h.loop || []);
+        }).filter(function (h) { return h.length >= 3; });
+
+        var origin = sideObj.p1
+          ? [sideObj.p1[0], sideObj.p1[1], 0]
+          : [outer[0][0], outer[0][1], 0];
+
+        var t = sideObj.tangent;
+        if (!t) {
+          var dx0 = outer[1][0] - outer[0][0];
+          var dy0 = outer[1][1] - outer[0][1];
+          var len0 = Math.hypot(dx0, dy0) || 1;
+          t = [dx0 / len0, dy0 / len0, 0];
+        }
+        var n = sideObj.normal || [t[1], -t[0], 0];
+        var det = t[1] * n[0] - t[0] * n[1];
+        var flipWinding = (det < 0);
+
+        function to2D(pt3) {
+          var dx = pt3[0] - origin[0];
+          var dy = pt3[1] - origin[1];
+          return [dx * t[0] + dy * t[1], pt3[2]];
+        }
+
+        function to3D(u, v, d) {
+          return [
+            origin[0] + u * t[0] + d * n[0],
+            origin[1] + u * t[1] + d * n[1],
+            v
+          ];
+        }
+
+        function pushQuad(p0, p1, p2, p3, norm, uv0, uv1, uv2, uv3) {
+          if (flipWinding) {
+            addTriangle3D(barBuilder, p0, p2, p1, norm, uv0, uv2, uv1);
+            addTriangle3D(barBuilder, p0, p3, p2, norm, uv0, uv3, uv2);
+          } else {
+            addTriangle3D(barBuilder, p0, p1, p2, norm, uv0, uv1, uv2);
+            addTriangle3D(barBuilder, p0, p2, p3, norm, uv0, uv2, uv3);
+          }
+        }
+
+        var outer2D = outer.map(to2D);
+        var holes2D = holes.map(function (h) { return h.map(to2D); });
+
+        var uSet = {};
+        var vSet = {};
+        function addUV(p) {
+          var uk = Math.round(p[0] * 10) / 10;
+          var vk = Math.round(p[1] * 10) / 10;
+          uSet[uk] = uk;
+          vSet[vk] = vk;
+        }
+        outer2D.forEach(addUV);
+        holes2D.forEach(function (hLoop) { hLoop.forEach(addUV); });
+
+        var uCoords = Object.keys(uSet).map(Number).sort(function (a, b) { return a - b; });
+        var vCoords = Object.keys(vSet).map(Number).sort(function (a, b) { return a - b; });
+        var maxU = uCoords.length > 0 ? uCoords[uCoords.length - 1] - (concaveTrimEndMm || 0) : 0;
+
+        var PITCH_MM = 60;
+        var BAR_W_MM = 30;
+        var PROJ_MM = 20.9; // 23.9 mm total depth minus ~3.0 mm K441208X backing plate
+        var negT = [-t[0], -t[1], 0];
+        var posT = [t[0], t[1], 0];
+
+        for (var i = 0; i + 1 < uCoords.length; i++) {
+          var u0 = uCoords[i];
+          var u1 = Math.min(uCoords[i + 1], maxU);
+          if (u1 - u0 < 2) continue;
+          var uMid = 0.5 * (u0 + u1);
+
+          for (var j = 0; j + 1 < vCoords.length; j++) {
+            var v0 = vCoords[j];
+            var v1 = vCoords[j + 1];
+            if (v1 - v0 < 2) continue;
+            var vMid = 0.5 * (v0 + v1);
+
+            if (!pointInPolygon2D(uMid, vMid, outer2D)) continue;
+            var inHole = false;
+            for (var h = 0; h < holes2D.length; h++) {
+              if (pointInPolygon2D(uMid, vMid, holes2D[h])) {
+                inHole = true;
+                break;
+              }
+            }
+            if (inHole) continue;
+
+            var vy0 = (v0 - 3430) / 2900;
+            var vy1 = (v1 - 3430) / 2900;
+            var kStart = Math.floor(u0 / PITCH_MM);
+            var kEnd = Math.ceil(u1 / PITCH_MM);
+
+            for (var k = kStart; k < kEnd; k++) {
+              var rawStart = k * PITCH_MM;
+              var b0 = Math.max(u0, rawStart);
+              var b1 = Math.min(u1, rawStart + BAR_W_MM);
+              if (b1 - b0 < 2) continue;
+
+              var stripIdx = ((k % 8) + 8) % 8;
+              var uBase = stripIdx / 8;
+              var pad = 0.003;
+              var spanU = (1 / 8) - pad * 2;
+              var f0 = (b0 - rawStart) / BAR_W_MM;
+              var f1 = (b1 - rawStart) / BAR_W_MM;
+              var tu0 = uBase + pad + f0 * spanU;
+              var tu1 = uBase + pad + f1 * spanU;
+              var tuS0 = uBase + 0.025;
+              var tuS1 = uBase + 0.095;
+
+              var bk00 = to3D(b0, v0, 0);
+              var bk10 = to3D(b1, v0, 0);
+              var bk11 = to3D(b1, v1, 0);
+              var bk01 = to3D(b0, v1, 0);
+
+              var fr00 = to3D(b0, v0, PROJ_MM);
+              var fr10 = to3D(b1, v0, PROJ_MM);
+              var fr11 = to3D(b1, v1, PROJ_MM);
+              var fr01 = to3D(b0, v1, PROJ_MM);
+
+              // 5 exposed faces (no back face at d=0 so zero Z-fighting with K441208X backing wall)
+              pushQuad(fr00, fr10, fr11, fr01, n, [tu0, vy0], [tu1, vy0], [tu1, vy1], [tu0, vy1]);
+              pushQuad(fr10, bk10, bk11, fr11, posT, [tuS0, vy0], [tuS1, vy0], [tuS1, vy1], [tuS0, vy1]);
+              pushQuad(bk00, fr00, fr01, bk01, negT, [tuS0, vy0], [tuS1, vy0], [tuS1, vy1], [tuS0, vy1]);
+              pushQuad(fr01, fr11, bk11, bk01, [0, 0, 1], [tu0, tuS0], [tu1, tuS0], [tu1, tuS1], [tu0, tuS1]);
+              pushQuad(bk00, bk10, fr10, fr00, [0, 0, -1], [tu0, tuS0], [tu1, tuS0], [tu1, tuS1], [tu0, tuS1]);
+            }
+          }
+        }
+      }
+
       // Add perpendicular thickness reveals (mitered end caps, top cap, doorway jambs/lintels, and window reveals)
       // connecting sideA and sideB without vertex-index twisting or coplanar Z-fighting
       function addWallReveals3D(extJambBuilder, intWallBuilder, intRevealBuilder, topCapFasciaBuilder, topCapWhiteBuilder, wall, isExteriorWall, allWallFaceSegments) {
@@ -1705,6 +1944,7 @@
         var bPlinth = createBuilder();
         var bLowerFacade = createBuilder();
         var bUpperFacade = createBuilder();
+        var bUpperEarthlineBars = createBuilder();
         var bFascia = createBuilder();
         var bInteriorWall = createBuilder();
         var bInteriorReveal = createBuilder();
@@ -1863,6 +2103,7 @@
             addWallReveals3D(bFascia, bInteriorWall, bInteriorReveal, bUpperWallCapFascia, bUpperWallCapWhite, w, true, allWallFaceSegments);
           } else if (isUW) {
             addWallFace3D(bUpperFacade, w.sideA, 1600, 1600, false, 0);
+            addEarthlineLamellasOnFace3D(bUpperEarthlineBars, w.sideA, w.id === 'UW_TERRACE_BACK' ? 24 : 0);
             addWallFace3D(bInteriorWall, w.sideB, 1600, 1600, false, 0);
             addWallReveals3D(bFascia, bInteriorWall, bInteriorReveal, bUpperWallCapFascia, bUpperWallCapWhite, w, true, allWallFaceSegments);
           } else if (Array.isArray(w.sides) && w.sides.length > 2) {
@@ -2336,7 +2577,17 @@
         opaqueMeshes.push(uploadMesh(bTerrace, { color: [0.92, 0.91, 0.89], texKey: 'terrace' }));
         opaqueMeshes.push(uploadMesh(bPlinth, { color: [0.22, 0.24, 0.25] }));
         opaqueMeshes.push(uploadMesh(bLowerFacade, { color: [1, 1, 1], texKey: activeLowerMatId, isLowerFacade: true }));
-        opaqueMeshes.push(uploadMesh(bUpperFacade, { color: [1, 1, 1], texKey: activeUpperMatId, isUpperFacade: true }));
+        opaqueMeshes.push(uploadMesh(bUpperFacade, {
+          color: [1, 1, 1],
+          texKey: isEarthlineUpperMat(activeUpperMatId) ? 'aluprofEarthlineBack' : activeUpperMatId,
+          isUpperFacade: true
+        }));
+        opaqueMeshes.push(uploadMesh(bUpperEarthlineBars, {
+          color: [1, 1, 1],
+          texKey: getEarthlineBarTexKey(activeUpperMatId),
+          isMetallic: activeUpperMatId === 'aluprofEarthlineBlack',
+          isUpperEarthlineBars: true
+        }));
         opaqueMeshes.push(uploadMesh(bFascia, { color: [0.92, 0.94, 0.93], texKey: 'fascia' }));
         opaqueMeshes.push(uploadMesh(bInteriorWall, { color: [0.955, 0.948, 0.932], isInteriorWall: true }));
         opaqueMeshes.push(uploadMesh(bInteriorReveal, { color: [0.88, 0.872, 0.856] }));
@@ -3280,8 +3531,15 @@
 
       upperMatSelect.addEventListener('change', function () {
         activeUpperMatId = upperMatSelect.value;
+        var earthlineActive = isEarthlineUpperMat(activeUpperMatId);
         opaqueMeshes.forEach(function (m) {
-          if (m.isUpperFacade) m.texKey = activeUpperMatId;
+          if (m.isUpperFacade) {
+            m.texKey = earthlineActive ? 'aluprofEarthlineBack' : activeUpperMatId;
+          }
+          if (m.isUpperEarthlineBars) {
+            m.texKey = getEarthlineBarTexKey(activeUpperMatId);
+            m.isMetallic = (activeUpperMatId === 'aluprofEarthlineBlack');
+          }
         });
       });
 
@@ -3947,6 +4205,7 @@
         gl.depthMask(true);
         for (var i = 0; i < opaqueMeshes.length; i++) {
           var m = opaqueMeshes[i];
+          if (m.isUpperEarthlineBars && !isEarthlineUpperMat(activeUpperMatId)) continue;
           if (m.isRoof && hideRoof) continue;
           if (m.isWallTopCap && !hideRoof) continue;
           if (m.isTree && !showTrees) continue;

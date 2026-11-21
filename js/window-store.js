@@ -57,17 +57,59 @@
         throw new Error('WindowStore requires PersistenceService (js/persistence.js) to be loaded first.');
     }
 
+    // Physical wall span bounds (mm) for openings that must never penetrate perpendicular structural walls
+    const OPENING_WALL_BOUNDS = {
+        // Z2 sits on EW_GARAGE_WEST between EW_GARAGE_NORTH inner face (Y = 90 mm) and EW_ALCOVE_NORTH (Y = 8,560 mm)
+        Z2: { axis: 'y', minStart: 90, maxEnd: 8560 }
+    };
+
+    let needsHealZ2Persist = false;
+    function normalizeWindowItem(item) {
+        if (!item || typeof item !== 'object') return item;
+        const bounds = OPENING_WALL_BOUNDS[item.id];
+        if (bounds) {
+            const defItem = defaultWindows[item.id] || {};
+            const w = Number(item.width) || Number(defItem.width) || 0;
+            const pos = Number(item[bounds.axis]);
+            const maxStart = bounds.maxEnd - w;
+            if (!Number.isFinite(pos) || pos < bounds.minStart || pos > maxStart) {
+                const healedPos = (defItem[bounds.axis] !== undefined)
+                    ? Number(defItem[bounds.axis])
+                    : Math.max(bounds.minStart, Math.min(maxStart, pos || bounds.minStart));
+                const healedW = (w > bounds.maxEnd - bounds.minStart && defItem.width !== undefined)
+                    ? Number(defItem.width)
+                    : w;
+                if (item.id === 'Z2') needsHealZ2Persist = true;
+                return { ...item, [bounds.axis]: healedPos, width: healedW };
+            }
+        }
+        return item;
+    }
+
     // Register 'windows' and 'views' entity types with explicit default seed values
     PersistenceService.registerType(ENTITY_WINDOWS, {
         collectionKind: 'map',
         defaults: defaultWindows,
         filePath: 'data/windows.js',
         legacyStorageKey: LEGACY_KEY_WINDOWS,
+        normalizeItem: normalizeWindowItem,
         metadata: (initialWindowsData && initialWindowsData.metadata) || {
             isDefaultSeed: false,
             entityType: ENTITY_WINDOWS
         }
     });
+
+    if (needsHealZ2Persist && defaultWindows.Z2) {
+        needsHealZ2Persist = false;
+        try {
+            PersistenceService.upsert(ENTITY_WINDOWS, 'Z2', {
+                y: defaultWindows.Z2.y,
+                width: defaultWindows.Z2.width
+            });
+        } catch (e) {
+            // Ignore storage write failures in restricted environments
+        }
+    }
 
     PersistenceService.registerType(ENTITY_VIEWS, {
         collectionKind: 'map',
@@ -274,6 +316,23 @@
                     patch[field] = Number(patch[field]);
                 }
             });
+
+            const bounds = OPENING_WALL_BOUNDS[id];
+            if (bounds) {
+                const effWidth = (patch.width !== undefined && Number.isFinite(patch.width))
+                    ? patch.width
+                    : (Number(currentWin.width) || 0);
+                const maxStart = Math.max(bounds.minStart, bounds.maxEnd - effWidth);
+                const curPos = (patch[bounds.axis] !== undefined && Number.isFinite(patch[bounds.axis]))
+                    ? patch[bounds.axis]
+                    : Number(currentWin[bounds.axis]);
+                if (Number.isFinite(curPos)) {
+                    const clampedPos = Math.max(bounds.minStart, Math.min(maxStart, curPos));
+                    if (clampedPos !== curPos || patch[bounds.axis] !== undefined) {
+                        patch[bounds.axis] = clampedPos;
+                    }
+                }
+            }
 
             const updatedCopy = PersistenceService.upsert(ENTITY_WINDOWS, id, patch);
 
