@@ -2549,16 +2549,14 @@
                 floor: 'first',
                 category: 'internal',
                 axis: 'x',
-                x1: 6495, y1: 6940, x2: 10575, y2: 7120,
+                x1: 6495, y1: 6940, x2: 9525, y2: 7120,
                 thickness: 180,
                 zBottom: 3330,
                 zTop: 6300,
                 rooms: '1.01 Sypialnia (408 × 377 cm) ↔ 1.08 Garderoba (408 × 408 cm)',
-                specs: '4,080 × 180 mm (18 cm structural wall) • 3,770 mm (377 cm) South of North inner wall (Z = 3,170 mm); doorway notch X=9525..10425, Z=3330..5430 mm',
+                specs: '3,030 × 180 mm (18 cm structural wall) • 3,770 mm (377 cm) South of North inner wall (Z = 3,170 mm); terminates at X = 9,525 mm leaving a 1,050 mm (105 cm) full-height open passage to 1.08 Garderoba',
                 openings: [],
-                doors: [
-                    { id: 'D_FW7_1', start: 9525, end: 10425, sillMm: 0, heightMm: 2100, swingDir: -1, hingeStart: false }
-                ],
+                doors: [],
                 sides: [
                     {
                         id: 'FW_7_NORTH',
@@ -2566,15 +2564,11 @@
                         material: 'plaster_white',
                         normal: [0, -1, 0],
                         p1: [6495, 6940],
-                        p2: [10575, 6940],
+                        p2: [9525, 6940],
                         outerLoop: [
                             [6495, 6940, 3330],
                             [9525, 6940, 3330],
-                            [9525, 6940, 5430],
-                            [10425, 6940, 5430],
-                            [10425, 6940, 3330],
-                            [10575, 6940, 3330],
-                            [10575, 6940, 6300],
+                            [9525, 6940, 6300],
                             [6495, 6940, 6300]
                         ],
                         holes: []
@@ -2584,17 +2578,13 @@
                         role: 'interior',
                         material: 'plaster_white',
                         normal: [0, 1, 0],
-                        p1: [10575, 7120],
+                        p1: [9525, 7120],
                         p2: [6495, 7120],
                         outerLoop: [
-                            [10575, 7120, 3330],
-                            [10425, 7120, 3330],
-                            [10425, 7120, 5430],
-                            [9525, 7120, 5430],
                             [9525, 7120, 3330],
                             [6495, 7120, 3330],
                             [6495, 7120, 6300],
-                            [10575, 7120, 6300]
+                            [9525, 7120, 6300]
                         ],
                         holes: []
                     }
