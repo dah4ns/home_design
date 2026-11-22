@@ -344,12 +344,119 @@ const ROOM_FURNITURE_CATALOG = [
         ]
       }
     ]
+  },
+  {
+    typeId: 'upholstered_bed_channeled',
+    name: 'Channeled Upholstered Storage Bed (Queen 160 / King 180 × 200 cm)',
+    shortName: 'Channeled Bed',
+    category: 'bed',
+    categoryLabel: 'Bed',
+    description: 'Modern upholstered lift-up storage bed with 110 cm tall vertically channeled headboard (8 plush flutes on King / 7 on Queen), 41 cm box rails on 1.5 cm glides (42.5 cm rail top), 23 cm quilted mattress, sculpted linen duvet, wavy draped throw blanket, 2 reclined sleeping pillows & 3 layered accent cushions.',
+    dimensionsMm: {
+      queenWidthMm: 1650,
+      kingWidthMm: 1850,
+      lengthMm: 2095,
+      headboardHeightMm: 1100,
+      headboardThicknessMm: 70,
+      frameHeightMm: 425,
+      framePanelHeightMm: 410,
+      footHeightMm: 15,
+      railThicknessMm: 25,
+      queenMattressWidthMm: 1600,
+      kingMattressWidthMm: 1800,
+      mattressLengthMm: 2000,
+      mattressHeightMm: 230
+    },
+    defaultProperties: {
+      bedSize: 'king',
+      upholsteryColor: '#D5CEC5',
+      beddingColor: '#F2F0EC',
+      throwColor: '#7D7265',
+      accentPillowColor: '#6D6B44'
+    },
+    propertiesSchema: [
+      {
+        key: 'bedSize',
+        label: 'Bed Size (Mattress & Frame)',
+        type: 'select',
+        default: 'king',
+        options: [
+          { label: 'King — 180 × 200 cm mattress (Frame 185 × 209.5 × H110 cm)', value: 'king' },
+          { label: 'Queen — 160 × 200 cm mattress (Frame 165 × 209.5 × H110 cm)', value: 'queen' }
+        ]
+      },
+      {
+        key: 'upholsteryColor',
+        label: 'Bed Frame & Headboard Upholstery',
+        type: 'color_swatches',
+        default: '#D5CEC5',
+        swatches: [
+          { label: 'Warm Cashmere Beige (Photo Default)', value: '#D5CEC5' },
+          { label: 'Pearl Ivory', value: '#ECE8E1' },
+          { label: 'Warm Sand Beige', value: '#DECBB7' },
+          { label: 'Light Dove Grey', value: '#C4C5C2' },
+          { label: 'Architectural Stone Grey', value: '#8B9097' },
+          { label: 'Deep Charcoal Grey', value: '#3F434B' },
+          { label: 'Matte Onyx Black', value: '#1F2126' },
+          { label: 'Rich Maroon / Burgundy', value: '#6B2737' },
+          { label: 'Dusty Rose Taupe', value: '#A88A87' },
+          { label: 'Terracotta Clay', value: '#B96950' },
+          { label: 'Sage Olive Velvet', value: '#748272' },
+          { label: 'Nordic Fjord Navy', value: '#2C3F56' }
+        ]
+      },
+      {
+        key: 'beddingColor',
+        label: 'Duvet & Sleeping Pillows Linen',
+        type: 'color_swatches',
+        default: '#F2F0EC',
+        swatches: [
+          { label: 'Crisp White Linen (Photo Default)', value: '#F2F0EC' },
+          { label: 'Warm Pearl Ivory', value: '#ECE6DA' },
+          { label: 'Cool Mist Grey', value: '#DDE0E3' },
+          { label: 'Oatmeal Sand', value: '#DDD2C3' },
+          { label: 'Soft Sage Linen', value: '#CFD6CC' },
+          { label: 'Slate Grey', value: '#6B727B' },
+          { label: 'Charcoal Cotton', value: '#363A42' }
+        ]
+      },
+      {
+        key: 'throwColor',
+        label: 'Draped Throw Blanket',
+        type: 'color_swatches',
+        default: '#7D7265',
+        swatches: [
+          { label: 'Warm Stone Taupe (Photo Default)', value: '#7D7265' },
+          { label: 'Olive Moss Wool', value: '#6B6947' },
+          { label: 'Oatmeal Cream Knit', value: '#D6C9B8' },
+          { label: 'Deep Maroon Cashmere', value: '#652A36' },
+          { label: 'Charcoal Wool', value: '#3A3E46' },
+          { label: 'Rust Terracotta', value: '#A85D44' },
+          { label: 'Deep Fjord Navy', value: '#2B3E54' }
+        ]
+      },
+      {
+        key: 'accentPillowColor',
+        label: 'Center Accent Cushion',
+        type: 'color_swatches',
+        default: '#6D6B44',
+        swatches: [
+          { label: 'Olive Moss Velvet (Photo Default)', value: '#6D6B44' },
+          { label: 'Warm Taupe Linen', value: '#9C8E7E' },
+          { label: 'Deep Maroon Velvet', value: '#6B2737' },
+          { label: 'Terracotta Clay', value: '#B5634A' },
+          { label: 'Pearl Sand', value: '#E7E1D6' },
+          { label: 'Charcoal Velvet', value: '#3D414A' },
+          { label: 'Nordic Navy', value: '#344B63' }
+        ]
+      }
+    ]
   }
 ];
 
 // Default Placed Room Furniture Instances:
-// Includes the Modular Corner Sofa (L226×226×H81 cm) from the attached plan
-// placed in 0.11 Salon (Living Room: X = 95..6,315 mm, Y = 6,290..11,200 mm).
+// Includes the Modular Corner Sofa (L226×226×H81 cm) in 0.11 Salon
+// and the Channeled Upholstered King Storage Bed (185×209.5×H110 cm) in 1.01 Master Bedroom.
 const DEFAULT_ROOM_FURNITURE = [
   {
     id: 'SOFA_LIVING_1',
@@ -365,6 +472,23 @@ const DEFAULT_ROOM_FURNITURE = [
       pillowColor: '#E2DBD0',
       legColor: '#232528',
       wingVariant: '226x226'
+    }
+  },
+  {
+    id: 'BED_MASTER_1',
+    typeId: 'upholstered_bed_channeled',
+    name: 'Master Bedroom Channeled Bed (1.01 Sypialnia)',
+    floor: 'first',
+    room: '1.01 Sypialnia',
+    x: 8010,
+    y: 5892,
+    rotation: 180,
+    properties: {
+      bedSize: 'king',
+      upholsteryColor: '#D5CEC5',
+      beddingColor: '#F2F0EC',
+      throwColor: '#7D7265',
+      accentPillowColor: '#6D6B44'
     }
   }
 ];

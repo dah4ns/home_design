@@ -253,8 +253,123 @@ const RoomFurnitureStore = (() => {
     };
   }
 
+  function mixHexColors(hexA, hexB, t) {
+    const a = hexToRgb01(hexA, 1.0);
+    const b = hexToRgb01(hexB, 1.0);
+    const k = Math.max(0, Math.min(1, t));
+    const r = Math.round((a[0] * (1 - k) + b[0] * k) * 255);
+    const g = Math.round((a[1] * (1 - k) + b[1] * k) * 255);
+    const bl = Math.round((a[2] * (1 - k) + b[2] * k) * 255);
+    const toHex = n => n.toString(16).padStart(2, '0').toUpperCase();
+    return '#' + toHex(r) + toHex(g) + toHex(bl);
+  }
+
+  function cross3(a, b) {
+    return [
+      a[1] * b[2] - a[2] * b[1],
+      a[2] * b[0] - a[0] * b[2],
+      a[0] * b[1] - a[1] * b[0]
+    ];
+  }
+
+  function sub3(a, b) {
+    return [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+  }
+
+  function dot3(a, b) {
+    return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  }
+
+  // Emit a 3D quad whose winding is mathematically guaranteed to match the outward normal
+  function emitOrientedQuad(faces3D, p0, p1, p2, p3, n0, n1, n2, n3, noWireframe) {
+    const g1 = cross3(sub3(p1, p0), sub3(p2, p0));
+    const g2 = cross3(sub3(p2, p0), sub3(p3, p0));
+    const gN = [g1[0] + g2[0], g1[1] + g2[1], g1[2] + g2[2]];
+    if (Math.hypot(gN[0], gN[1], gN[2]) < 1e-4) return;
+    const avgN = normalizeVec3([
+      n0[0] + n1[0] + n2[0] + n3[0],
+      n0[1] + n1[1] + n2[1] + n3[1],
+      n0[2] + n1[2] + n2[2] + n3[2]
+    ]);
+    if (dot3(gN, avgN) < 0) {
+      faces3D.push({
+        name: 'sculpted_quad',
+        noWireframe: noWireframe !== false,
+        normal: avgN,
+        loop3D: [p0, p3, p2, p1],
+        vertexNormals3D: [n0, n3, n2, n1]
+      });
+    } else {
+      faces3D.push({
+        name: 'sculpted_quad',
+        noWireframe: noWireframe !== false,
+        normal: avgN,
+        loop3D: [p0, p1, p2, p3],
+        vertexNormals3D: [n0, n1, n2, n3]
+      });
+    }
+  }
+
+  function emitOrientedTri(faces3D, p0, p1, p2, n0, n1, n2, noWireframe) {
+    const gN = cross3(sub3(p1, p0), sub3(p2, p0));
+    if (Math.hypot(gN[0], gN[1], gN[2]) < 1e-4) return;
+    const avgN = normalizeVec3([
+      n0[0] + n1[0] + n2[0],
+      n0[1] + n1[1] + n2[1],
+      n0[2] + n1[2] + n2[2]
+    ]);
+    if (dot3(gN, avgN) < 0) {
+      faces3D.push({
+        name: 'sculpted_tri',
+        noWireframe: noWireframe !== false,
+        normal: avgN,
+        loop3D: [p0, p2, p1],
+        vertexNormals3D: [n0, n2, n1]
+      });
+    } else {
+      faces3D.push({
+        name: 'sculpted_tri',
+        noWireframe: noWireframe !== false,
+        normal: avgN,
+        loop3D: [p0, p1, p2],
+        vertexNormals3D: [n0, n1, n2]
+      });
+    }
+  }
+
+  // Compute smooth per-vertex normals for a 2D surface grid of world points
+  // given a desired local-to-world outward hint normal per vertex or uniform orientation sign.
+  function computeGridSurfaceNormals(gridPts, nRows, nCols, hintNormFn) {
+    const norms = [];
+    for (let r = 0; r <= nRows; r++) {
+      const rowN = [];
+      for (let c = 0; c <= nCols; c++) {
+        const pPrevC = gridPts[r][Math.max(0, c - 1)];
+        const pNextC = gridPts[r][Math.min(nCols, c + 1)];
+        const pPrevR = gridPts[Math.max(0, r - 1)][c];
+        const pNextR = gridPts[Math.min(nRows, r + 1)][c];
+        const tC = sub3(pNextC, pPrevC);
+        const tR = sub3(pNextR, pPrevR);
+        let n = cross3(tC, tR);
+        const len = Math.hypot(n[0], n[1], n[2]);
+        const hint = hintNormFn(r, c);
+        if (len < 1e-4) {
+          n = hint;
+        } else {
+          n = normalizeVec3(n);
+          if (dot3(n, hint) < 0) {
+            n = [-n[0], -n[1], -n[2]];
+          }
+        }
+        rowN.push(n);
+      }
+      norms.push(rowN);
+    }
+    return norms;
+  }
+
   // Extrude a 2D cross-section profile (with smooth per-vertex normals) along a local axis
-  // or build a rounded cushion / bolster / armrest with soft curved edges!
+  // or build a rounded cushion / bolster / armrest / sculpted bed component with soft curved edges!
   function buildRoundedBoxPart(spec, transformFn, normalFn) {
     const x0 = spec.lx0, x1 = spec.lx1;
     const y0 = spec.ly0, y1 = spec.ly1;
@@ -262,9 +377,531 @@ const RoomFurnitureStore = (() => {
     const w = x1 - x0;
     const d = y1 - y0;
     const h = z1 - z0;
-    const shape = spec.shape || 'box'; // 'box' | 'cushion' | 'bolster_x' | 'bolster_y' | 'pillow' | 'armrest_x' | 'armrest_y'
+    const shape = spec.shape || 'box';
 
     const { mapPt, mapN } = createLocalTransform(spec, transformFn, normalFn);
+
+    // -------------------------------------------------------------------------
+    // A. Sleek Upholstered Beveled Panel (crisp flat rails & footboard with 5 mm upholstered chamfer)
+    // -------------------------------------------------------------------------
+    if (shape === 'beveled_panel') {
+      const b = spec.bevelMm !== undefined ? spec.bevelMm : 5;
+      const bx = Math.min(b, w * 0.28);
+      const by = Math.min(b, d * 0.28);
+      const bz = Math.min(b, h * 0.22);
+
+      // 8 outer corners inset on each axis for exact 26-face chamfered upholstered prism
+      const xi0 = x0 + bx, xi1 = x1 - bx;
+      const yi0 = y0 + by, yi1 = y1 - by;
+      const zi0 = z0 + bz, zi1 = z1 - bz;
+
+      const nTop = normalizeVec3(mapN(0, 0, 1));
+      const nBot = normalizeVec3(mapN(0, 0, -1));
+      const nNor = normalizeVec3(mapN(0, -1, 0));
+      const nSou = normalizeVec3(mapN(0, 1, 0));
+      const nWes = normalizeVec3(mapN(-1, 0, 0));
+      const nEas = normalizeVec3(mapN(1, 0, 0));
+
+      const faces3D = [];
+
+      // 6 Main Flat Faces
+      const topPts = [mapPt(xi0, yi0, z1), mapPt(xi1, yi0, z1), mapPt(xi1, yi1, z1), mapPt(xi0, yi1, z1)];
+      const botPts = [mapPt(xi0, yi0, z0), mapPt(xi1, yi0, z0), mapPt(xi1, yi1, z0), mapPt(xi0, yi1, z0)];
+      const norPts = [mapPt(xi0, y0, zi0), mapPt(xi1, y0, zi0), mapPt(xi1, y0, zi1), mapPt(xi0, y0, zi1)];
+      const souPts = [mapPt(xi0, y1, zi0), mapPt(xi1, y1, zi0), mapPt(xi1, y1, zi1), mapPt(xi0, y1, zi1)];
+      const wesPts = [mapPt(x0, yi0, zi0), mapPt(x0, yi1, zi0), mapPt(x0, yi1, zi1), mapPt(x0, yi0, zi1)];
+      const easPts = [mapPt(x1, yi0, zi0), mapPt(x1, yi1, zi0), mapPt(x1, yi1, zi1), mapPt(x1, yi0, zi1)];
+
+      emitOrientedQuad(faces3D, topPts[0], topPts[1], topPts[2], topPts[3], nTop, nTop, nTop, nTop, true);
+      emitOrientedQuad(faces3D, botPts[0], botPts[1], botPts[2], botPts[3], nBot, nBot, nBot, nBot, true);
+      emitOrientedQuad(faces3D, norPts[0], norPts[1], norPts[2], norPts[3], nNor, nNor, nNor, nNor, true);
+      emitOrientedQuad(faces3D, souPts[0], souPts[1], souPts[2], souPts[3], nSou, nSou, nSou, nSou, true);
+      emitOrientedQuad(faces3D, wesPts[0], wesPts[1], wesPts[2], wesPts[3], nWes, nWes, nWes, nWes, true);
+      emitOrientedQuad(faces3D, easPts[0], easPts[1], easPts[2], easPts[3], nEas, nEas, nEas, nEas, true);
+
+      // 12 Smooth Chamfer Edge Strips (interpolated vertex normals between adjacent faces!)
+      // Top 4 bevels
+      emitOrientedQuad(faces3D, norPts[3], norPts[2], topPts[1], topPts[0], nNor, nNor, nTop, nTop, true);
+      emitOrientedQuad(faces3D, souPts[2], souPts[3], topPts[3], topPts[2], nSou, nSou, nTop, nTop, true);
+      emitOrientedQuad(faces3D, wesPts[3], wesPts[2], topPts[3], topPts[0], nWes, nWes, nTop, nTop, true);
+      emitOrientedQuad(faces3D, easPts[2], easPts[3], topPts[1], topPts[2], nEas, nEas, nTop, nTop, true);
+      // Bottom 4 bevels
+      emitOrientedQuad(faces3D, norPts[0], norPts[1], botPts[1], botPts[0], nNor, nNor, nBot, nBot, true);
+      emitOrientedQuad(faces3D, souPts[1], souPts[0], botPts[0], botPts[1], nSou, nSou, nBot, nBot, true);
+      emitOrientedQuad(faces3D, wesPts[0], wesPts[1], botPts[3], botPts[0], nWes, nWes, nBot, nBot, true);
+      emitOrientedQuad(faces3D, easPts[1], easPts[0], botPts[1], botPts[2], nEas, nEas, nBot, nBot, true);
+      // Vertical 4 corner bevels
+      emitOrientedQuad(faces3D, wesPts[0], norPts[0], norPts[3], wesPts[3], nWes, nNor, nNor, nWes, true);
+      emitOrientedQuad(faces3D, norPts[1], easPts[0], easPts[3], norPts[2], nNor, nEas, nEas, nNor, true);
+      emitOrientedQuad(faces3D, easPts[1], souPts[1], souPts[2], easPts[2], nEas, nSou, nSou, nEas, true);
+      emitOrientedQuad(faces3D, souPts[0], wesPts[1], wesPts[2], souPts[3], nSou, nWes, nWes, nSou, true);
+
+      // 8 Corner Micro-Bevel Triangles
+      emitOrientedTri(faces3D, topPts[0], norPts[3], wesPts[3], nTop, nNor, nWes, true);
+      emitOrientedTri(faces3D, topPts[1], easPts[3], norPts[2], nTop, nEas, nNor, true);
+      emitOrientedTri(faces3D, topPts[2], souPts[2], easPts[2], nTop, nSou, nEas, true);
+      emitOrientedTri(faces3D, topPts[3], wesPts[2], souPts[3], nTop, nWes, nSou, true);
+      emitOrientedTri(faces3D, botPts[0], wesPts[0], norPts[0], nBot, nWes, nNor, true);
+      emitOrientedTri(faces3D, botPts[1], norPts[1], easPts[0], nBot, nNor, nEas, true);
+      emitOrientedTri(faces3D, botPts[2], easPts[1], souPts[1], nBot, nEas, nSou, true);
+      emitOrientedTri(faces3D, botPts[3], souPts[0], wesPts[1], nBot, nSou, nWes, true);
+
+      const wf = [];
+      if (spec.showTopRimLine) {
+        const r0 = mapPt(x0, y0, z1), r1 = mapPt(x1, y0, z1), r2 = mapPt(x1, y1, z1), r3 = mapPt(x0, y1, z1);
+        wf.push([r0, r1, r2, r3, r0]);
+      }
+
+      const fp2D = [
+        [Math.round(mapPt(x0, y0, z0)[0]), Math.round(mapPt(x0, y0, z0)[1])],
+        [Math.round(mapPt(x1, y0, z0)[0]), Math.round(mapPt(x1, y0, z0)[1])],
+        [Math.round(mapPt(x1, y1, z0)[0]), Math.round(mapPt(x1, y1, z0)[1])],
+        [Math.round(mapPt(x0, y1, z0)[0]), Math.round(mapPt(x0, y1, z0)[1])]
+      ];
+      return computePartBounds(faces3D, fp2D, spec.id, spec.role, spec.label, spec.colorHex, spec.colorRgb, wf);
+    }
+
+    // -------------------------------------------------------------------------
+    // B. Vertically Channeled Upholstered Headboard Flute (plush pillowed vertical panel)
+    // -------------------------------------------------------------------------
+    if (shape === 'headboard_channel') {
+      const nS = 10; // Horizontal curve segments across each vertical channel flute
+      const nT = 12; // Vertical profile segments from frame rim to headboard top
+      const gridPts = [];
+
+      for (let it = 0; it <= nT; it++) {
+        const t = it / nT;
+        let archZ;
+        if (t > 0.93) {
+          const u = (1 - t) / 0.07;
+          archZ = Math.pow(Math.sin(u * Math.PI / 2), 0.52);
+        } else if (t < 0.04) {
+          const u = t / 0.04;
+          archZ = Math.pow(Math.sin(u * Math.PI / 2), 0.55);
+        } else {
+          archZ = 0.95 + 0.05 * Math.sin(t * Math.PI);
+        }
+
+        const row = [];
+        for (let is = 0; is <= nS; is++) {
+          const s = is / nS;
+          // Plush flat-crowned cylinder profile tucking cleanly into vertical channel seams
+          const archX = Math.pow(Math.sin(s * Math.PI), 0.34);
+          const lx = x0 + s * w;
+          const ly = y0 + d * archX * archZ;
+          // Subtle 3 mm dip right at the top seam edges so channel notches read cleanly on silhouette
+          const topDip = (t > 0.85) ? (3.5 * ((t - 0.85) / 0.15) * (1 - archX)) : 0;
+          const lz = z0 + t * h - topDip;
+          row.push(mapPt(lx, ly, lz));
+        }
+        gridPts.push(row);
+      }
+
+      const nFrontHint = normalizeVec3(mapN(0, 1, 0));
+      const nTopHint = normalizeVec3(mapN(0, 0, 1));
+      const nBotHint = normalizeVec3(mapN(0, 0, -1));
+      const nLeftHint = normalizeVec3(mapN(-1, 0, 0));
+      const nRightHint = normalizeVec3(mapN(1, 0, 0));
+
+      const gridNorms = computeGridSurfaceNormals(gridPts, nT, nS, (r, c) => {
+        if (r === nT) return normalizeVec3([nFrontHint[0] * 0.3 + nTopHint[0], nFrontHint[1] * 0.3 + nTopHint[1], nFrontHint[2] * 0.3 + nTopHint[2]]);
+        if (r === 0) return normalizeVec3([nFrontHint[0] * 0.3 + nBotHint[0], nFrontHint[1] * 0.3 + nBotHint[1], nFrontHint[2] * 0.3 + nBotHint[2]]);
+        if (c === 0) return normalizeVec3([nFrontHint[0] * 0.35 + nLeftHint[0], nFrontHint[1] * 0.35 + nLeftHint[1], nFrontHint[2] * 0.35 + nLeftHint[2]]);
+        if (c === nS) return normalizeVec3([nFrontHint[0] * 0.35 + nRightHint[0], nFrontHint[1] * 0.35 + nRightHint[1], nFrontHint[2] * 0.35 + nRightHint[2]]);
+        return nFrontHint;
+      });
+
+      const faces3D = [];
+      for (let it = 0; it < nT; it++) {
+        for (let is = 0; is < nS; is++) {
+          emitOrientedQuad(
+            faces3D,
+            gridPts[it][is], gridPts[it][is + 1], gridPts[it + 1][is + 1], gridPts[it + 1][is],
+            gridNorms[it][is], gridNorms[it][is + 1], gridNorms[it + 1][is + 1], gridNorms[it + 1][is],
+            true
+          );
+        }
+      }
+
+      // Subtle vertical seam crease line along the right channel seam if requested
+      const wf = [];
+      if (spec.seamLineRight) {
+        const seamPts = [];
+        for (let it = 1; it < nT; it++) {
+          seamPts.push(gridPts[it][nS]);
+        }
+        wf.push(seamPts);
+      }
+
+      const fp2D = [
+        [Math.round(mapPt(x0, y0, z0)[0]), Math.round(mapPt(x0, y0, z0)[1])],
+        [Math.round(mapPt(x1, y0, z0)[0]), Math.round(mapPt(x1, y0, z0)[1])],
+        [Math.round(mapPt(x1, y1, z0)[0]), Math.round(mapPt(x1, y1, z0)[1])],
+        [Math.round(mapPt(x0, y1, z0)[0]), Math.round(mapPt(x0, y1, z0)[1])]
+      ];
+      return computePartBounds(faces3D, fp2D, spec.id, spec.role, spec.label, spec.colorHex, spec.colorRgb, wf);
+    }
+
+    // -------------------------------------------------------------------------
+    // C. High-Resolution Sculpted Organic Linen Duvet (soft folds & tucked curved shoulders)
+    // -------------------------------------------------------------------------
+    if (shape === 'sculpted_duvet') {
+      const nU = 24;
+      const nV = 22;
+      const gridPts = [];
+
+      function edgeRamp(t, margin) {
+        if (t >= margin) return 1.0;
+        if (t <= 0) return 0.0;
+        return Math.sin((t / margin) * Math.PI / 2);
+      }
+
+      for (let iv = 0; iv <= nV; iv++) {
+        const v = iv / nV;
+        const eV0 = edgeRamp(v, 0.09);
+        const eV1 = edgeRamp(1 - v, 0.11);
+        const row = [];
+        for (let iu = 0; iu <= nU; iu++) {
+          const u = iu / nU;
+          const eU = edgeRamp(Math.min(u, 1 - u), 0.11);
+          const env = Math.pow(eU, 0.62) * Math.pow(eV0, 0.55) * Math.pow(eV1, 0.65);
+
+          // Organic multi-frequency linen folds across top surface (smoothly attenuated to 0 at tucked rim)
+          const mask = Math.pow(Math.sin(u * Math.PI), 0.6) * Math.pow(Math.sin(v * Math.PI), 0.55);
+          const fold1 = 8.5 * Math.sin(u * Math.PI * 3.1 + 0.4) * Math.cos(v * Math.PI * 2.3 - 0.35);
+          const fold2 = 5.0 * Math.sin(u * Math.PI * 6.4 - v * Math.PI * 3.2 + 0.9);
+          const fold3 = 4.2 * Math.cos(v * Math.PI * 4.6 + u * Math.PI * 1.9);
+          const centerLoft = 10.0 * Math.sin(u * Math.PI) * Math.sin(v * Math.PI);
+          const wrinkle = mask * (fold1 + fold2 + fold3) + centerLoft * env;
+
+          const lx = x0 + u * w;
+          const ly = y0 + v * d;
+          const lz = z0 + h * env + wrinkle;
+          row.push(mapPt(lx, ly, lz));
+        }
+        gridPts.push(row);
+      }
+
+      const nUp = normalizeVec3(mapN(0, 0, 1));
+      const nLeft = normalizeVec3(mapN(-1, 0, 0));
+      const nRight = normalizeVec3(mapN(1, 0, 0));
+      const nBack = normalizeVec3(mapN(0, -1, 0));
+      const nFront = normalizeVec3(mapN(0, 1, 0));
+
+      const gridNorms = computeGridSurfaceNormals(gridPts, nV, nU, (r, c) => {
+        if (c === 0) return normalizeVec3([nLeft[0] + nUp[0] * 0.25, nLeft[1] + nUp[1] * 0.25, nLeft[2] + nUp[2] * 0.25]);
+        if (c === nU) return normalizeVec3([nRight[0] + nUp[0] * 0.25, nRight[1] + nUp[1] * 0.25, nRight[2] + nUp[2] * 0.25]);
+        if (r === 0) return normalizeVec3([nBack[0] + nUp[0] * 0.25, nBack[1] + nUp[1] * 0.25, nBack[2] + nUp[2] * 0.25]);
+        if (r === nV) return normalizeVec3([nFront[0] + nUp[0] * 0.25, nFront[1] + nUp[1] * 0.25, nFront[2] + nUp[2] * 0.25]);
+        return nUp;
+      });
+
+      const faces3D = [];
+      for (let iv = 0; iv < nV; iv++) {
+        for (let iu = 0; iu < nU; iu++) {
+          emitOrientedQuad(
+            faces3D,
+            gridPts[iv][iu], gridPts[iv][iu + 1], gridPts[iv + 1][iu + 1], gridPts[iv + 1][iu],
+            gridNorms[iv][iu], gridNorms[iv][iu + 1], gridNorms[iv + 1][iu + 1], gridNorms[iv + 1][iu],
+            true
+          );
+        }
+      }
+
+      const fp2D = [
+        [Math.round(mapPt(x0, y0, z0)[0]), Math.round(mapPt(x0, y0, z0)[1])],
+        [Math.round(mapPt(x1, y0, z0)[0]), Math.round(mapPt(x1, y0, z0)[1])],
+        [Math.round(mapPt(x1, y1, z0)[0]), Math.round(mapPt(x1, y1, z0)[1])],
+        [Math.round(mapPt(x0, y1, z0)[0]), Math.round(mapPt(x0, y1, z0)[1])]
+      ];
+      return computePartBounds(faces3D, fp2D, spec.id, spec.role, spec.label, spec.colorHex, spec.colorRgb, []);
+    }
+
+    // -------------------------------------------------------------------------
+    // D. Sculpted Wavy Draped Throw Blanket (thickened cloth shell with natural folds & side cascades)
+    // -------------------------------------------------------------------------
+    if (shape === 'sculpted_throw') {
+      const nU = 26;
+      const nV = 14;
+      const clothThick = spec.clothThicknessMm || 15;
+      const topPts = [];
+      const botPts = [];
+
+      function sideDrop(u) {
+        const edge = Math.min(u, 1 - u);
+        if (edge >= 0.085) return 1.0;
+        return Math.pow(Math.sin((edge / 0.085) * Math.PI / 2), 0.72);
+      }
+
+      for (let iv = 0; iv <= nV; iv++) {
+        const v = iv / nV;
+        const rowT = [];
+        const rowB = [];
+        for (let iu = 0; iu <= nU; iu++) {
+          const u = iu / nU;
+          const drop = sideDrop(u);
+          // Organic hand-draped wavy front & back silhouette edges
+          const waveY = (20 * Math.sin(u * Math.PI * 3.1 + (v > 0.5 ? 0.55 : -0.45)) +
+            9 * Math.cos(u * Math.PI * 5.7 + v * 2.4)) * (0.4 + 0.6 * Math.abs(v - 0.5) * 2);
+          // Soft horizontal fabric gather folds (3 lush draped waves across depth)
+          const vEnv = Math.pow(Math.sin(v * Math.PI), 0.42);
+          const gather = vEnv * (10 + 13 * Math.sin(v * Math.PI * 3.4 + 0.8 * Math.sin(u * Math.PI * 2.2) + 0.35));
+          const micro = vEnv * 4.5 * Math.cos(u * Math.PI * 5.2 - v * Math.PI * 2.1);
+
+          const lx = x0 + u * w;
+          const ly = y0 + v * d + waveY;
+          const lzTop = z0 + h * drop + (gather + micro) * (0.35 + 0.65 * drop);
+          // Taper thickness smoothly near outer front/back hems
+          const localThick = clothThick * (0.45 + 0.55 * Math.sin(v * Math.PI));
+          const lzBot = lzTop - localThick;
+
+          rowT.push(mapPt(lx, ly, lzTop));
+          rowB.push(mapPt(lx, ly, lzBot));
+        }
+        topPts.push(rowT);
+        botPts.push(rowB);
+      }
+
+      const nUp = normalizeVec3(mapN(0, 0, 1));
+      const nDown = normalizeVec3(mapN(0, 0, -1));
+      const nLeft = normalizeVec3(mapN(-1, 0, 0));
+      const nRight = normalizeVec3(mapN(1, 0, 0));
+      const nBack = normalizeVec3(mapN(0, -1, 0));
+      const nFront = normalizeVec3(mapN(0, 1, 0));
+
+      const topNorms = computeGridSurfaceNormals(topPts, nV, nU, (_r, c) => {
+        if (c === 0) return nLeft;
+        if (c === nU) return nRight;
+        return nUp;
+      });
+      const botNorms = computeGridSurfaceNormals(botPts, nV, nU, () => nDown);
+
+      const faces3D = [];
+      for (let iv = 0; iv < nV; iv++) {
+        for (let iu = 0; iu < nU; iu++) {
+          emitOrientedQuad(
+            faces3D,
+            topPts[iv][iu], topPts[iv][iu + 1], topPts[iv + 1][iu + 1], topPts[iv + 1][iu],
+            topNorms[iv][iu], topNorms[iv][iu + 1], topNorms[iv + 1][iu + 1], topNorms[iv + 1][iu],
+            true
+          );
+          emitOrientedQuad(
+            faces3D,
+            botPts[iv][iu], botPts[iv + 1][iu], botPts[iv + 1][iu + 1], botPts[iv][iu + 1],
+            botNorms[iv][iu], botNorms[iv + 1][iu], botNorms[iv + 1][iu + 1], botNorms[iv][iu + 1],
+            true
+          );
+        }
+      }
+      // Stitch front, back, left & right hems closed
+      for (let iu = 0; iu < nU; iu++) {
+        emitOrientedQuad(faces3D, topPts[0][iu], topPts[0][iu + 1], botPts[0][iu + 1], botPts[0][iu], nBack, nBack, nBack, nBack, true);
+        emitOrientedQuad(faces3D, topPts[nV][iu], botPts[nV][iu], botPts[nV][iu + 1], topPts[nV][iu + 1], nFront, nFront, nFront, nFront, true);
+      }
+      for (let iv = 0; iv < nV; iv++) {
+        emitOrientedQuad(faces3D, topPts[iv][0], botPts[iv][0], botPts[iv + 1][0], topPts[iv + 1][0], nLeft, nLeft, nLeft, nLeft, true);
+        emitOrientedQuad(faces3D, topPts[iv][nU], topPts[iv + 1][nU], botPts[iv + 1][nU], botPts[iv][nU], nRight, nRight, nRight, nRight, true);
+      }
+
+      const fp2D = [
+        [Math.round(mapPt(x0, y0, z0)[0]), Math.round(mapPt(x0, y0, z0)[1])],
+        [Math.round(mapPt(x1, y0, z0)[0]), Math.round(mapPt(x1, y0, z0)[1])],
+        [Math.round(mapPt(x1, y1, z0)[0]), Math.round(mapPt(x1, y1, z0)[1])],
+        [Math.round(mapPt(x0, y1, z0)[0]), Math.round(mapPt(x0, y1, z0)[1])]
+      ];
+      return computePartBounds(faces3D, fp2D, spec.id, spec.role, spec.label, spec.colorHex, spec.colorRgb, []);
+    }
+
+    // -------------------------------------------------------------------------
+    // E. Plump Reclined Bed Pillow / Accent Cushion (pitch + yaw + pinched seam + chop crease!)
+    // -------------------------------------------------------------------------
+    if (shape === 'tilted_pillow') {
+      const cx = 0.5 * (x0 + x1);
+      const cy = 0.5 * (y0 + y1);
+      const cz = 0.5 * (z0 + z1);
+      const rx = w / 2;
+      const ry = d / 2;
+      const rz = h / 2;
+      const pitchRad = ((spec.pitchDeg || 0) * Math.PI) / 180;
+      const cosP = Math.cos(pitchRad);
+      const sinP = Math.sin(pitchRad);
+      const chopMm = spec.chopMm || 0;
+      const pXY = spec.pXY || 0.56;
+      const pZ = spec.pZ || 0.68;
+
+      function sgnPowLocal(val, p) {
+        return (val < 0 ? -1 : 1) * Math.pow(Math.abs(val), p);
+      }
+
+      const nU = 20;
+      const nV = 10;
+      const gridPts = [];
+      const gridNorms = [];
+
+      for (let iv = 0; iv <= nV; iv++) {
+        const phi = -Math.PI / 2 + (iv / nV) * Math.PI;
+        const sinPhi = Math.sin(phi);
+        const cosPhi = Math.cos(phi);
+        const zFactor = sgnPowLocal(sinPhi, pZ);
+        const ringScale = sgnPowLocal(cosPhi, pZ * 0.72);
+
+        const rowPts = [];
+        const rowNorms = [];
+        for (let iu = 0; iu < nU; iu++) {
+          const theta = (iu / nU) * Math.PI * 2;
+          const cosT = Math.cos(theta);
+          const sinT = Math.sin(theta);
+
+          const ux = sgnPowLocal(cosT, pXY);
+          const uy = sgnPowLocal(sinT, pXY);
+
+          // Pinched pillow corners slightly wider & thinner along perimeter seam
+          const cornerPinch = 1.0 + 0.06 * Math.abs(ux * zFactor);
+          const dx = rx * ringScale * ux * cornerPinch;
+          // Gentle thickness taper toward top/left/right stitched edges
+          const dy = ry * ringScale * uy * (1.0 - 0.14 * Math.abs(zFactor));
+          // Classic interior-designer top-center pillow chop / soft natural slouch (converges smoothly at top pole)
+          const chopIndent = (chopMm > 0 && sinPhi > 0.25)
+            ? chopMm * Math.pow((sinPhi - 0.25) / 0.75, 1.4) * Math.exp(-Math.pow(ringScale * ux * 2.6, 2))
+            : 0;
+          const dz = rz * zFactor - chopIndent;
+
+          // Apply pitch rotation around local X axis (positive pitchDeg leans top back toward -ly headboard!)
+          const dyRot = dy * cosP - dz * sinP;
+          const dzRot = dy * sinP + dz * cosP;
+
+          const nxL = (cosPhi * cosT) / (rx || 1);
+          const nyL = (cosPhi * sinT) / (ry || 1);
+          const nzL = sinPhi / (rz || 1);
+          const nyRot = nyL * cosP - nzL * sinP;
+          const nzRot = nyL * sinP + nzL * cosP;
+
+          rowPts.push(mapPt(cx + dx, cy + dyRot, cz + dzRot));
+          rowNorms.push(normalizeVec3(mapN(nxL, nyRot, nzRot)));
+        }
+        gridPts.push(rowPts);
+        gridNorms.push(rowNorms);
+      }
+
+      const faces3D = [];
+      for (let iv = 0; iv < nV; iv++) {
+        for (let iu = 0; iu < nU; iu++) {
+          const iuNext = (iu + 1) % nU;
+          if (iv === 0) {
+            emitOrientedTri(
+              faces3D,
+              gridPts[0][0], gridPts[1][iuNext], gridPts[1][iu],
+              gridNorms[0][0], gridNorms[1][iuNext], gridNorms[1][iu],
+              true
+            );
+          } else if (iv === nV - 1) {
+            emitOrientedTri(
+              faces3D,
+              gridPts[iv][iu], gridPts[iv][iuNext], gridPts[nV][0],
+              gridNorms[iv][iu], gridNorms[iv][iuNext], gridNorms[nV][0],
+              true
+            );
+          } else {
+            emitOrientedQuad(
+              faces3D,
+              gridPts[iv][iu], gridPts[iv][iuNext], gridPts[iv + 1][iuNext], gridPts[iv + 1][iu],
+              gridNorms[iv][iu], gridNorms[iv][iuNext], gridNorms[iv + 1][iuNext], gridNorms[iv + 1][iu],
+              true
+            );
+          }
+        }
+      }
+
+      const midRing = gridPts[Math.floor(nV / 2)];
+      const fp2D = midRing.map(p => [Math.round(p[0]), Math.round(p[1])]);
+      return computePartBounds(faces3D, fp2D, spec.id, spec.role, spec.label, spec.colorHex, spec.colorRgb, []);
+    }
+
+    // -------------------------------------------------------------------------
+    // F. Quilted 23 cm Mattress (plush bullnose top/bottom with crisp piped perimeter seam)
+    // -------------------------------------------------------------------------
+    if (shape === 'mattress') {
+      const cx = 0.5 * (x0 + x1);
+      const cy = 0.5 * (y0 + y1);
+      const cz = 0.5 * (z0 + z1);
+      const rx = w / 2;
+      const ry = d / 2;
+      const rz = h / 2;
+      const pXY = 0.18;
+      const pZ = 0.28;
+
+      function sgnPowM(val, p) {
+        return (val < 0 ? -1 : 1) * Math.pow(Math.abs(val), p);
+      }
+
+      const nU = 24;
+      const nV = 8;
+      const gridPts = [];
+      const gridNorms = [];
+
+      for (let iv = 0; iv <= nV; iv++) {
+        const phi = -Math.PI / 2 + (iv / nV) * Math.PI;
+        const sinPhi = Math.sin(phi);
+        const cosPhi = Math.cos(phi);
+        const zFactor = sgnPowM(sinPhi, pZ);
+        const ringScale = sgnPowM(cosPhi, pZ * 0.65);
+
+        const rowPts = [];
+        const rowNorms = [];
+        for (let iu = 0; iu < nU; iu++) {
+          const theta = (iu / nU) * Math.PI * 2;
+          const cosT = Math.cos(theta);
+          const sinT = Math.sin(theta);
+          const ux = sgnPowM(cosT, pXY);
+          const uy = sgnPowM(sinT, pXY);
+
+          const lx = cx + rx * ringScale * ux;
+          const ly = cy + ry * ringScale * uy;
+          const crown = sinPhi > 0 ? (8 * Math.pow(cosPhi, 1.4)) : 0;
+          const lz = cz + rz * zFactor + crown;
+
+          rowPts.push(mapPt(lx, ly, lz));
+          rowNorms.push(normalizeVec3(mapN((cosPhi * cosT) / (rx || 1), (cosPhi * sinT) / (ry || 1), sinPhi / (rz || 1))));
+        }
+        gridPts.push(rowPts);
+        gridNorms.push(rowNorms);
+      }
+
+      const faces3D = [];
+      for (let iv = 0; iv < nV; iv++) {
+        for (let iu = 0; iu < nU; iu++) {
+          const iuNext = (iu + 1) % nU;
+          if (iv === 0) {
+            emitOrientedTri(
+              faces3D,
+              gridPts[0][0], gridPts[1][iuNext], gridPts[1][iu],
+              gridNorms[0][0], gridNorms[1][iuNext], gridNorms[1][iu],
+              true
+            );
+          } else if (iv === nV - 1) {
+            emitOrientedTri(
+              faces3D,
+              gridPts[iv][iu], gridPts[iv][iuNext], gridPts[nV][0],
+              gridNorms[iv][iu], gridNorms[iv][iuNext], gridNorms[nV][0],
+              true
+            );
+          } else {
+            emitOrientedQuad(
+              faces3D,
+              gridPts[iv][iu], gridPts[iv][iuNext], gridPts[iv + 1][iuNext], gridPts[iv + 1][iu],
+              gridNorms[iv][iu], gridNorms[iv][iuNext], gridNorms[iv + 1][iuNext], gridNorms[iv + 1][iu],
+              true
+            );
+          }
+        }
+      }
+
+      // Crisp upper mattress piping welt ring
+      const topWeltRing = gridPts[nV - 1].concat([gridPts[nV - 1][0]]);
+      const midRing = gridPts[Math.floor(nV / 2)];
+      const fp2D = midRing.map(p => [Math.round(p[0]), Math.round(p[1])]);
+      return computePartBounds(faces3D, fp2D, spec.id, spec.role, spec.label, spec.colorHex, spec.colorRgb, [topWeltRing]);
+    }
 
     // If shape is a soft rounded cushion, bolster, pillow, or arched armrest,
     // generate a smooth multi-ring rounded superellipsoid / lofted cushion mesh with smooth vertexNormals3D!
@@ -916,6 +1553,354 @@ const RoomFurnitureStore = (() => {
     };
   }
 
+  function buildChanneledBedLocal(inst) {
+    const props = inst.properties || {};
+    const isQueen = props.bedSize === 'queen';
+    const uphHex = sanitizeHexColor(props.upholsteryColor, '#D5CEC5');
+    const bedHex = sanitizeHexColor(props.beddingColor, '#F2F0EC');
+    const throwHex = sanitizeHexColor(props.throwColor, '#7D7265');
+    const accentHex = sanitizeHexColor(props.accentPillowColor, '#6D6B44');
+
+    // Exact dimensions from architectural specification diagram & request (in mm):
+    // King:  180 × 200 cm mattress -> 185 × 209.5 × H110 cm outer frame (8 vertical channels)
+    // Queen: 160 × 200 cm mattress -> 165 × 209.5 × H110 cm outer frame (7 vertical channels)
+    // Frame panel = 41 cm on 1.5 cm recessed floor glides -> 42.5 cm rail top; Mattress = 23 cm high!
+    const railT = 25;
+    const mattressW = isQueen ? 1600 : 1800;
+    const mattressL = 2000;
+    const mattressH = 230;
+    const headboardT = 70;
+    const headboardCoreT = 38;
+    const headboardH = 1100;
+    const footH = 15;
+    const railTopZ = 425; // 15 mm glides + 410 mm upholstered box panel = 425 mm (42.5 cm)
+    const slatTopZ = 325; // 230 mm mattress sits 100 mm tucked in box, rising 130 mm above rail to 555 mm
+    const mattressTopZ = slatTopZ + mattressH; // 555 mm
+    const channelCount = isQueen ? 7 : 8;
+
+    const totalW = mattressW + 2 * railT; // 1650 (Queen) or 1850 (King)
+    const totalD = headboardT + mattressL + railT; // 2095 mm (209.5 cm)
+    const ox = -totalW / 2;
+    const oy = -totalD / 2;
+
+    // Curated tonal shades so upholstery channels, frame rails, seams, bedding & pillows have rich visual depth
+    const rgbFrame = hexToRgb01(uphHex, 0.96);
+    const rgbHeadCore = hexToRgb01(uphHex, 0.93);
+    const rgbChannel = hexToRgb01(uphHex, 1.01);
+    const rgbSeam = hexToRgb01(uphHex, 0.72);
+    const rgbInnerLiner = hexToRgb01(uphHex, 0.80);
+    const rgbGlide = hexToRgb01('#1C1E22', 1.0);
+    const rgbSteel = hexToRgb01('#22252A', 1.0);
+    const rgbSlatWood = hexToRgb01('#D4B48C', 1.0);
+    const mattressHex = mixHexColors('#FFFFFF', bedHex, 0.35);
+    const rgbMattress = hexToRgb01(mattressHex, 1.0);
+    const rgbDuvet = hexToRgb01(bedHex, 0.99);
+    const rgbDuvetCuff = hexToRgb01(bedHex, 1.02);
+    const rgbSleepPillow = hexToRgb01(bedHex, 1.03);
+    const rgbThrow = hexToRgb01(throwHex, 0.98);
+    const sidePillowLeftHex = mixHexColors(throwHex, bedHex, 0.44);
+    const sidePillowRightHex = mixHexColors(bedHex, uphHex, 0.36);
+    const rgbSidePillowL = hexToRgb01(sidePillowLeftHex, 1.0);
+    const rgbSidePillowR = hexToRgb01(sidePillowRightHex, 1.0);
+    const rgbAccentPillow = hexToRgb01(accentHex, 1.0);
+
+    const skeletonBoxes = [];
+    const frontBoxes = [];
+
+    function addSkel(id, label, u0, u1, v0, v1, z0, z1, rgb, hex, role, shape, extra) {
+      skeletonBoxes.push(Object.assign({
+        id: id,
+        label: label,
+        role: role || 'bed_frame',
+        shape: shape || 'beveled_panel',
+        lx0: ox + u0,
+        lx1: ox + u1,
+        ly0: oy + v0,
+        ly1: oy + v1,
+        lz0: z0,
+        lz1: z1,
+        colorHex: hex || uphHex,
+        colorRgb: rgb
+      }, extra || {}));
+    }
+
+    function addFront(id, label, u0, u1, v0, v1, z0, z1, rgb, hex, role, shape, extra) {
+      frontBoxes.push(Object.assign({
+        id: id,
+        label: label,
+        role: role || 'bed_duvet',
+        shape: shape || 'box',
+        lx0: ox + u0,
+        lx1: ox + u1,
+        ly0: oy + v0,
+        ly1: oy + v1,
+        lz0: z0,
+        lz1: z1,
+        colorHex: hex || bedHex,
+        colorRgb: rgb
+      }, extra || {}));
+    }
+
+    // -------------------------------------------------------------------------
+    // 1. SKELETON: Recessed 1.5 cm Glides, 41 cm Box Frame, Storage Cavity & Metal Slat Base
+    // -------------------------------------------------------------------------
+    const glideW = 55;
+    const glidePts = [
+      [35, 35],
+      [totalW - 35 - glideW, 35],
+      [35, Math.round(totalD / 2) - 28],
+      [totalW - 35 - glideW, Math.round(totalD / 2) - 28],
+      [35, totalD - 35 - glideW],
+      [totalW - 35 - glideW, totalD - 35 - glideW]
+    ];
+    glidePts.forEach((gp, idx) => {
+      addSkel(
+        inst.id + '_GLIDE_' + (idx + 1),
+        'Recessed Floor Glide (1.5 cm) #' + (idx + 1),
+        gp[0], gp[0] + glideW,
+        gp[1], gp[1] + glideW,
+        1.5, footH + 1,
+        rgbGlide, '#1C1E22', 'bed_foot', 'box'
+      );
+    });
+
+    // Upholstered Structural Headboard Core (Z = 15..1,100 mm, 38 mm rear upholstered shell)
+    addSkel(
+      inst.id + '_HB_BACK',
+      'Upholstered Headboard Structural Back (110 cm)',
+      0, totalW,
+      0, headboardCoreT,
+      footH, headboardH,
+      rgbHeadCore, uphHex, 'bed_headboard', 'beveled_panel',
+      { bevelMm: 5 }
+    );
+
+    // Lower Upholstered Headboard Apron behind mattress (Z = 15..425 mm)
+    addSkel(
+      inst.id + '_HB_LOWER',
+      'Headboard Lower Apron',
+      2, totalW - 2,
+      headboardCoreT - 2, headboardT,
+      footH, railTopZ,
+      rgbHeadCore, uphHex, 'bed_frame', 'beveled_panel',
+      { bevelMm: 3 }
+    );
+
+    // Left & Right Upholstered Box Side Rails (25 mm thick × 410 mm tall, Z = 15..425 mm)
+    addSkel(
+      inst.id + '_RAIL_L',
+      'Left Upholstered Side Rail (41 cm panel / 42.5 cm top)',
+      0, railT,
+      headboardT - 2, totalD - railT + 2,
+      footH, railTopZ,
+      rgbFrame, uphHex, 'bed_frame', 'beveled_panel',
+      { bevelMm: 4 }
+    );
+    addSkel(
+      inst.id + '_RAIL_R',
+      'Right Upholstered Side Rail (41 cm panel / 42.5 cm top)',
+      totalW - railT, totalW,
+      headboardT - 2, totalD - railT + 2,
+      footH, railTopZ,
+      rgbFrame, uphHex, 'bed_frame', 'beveled_panel',
+      { bevelMm: 4 }
+    );
+
+    // Upholstered Footboard (25 mm thick × 410 mm tall, Z = 15..425 mm)
+    addSkel(
+      inst.id + '_FOOTBOARD',
+      'Upholstered Footboard (42.5 cm height)',
+      0, totalW,
+      totalD - railT, totalD,
+      footH, railTopZ,
+      rgbFrame, uphHex, 'bed_frame', 'beveled_panel',
+      { bevelMm: 4 }
+    );
+
+    // Storage Box Interior Floor Liner (Z = 22..42 mm)
+    addSkel(
+      inst.id + '_STORAGE_FLOOR',
+      'Under-Bed Storage Box Floor',
+      railT, totalW - railT,
+      headboardT, totalD - railT,
+      22, 42,
+      rgbInnerLiner, uphHex, 'bed_frame', 'box'
+    );
+
+    // Black Powder-Coated Steel Lift-Up Slat Frame (Z = 295..325 mm, matching dimension diagram)
+    const steelBar = 32;
+    const frameU0 = railT + 8, frameU1 = totalW - railT - 8;
+    const frameV0 = headboardT + 8, frameV1 = totalD - railT - 8;
+    const midU = totalW / 2;
+    addSkel(inst.id + '_SLAT_FRAME_L', 'Lift-Up Steel Frame Left Rail', frameU0, frameU0 + steelBar, frameV0, frameV1, 295, slatTopZ, rgbSteel, '#22252A', 'bed_slat_frame', 'box');
+    addSkel(inst.id + '_SLAT_FRAME_R', 'Lift-Up Steel Frame Right Rail', frameU1 - steelBar, frameU1, frameV0, frameV1, 295, slatTopZ, rgbSteel, '#22252A', 'bed_slat_frame', 'box');
+    addSkel(inst.id + '_SLAT_FRAME_H', 'Lift-Up Steel Frame Head Rail', frameU0 + steelBar, frameU1 - steelBar, frameV0, frameV0 + steelBar, 295, slatTopZ, rgbSteel, '#22252A', 'bed_slat_frame', 'box');
+    addSkel(inst.id + '_SLAT_FRAME_F', 'Lift-Up Steel Frame Foot Rail', frameU0 + steelBar, frameU1 - steelBar, frameV1 - steelBar, frameV1, 295, slatTopZ, rgbSteel, '#22252A', 'bed_slat_frame', 'box');
+    addSkel(inst.id + '_SLAT_FRAME_MID', 'Lift-Up Steel Frame Center Spine', midU - 18, midU + 18, frameV0 + steelBar, frameV1 - steelBar, 295, slatTopZ, rgbSteel, '#22252A', 'bed_slat_frame', 'box');
+
+    // Birch Bentwood Slats (14 pairs across left & right bays, Z = 312..324 mm)
+    const slatCount = 14;
+    const slatSpanV = (frameV1 - steelBar) - (frameV0 + steelBar);
+    const slatStepV = slatSpanV / slatCount;
+    for (let si = 0; si < slatCount; si++) {
+      const sv0 = frameV0 + steelBar + si * slatStepV + 24;
+      const sv1 = sv0 + 52;
+      addSkel(inst.id + '_SLAT_L_' + (si + 1), 'Birch Slat L' + (si + 1), frameU0 + steelBar, midU - 18, sv0, sv1, 312, slatTopZ - 1, rgbSlatWood, '#D4B48C', 'bed_slat', 'box');
+      addSkel(inst.id + '_SLAT_R_' + (si + 1), 'Birch Slat R' + (si + 1), midU + 18, frameU1 - steelBar, sv0, sv1, 312, slatTopZ - 1, rgbSlatWood, '#D4B48C', 'bed_slat', 'box');
+    }
+
+    // -------------------------------------------------------------------------
+    // 2. FRONTS / SOFT FURNISHINGS: Channeled Headboard Flutes, 23 cm Mattress, Duvet, Throw & Pillows
+    // -------------------------------------------------------------------------
+    // Individually Sculpted Plush Vertical Headboard Channels (8 on King, 7 on Queen, Z = 420..1,100 mm)
+    const chanW = totalW / channelCount;
+    for (let ci = 0; ci < channelCount; ci++) {
+      const cu0 = ci * chanW;
+      const cu1 = (ci === channelCount - 1) ? totalW : (cu0 + chanW);
+      // Alternating micro-tonal variation (+/-1.2%) brings out the tactile velvet sheen across channels
+      const toneShift = (ci % 2 === 0) ? 1.01 : 0.99;
+      addFront(
+        inst.id + '_HB_CHAN_' + (ci + 1),
+        'Headboard Vertical Channel #' + (ci + 1),
+        cu0 + 1.5, cu1 - 1.5,
+        headboardCoreT - 2, headboardT + 6,
+        railTopZ - 5, headboardH,
+        hexToRgb01(uphHex, toneShift), uphHex,
+        'bed_headboard', 'headboard_channel',
+        { seamLineRight: ci < channelCount - 1 }
+      );
+      // Recessed darkened vertical stitch shadow groove between flutes
+      if (ci < channelCount - 1) {
+        addFront(
+          inst.id + '_HB_SEAM_' + (ci + 1),
+          'Headboard Channel Stitch Seam #' + (ci + 1),
+          cu1 - 3, cu1 + 3,
+          headboardCoreT - 1, headboardCoreT + 7,
+          railTopZ, headboardH - 5,
+          rgbSeam, uphHex,
+          'bed_headboard_seam', 'box'
+        );
+      }
+    }
+
+    // Exact 23 cm Quilted Mattress (160×200×23 cm Queen or 180×200×23 cm King, Z = 325..555 mm)
+    addFront(
+      inst.id + '_MATTRESS',
+      `23 cm Quilted Mattress (${Math.round(mattressW / 10)}×200×23 cm)`,
+      railT + 2, totalW - railT - 2,
+      headboardT + 2, totalD - railT - 2,
+      slatTopZ, mattressTopZ,
+      rgbMattress, mattressHex,
+      'bed_mattress', 'mattress'
+    );
+
+    // High-Resolution Sculpted Organic Linen Duvet (soft folds, tucking cleanly inside box rails)
+    addFront(
+      inst.id + '_DUVET',
+      'Sculpted Organic Linen Duvet',
+      railT + 1, totalW - railT - 1,
+      headboardT + 480, totalD - railT - 1,
+      railTopZ + 5, mattressTopZ + 22,
+      rgbDuvet, bedHex,
+      'bed_duvet', 'sculpted_duvet'
+    );
+
+    // Soft Folded Upper Duvet Turn-Down Cuff
+    addFront(
+      inst.id + '_DUVET_CUFF',
+      'Folded Duvet Turn-Down Cuff',
+      railT + 12, totalW - railT - 12,
+      headboardT + 445, headboardT + 565,
+      mattressTopZ - 10, mattressTopZ + 38,
+      rgbDuvetCuff, bedHex,
+      'bed_duvet', 'bolster_x'
+    );
+
+    // Sculpted Wavy Draped Throw Blanket (cascading softly across upper bed & mattress flanks)
+    addFront(
+      inst.id + '_THROW_BLANKET',
+      'Draped Folded Throw Blanket',
+      railT - 8, totalW - railT + 8,
+      headboardT + 405, headboardT + 805,
+      railTopZ + 22, mattressTopZ + 36,
+      rgbThrow, throwHex,
+      'bed_throw', 'sculpted_throw',
+      { clothThicknessMm: 16 }
+    );
+
+    // Two Large Plump Reclined Sleeping Pillows (leaning naturally back against channeled headboard)
+    const sleepPilW = isQueen ? 690 : 780;
+    const sleepGap = isQueen ? 24 : 30;
+    const sleepL0 = Math.round(midU - sleepGap / 2 - sleepPilW);
+    const sleepR0 = Math.round(midU + sleepGap / 2);
+    addFront(
+      inst.id + '_SLEEP_PILLOW_L',
+      'Left Sleeping Pillow',
+      sleepL0, sleepL0 + sleepPilW,
+      headboardT + 48, headboardT + 245,
+      mattressTopZ - 18, mattressTopZ + 305,
+      rgbSleepPillow, bedHex,
+      'bed_pillow', 'tilted_pillow',
+      { pitchDeg: 24, localRotDeg: 3, chopMm: 12, pXY: 0.56, pZ: 0.68 }
+    );
+    addFront(
+      inst.id + '_SLEEP_PILLOW_R',
+      'Right Sleeping Pillow',
+      sleepR0, sleepR0 + sleepPilW,
+      headboardT + 48, headboardT + 245,
+      mattressTopZ - 18, mattressTopZ + 305,
+      rgbSleepPillow, bedHex,
+      'bed_pillow', 'tilted_pillow',
+      { pitchDeg: 24, localRotDeg: -3, chopMm: 12, pXY: 0.56, pZ: 0.68 }
+    );
+
+    // Two Layered Flanking Decorative Cushions (warm taupe left, soft cream-sand right — matching photo!)
+    const decoW = isQueen ? 400 : 445;
+    const decoOffset = isQueen ? 290 : 335;
+    addFront(
+      inst.id + '_DECO_PILLOW_L',
+      'Left Decorative Accent Cushion',
+      Math.round(midU - decoOffset - decoW / 2), Math.round(midU - decoOffset + decoW / 2),
+      headboardT + 195, headboardT + 345,
+      mattressTopZ - 10, mattressTopZ + 255,
+      rgbSidePillowL, sidePillowLeftHex,
+      'bed_pillow', 'tilted_pillow',
+      { pitchDeg: 19, localRotDeg: 7, chopMm: 14, pXY: 0.58, pZ: 0.70 }
+    );
+    addFront(
+      inst.id + '_DECO_PILLOW_R',
+      'Right Decorative Accent Cushion',
+      Math.round(midU + decoOffset - decoW / 2), Math.round(midU + decoOffset + decoW / 2),
+      headboardT + 195, headboardT + 345,
+      mattressTopZ - 10, mattressTopZ + 255,
+      rgbSidePillowR, sidePillowRightHex,
+      'bed_pillow', 'tilted_pillow',
+      { pitchDeg: 19, localRotDeg: -7, chopMm: 14, pXY: 0.58, pZ: 0.70 }
+    );
+
+    // Center Olive/Accent Lumbar Cushion (front-and-center with classic top-center crease!)
+    const lumbarW = isQueen ? 460 : 510;
+    addFront(
+      inst.id + '_LUMBAR_PILLOW',
+      'Center Accent Lumbar Cushion',
+      Math.round(midU - lumbarW / 2), Math.round(midU + lumbarW / 2),
+      headboardT + 290, headboardT + 425,
+      mattressTopZ - 10, mattressTopZ + 235,
+      rgbAccentPillow, accentHex,
+      'bed_pillow', 'tilted_pillow',
+      { pitchDeg: 14, localRotDeg: 0, chopMm: 22, pXY: 0.56, pZ: 0.68 }
+    );
+
+    return {
+      widthMm: totalW,
+      depthMm: totalD,
+      heightMm: headboardH,
+      skeletonBoxes: skeletonBoxes,
+      frontBoxes: frontBoxes,
+      localFootprint2D: [[ox, oy], [ox + totalW, oy], [ox + totalW, oy + totalD], [ox, oy + totalD]]
+    };
+  }
+
   function buildLocalGeometry(inst) {
     switch (inst.typeId) {
       case 'corner_sofa_l226':
@@ -930,6 +1915,8 @@ const RoomFurnitureStore = (() => {
         return buildTableLocal(inst, 2200, 1000, 760);
       case 'media_console_200':
         return buildMediaConsoleLocal(inst);
+      case 'upholstered_bed_channeled':
+        return buildChanneledBedLocal(inst);
       default:
         return buildCornerSofaL226Local(inst);
     }
@@ -997,7 +1984,7 @@ const RoomFurnitureStore = (() => {
     });
 
     const primaryColor = inst.properties.upholsteryColor || inst.properties.topColor || inst.properties.bodyColor || '#EFEAE1';
-    const secondaryColor = inst.properties.pillowColor || inst.properties.baseColor || inst.properties.frontColor || primaryColor;
+    const secondaryColor = inst.properties.pillowColor || inst.properties.beddingColor || inst.properties.baseColor || inst.properties.frontColor || primaryColor;
 
     return {
       id: inst.id,
@@ -1058,7 +2045,9 @@ const RoomFurnitureStore = (() => {
     const spec = getCatalogType(input && input.typeId ? input.typeId : 'corner_sofa_l226');
     if (!spec) return null;
 
-    const prefix = spec.category === 'corner_sofa' ? 'SOFA_' : 'FURN_';
+    const prefix = spec.category === 'corner_sofa'
+      ? 'SOFA_'
+      : (spec.category === 'bed' ? 'BED_' : 'FURN_');
     let maxNum = 0;
     all.forEach(item => {
       const m = String(item.id).match(/(\d+)$/);

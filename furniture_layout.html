@@ -556,10 +556,11 @@
                     <span>3. Quick View &amp; Persistence</span>
                 </div>
                 <div class="btn-row">
-                    <button type="button" class="btn" id="btn-zoom-living">🔍 Living Room (0.11)</button>
-                    <button type="button" class="btn" id="btn-zoom-full">🏠 Full Floor Map</button>
+                    <button type="button" class="btn" id="btn-zoom-living">🔍 Living (0.11)</button>
+                    <button type="button" class="btn" id="btn-zoom-master">🛏️ Master (1.01)</button>
                 </div>
-                <button type="button" class="btn danger" id="btn-reset-defaults">↺ Reset Default Corner Sofa in Living Room</button>
+                <button type="button" class="btn" id="btn-zoom-full">🏠 Full Floor Map</button>
+                <button type="button" class="btn danger" id="btn-reset-defaults">↺ Reset Default Furniture Layout</button>
             </div>
         </aside>
 
@@ -993,6 +994,166 @@
                         });
                         dimTextLeft.textContent = `${Math.round(leftWing / 10)} cm`;
                         g.appendChild(dimTextLeft);
+                    }
+                } else if (inst.typeId === 'upholstered_bed_channeled') {
+                    // Channeled Upholstered Storage Bed (Queen 165×209.5 cm or King 185×209.5 cm)
+                    const isQueen = props.bedSize === 'queen';
+                    const totalW = isQueen ? 1650 : 1850;
+                    const totalD = 2095;
+                    const railT = 25;
+                    const hbD = 70;
+                    const channelCount = isQueen ? 7 : 8;
+                    const ox = -totalW / 2;
+                    const oy = -totalD / 2;
+
+                    const uphColor = RoomFurnitureStore.sanitizeHexColor(props.upholsteryColor, '#D5CEC5');
+                    const bedColor = RoomFurnitureStore.sanitizeHexColor(props.beddingColor, '#F2F0EC');
+                    const throwColor = RoomFurnitureStore.sanitizeHexColor(props.throwColor, '#7D7265');
+                    const accentColor = RoomFurnitureStore.sanitizeHexColor(props.accentPillowColor, '#6D6B44');
+                    const strokeColor = isSelected ? '#38bdf8' : '#334155';
+
+                    // 1. Outer Upholstered Storage Box Frame (165 or 185 × 209.5 cm)
+                    g.appendChild(createSvgEl('rect', {
+                        x: ox, y: oy, width: totalW, height: totalD, rx: 22,
+                        fill: uphColor,
+                        stroke: strokeColor,
+                        'stroke-width': isSelected ? 22 : 14
+                    }));
+
+                    // 2. Vertically Channeled Headboard Flutes (7 Queen / 8 King plush cushions along top 7 cm)
+                    const chanW = totalW / channelCount;
+                    for (let ci = 0; ci < channelCount; ci++) {
+                        g.appendChild(createSvgEl('path', {
+                            d: makePlumpCushionPath(ox + ci * chanW + 4, oy + 4, chanW - 8, hbD - 4, 24, 10),
+                            fill: uphColor,
+                            stroke: 'rgba(51, 65, 85, 0.65)',
+                            'stroke-width': 8
+                        }));
+                    }
+
+                    // 3. Recessed 23 cm Mattress Bay (160×200 or 180×200 cm inside 2.5 cm rails)
+                    const matX = ox + railT;
+                    const matY = oy + hbD;
+                    const matW = totalW - 2 * railT;
+                    const matD = totalD - hbD - railT;
+                    g.appendChild(createSvgEl('rect', {
+                        x: matX, y: matY, width: matW, height: matD, rx: 32,
+                        fill: '#F8F7F4',
+                        stroke: '#64748b',
+                        'stroke-width': 9
+                    }));
+
+                    // 4. Sculpted Organic Linen Duvet covering lower 75% of mattress
+                    const duvetY = matY + 465;
+                    const duvetH = matD - 472;
+                    g.appendChild(createSvgEl('path', {
+                        d: makePlumpCushionPath(matX + 8, duvetY, matW - 16, duvetH, 55, 16),
+                        fill: bedColor,
+                        stroke: '#64748b',
+                        'stroke-width': 8
+                    }));
+                    // Subtle organic duvet linen crease arcs
+                    [0.28, 0.54, 0.78].forEach((f, idx) => {
+                        const fy = duvetY + Math.round(duvetH * f);
+                        const sway = idx % 2 === 0 ? 28 : -24;
+                        g.appendChild(createSvgEl('path', {
+                            d: `M ${matX + 95} ${fy} Q ${ox + totalW * 0.34} ${fy + sway} ${ox + totalW * 0.52} ${fy - sway * 0.5} T ${matX + matW - 95} ${fy + sway * 0.4}`,
+                            fill: 'none',
+                            stroke: 'rgba(100, 116, 139, 0.32)',
+                            'stroke-width': 7,
+                            'stroke-linecap': 'round'
+                        }));
+                    });
+
+                    // 5. Wavy Draped Throw Blanket Band across upper-mid bed (cascading slightly over side rails)
+                    const thrY0 = matY + 410;
+                    const thrY1 = matY + 785;
+                    const throwPath = [
+                        `M ${ox + 10} ${thrY0 + 18}`,
+                        `Q ${ox + totalW * 0.25} ${thrY0 - 22} ${ox + totalW * 0.5} ${thrY0 + 12}`,
+                        `T ${ox + totalW - 10} ${thrY0 - 8}`,
+                        `L ${ox + totalW - 6} ${thrY1 - 14}`,
+                        `Q ${ox + totalW * 0.72} ${thrY1 + 26} ${ox + totalW * 0.48} ${thrY1 - 10}`,
+                        `T ${ox + 6} ${thrY1 + 14}`,
+                        'Z'
+                    ].join(' ');
+                    g.appendChild(createSvgEl('path', {
+                        d: throwPath,
+                        fill: throwColor,
+                        stroke: 'rgba(30, 41, 59, 0.55)',
+                        'stroke-width': 9,
+                        'stroke-linejoin': 'round'
+                    }));
+                    // Throw gather ridge lines
+                    g.appendChild(createSvgEl('path', {
+                        d: `M ${ox + 45} ${thrY0 + 135} Q ${ox + totalW * 0.33} ${thrY0 + 98} ${ox + totalW * 0.56} ${thrY0 + 142} T ${ox + totalW - 45} ${thrY0 + 118}`,
+                        fill: 'none', stroke: 'rgba(255, 255, 255, 0.22)', 'stroke-width': 7, 'stroke-linecap': 'round'
+                    }));
+                    g.appendChild(createSvgEl('path', {
+                        d: `M ${ox + 45} ${thrY0 + 245} Q ${ox + totalW * 0.30} ${thrY0 + 275} ${ox + totalW * 0.54} ${thrY0 + 232} T ${ox + totalW - 45} ${thrY0 + 260}`,
+                        fill: 'none', stroke: 'rgba(15, 23, 42, 0.24)', 'stroke-width': 7, 'stroke-linecap': 'round'
+                    }));
+
+                    // 6. Two Large Sleeping Pillows leaning against channeled headboard
+                    const spW = isQueen ? 685 : 775;
+                    const spGap = isQueen ? 28 : 34;
+                    const spY = matY + 42;
+                    const spH = 260;
+                    const spLX = -spGap / 2 - spW;
+                    const spRX = spGap / 2;
+                    g.appendChild(createSvgEl('path', {
+                        d: makePlumpCushionPath(spLX, spY, spW, spH, 68, 22),
+                        fill: bedColor, stroke: '#475569', 'stroke-width': 9,
+                        transform: `rotate(2 ${spLX + spW / 2} ${spY + spH / 2})`
+                    }));
+                    g.appendChild(createSvgEl('path', {
+                        d: makePlumpCushionPath(spRX, spY, spW, spH, 68, 22),
+                        fill: bedColor, stroke: '#475569', 'stroke-width': 9,
+                        transform: `rotate(-2 ${spRX + spW / 2} ${spY + spH / 2})`
+                    }));
+
+                    // 7. Two Flanking Decorative Cushions + Center Accent Lumbar Pillow
+                    const decoW = isQueen ? 390 : 435;
+                    const decoH = 165;
+                    const decoOff = isQueen ? 285 : 330;
+                    const decoY = matY + 215;
+                    g.appendChild(createSvgEl('path', {
+                        d: makePlumpCushionPath(-decoOff - decoW / 2, decoY, decoW, decoH, 52, 18),
+                        fill: throwColor, 'fill-opacity': '0.68', stroke: '#475569', 'stroke-width': 8,
+                        transform: `rotate(6 ${-decoOff} ${decoY + decoH / 2})`
+                    }));
+                    g.appendChild(createSvgEl('path', {
+                        d: makePlumpCushionPath(decoOff - decoW / 2, decoY, decoW, decoH, 52, 18),
+                        fill: uphColor, stroke: '#475569', 'stroke-width': 8,
+                        transform: `rotate(-6 ${decoOff} ${decoY + decoH / 2})`
+                    }));
+
+                    const lumW = isQueen ? 450 : 500;
+                    const lumH = 148;
+                    const lumY = matY + 305;
+                    g.appendChild(createSvgEl('path', {
+                        d: makePlumpCushionPath(-lumW / 2, lumY, lumW, lumH, 52, 20),
+                        fill: accentColor, stroke: '#334155', 'stroke-width': 9
+                    }));
+
+                    // 8. CAD Dimension Labels when Selected (185 / 165 cm × 209.5 cm)
+                    if (isSelected) {
+                        const dimTop = createSvgEl('text', {
+                            x: 0, y: oy - 65,
+                            fill: '#38bdf8', 'font-size': 105, 'font-weight': '700',
+                            'text-anchor': 'middle', 'font-family': 'JetBrains Mono, monospace'
+                        });
+                        dimTop.textContent = `${Math.round(totalW / 10)} cm (${isQueen ? 'Queen 160' : 'King 180'})`;
+                        g.appendChild(dimTop);
+
+                        const dimSide = createSvgEl('text', {
+                            x: ox - 65, y: 0,
+                            fill: '#38bdf8', 'font-size': 105, 'font-weight': '700',
+                            'text-anchor': 'middle', 'font-family': 'JetBrains Mono, monospace',
+                            transform: `rotate(-90 ${ox - 65} 0)`
+                        });
+                        dimSide.textContent = '209.5 cm';
+                        g.appendChild(dimSide);
                     }
                 } else {
                     // Other Catalog Types (Chaise Sofa, Armchair, Coffee Table, Dining Table, Media Console)
@@ -1662,6 +1823,43 @@
                     });
                     secSpec.appendChild(table);
                     inspectorPanel.appendChild(secSpec);
+                } else if (inst.typeId === 'upholstered_bed_channeled' && spec && spec.dimensionsMm) {
+                    const isQueen = inst.properties && inst.properties.bedSize === 'queen';
+                    const secSpec = document.createElement('div');
+                    secSpec.className = 'panel-section';
+                    const spHdr = document.createElement('div');
+                    spHdr.className = 'section-header';
+                    spHdr.textContent = 'Specification Plan Dimensions';
+                    secSpec.appendChild(spHdr);
+
+                    const table = document.createElement('div');
+                    table.className = 'spec-table';
+                    const rows = [
+                        ['Bed Size Option', isQueen ? 'Queen (160 × 200 cm)' : 'King (180 × 200 cm)'],
+                        ['Outer Width × Length', isQueen ? '165 × 209.5 cm' : '185 × 209.5 cm'],
+                        ['Headboard Height', '110 cm'],
+                        ['Headboard Channels', isQueen ? '7 vertical plush flutes' : '8 vertical plush flutes'],
+                        ['Frame Rail Top / Panel', '42.5 cm / 41 cm'],
+                        ['Recessed Floor Glides', '1.5 cm'],
+                        ['Mattress Height', '23 cm (top at 55.5 cm)'],
+                        ['Side & Foot Rail Thickness', '2.5 cm'],
+                        ['Storage Base', 'Lift-up steel slat frame']
+                    ];
+                    rows.forEach(pair => {
+                        const r = document.createElement('div');
+                        r.className = 'spec-row';
+                        const k = document.createElement('span');
+                        k.className = 'spec-key';
+                        k.textContent = pair[0];
+                        const v = document.createElement('span');
+                        v.className = 'spec-val';
+                        v.textContent = pair[1];
+                        r.appendChild(k);
+                        r.appendChild(v);
+                        table.appendChild(r);
+                    });
+                    secSpec.appendChild(table);
+                    inspectorPanel.appendChild(secSpec);
                 }
 
                 // Section E: Duplicate & Delete Actions
@@ -1879,7 +2077,19 @@
                 state.activeFloor = 'ground';
                 tabGround.classList.add('active');
                 tabFirst.classList.remove('active');
+                const items = RoomFurnitureStore.getByFloor('ground');
+                state.selectedObjectId = items.length > 0 ? items[0].id : null;
                 state.viewBox = { x: 7620, y: 2700, w: 13200, h: 9200 };
+                renderAll();
+            });
+
+            document.getElementById('btn-zoom-master').addEventListener('click', () => {
+                state.activeFloor = 'first';
+                tabFirst.classList.add('active');
+                tabGround.classList.remove('active');
+                const items = RoomFurnitureStore.getByFloor('first');
+                state.selectedObjectId = items.length > 0 ? items[0].id : null;
+                state.viewBox = { x: 7400, y: 2500, w: 9200, h: 9400 };
                 renderAll();
             });
 

@@ -2284,6 +2284,8 @@
                                 wireColor = [0.34, 0.24, 0.15, 0.96];
                             } else if (part.role === 'socket_cover' || part.role === 'socket_cover_handle') {
                                 wireColor = [0.12, 0.32, 0.50, 0.96];
+                            } else if (part.role && part.role.indexOf('bed_') === 0) {
+                                wireColor = [0.46, 0.44, 0.41, 0.48];
                             }
                             const frontAlpha = (part.role === 'handle_rail' || part.role === 'socket_cover') ? 0.97 : 0.99;
                             (part.faces3D || []).forEach(face => {

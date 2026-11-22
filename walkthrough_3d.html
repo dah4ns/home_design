@@ -805,7 +805,7 @@
 
       var UPPER_PRESETS = [
         { id: 'uf_gallery', label: '1.06 Upper Gallery', x: 11400, y: 8200, footZ: 3330, yaw: 2.65, pitch: -0.10 },
-        { id: 'uf_master', label: '1.01 Master Bedroom', x: 8500, y: 5000, footZ: 3330, yaw: -2.25, pitch: -0.02 },
+        { id: 'uf_master', label: '1.01 Master Bedroom', x: 8450, y: 3750, footZ: 3330, yaw: 1.75, pitch: -0.18 },
         { id: 'uf_wardrobe', label: '1.08 Master Wardrobe', x: 8400, y: 9100, footZ: 3330, yaw: 1.57, pitch: -0.02 },
         { id: 'uf_bed_nw', label: '1.05 Bedroom NW', x: 17900, y: 5000, footZ: 3330, yaw: -0.85, pitch: -0.02 },
         { id: 'uf_bed_sw', label: '1.04 Bedroom SW', x: 18100, y: 9400, footZ: 3330, yaw: 0.65, pitch: -0.02 },
@@ -2681,7 +2681,8 @@
             role === 'sofa_cushion' ||
             role === 'sofa_base' ||
             role === 'sofa_pillow' ||
-            role === 'sofa_foot'
+            role === 'sofa_foot' ||
+            role.indexOf('bed_') === 0
           );
           var effectiveFront = isUpholstery ? false : isFront;
 
@@ -2949,7 +2950,7 @@
               if (furn.floor === 'first') return;
               // Use individual base part bounds so L-shaped corner sofas keep their inner seating space walkable
               (furn.skeletonParts3D || []).forEach(function (part) {
-                if (part.role === 'sofa_foot') return;
+                if (part.role === 'sofa_foot' || part.role === 'bed_foot' || part.role === 'bed_slat' || part.role === 'bed_slat_frame') return;
                 if (part.x0 !== undefined && part.x1 !== undefined) {
                   gBoxes.push({
                     x0: part.x0,
@@ -2985,7 +2986,7 @@
           furnitureItems3D.forEach(function (furn) {
             if (furn.isRoomFurniture && furn.floor === 'first') {
               (furn.skeletonParts3D || []).forEach(function (part) {
-                if (part.role === 'sofa_foot') return;
+                if (part.role === 'sofa_foot' || part.role === 'bed_foot' || part.role === 'bed_slat' || part.role === 'bed_slat_frame') return;
                 if (part.x0 !== undefined && part.x1 !== undefined) {
                   uBoxes.push({
                     x0: part.x0,
