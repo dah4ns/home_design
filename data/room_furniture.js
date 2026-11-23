@@ -451,12 +451,121 @@ const ROOM_FURNITURE_CATALOG = [
         ]
       }
     ]
+  },
+  {
+    typeId: 'bookshelf_cabinet_30',
+    name: 'Architectural Bookshelf Cabinet (110 × 30 × H280 cm)',
+    shortName: 'Bookshelf 30 cm',
+    category: 'bookcase',
+    categoryLabel: 'Bookshelf',
+    description: 'Bespoke 30 cm deep tall bookshelf cabinet with a recessed 8 cm plinth, lower closed push-to-open storage doors, staggered architectural cubby dividers, warm shelf accent lighting, and curated hardcover books & ceramic vessels.',
+    dimensionsMm: {
+      widthMm: 1100,
+      depthMm: 300,
+      heightMm: 2800,
+      plinthHeightMm: 80,
+      lowerCabinetTopMm: 760,
+      shelfThicknessMm: 24
+    },
+    defaultProperties: {
+      widthVariant: '110',
+      heightVariant: '280',
+      bodyColor: '#B5895A',
+      doorColor: '#D8CFC2',
+      backColor: '#A67C52',
+      shelfStyling: 'styled'
+    },
+    propertiesSchema: [
+      {
+        key: 'widthVariant',
+        label: 'Cabinet Width (Depth fixed 30 cm)',
+        type: 'select',
+        default: '110',
+        options: [
+          { label: '110 × 30 cm (Master Bedroom East Niche Fit)', value: '110' },
+          { label: '100 × 30 cm (Standard)', value: '100' },
+          { label: '90 × 30 cm (Compact)', value: '90' },
+          { label: '120 × 30 cm (Wide)', value: '120' }
+        ]
+      },
+      {
+        key: 'heightVariant',
+        label: 'Cabinet Height',
+        type: 'select',
+        default: '280',
+        options: [
+          { label: '280 cm (Aligned with Balcony Window Top)', value: '280' },
+          { label: '240 cm (Tall Freestanding)', value: '240' },
+          { label: '295 cm (Full Ceiling Built-In)', value: '295' }
+        ]
+      },
+      {
+        key: 'bodyColor',
+        label: 'Bookcase Frame & Shelves Finish',
+        type: 'color_swatches',
+        default: '#B5895A',
+        swatches: [
+          { label: 'Warm Natural Oak (Default)', value: '#B5895A' },
+          { label: 'Smoked Walnut', value: '#5C402C' },
+          { label: 'Warm Cashmere Beige', value: '#D8CFC2' },
+          { label: 'Pearl Matte White', value: '#EFECE6' },
+          { label: 'Light Dove Grey', value: '#BFC2C0' },
+          { label: 'Architectural Stone Grey', value: '#7E848C' },
+          { label: 'Matte Charcoal Graphite', value: '#36393F' },
+          { label: 'Matte Onyx Black', value: '#222429' },
+          { label: 'Sage Olive Lacquer', value: '#6F7E6D' },
+          { label: 'Rich Maroon Lacquer', value: '#6B2737' }
+        ]
+      },
+      {
+        key: 'doorColor',
+        label: 'Lower Closed Doors Finish',
+        type: 'color_swatches',
+        default: '#D8CFC2',
+        swatches: [
+          { label: 'Warm Cashmere Matte (Default)', value: '#D8CFC2' },
+          { label: 'Warm Natural Oak', value: '#B5895A' },
+          { label: 'Smoked Walnut', value: '#5C402C' },
+          { label: 'Pearl Matte White', value: '#EFECE6' },
+          { label: 'Architectural Stone Grey', value: '#7E848C' },
+          { label: 'Matte Graphite', value: '#36393F' },
+          { label: 'Matte Onyx Black', value: '#222429' },
+          { label: 'Sage Olive', value: '#6F7E6D' },
+          { label: 'Deep Maroon', value: '#6B2737' }
+        ]
+      },
+      {
+        key: 'backColor',
+        label: 'Recessed Back Panel Finish',
+        type: 'color_swatches',
+        default: '#A67C52',
+        swatches: [
+          { label: 'Warm Oak Veneer (Default)', value: '#A67C52' },
+          { label: 'Warm Cashmere Plaster', value: '#CFC6B9' },
+          { label: 'Soft Pearl Cream', value: '#ECE7DF' },
+          { label: 'Smoked Walnut', value: '#4E3624' },
+          { label: 'Matte Anthracite', value: '#2F3238' }
+        ]
+      },
+      {
+        key: 'shelfStyling',
+        label: 'Books & Decorative Styling',
+        type: 'select',
+        default: 'styled',
+        options: [
+          { label: 'Curated Books & Ceramic Decor (Default)', value: 'styled' },
+          { label: 'Hardcover Books Only', value: 'books_only' },
+          { label: 'Empty Shelves Only', value: 'empty' }
+        ]
+      }
+    ]
   }
 ];
 
 // Default Placed Room Furniture Instances:
-// Includes the Modular Corner Sofa (L226×226×H81 cm) in 0.11 Salon
-// and the Channeled Upholstered King Storage Bed (185×209.5×H110 cm) in 1.01 Master Bedroom.
+// Includes the Modular Corner Sofa (L226×226×H81 cm) in 0.11 Salon,
+// the Channeled Upholstered King Storage Bed (185×209.5×H110 cm) in 1.01 Master Bedroom,
+// and the 30 cm deep Architectural Bookshelf Cabinet along the East wall of 1.01 Master Bedroom.
 const DEFAULT_ROOM_FURNITURE = [
   {
     id: 'SOFA_LIVING_1',
@@ -489,6 +598,24 @@ const DEFAULT_ROOM_FURNITURE = [
       beddingColor: '#F2F0EC',
       throwColor: '#7D7265',
       accentPillowColor: '#6D6B44'
+    }
+  },
+  {
+    id: 'BOOKCASE_MASTER_1',
+    typeId: 'bookshelf_cabinet_30',
+    name: 'Master Bedroom Bookshelf (1.01 Sypialnia, 30 cm)',
+    floor: 'first',
+    room: '1.01 Sypialnia',
+    x: 6646,
+    y: 6370,
+    rotation: 90,
+    properties: {
+      widthVariant: '110',
+      heightVariant: '280',
+      bodyColor: '#B5895A',
+      doorColor: '#D8CFC2',
+      backColor: '#A67C52',
+      shelfStyling: 'styled'
     }
   }
 ];

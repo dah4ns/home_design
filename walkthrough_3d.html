@@ -2682,7 +2682,8 @@
             role === 'sofa_base' ||
             role === 'sofa_pillow' ||
             role === 'sofa_foot' ||
-            role.indexOf('bed_') === 0
+            role.indexOf('bed_') === 0 ||
+            role.indexOf('bookcase_') === 0
           );
           var effectiveFront = isUpholstery ? false : isFront;
 
@@ -2950,7 +2951,7 @@
               if (furn.floor === 'first') return;
               // Use individual base part bounds so L-shaped corner sofas keep their inner seating space walkable
               (furn.skeletonParts3D || []).forEach(function (part) {
-                if (part.role === 'sofa_foot' || part.role === 'bed_foot' || part.role === 'bed_slat' || part.role === 'bed_slat_frame') return;
+                if (part.role === 'sofa_foot' || part.role === 'bed_foot' || part.role === 'bed_slat' || part.role === 'bed_slat_frame' || part.role === 'bookcase_plinth' || part.role === 'bookcase_led') return;
                 if (part.x0 !== undefined && part.x1 !== undefined) {
                   gBoxes.push({
                     x0: part.x0,
@@ -2986,7 +2987,7 @@
           furnitureItems3D.forEach(function (furn) {
             if (furn.isRoomFurniture && furn.floor === 'first') {
               (furn.skeletonParts3D || []).forEach(function (part) {
-                if (part.role === 'sofa_foot' || part.role === 'bed_foot' || part.role === 'bed_slat' || part.role === 'bed_slat_frame') return;
+                if (part.role === 'sofa_foot' || part.role === 'bed_foot' || part.role === 'bed_slat' || part.role === 'bed_slat_frame' || part.role === 'bookcase_plinth' || part.role === 'bookcase_led') return;
                 if (part.x0 !== undefined && part.x1 !== undefined) {
                   uBoxes.push({
                     x0: part.x0,

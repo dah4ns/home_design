@@ -903,6 +903,144 @@ const RoomFurnitureStore = (() => {
       return computePartBounds(faces3D, fp2D, spec.id, spec.role, spec.label, spec.colorHex, spec.colorRgb, [topWeltRing]);
     }
 
+    // -------------------------------------------------------------------------
+    // G. Lathe-Revolved Sculptural Ceramic Vessel / Vase (for curated bookshelf styling)
+    // -------------------------------------------------------------------------
+    if (shape === 'ceramic_vase') {
+      const cx = 0.5 * (x0 + x1);
+      const cy = 0.5 * (y0 + y1);
+      const maxR = Math.min(w, d) / 2;
+      const profile = spec.vaseProfile || [
+        // [heightFrac, radiusFrac]
+        [0.00, 0.56],
+        [0.12, 0.80],
+        [0.34, 1.00],
+        [0.56, 0.90],
+        [0.74, 0.52],
+        [0.88, 0.40],
+        [1.00, 0.48]
+      ];
+      const nU = 16;
+      const nV = profile.length - 1;
+      const gridPts = [];
+      for (let iv = 0; iv <= nV; iv++) {
+        const z = z0 + profile[iv][0] * h;
+        const r = maxR * profile[iv][1];
+        const row = [];
+        for (let iu = 0; iu < nU; iu++) {
+          const theta = (iu / nU) * Math.PI * 2;
+          row.push(mapPt(cx + r * Math.cos(theta), cy + r * Math.sin(theta), z));
+        }
+        gridPts.push(row);
+      }
+
+      const faces3D = [];
+      for (let iv = 0; iv < nV; iv++) {
+        const dz = (profile[iv + 1][0] - profile[iv][0]) * h || 1;
+        const dr = (profile[iv + 1][1] - profile[iv][1]) * maxR;
+        const nzSlope = -dr / Math.hypot(dz, dr);
+        const nrSlope = dz / Math.hypot(dz, dr);
+        for (let iu = 0; iu < nU; iu++) {
+          const iuNext = (iu + 1) % nU;
+          const th0 = (iu / nU) * Math.PI * 2;
+          const th1 = (iuNext / nU) * Math.PI * 2;
+          const n0 = normalizeVec3(mapN(Math.cos(th0) * nrSlope, Math.sin(th0) * nrSlope, nzSlope));
+          const n1 = normalizeVec3(mapN(Math.cos(th1) * nrSlope, Math.sin(th1) * nrSlope, nzSlope));
+          emitOrientedQuad(
+            faces3D,
+            gridPts[iv][iu], gridPts[iv][iuNext], gridPts[iv + 1][iuNext], gridPts[iv + 1][iu],
+            n0, n1, n1, n0,
+            true
+          );
+        }
+      }
+      // Top rim cap & bottom base cap
+      const topCenter = mapPt(cx, cy, z1 - Math.min(18, h * 0.08));
+      const botCenter = mapPt(cx, cy, z0);
+      const nUp = normalizeVec3(mapN(0, 0, 1));
+      const nDn = normalizeVec3(mapN(0, 0, -1));
+      for (let iu = 0; iu < nU; iu++) {
+        const iuNext = (iu + 1) % nU;
+        emitOrientedTri(faces3D, topCenter, gridPts[nV][iu], gridPts[nV][iuNext], nUp, nUp, nUp, true);
+        emitOrientedTri(faces3D, botCenter, gridPts[0][iuNext], gridPts[0][iu], nDn, nDn, nDn, true);
+      }
+
+      const fp2D = gridPts[Math.min(2, nV)].map(p => [Math.round(p[0]), Math.round(p[1])]);
+      return computePartBounds(faces3D, fp2D, spec.id, spec.role, spec.label, spec.colorHex, spec.colorRgb, []);
+    }
+
+    // -------------------------------------------------------------------------
+    // H. Hardcover Book Volume (optional natural lean around local Y axis + crisp rounded spine!)
+    // -------------------------------------------------------------------------
+    if (shape === 'tilted_book') {
+      const leanRad = ((spec.leanDeg || 0) * Math.PI) / 180;
+      const cosL = Math.cos(leanRad);
+      const sinL = Math.sin(leanRad);
+      // Pivot around bottom-center of the book so leaning books rest squarely on the shelf!
+      const px = 0.5 * (x0 + x1);
+      const pz = z0;
+
+      function bookPt(lx, ly, lz) {
+        const dx = lx - px;
+        const dz = lz - pz;
+        const rx = px + dx * cosL + dz * sinL;
+        const rz = pz - dx * sinL + dz * cosL;
+        return mapPt(rx, ly, rz);
+      }
+      function bookN(nx, ny, nz) {
+        return normalizeVec3(mapN(nx * cosL + nz * sinL, ny, -nx * sinL + nz * cosL));
+      }
+
+      const p000 = bookPt(x0, y0, z0);
+      const p100 = bookPt(x1, y0, z0);
+      const p110 = bookPt(x1, y1, z0);
+      const p010 = bookPt(x0, y1, z0);
+      const p001 = bookPt(x0, y0, z1);
+      const p101 = bookPt(x1, y0, z1);
+      const p111 = bookPt(x1, y1, z1);
+      const p011 = bookPt(x0, y1, z1);
+
+      // Slightly bowed front spine crest (4 mm rounded book spine!)
+      const smx = 0.5 * (x0 + x1);
+      const sBulge = Math.min(5, w * 0.16);
+      const psBot = bookPt(smx, y1 + sBulge, z0);
+      const psTop = bookPt(smx, y1 + sBulge, z1);
+
+      const nTop = bookN(0, 0, 1);
+      const nBot = bookN(0, 0, -1);
+      const nBack = bookN(0, -1, 0);
+      const nLeft = bookN(-1, 0, 0);
+      const nRight = bookN(1, 0, 0);
+      const nSpineL = bookN(-0.35, 0.94, 0);
+      const nSpineC = bookN(0, 1, 0);
+      const nSpineR = bookN(0.35, 0.94, 0);
+
+      const faces3D = [];
+      emitOrientedQuad(faces3D, p001, p101, p111, p011, nTop, nTop, nTop, nTop, true);
+      emitOrientedQuad(faces3D, p000, p100, p110, p010, nBot, nBot, nBot, nBot, true);
+      emitOrientedQuad(faces3D, p000, p100, p101, p001, nBack, nBack, nBack, nBack, true);
+      emitOrientedQuad(faces3D, p000, p010, p011, p001, nLeft, nLeft, nLeft, nLeft, true);
+      emitOrientedQuad(faces3D, p100, p110, p111, p101, nRight, nRight, nRight, nRight, true);
+      // Curved 2-facet cloth spine facing forward (+ly)
+      emitOrientedQuad(faces3D, p010, psBot, psTop, p011, nSpineL, nSpineC, nSpineC, nSpineL, true);
+      emitOrientedQuad(faces3D, psBot, p110, p111, psTop, nSpineC, nSpineR, nSpineR, nSpineC, true);
+      emitOrientedTri(faces3D, p011, psTop, p111, nTop, nTop, nTop, true);
+      emitOrientedTri(faces3D, p010, p110, psBot, nBot, nBot, nBot, true);
+
+      // Subtle vertical spine edge outline so stacked books read crisply side-by-side
+      const wf = [
+        [p010, p011],
+        [p110, p111]
+      ];
+      const fp2D = [
+        [Math.round(p000[0]), Math.round(p000[1])],
+        [Math.round(p100[0]), Math.round(p100[1])],
+        [Math.round(p110[0]), Math.round(p110[1])],
+        [Math.round(p010[0]), Math.round(p010[1])]
+      ];
+      return computePartBounds(faces3D, fp2D, spec.id, spec.role, spec.label, spec.colorHex, spec.colorRgb, wf);
+    }
+
     // If shape is a soft rounded cushion, bolster, pillow, or arched armrest,
     // generate a smooth multi-ring rounded superellipsoid / lofted cushion mesh with smooth vertexNormals3D!
     if (shape === 'cushion' || shape === 'pillow' || shape === 'bolster_x' || shape === 'bolster_y' || shape === 'armrest_x' || shape === 'armrest_y') {
@@ -1901,6 +2039,420 @@ const RoomFurnitureStore = (() => {
     };
   }
 
+  function buildBookshelfCabinet30Local(inst) {
+    const props = inst.properties || {};
+    const totalW = Math.max(800, Math.min(1400, (parseInt(props.widthVariant, 10) || 110) * 10));
+    const totalD = 300; // Exact 30 cm depth
+    const totalH = Math.max(2000, Math.min(2960, (parseInt(props.heightVariant, 10) || 280) * 10));
+    const styling = props.shelfStyling || 'styled'; // 'styled' | 'books_only' | 'empty'
+
+    const bodyHex = sanitizeHexColor(props.bodyColor, '#B5895A');
+    const doorHex = sanitizeHexColor(props.doorColor, '#D8CFC2');
+    const backHex = sanitizeHexColor(props.backColor, '#A67C52');
+
+    const plinthH = 80;       // 8 cm recessed shadow plinth
+    const sideT = 22;         // 2.2 cm architectural side cheeks & top crown
+    const backT = 14;         // 1.4 cm solid recessed back panel
+    const shelfT = 24;        // 2.4 cm horizontal shelves
+    const lowerTopZ = 760;    // 76 cm closed lower credenza top
+    const doorT = 20;         // 2.0 cm flush lower cabinet doors
+
+    const ox = -totalW / 2;
+    const oy = -totalD / 2;
+    const innerW = totalW - 2 * sideT;
+
+    const rgbBody = hexToRgb01(bodyHex, 1.0);
+    const rgbShelf = hexToRgb01(bodyHex, 0.97);
+    const rgbDivider = hexToRgb01(bodyHex, 0.94);
+    const rgbBack = hexToRgb01(backHex, 0.92);
+    const rgbDoor = hexToRgb01(doorHex, 1.0);
+    const rgbPlinth = hexToRgb01('#23252A', 1.0);
+    const rgbPull = hexToRgb01('#3A342E', 1.0);
+    const rgbLed = hexToRgb01('#FBE7B2', 1.0);
+
+    const skeletonBoxes = [];
+    const frontBoxes = [];
+
+    function addSkel(id, label, u0, u1, v0, v1, z0, z1, rgb, hex, role, shape, extra) {
+      skeletonBoxes.push(Object.assign({
+        id: id,
+        label: label,
+        role: role || 'bookcase_frame',
+        shape: shape || 'beveled_panel',
+        lx0: ox + u0,
+        lx1: ox + u1,
+        ly0: oy + v0,
+        ly1: oy + v1,
+        lz0: z0,
+        lz1: z1,
+        colorHex: hex || bodyHex,
+        colorRgb: rgb
+      }, extra || {}));
+    }
+
+    function addFront(id, label, u0, u1, v0, v1, z0, z1, rgb, hex, role, shape, extra) {
+      frontBoxes.push(Object.assign({
+        id: id,
+        label: label,
+        role: role || 'bookcase_book',
+        shape: shape || 'box',
+        lx0: ox + u0,
+        lx1: ox + u1,
+        ly0: oy + v0,
+        ly1: oy + v1,
+        lz0: z0,
+        lz1: z1,
+        colorHex: hex || doorHex,
+        colorRgb: rgb
+      }, extra || {}));
+    }
+
+    // -------------------------------------------------------------------------
+    // 1. SKELETON: Recessed Plinth, Outer Frame, Back Panel, Shelves & Dividers
+    // -------------------------------------------------------------------------
+    // Recessed 8 cm shadow plinth (Z = 1.5..80 mm, inset 25 mm from front)
+    addSkel(
+      inst.id + '_PLINTH',
+      'Recessed Shadow Plinth (8 cm)',
+      12, totalW - 12,
+      8, totalD - 26,
+      1.5, plinthH,
+      rgbPlinth, '#23252A', 'bookcase_plinth', 'box'
+    );
+
+    // Outer Architectural Side Cheeks (22 mm thick × full 300 mm depth)
+    addSkel(
+      inst.id + '_SIDE_L',
+      'Left Bookcase Side Panel (30 cm deep)',
+      0, sideT,
+      0, totalD,
+      plinthH, totalH,
+      rgbBody, bodyHex, 'bookcase_frame', 'beveled_panel',
+      { bevelMm: 3 }
+    );
+    addSkel(
+      inst.id + '_SIDE_R',
+      'Right Bookcase Side Panel (30 cm deep)',
+      totalW - sideT, totalW,
+      0, totalD,
+      plinthH, totalH,
+      rgbBody, bodyHex, 'bookcase_frame', 'beveled_panel',
+      { bevelMm: 3 }
+    );
+
+    // Top Crown Panel & Bottom Base Deck
+    addSkel(
+      inst.id + '_TOP_CROWN',
+      'Top Crown Cornice Panel',
+      sideT, totalW - sideT,
+      0, totalD,
+      totalH - sideT, totalH,
+      rgbBody, bodyHex, 'bookcase_frame', 'beveled_panel',
+      { bevelMm: 3 }
+    );
+    addSkel(
+      inst.id + '_BOTTOM_DECK',
+      'Lower Cabinet Bottom Deck',
+      sideT, totalW - sideT,
+      0, totalD - doorT,
+      plinthH, plinthH + shelfT,
+      rgbShelf, bodyHex, 'bookcase_frame', 'box'
+    );
+
+    // Full-Height Recessed Back Panel (14 mm thick)
+    addSkel(
+      inst.id + '_BACK_PANEL',
+      'Full-Height Recessed Back Panel',
+      sideT, totalW - sideT,
+      0, backT,
+      plinthH + shelfT, totalH - sideT,
+      rgbBack, backHex, 'bookcase_back', 'box'
+    );
+
+    // Lower Closed Cabinet Top Ledge (Z = 736..760 mm) & Internal Shelf
+    addSkel(
+      inst.id + '_LOWER_TOP',
+      'Lower Credenza Top Shelf (76 cm)',
+      sideT, totalW - sideT,
+      backT, totalD - 4,
+      lowerTopZ - shelfT, lowerTopZ,
+      rgbShelf, bodyHex, 'bookcase_shelf', 'beveled_panel',
+      { bevelMm: 2 }
+    );
+    addSkel(
+      inst.id + '_LOWER_MID_SHELF',
+      'Lower Cabinet Interior Shelf',
+      sideT, totalW - sideT,
+      backT, totalD - doorT - 10,
+      Math.round((plinthH + lowerTopZ) / 2) - 10, Math.round((plinthH + lowerTopZ) / 2) + 10,
+      rgbShelf, bodyHex, 'bookcase_shelf', 'box'
+    );
+
+    // Upper Open Bookshelf Levels (evenly spaced bays above lowerTopZ)
+    const numOpenBays = totalH >= 2900 ? 6 : (totalH >= 2650 ? 5 : 4);
+    const openSpanZ = (totalH - sideT) - lowerTopZ;
+    const bayStepZ = openSpanZ / numOpenBays;
+
+    // Shelf top Z coordinates for each open bay [0 .. numOpenBays-1]
+    const bayFloorZs = [];
+    const bayCeilZs = [];
+    for (let bi = 0; bi < numOpenBays; bi++) {
+      const fz = bi === 0 ? lowerTopZ : Math.round(lowerTopZ + bi * bayStepZ);
+      const cz = (bi === numOpenBays - 1) ? (totalH - sideT) : Math.round(lowerTopZ + (bi + 1) * bayStepZ - shelfT);
+      bayFloorZs.push(fz);
+      bayCeilZs.push(cz);
+
+      if (bi > 0) {
+        addSkel(
+          inst.id + '_SHELF_' + bi,
+          'Bookshelf Deck #' + bi + ' (2.4 cm)',
+          sideT, totalW - sideT,
+          backT, totalD - 6,
+          fz - shelfT, fz,
+          rgbShelf, bodyHex, 'bookcase_shelf', 'beveled_panel',
+          { bevelMm: 2 }
+        );
+      }
+      // Subtle recessed warm under-shelf LED accent strip along top underside of showcase bays
+      addSkel(
+        inst.id + '_LED_' + (bi + 1),
+        'Warm Under-Shelf LED Strip #' + (bi + 1),
+        sideT + 18, totalW - sideT - 18,
+        totalD - 42, totalD - 34,
+        cz - 4, cz,
+        rgbLed, '#FBE7B2', 'bookcase_led', 'box'
+      );
+    }
+
+    // Staggered Architectural Vertical Cubby Dividers (18 mm thick, alternating rhythm)
+    const divT = 18;
+    const divFracs = [0.64, 0.36, 0.62, 0.38, 0.60, 0.40];
+    const divPositions = [];
+    for (let bi = 0; bi < numOpenBays; bi++) {
+      const divCenterU = Math.round(sideT + innerW * divFracs[bi % divFracs.length]);
+      divPositions.push(divCenterU);
+      addSkel(
+        inst.id + '_DIV_' + (bi + 1),
+        'Architectural Vertical Divider #' + (bi + 1),
+        divCenterU - divT / 2, divCenterU + divT / 2,
+        backT, totalD - 10,
+        bayFloorZs[bi], bayCeilZs[bi],
+        rgbDivider, bodyHex, 'bookcase_shelf', 'beveled_panel',
+        { bevelMm: 2 }
+      );
+    }
+
+    // -------------------------------------------------------------------------
+    // 2. FRONTS: Lower Flush Doors, Edge Pulls, Curated Books & Sculptural Ceramic Vases
+    // -------------------------------------------------------------------------
+    const doorGap = 4;
+    const doorW = Math.floor((innerW - doorGap - 4) / 2);
+    const doorZ0 = plinthH + 4;
+    const doorZ1 = lowerTopZ - shelfT - 3;
+    addFront(
+      inst.id + '_DOOR_L',
+      'Lower Cabinet Left Flush Door',
+      sideT + 2, sideT + 2 + doorW,
+      totalD - doorT, totalD,
+      doorZ0, doorZ1,
+      rgbDoor, doorHex, 'bookcase_door', 'beveled_panel',
+      { bevelMm: 2 }
+    );
+    addFront(
+      inst.id + '_DOOR_R',
+      'Lower Cabinet Right Flush Door',
+      totalW - sideT - 2 - doorW, totalW - sideT - 2,
+      totalD - doorT, totalD,
+      doorZ0, doorZ1,
+      rgbDoor, doorHex, 'bookcase_door', 'beveled_panel',
+      { bevelMm: 2 }
+    );
+    // Subtle vertical bronze-charcoal edge pulls near center reveal
+    const pullZ0 = doorZ1 - 210;
+    const pullZ1 = doorZ1 - 28;
+    addFront(
+      inst.id + '_PULL_L',
+      'Left Cabinet Vertical Pull',
+      sideT + 2 + doorW - 22, sideT + 2 + doorW - 12,
+      totalD, totalD + 12,
+      pullZ0, pullZ1,
+      rgbPull, '#3A342E', 'bookcase_pull', 'box'
+    );
+    addFront(
+      inst.id + '_PULL_R',
+      'Right Cabinet Vertical Pull',
+      totalW - sideT - 2 - doorW + 12, totalW - sideT - 2 - doorW + 22,
+      totalD, totalD + 12,
+      pullZ0, pullZ1,
+      rgbPull, '#3A342E', 'bookcase_pull', 'box'
+    );
+
+    // Curated Books & Minimalist Ceramic Decor across all Open Bays
+    if (styling !== 'empty') {
+      const bookPalette = [
+        '#EAE3D7', // Warm ivory linen
+        '#D4C6B4', // Oatmeal canvas
+        '#9A8D7D', // Warm stone taupe
+        '#728070', // Muted sage
+        '#B46B52', // Terracotta cloth
+        '#3C4048', // Deep charcoal
+        '#3A4D61', // Nordic navy
+        '#C39B58', // Ochre linen
+        '#6D323D', // Deep maroon
+        '#DFD6C7', // Warm parchment
+        '#5B665D', // Forest slate
+        '#8F7E6D'  // Umber linen
+      ];
+      const bookHeights = [268, 242, 278, 224, 254, 236, 282, 214, 248, 262, 228, 272];
+      const bookThicks  = [32, 26, 36, 24, 30, 28, 38, 25, 31, 27, 34, 29];
+      const bookDepths  = [215, 198, 226, 188, 210, 202, 230, 185, 206, 218, 195, 222];
+
+      let bookSeq = 0;
+
+      function fillVerticalBooks(uStart, uEnd, shelfZ, maxClearH, seedOffset, leanEnd) {
+        const usableH = Math.max(180, maxClearH - 28);
+        let curU = uStart + 10;
+        const limitU = uEnd - (leanEnd ? 56 : 14);
+        let localIdx = 0;
+        while (curU + 30 < limitU && localIdx < 16) {
+          const pIdx = (seedOffset + localIdx * 3) % bookPalette.length;
+          const bThick = bookThicks[(seedOffset + localIdx) % bookThicks.length];
+          if (curU + bThick > limitU) break;
+          const bH = Math.min(usableH, bookHeights[(seedOffset + localIdx * 2) % bookHeights.length]);
+          const bD = bookDepths[(seedOffset + localIdx) % bookDepths.length];
+          const bHex = bookPalette[pIdx];
+          const spineV1 = totalD - 28 - ((localIdx % 3) * 8);
+          const spineV0 = Math.max(backT + 8, spineV1 - bD);
+          bookSeq++;
+          addFront(
+            inst.id + '_BOOK_' + bookSeq,
+            'Hardcover Book #' + bookSeq,
+            curU, curU + bThick - 2,
+            spineV0, spineV1,
+            shelfZ, shelfZ + bH,
+            hexToRgb01(bHex, 1.0), bHex,
+            'bookcase_book', 'tilted_book',
+            { leanDeg: 0 }
+          );
+          curU += bThick;
+          localIdx++;
+        }
+        // Optional subtle leaning end-volume for lived-in organic bookshelf feel!
+        if (leanEnd && curU + 46 < uEnd - 8) {
+          const bHex = bookPalette[(seedOffset + 5) % bookPalette.length];
+          const bH = Math.min(usableH - 12, 238);
+          const bThick = 28;
+          bookSeq++;
+          addFront(
+            inst.id + '_BOOK_' + bookSeq,
+            'Leaning Hardcover Book #' + bookSeq,
+            curU + 14, curU + 14 + bThick,
+            totalD - 226, totalD - 34,
+            shelfZ, shelfZ + bH,
+            hexToRgb01(bHex, 1.0), bHex,
+            'bookcase_book', 'tilted_book',
+            { leanDeg: -11 }
+          );
+        }
+      }
+
+      function addHorizontalStackAndDecor(uStart, uEnd, shelfZ, maxClearH, bayIdx) {
+        const bayW = uEnd - uStart;
+        const stackW = Math.min(245, Math.max(165, Math.round(bayW * 0.68)));
+        const stackU0 = Math.round((uStart + uEnd - stackW) / 2);
+        const stackColors = [
+          bookPalette[(bayIdx * 3 + 1) % bookPalette.length],
+          bookPalette[(bayIdx * 3 + 5) % bookPalette.length],
+          bookPalette[(bayIdx * 3 + 9) % bookPalette.length]
+        ];
+        const stackCount = (bayIdx % 2 === 0) ? 3 : 2;
+        let topZ = shelfZ;
+        for (let si = 0; si < stackCount; si++) {
+          const tH = 26 - si * 2;
+          const shrink = si * 10;
+          const cHex = stackColors[si];
+          bookSeq++;
+          addFront(
+            inst.id + '_HBOOK_' + bookSeq,
+            'Art Monograph Stack #' + bookSeq,
+            stackU0 + shrink / 2, stackU0 + stackW - shrink / 2,
+            totalD - 224 + shrink / 3, totalD - 28,
+            topZ, topZ + tH,
+            hexToRgb01(cHex, 1.0), cHex,
+            'bookcase_book', 'beveled_panel',
+            { bevelMm: 2 }
+          );
+          topZ += tH;
+        }
+
+        // Add sculptural matte ceramic vessel on top of the book stack (when 'styled')
+        if (styling === 'styled' && (maxClearH - (topZ - shelfZ)) > 140) {
+          const vaseStyle = bayIdx % 3;
+          const vaseColors = ['#EFECE5', '#3B3E45', '#B96D52'];
+          const vaseHex = vaseColors[vaseStyle];
+          const vaseDiam = vaseStyle === 1 ? 108 : (vaseStyle === 2 ? 124 : 114);
+          const vaseH = Math.min(maxClearH - (topZ - shelfZ) - 34, vaseStyle === 0 ? 185 : (vaseStyle === 1 ? 210 : 148));
+          const vCenterU = Math.round((uStart + uEnd) / 2);
+          const vCenterV = totalD - 126;
+          const profiles = [
+            // Organic amphora vase
+            [[0.0, 0.56], [0.14, 0.84], [0.36, 1.00], [0.60, 0.86], [0.78, 0.44], [0.90, 0.36], [1.0, 0.44]],
+            // Tall slim architectural bottle vessel
+            [[0.0, 0.62], [0.12, 0.78], [0.44, 0.82], [0.68, 0.58], [0.84, 0.34], [0.94, 0.32], [1.0, 0.38]],
+            // Low wide stoneware bowl vessel
+            [[0.0, 0.52], [0.22, 0.90], [0.55, 1.00], [0.80, 0.86], [0.94, 0.70], [1.0, 0.74]]
+          ];
+          addFront(
+            inst.id + '_VASE_' + (bayIdx + 1),
+            'Sculpted Ceramic Vessel #' + (bayIdx + 1),
+            vCenterU - vaseDiam / 2, vCenterU + vaseDiam / 2,
+            vCenterV - vaseDiam / 2, vCenterV + vaseDiam / 2,
+            topZ, topZ + vaseH,
+            hexToRgb01(vaseHex, 1.0), vaseHex,
+            'bookcase_decor', 'ceramic_vase',
+            { vaseProfile: profiles[vaseStyle] }
+          );
+        }
+      }
+
+      for (let bi = 0; bi < numOpenBays; bi++) {
+        const divU = divPositions[bi];
+        const leftU0 = sideT;
+        const leftU1 = divU - divT / 2;
+        const rightU0 = divU + divT / 2;
+        const rightU1 = totalW - sideT;
+        const fz = bayFloorZs[bi];
+        const clearH = bayCeilZs[bi] - fz;
+
+        const leftIsWider = (leftU1 - leftU0) >= (rightU1 - rightU0);
+        if (leftIsWider) {
+          fillVerticalBooks(leftU0, leftU1, fz, clearH, bi * 4 + 1, bi % 2 === 0);
+          if (styling === 'books_only') {
+            fillVerticalBooks(rightU0, rightU1, fz, clearH, bi * 4 + 7, false);
+          } else {
+            addHorizontalStackAndDecor(rightU0, rightU1, fz, clearH, bi);
+          }
+        } else {
+          if (styling === 'books_only') {
+            fillVerticalBooks(leftU0, leftU1, fz, clearH, bi * 4 + 2, false);
+          } else {
+            addHorizontalStackAndDecor(leftU0, leftU1, fz, clearH, bi);
+          }
+          fillVerticalBooks(rightU0, rightU1, fz, clearH, bi * 4 + 6, bi % 2 === 1);
+        }
+      }
+    }
+
+    return {
+      widthMm: totalW,
+      depthMm: totalD,
+      heightMm: totalH,
+      skeletonBoxes: skeletonBoxes,
+      frontBoxes: frontBoxes,
+      localFootprint2D: [[ox, oy], [ox + totalW, oy], [ox + totalW, oy + totalD], [ox, oy + totalD]]
+    };
+  }
+
   function buildLocalGeometry(inst) {
     switch (inst.typeId) {
       case 'corner_sofa_l226':
@@ -1917,6 +2469,8 @@ const RoomFurnitureStore = (() => {
         return buildMediaConsoleLocal(inst);
       case 'upholstered_bed_channeled':
         return buildChanneledBedLocal(inst);
+      case 'bookshelf_cabinet_30':
+        return buildBookshelfCabinet30Local(inst);
       default:
         return buildCornerSofaL226Local(inst);
     }
@@ -1984,7 +2538,7 @@ const RoomFurnitureStore = (() => {
     });
 
     const primaryColor = inst.properties.upholsteryColor || inst.properties.topColor || inst.properties.bodyColor || '#EFEAE1';
-    const secondaryColor = inst.properties.pillowColor || inst.properties.beddingColor || inst.properties.baseColor || inst.properties.frontColor || primaryColor;
+    const secondaryColor = inst.properties.pillowColor || inst.properties.beddingColor || inst.properties.doorColor || inst.properties.baseColor || inst.properties.frontColor || primaryColor;
 
     return {
       id: inst.id,
@@ -2047,7 +2601,9 @@ const RoomFurnitureStore = (() => {
 
     const prefix = spec.category === 'corner_sofa'
       ? 'SOFA_'
-      : (spec.category === 'bed' ? 'BED_' : 'FURN_');
+      : (spec.category === 'bed'
+          ? 'BED_'
+          : (spec.category === 'bookcase' ? 'BOOKCASE_' : 'FURN_'));
     let maxNum = 0;
     all.forEach(item => {
       const m = String(item.id).match(/(\d+)$/);
